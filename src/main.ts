@@ -57,7 +57,7 @@ Devvit.addSettings([
         type: 'string',
         name: 'liveFlairId',
         label: 'Live Post Flair Template ID (Optional)',
-        helpText: 'The UUID of the flair template to apply to the live post (from Mod Tools -> Post Flair)',
+        helpText: 'The UUID of the flair template to apply to the live post (from Mod Tools ➔ Post Flair)',
       }
     ]
   },
@@ -70,35 +70,35 @@ Devvit.addSettings([
         name: 'removeOfflinePost',
         label: 'Remove Live Post from Feed when Offline',
         defaultValue: false,
-        helpText: 'Moderator action: Hides the live post from the main subreddit listing when offline. It remains accessible via direct link/comment history, but won\'t flood the feed.',
+        helpText: 'Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed.',
       },
       {
         type: 'boolean',
         name: 'deleteOfflinePost',
-        label: 'Delete Live Post completely when Offline',
+        label: 'Delete Live Post when Offline',
         defaultValue: false,
-        helpText: 'Deletes the live post and all its comments completely from Reddit when the stream ends.',
+        helpText: 'Completely deletes the live post and all its comments when the stream ends.',
       },
       {
         type: 'number',
         name: 'offlineGracePeriod',
         label: 'Offline Grace Period (Minutes)',
         defaultValue: 6,
-        helpText: 'The buffer period (in minutes) to wait before concluding the stream post when detected offline. Prevents duplicate threads during brief stream crashes.',
+        helpText: 'How long (in minutes) to wait before concluding the live post after going offline. Prevents duplicate posts during brief stream crashes.',
       },
       {
         type: 'boolean',
         name: 'stickyOfflinePost',
-        label: 'Enable Sticky Offline Post',
+        label: 'Enable Pinned Offline Post',
         defaultValue: true,
-        helpText: 'Recycles a single permanent stickied post when offline to announce news and useful links. The post is unstickied when live and restickied when offline. Because it is recycled, users are never notified of a new post after creation.',
+        helpText: 'Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation.',
       },
       {
         type: 'boolean',
         name: 'updateSidebarWidget',
         label: 'Enable Sidebar Widget',
         defaultValue: false,
-        helpText: 'Creates and automatically updates a "Stream Status" text widget in your subreddit sidebar.',
+        helpText: 'Creates and automatically updates a "Stream Status" text widget in your community sidebar.',
       },
       {
         type: 'string',
@@ -163,7 +163,7 @@ Devvit.addSettings([
         type: 'paragraph',
         name: 'liveCommentText',
         label: 'Auto-Pinned Comment Text (Optional)',
-        helpText: 'Text to automatically post and pin as a mod comment inside the live thread (e.g. Discord link). Supports placeholders: {channel}, {display_name}.',
+        helpText: 'Text to automatically post and pin as a mod comment inside the live post (e.g. Discord link). Supports placeholders: {channel}, {display_name}.',
       },
       {
         type: 'paragraph',
@@ -207,7 +207,7 @@ Devvit.addSettings([
         type: 'string',
         name: 'highlightsFlairId',
         label: 'Highlights Post Flair Template ID (Optional)',
-        helpText: 'The UUID of the flair template to apply to the stream highlights post (from Mod Tools -> Post Flair).',
+        helpText: 'The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Post Flair).',
       },
       {
         type: 'string',
@@ -1058,14 +1058,14 @@ Devvit.addMenuItem({
     await context.redis.del('offline_post_id');
     await context.redis.del('twitch_display_name');
     await context.redis.del('is_offline_post_pinned');
-    context.ui.showToast('LiveSticky has been restarted successfully!');
+    context.ui.showToast('LiveSticky has been restarted!');
   },
 });
 
 // Add a moderator menu item to quickly access the default settings templates
 Devvit.addMenuItem({
   label: 'Get Default LiveSticky Templates',
-  description: 'Opens GitHub page with copy-pasteable markdown templates for settings.',
+  description: 'Opens the GitHub page with copy-pasteable templates for your settings.',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_, context) => {

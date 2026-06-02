@@ -2,69 +2,69 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky monitors your Twitch channel status and automatically creates and manages stickied posts and sidebar widgets on your subreddit.
+LiveSticky keeps your community connected by automatically pinning a live post and updating your sidebar widget whenever you go online.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
 [![YouTube Integration](https://img.shields.io/badge/Integration-YouTube-FF0000?style=for-the-badge&logo=youtube)](https://developers.google.com/youtube)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-It handles the entire stream lifecycle automatically: creating and flairing a dedicated live discussion thread when the stream goes live, updating real-time stats (viewers, uptime, and category) every 2 minutes, auto-pinning a customizable moderator comment, and concluding the thread with VOD archives when the stream goes offline.
+It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and wrapping it up with a VOD archive when you go offline.
 
 ## ✨ Core Features
 
-**🔴 Automatic Live Threads**  
-Periodically polls your Twitch stream (every 2 minutes) and posts a beautifully stickied live discussion thread when you go live.
+**🔴 Automatic Live Posts**  
+Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **⚡ Real-Time Statistics**  
-Keeps the post body up-to-date in real-time with current uptime, game/category, and live viewer count.
+Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
-**🛡️ Flapping & Disconnect Protection (6-Min Grace Period)**  
-Prevents duplicate thread spam if your stream crashes briefly, OBS restarts, or Twitch’s API has a hiccup. It buffers the offline status for 6 minutes before concluding the thread.
+**🛡️ Stream Crash Protection (6-Min Grace Period)**  
+Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **📺 Dual-Platform Promotion**  
 Optionally promotes your YouTube stream alongside Twitch. If configured, links to both platforms are displayed side-by-side in both live and concluding posts.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **🏷️ Custom Post Flairing**  
 Automatically flairs the live post (e.g., "🔴 Live Now") using your subreddit's custom post flair templates.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **📌 Pinned Moderator Comments**  
-Auto-posts a distinguished, stickied moderator comment at the top of the discussion section to drive users to your Discord, social media, or list rules.
+Auto-posts a customizable, stickied moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **🏁 Concluding VOD Archives**  
-When the stream goes offline for more than 6 minutes, LiveSticky edits the post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unstickies it.
+When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **💬 Auto-Suggested Comment Sort**  
 Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
 **🎥 Stream Highlights Post**  
-Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights thread.
+Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
-**🚀 Efficient Redis Caching**  
-Caches Twitch OAuth credentials for 24 hours to ensure high speed and prevent rate-limiting.
+**🚀 Speed & Rate-Limit Protection**  
+Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API.
 
----
+<p align="center">⬝ ⬝ ⬝</p>
 
-**🛠️ Unified Admin Reset**  
-Includes a single-click moderator action in your subreddit mod tools to reset the scheduler and clear the cached database state instantly.
+**🛠️ One-Click Moderator Reset**  
+Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your subreddit.
 
 ---
 
@@ -86,11 +86,11 @@ Configure these options by going to **Mod Tools** ➔ **Apps** ➔ **live-sticky
 
 | Setting Name | Type | Description |
 | :--- | :--- | :--- |
-| **Remove Live Post from Feed when Offline** | `Boolean` | Moderator action: Hides the live post from the main subreddit listing when offline (prevents feed flooding while keeping comments/links active). |
-| **Delete Live Post completely when Offline** | `Boolean` | Completely deletes the live post and all its comments from Reddit when the stream ends. |
-| **Offline Grace Period (Minutes)** | `Number` | The buffer period (in minutes) to wait before concluding the stream post when detected offline (defaults to `6`). Prevents duplicate threads during brief stream crashes. |
-| **Enable Sticky Offline Post** | `Boolean` | Recycles a single permanent stickied post when offline (e.g. `😴 {display_name} is Offline. 😴`) to prevent new-post notifications, automatically clearing/flushing old comments on each transition so the comment section starts fresh. |
-| **Enable Sidebar Widget** | `Boolean` | Creates and automatically updates a "STREAM STATUS" text widget in your subreddit sidebar reflecting the live/offline state, category, viewers, and uptime in real-time. |
+| **Remove Live Post from Feed when Offline** | `Boolean` | Mod action: Hides the live post from the community feed when offline (prevents feed flooding while keeping comments/links active). |
+| **Delete Live Post when Offline** | `Boolean` | Completely deletes the live post and all its comments when the stream ends. |
+| **Offline Grace Period (Minutes)** | `Number` | How long (in minutes) to wait before concluding the live post after going offline (defaults to `6`). Prevents duplicate posts during brief stream crashes. |
+| **Enable Pinned Offline Post** | `Boolean` | Recycles a single permanent pinned post when offline (e.g. `😴 {display_name} is Offline. 😴`) to prevent new-post notifications, automatically clearing/flushing old comments on each transition so the comment section starts fresh. |
+| **Enable Sidebar Widget** | `Boolean` | Creates and automatically updates a "STREAM STATUS" text widget in your community sidebar reflecting the live/offline state, category, viewers, and uptime in real-time. |
 | **Offline Post Title (Optional)** | `String` | Custom title for the offline post. If empty, the default template is used. Supports placeholder: `{display_name}`. |
 | **Offline Post Body (Optional)** | `Paragraph` | Custom markdown for the body of the offline post. If empty, the default template is used. You can use `{channel}`, `{display_name}`, and `{youtube_url}` as dynamic placeholders. |
 | **Offline Post Custom Footer (Optional)** | `Paragraph` | Custom markdown to append at the bottom of the offline post (works with both custom and default templates). Useful for adding Discord/social links or rules. |
@@ -163,7 +163,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 * **▶️ YouTube:** [Watch VODs on YouTube]({youtube_url})
 
 ---
-*This live thread has concluded and is now locked.*
+*This post is now locked as the stream has ended.*
 ```
 
 #### 3. Offline Post Templates
@@ -171,7 +171,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 **Default Offline Post Title:**
 
 ```text
-😴 {display_name} is Offline. 😴
+😴 {display_name} is offline 😴
 ```
 
 **Default Offline Post Body:**
@@ -206,7 +206,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 #### 5. Default Offline Sidebar Widget Text
 
 ```markdown
-# 😴 {display_name} is OFFLINE. 😴
+# 😴 {display_name} is offline 😴
 
 Follow the channels below to get notified when {display_name} goes live!
 

@@ -49,12 +49,12 @@ The stream has concluded. VODs and highlights may be available via the links bel
 * **▶️ YouTube:** [Watch VODs on YouTube]({youtube_url})
 
 ---
-*This live thread has concluded and is now locked.*`;
+*This post is now locked as the stream has ended.*`;
 
 // ---------------------------------------------------------------------------
 // Offline post (permanent sticky post shown on the subreddit when stream is offline)
 // ---------------------------------------------------------------------------
-export const DEFAULT_OFFLINE_POST_TITLE = '😴 {display_name} is Offline. 😴';
+export const DEFAULT_OFFLINE_POST_TITLE = '😴 {display_name} is offline 😴';
 
 export const DEFAULT_OFFLINE_POST_BODY = `\
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
@@ -86,7 +86,7 @@ export const DEFAULT_LIVE_SIDEBAR = `\
 // Offline sidebar widget
 // ---------------------------------------------------------------------------
 export const DEFAULT_OFFLINE_SIDEBAR = `\
-# 😴 {display_name} is OFFLINE. 😴
+# 😴 {display_name} is offline 😴
 
 Follow the channels below to get notified when {display_name} goes live!
 
