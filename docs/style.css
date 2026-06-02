@@ -171,15 +171,6 @@ h1 {
   transition: var(--transition-smooth);
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--gradient-glow);
-}
 
 /* Legal Content Typographical Hierarchy */
 .content h2 {
