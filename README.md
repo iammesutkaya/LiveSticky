@@ -13,7 +13,7 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 
 ## ✨ Core Features
 
-| | | |
+| | Feature | Description |
 | :---: | :--- | :--- |
 | 🔴 | **Automatic Live Posts** | Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live. <br> |
 | ⚡ | **Real-Time Statistics** | Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count. <br> |
