@@ -186,7 +186,7 @@ Devvit.addSettings([
           { label: 'New (Recommended)', value: 'NEW' },
           { label: 'Live', value: 'LIVE' },
           { label: 'Q&A', value: 'QA' },
-          { label: 'None (Subreddit default)', value: 'BLANK' }
+          { label: 'None (Community default)', value: 'BLANK' }
         ],
         defaultValue: ['NEW'],
       }

@@ -2,14 +2,14 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky automatically creates and updates a pinned live post and your sidebar widget whenever you go live.
+LiveSticky monitors your Twitch stream and updates your community by pinning a post, updating your sidebar, and sharing highlights when the stream ends.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
 [![YouTube Integration](https://img.shields.io/badge/Integration-YouTube-FF0000?style=for-the-badge&logo=youtube)](https://developers.google.com/youtube)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and wrapping it up with a VOD archive when you go offline.
+It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends.
 
 ## ✨ Core Features
 
@@ -19,13 +19,13 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 | ⚡ | **Real-Time Statistics** | Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count. |
 | 🛡️ | **Stream Crash Protection (6-Min Grace Period)** | Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly. |
 | 📺 | **Dual-Platform Promotion** | Optionally promotes your YouTube stream alongside Twitch. If configured, links to both platforms are displayed side-by-side in both live and concluding posts. |
-| 🏷️ | **Custom Post Flairing** | Automatically flairs the live post (e.g., "🔴 Live Now") using your subreddit's custom post flair templates. |
-| 📌 | **Pinned Moderator Comments** | Auto-posts a customizable, stickied moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules. |
+| 🏷️ | **Custom Post Flairing** | Automatically flairs the live post (e.g., "🔴 Live Now") using your community's custom post flair templates. |
+| 📌 | **Pinned Moderator Comments** | Auto-posts a customizable, pinned moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules. |
 | 🏁 | **Concluding VOD Archives** | When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it. |
 | 💬 | **Auto-Suggested Comment Sort** | Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat. |
 | 🎥 | **Stream Highlights Post** | Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post. |
 | 🚀 | **Speed & Rate-Limit Protection** | Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API. |
-| 🛠️ | **One-Click Moderator Reset** | Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your subreddit. |
+| 🛠️ | **One-Click Moderator Reset** | Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your community. |
 
 ---
 
@@ -41,7 +41,7 @@ Configure these options by going to **Mod Tools** ➔ **Apps** ➔ **live-sticky
 | **Twitch Client ID** | `String (Secret)` | Your Twitch Developer Client ID (scoped to App). |
 | **Twitch Client Secret** | `String (Secret)` | Your Twitch Developer Client Secret (scoped to App). |
 | **YouTube Channel/Live URL (Optional)** | `String` | The full link to your YouTube channel or live stream (e.g. `https://youtube.com/c/mesut/live`). |
-| **Live Post Flair Template ID (Optional)** | `String` | The UUID of the flair template to apply to the post (found in Subreddit Mod Tools ➔ Post Flair). |
+| **Live Post Flair Template ID (Optional)** | `String` | The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair). |
 
 ### 😴 Offline Stage
 
@@ -68,7 +68,7 @@ Configure these options by going to **Mod Tools** ➔ **Apps** ➔ **live-sticky
 | **Auto-Pinned Comment Text (Optional)** | `Paragraph` | Custom multiline markdown to pin at the top of the comment section (supports paragraphs, list formatting, and links). |
 | **Live Sidebar Widget Text (Optional)** | `Paragraph` | Custom markdown for the sidebar widget when the stream is live. If empty, the default template is used. You can use `{channel}`, `{display_name}`, `{game}`, `{viewers}`, `{uptime}`, `{title}`, and `{youtube_url}` as placeholders. |
 | **Live Sidebar Widget Custom Footer (Optional)** | `Paragraph` | Custom markdown to append at the bottom of the sidebar widget when the stream is live. Perfect for adding Discord links, rules, etc. |
-| **Suggested Comment Sort** | `Select` | The default comment sorting applied to the live post (options: `New`, `Live`, `Q&A`, or `None` to leave it to the subreddit default). Defaults to `New`. |
+| **Suggested Comment Sort** | `Select` | The default comment sorting applied to the live post (options: `New`, `Live`, `Q&A`, or `None` to leave it to the community default). Defaults to `New`. |
 
 ### 🎥 Post-Stream Stage
 
@@ -208,7 +208,7 @@ To configure LiveSticky, you need a **Twitch Client ID** and **Twitch Client Sec
 1. Go to the [Twitch Developer Console](https://dev.twitch.tv/console) and log in with your Twitch account.
 2. Click **Register Your Application** (or navigate to **Applications** ➔ **Register Your Application**).
 3. Fill in the registration form:
-   * **Name**: Choose a unique name (e.g., `Subreddit-Stream-Notifier-Bot`).
+   * **Name**: Choose a unique name (e.g., `Community-Stream-Notifier-Bot`).
    * **OAuth Redirect URLs**: Enter `http://localhost` (a placeholder is fine; LiveSticky uses the secure Client Credentials flow and does not need a redirect web page).
    * **Category**: Select **Application Integration** or **Chat Bot**.
    * **Client Type**: Select **Confidential** (required to generate a Client Secret for secure server-to-server requests).

@@ -52,7 +52,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 *This post is now locked as the stream has ended.*`;
 
 // ---------------------------------------------------------------------------
-// Offline post (permanent sticky post shown on the subreddit when stream is offline)
+// Offline post (permanent pinned post shown on the community when stream is offline)
 // ---------------------------------------------------------------------------
 export const DEFAULT_OFFLINE_POST_TITLE = '😴 {display_name} is offline 😴';
 
