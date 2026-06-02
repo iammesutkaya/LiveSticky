@@ -2,7 +2,7 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky is a Reddit bot that monitors your Twitch channel status and automatically manages stickied live discussion threads and sidebar widgets on your subreddit.
+LiveSticky monitors your Twitch channel status and automatically creates and manages stickied live discussion threads and sidebar widgets on your subreddit.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
