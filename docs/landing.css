@@ -263,6 +263,7 @@
   color: var(--text-muted);
   font-size: 0.98rem;
   line-height: 1.6;
+  padding-left: 0;
 }
 
 .steps-list li::before {
@@ -274,7 +275,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--gradient-glow);
+  background: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
