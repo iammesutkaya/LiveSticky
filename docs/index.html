@@ -3,61 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legal Portal | LiveSticky Reddit Bot</title>
+  <title>LiveSticky — Automatic Reddit Live Posts for Twitch Streamers</title>
+  <meta name="description" content="LiveSticky automatically pins a live post to your subreddit when you go live on Twitch, updates real-time stats, and archives the stream when you go offline. Built on the Reddit Developer Platform.">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="landing.css">
 </head>
 <body>
 
-  <div class="container">
-    <header>
+  <!-- Hero -->
+  <div class="landing-container">
+    <header class="hero">
       <div class="logo-container">
         <div class="logo-glow">
           <img src="icon.png" alt="LiveSticky Logo" class="logo-image">
         </div>
       </div>
       <h1>LiveSticky</h1>
+      <p class="subtitle">Automatic Reddit live posts — from first frame to final clip.</p>
+      <div class="hero-badges">
+        <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer" class="badge badge-orange">Reddit Devvit</a>
+        <a href="https://dev.twitch.tv" target="_blank" rel="noopener noreferrer" class="badge badge-purple">Twitch Helix</a>
+        <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer" class="badge badge-neutral">Open Source</a>
+      </div>
     </header>
 
-    <main class="card">
+    <!-- What is LiveSticky -->
+    <section class="section card">
       <div class="content">
-        <h2>App Overview</h2>
+        <h2>What is LiveSticky?</h2>
         <p>
-          <strong>LiveSticky</strong> is an open-source, secure, and automated community utility built on the Reddit Developer Platform (Devvit). The Bot monitors the livestreaming status of a designated Twitch channel and creates a sticky post on the community's subreddit.
+          <strong>LiveSticky</strong> is a free, open-source Reddit bot built on the <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer">Reddit Developer Platform (Devvit)</a>.
+          It monitors your Twitch channel and handles your community's live posts end-to-end — automatically.
         </p>
         <p>
-          You can inspect the source code, check updates, and report issues on our <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub Repository</a>.
+          When you go live, it pins a post. While you stream, it updates viewer counts, uptime, and the current category. When you go offline, it wraps up the post with VOD links and top clips, then unpins it cleanly.
         </p>
         <p>
-          To ensure platform safety, security, and full transparency, please review our legal and data policy agreements below:
+          You can inspect the source code, follow updates, and report issues on the <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub Repository</a>.
         </p>
       </div>
+    </section>
 
+    <!-- Live Post Preview -->
+    <section class="section">
+      <h2 class="section-title">What Your Community Sees</h2>
+      <div class="preview-card card">
+        <div class="preview-header">
+          <span class="live-dot"></span>
+          <span class="preview-flair">🔴 Live Now</span>
+        </div>
+        <h3 class="preview-title">🔴 Streamer is LIVE on Twitch! | Just Chatting</h3>
+        <div class="preview-body">
+          <p>👋 <strong>Streamer</strong> is currently live on Twitch!</p>
+          <p>🎮 <strong>Playing:</strong> Just Chatting</p>
+          <p>👥 <strong>Viewers:</strong> 15,420</p>
+          <p>⏱️ <strong>Uptime:</strong> 2h 15m</p>
+          <p>🔗 <a href="#" onclick="return false">twitch.tv/streamer</a></p>
+        </div>
+        <p class="preview-note">Updated automatically every 2 minutes while live.</p>
+      </div>
+    </section>
+
+    <!-- Core Features -->
+    <section class="section">
+      <h2 class="section-title">✨ Core Features</h2>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">🔴</div>
+          <h3>Automatic Live Posts</h3>
+          <p>Polls your Twitch stream every 2 minutes and pins a new post the moment you go live — no manual action needed.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Real-Time Statistics</h3>
+          <p>Keeps the live post body up-to-date with current viewer count, uptime, and current game or category like <em>Just Chatting</em>.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Crash Grace Period</h3>
+          <p>Waits 6 minutes before concluding — so a brief OBS restart or Twitch hiccup won't spam your community with duplicate posts.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📺</div>
+          <h3>Dual-Platform Promotion</h3>
+          <p>Optionally links your YouTube stream alongside Twitch — side-by-side in both live and archive posts.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏁</div>
+          <h3>Concluding VOD Archives</h3>
+          <p>When the stream ends, LiveSticky edits the post to an offline archive state with VOD links, locks it, and unpins it automatically.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎥</div>
+          <h3>Stream Highlights Post</h3>
+          <p>Queries the Twitch Clips API on stream end to compile the top 5 clips into a standalone highlights post for your community.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📌</div>
+          <h3>Pinned Mod Comment</h3>
+          <p>Auto-posts a customizable, pinned moderator comment — great for Discord links, community rules, or social callouts.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏷️</div>
+          <h3>Custom Post Flair</h3>
+          <p>Applies your community's custom post flair template to the live post automatically — e.g., <em>"🔴 Live Now"</em>.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Sidebar Widget</h3>
+          <p>Keeps a "STREAM STATUS" sidebar widget updated in real-time with live/offline state, category, viewers, and uptime.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>New Comment Sort</h3>
+          <p>Sets the suggested sort to "New" automatically so the live post comment section behaves like a real-time stream chat.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Rate-Limit Protection</h3>
+          <p>Uses Redis caching to keep status checks fast, lightweight, and safe from Twitch API rate limits.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛠️</div>
+          <h3>One-Click Mod Reset</h3>
+          <p>Restart the status checker or clear the cache instantly using a custom shortcut directly in your community's mod tools.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section card">
+      <div class="content">
+        <h2>How It Works</h2>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Install LiveSticky</strong> from the Reddit Developer Platform on your subreddit.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Add your Twitch credentials</strong> — your channel name, Client ID, and Client Secret — in Mod Tools → Apps → live-sticky → Settings.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <strong>Go live on Twitch.</strong> LiveSticky will detect your stream within 2 minutes and pin a live post automatically.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div>
+              <strong>Stream freely.</strong> Viewer counts, category (e.g. <em>Just Chatting</em>), and uptime update in real-time with zero effort from you.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">5</span>
+            <div>
+              <strong>Go offline.</strong> After a 6-minute grace period, LiveSticky archives the post, compiles highlights, and unpins cleanly.
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Legal Portal -->
+    <section class="section">
+      <h2 class="section-title">Legal</h2>
       <div class="portal-grid">
-        <a href="privacy.html" class="portal-btn">
+        <a href="privacy.html" class="portal-btn" id="privacy-btn">
           <div class="btn-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#9146ff">
               <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M17.13,17C15.8,18.84 14,20 12,20.5C10,20 8.2,18.84 6.87,17C6.97,15.33 10.33,14.4 12,14.4C13.67,14.4 17.03,15.33 17.13,17Z"/>
             </svg>
           </div>
           <h3>Privacy Policy</h3>
-          <p>Read about what data we access, how we securely cache state, and our strict zero-PII data policies.</p>
+          <p>What data we access, how we securely cache state, and our strict zero-PII data policies.</p>
         </a>
 
-        <a href="terms.html" class="portal-btn">
+        <a href="terms.html" class="portal-btn" id="terms-btn">
           <div class="btn-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#ff4500">
               <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M17,11H13V7H11V11H7V13H11V17H13V13H17V11Z"/>
             </svg>
           </div>
           <h3>Terms of Service</h3>
-          <p>Understand the rules, licensing, moderator requirements, and platforms rules for using this app.</p>
+          <p>Rules, licensing, moderator requirements, and platform rules for using this app.</p>
         </a>
       </div>
-    </main>
+    </section>
+
   </div>
 
   <footer>
-    <p>&copy; 2026 Mesut Kaya. All rights reserved. Official Website: <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a> | GitHub: <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">github.com/iammesutkaya/LiveSticky</a> | Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a>.</p>
+    <p>&copy; 2026 Mesut Kaya. All rights reserved. &nbsp;|&nbsp;
+      <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a> &nbsp;|&nbsp;
+      <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;|&nbsp;
+      Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a>
+    </p>
   </footer>
 
 </body>
