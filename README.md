@@ -139,7 +139,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 * **Uptime:** live for {uptime}
 
 ---
-### 📺 Channels:
+#### 📺 Channels:
 * **🟣 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
 * **▶️ YouTube:** [Watch Live on YouTube]({youtube_url})
 
@@ -158,7 +158,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
-### 📺 Channels:
+#### 📺 Channels:
 * **🟣 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 * **▶️ YouTube:** [Watch VODs on YouTube]({youtube_url})
 
@@ -180,7 +180,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
-### 📺 Channels:
+#### 📺 Channels:
 * **🟣 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 * **▶️ YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
@@ -197,9 +197,10 @@ The stream is currently offline. Check back soon or follow the channels below to
 * **Current Viewers:** {viewers}
 * **Uptime:** live for {uptime}
 
-[**🟣 Watch Live on Twitch**](https://twitch.tv/{channel})
-
-[**▶️ Watch on YouTube**]({youtube_url})
+---
+#### 📺 Channels:
+* **🟣 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+* **▶️ YouTube:** [Watch Live on YouTube]({youtube_url})
 ```
 
 #### 5. Default Offline Sidebar Widget Text
@@ -209,9 +210,10 @@ The stream is currently offline. Check back soon or follow the channels below to
 
 Follow the channels below to get notified when {display_name} goes live!
 
-[**🟣 Visit Twitch Channel**](https://twitch.tv/{channel})
-
-[**▶️ Visit YouTube Channel**]({youtube_url})
+---
+#### 📺 Channels:
+* **🟣 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+* **▶️ YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
 
 #### 6. Stream Highlights Templates
