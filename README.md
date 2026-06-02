@@ -33,6 +33,21 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 
 Configure these options by going to **Mod Tools** ➔ **Apps** ➔ **live-sticky** ➔ **Settings**:
 
+### 🏷️ Placeholder Reference
+
+You can use these placeholders to dynamically insert stream info into your custom titles, bodies, footers, and sidebars:
+
+| Placeholder | Replaced With | Example Value |
+| :--- | :--- | :--- |
+| `{channel}` | Twitch channel name (lowercase) | `ninja` |
+| `{display_name}` | Twitch display name | `Ninja` |
+| `{title}` | Current stream title | `First stream back!` |
+| `{game}` | Category or game name | `Fortnite` |
+| `{viewers}` | Current live viewer count | `15,420` |
+| `{uptime}` | Stream uptime | `2h 15m` |
+| `{youtube_url}` | Configured YouTube URL | `https://youtube.com/...` |
+| `{date}` | Stream date (Highlights post only) | `June 2, 2026` |
+
 ### 🛠️ Setup
 
 | Setting Name | Type | Description |

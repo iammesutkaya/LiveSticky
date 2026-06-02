@@ -23,6 +23,25 @@ Devvit.configure({
 Devvit.addSettings([
   {
     type: 'group',
+    label: '🏷️ Placeholder Reference',
+    fields: [
+      {
+        type: 'paragraph',
+        name: 'placeholderRef',
+        label: 'Use these in your custom post templates:',
+        defaultValue: '• {channel} — Twitch channel name (lowercase)\n' +
+          '• {display_name} — Twitch display name\n' +
+          '• {title} — Stream title\n' +
+          '• {game} — Category / game\n' +
+          '• {viewers} — Live viewer count\n' +
+          '• {uptime} — Stream uptime (e.g. 1h 23m)\n' +
+          '• {youtube_url} — YouTube channel/live link\n' +
+          '• {date} — Stream date (Highlights post only)',
+      }
+    ]
+  },
+  {
+    type: 'group',
     label: 'Setup',
     fields: [
       {
