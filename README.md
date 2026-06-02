@@ -2,14 +2,14 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-The Bot monitors the livestreaming status of a designated Twitch channel and creates a sticky post on the community's subreddit.
+LiveSticky monitors the livestreaming status of a designated Twitch channel and creates a sticky post on the community's subreddit.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
 [![YouTube Integration](https://img.shields.io/badge/Integration-YouTube-FF0000?style=for-the-badge&logo=youtube)](https://developers.google.com/youtube)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-This bot automatically monitors a specified Twitch stream, creates and flairs a dedicated live discussion thread when the stream goes live, updates the stats (viewers, uptime, category) in real-time every 2 minutes, auto-pins a customizable moderator comment, and unpins/concludes the thread with VOD archives when the stream goes offline.
+LiveSticky automatically monitors a specified Twitch stream, creates and flairs a dedicated live discussion thread when the stream goes live, updates the stats (viewers, uptime, category) in real-time every 2 minutes, auto-pins a customizable moderator comment, and unpins/concludes the thread with VOD archives when the stream goes offline.
 
 ## ✨ Core Features
 
@@ -44,7 +44,7 @@ Auto-posts a distinguished, stickied moderator comment at the top of the discuss
 ---
 
 **🏁 Concluding VOD Archives**  
-When the stream goes offline for more than 6 minutes, the bot edits the post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unstickies it.
+When the stream goes offline for more than 6 minutes, LiveSticky edits the post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unstickies it.
 
 ---
 
@@ -242,19 +242,19 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
 
 ## 🔑 How to Get Twitch Credentials
 
-To configure the bot, you need a **Twitch Client ID** and **Twitch Client Secret** so the bot can securely request live status updates from Twitch's API:
+To configure LiveSticky, you need a **Twitch Client ID** and **Twitch Client Secret** so it can securely request live status updates from Twitch's API:
 
 1. Go to the [Twitch Developer Console](https://dev.twitch.tv/console) and log in with your Twitch account.
 2. Click **Register Your Application** (or navigate to **Applications** ➔ **Register Your Application**).
 3. Fill in the registration form:
    * **Name**: Choose a unique name (e.g., `Subreddit-Stream-Notifier-Bot`).
-   * **OAuth Redirect URLs**: Enter `http://localhost` (a placeholder is fine; the bot uses the secure Client Credentials flow and does not need a redirect web page).
+   * **OAuth Redirect URLs**: Enter `http://localhost` (a placeholder is fine; LiveSticky uses the secure Client Credentials flow and does not need a redirect web page).
    * **Category**: Select **Application Integration** or **Chat Bot**.
    * **Client Type**: Select **Confidential** (required to generate a Client Secret for secure server-to-server requests).
 4. Click **Create**.
 5. Find your newly created application and click **Manage**:
-   * Copy the **Client ID** and paste it into the bot settings.
-   * Click **New Secret** to generate a secret. Copy the **Client Secret** and paste it into the bot settings.
+   * Copy the **Client ID** and paste it into the LiveSticky settings.
+   * Click **New Secret** to generate a secret. Copy the **Client Secret** and paste it into the LiveSticky settings.
 
 > [!IMPORTANT]
 > Never share your Client Secret. Reddit securely encrypts this secret so it is never exposed to regular users or shown in plain text on the page once saved.
@@ -268,7 +268,7 @@ This app makes HTTP requests to the following external domains (declared in [`de
 | `id.twitch.tv` | Twitch OAuth 2.0 token endpoint. Used to obtain a short-lived App Access Token via the Client Credentials flow, which is required to authenticate all Twitch Helix API requests. |
 | `api.twitch.tv` | Twitch Helix REST API. Used to poll the live status of the configured channel (`/streams`), fetch stream metadata (title, game, viewer count), and retrieve top clips (`/clips`) for the post-stream highlights post. |
 
-No user data is sent to these external services. Only the bot's own Client ID and Client Secret (configured by the moderator) are used for authentication.
+No user data is sent to these external services. Only LiveSticky's own Client ID and Client Secret (configured by the moderator) are used for authentication.
 
 ---
 
