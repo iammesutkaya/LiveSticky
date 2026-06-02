@@ -13,60 +13,19 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 
 ## ✨ Core Features
 
-**🔴 Automatic Live Posts**  
-```
-Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live.
-```
-
-**⚡ Real-Time Statistics**  
-```
-Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count.
-```
-
-**🛡️ Stream Crash Protection (6-Min Grace Period)**  
-```
-Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly.
-```
-
-**📺 Dual-Platform Promotion**  
-```
-Optionally promotes your YouTube stream alongside Twitch. If configured, links to both platforms are displayed side-by-side in both live and concluding posts.
-```
-
-**🏷️ Custom Post Flairing**  
-```
-Automatically flairs the live post (e.g., "🔴 Live Now") using your subreddit's custom post flair templates.
-```
-
-**📌 Pinned Moderator Comments**  
-```
-Auto-posts a customizable, stickied moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules.
-```
-
-**🏁 Concluding VOD Archives**  
-```
-When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it.
-```
-
-**💬 Auto-Suggested Comment Sort**  
-```
-Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat.
-```
-
-**🎥 Stream Highlights Post**  
-```
-Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post.
-```
-
-**🚀 Speed & Rate-Limit Protection**  
-```
-Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API.
-```
-
-**🛠️ One-Click Moderator Reset**  
-```
-Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your subreddit.
-```
+| Feature | Description |
+| :--- | :--- |
+| **🔴 Automatic Live Posts** | Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live. |
+| **⚡ Real-Time Statistics** | Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count. |
+| **🛡️ Stream Crash Protection (6-Min Grace Period)** | Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly. |
+| **📺 Dual-Platform Promotion** | Optionally promotes your YouTube stream alongside Twitch. If configured, links to both platforms are displayed side-by-side in both live and concluding posts. |
+| **🏷️ Custom Post Flairing** | Automatically flairs the live post (e.g., "🔴 Live Now") using your subreddit's custom post flair templates. |
+| **📌 Pinned Moderator Comments** | Auto-posts a customizable, stickied moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules. |
+| **🏁 Concluding VOD Archives** | When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it. |
+| **💬 Auto-Suggested Comment Sort** | Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat. |
+| **🎥 Stream Highlights Post** | Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post. |
+| **🚀 Speed & Rate-Limit Protection** | Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API. |
+| **🛠️ One-Click Moderator Reset** | Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your subreddit. |
 
 ---
 
