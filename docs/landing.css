@@ -253,7 +253,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 0;
-  margin: 0;
+  margin: 28px 0 0 0;
 }
 
 .steps-list li {
@@ -275,7 +275,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
