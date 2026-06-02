@@ -42,7 +42,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 | `{channel}` | Twitch channel name (lowercase) | `streamer` |
 | `{display_name}` | Twitch display name | `Streamer` |
 | `{title}` | Current stream title | `First stream back!` |
-| `{game}` | Category or game name | `Fortnite` |
+| `{game}` | Category or game name | `Just Chatting` |
 | `{viewers}` | Current live viewer count | `15,420` |
 | `{uptime}` | Stream uptime | `2h 15m` |
 | `{youtube_url}` | Configured YouTube URL | `https://youtube.com/...` |
