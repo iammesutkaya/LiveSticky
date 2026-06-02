@@ -2,14 +2,14 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky monitors the livestreaming status of a designated Twitch channel and creates a sticky post on the community's subreddit.
+LiveSticky is a Reddit Devvit bot that monitors the livestreaming status of a designated Twitch channel and automatically creates and manages sticky posts on your community's subreddit.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
 [![YouTube Integration](https://img.shields.io/badge/Integration-YouTube-FF0000?style=for-the-badge&logo=youtube)](https://developers.google.com/youtube)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-LiveSticky automatically monitors a specified Twitch stream, creates and flairs a dedicated live discussion thread when the stream goes live, updates the stats (viewers, uptime, category) in real-time every 2 minutes, auto-pins a customizable moderator comment, and unpins/concludes the thread with VOD archives when the stream goes offline.
+It handles the entire stream lifecycle automatically: creating and flairing a dedicated live discussion thread when the stream goes live, updating real-time stats (viewers, uptime, and category) every 2 minutes, auto-pinning a customizable moderator comment, and concluding the thread with VOD archives when the stream goes offline.
 
 ## ✨ Core Features
 
