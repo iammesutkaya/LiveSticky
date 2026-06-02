@@ -48,7 +48,7 @@ Devvit.addSettings([
         type: 'string',
         name: 'twitchChannel',
         label: 'Twitch Channel Name',
-        helpText: 'The name of the Twitch channel to monitor (e.g., ninja)',
+        helpText: 'The name of the Twitch channel to monitor (e.g., your_channel)',
       },
       {
         type: 'string',

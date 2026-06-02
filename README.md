@@ -39,8 +39,8 @@ You can use these placeholders to dynamically insert stream info into your custo
 
 | Placeholder | Replaced With | Example Value |
 | :--- | :--- | :--- |
-| `{channel}` | Twitch channel name (lowercase) | `ninja` |
-| `{display_name}` | Twitch display name | `Ninja` |
+| `{channel}` | Twitch channel name (lowercase) | `your_channel` |
+| `{display_name}` | Twitch display name | `YourChannel` |
 | `{title}` | Current stream title | `First stream back!` |
 | `{game}` | Category or game name | `Fortnite` |
 | `{viewers}` | Current live viewer count | `15,420` |
@@ -52,7 +52,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 
 | Setting Name | Type | Description |
 | :--- | :--- | :--- |
-| **Twitch Channel Name** | `String` | The Twitch username to monitor (e.g. `ninja`). |
+| **Twitch Channel Name** | `String` | The Twitch username to monitor (e.g. `your_channel`). |
 | **Twitch Client ID** | `String (Secret)` | Your Twitch Developer Client ID (scoped to App). |
 | **Twitch Client Secret** | `String (Secret)` | Your Twitch Developer Client Secret (scoped to App). |
 | **YouTube Channel/Live URL (Optional)** | `String` | The full link to your YouTube channel or live stream (e.g. `https://youtube.com/c/mesut/live`). |
