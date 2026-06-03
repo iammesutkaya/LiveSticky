@@ -116,8 +116,8 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*
@@ -135,8 +135,8 @@ The stream has concluded. VODs and highlights may be available via the links bel
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 
 ---
 *This post is now locked as the stream has ended.*
@@ -157,8 +157,8 @@ The stream is currently offline. Check back soon or follow the channels below to
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
 
 #### 4. Default Live Sidebar Widget Text
@@ -175,8 +175,8 @@ The stream is currently offline. Check back soon or follow the channels below to
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
 ```
 
 #### 5. Default Offline Sidebar Widget Text
@@ -188,8 +188,8 @@ Follow the channels below to get notified when {display_name} goes live!
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
 
 #### 6. Stream Highlights Templates

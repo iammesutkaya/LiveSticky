@@ -26,8 +26,8 @@ export const DEFAULT_LIVE_POST_BODY = `\
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*`;
@@ -45,8 +45,8 @@ The stream has concluded. VODs and highlights may be available via the links bel
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 
 ---
 *This post is now locked as the stream has ended.*`;
@@ -61,8 +61,8 @@ The stream is currently offline. Check back soon or follow the channels below to
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})`;
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
 
 // ---------------------------------------------------------------------------
 // Live sidebar widget
@@ -79,8 +79,8 @@ export const DEFAULT_LIVE_SIDEBAR = `\
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch Live on YouTube]({youtube_url})`;
+🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})`;
 
 // ---------------------------------------------------------------------------
 // Offline sidebar widget
@@ -92,8 +92,8 @@ Follow the channels below to get notified when {display_name} goes live!
 
 ---
 #### 📺 Channels:
-* **🟪 Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
-* **🟥 YouTube:** [Watch VODs on YouTube]({youtube_url})`;
+🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
 
 // ---------------------------------------------------------------------------
 // Highlights post (shown when stream highlights are enabled)
