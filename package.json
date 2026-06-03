@@ -4,6 +4,7 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
+    "upload": "bash scripts/upload.sh",
     "release": "bash scripts/release.sh",
     "release:public": "bash scripts/release.sh --public"
   },
