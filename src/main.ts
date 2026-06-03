@@ -24,17 +24,6 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Setup',
-    helpText: [
-      '🏷️ Template Placeholders — use these in any text field below:',
-      '{channel} — Twitch channel login name (e.g. streamer)',
-      '{display_name} — Channel display name (e.g. Streamer)',
-      '{title} — Stream title',
-      '{game} — Game or category being streamed (live only)',
-      '{viewers} — Current viewer count (live only)',
-      '{uptime} — How long the stream has been live (live only)',
-      '{date} — Date the stream ended (post-stream only)',
-      '{youtube_url} — YouTube channel URL',
-    ].join('\n'),
     fields: [
       {
         type: 'string',
@@ -69,6 +58,28 @@ Devvit.addSettings([
         name: 'liveFlairId',
         label: 'Live Post Flair Template ID (Optional)',
         helpText: 'The UUID of the flair template to apply to the live post (from Mod Tools ➔ Post Flair)',
+      }
+    ]
+  },
+  {
+    type: 'group',
+    label: '🏷️ Placeholders',
+    helpText: 'Use these placeholders in any template field below.',
+    fields: [
+      {
+        type: 'paragraph',
+        name: 'placeholderReference',
+        label: 'Available Placeholders (for reference — changes here have no effect)',
+        defaultValue: [
+          '{channel} — Twitch channel login name (e.g. streamer)',
+          '{display_name} — Channel display name (e.g. Streamer)',
+          '{title} — Stream title',
+          '{game} — Game or category being streamed (live only)',
+          '{viewers} — Current viewer count (live only)',
+          '{uptime} — How long the stream has been live (live only)',
+          '{date} — Date the stream ended (post-stream only)',
+          '{youtube_url} — YouTube channel URL',
+        ].join('\n'),
       }
     ]
   },
