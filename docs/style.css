@@ -333,6 +333,16 @@ h1 {
   transform: translateX(-4px);
 }
 
+.back-btn svg {
+  fill: currentColor;
+  vertical-align: middle;
+}
+
+.header-left {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
 /* Footer styling */
 footer {
   text-align: center;
