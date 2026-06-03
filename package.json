@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "license": "BSD-3-Clause",
   "type": "module",
+  "scripts": {
+    "release": "bash scripts/release.sh",
+    "release:public": "bash scripts/release.sh --public"
+  },
   "dependencies": {
     "@devvit/public-api": "0.13.2"
   },
