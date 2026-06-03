@@ -64,7 +64,6 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Offline Stage',
-    helpText: 'Supported template placeholders: {channel}, {display_name}, {youtube_url}',
     fields: [
       {
         type: 'boolean',
@@ -106,79 +105,78 @@ Devvit.addSettings([
         name: 'offlinePostTitle',
         label: 'Offline Post Title (Optional)',
         defaultValue: DEFAULT_OFFLINE_POST_TITLE,
-        helpText: 'Custom title for the offline post. Supports placeholders: {display_name}. If empty, the default template is used.',
+        helpText: 'Custom title for the offline post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'offlinePostBody',
         label: 'Offline Post Body (Markdown) (Optional)',
         defaultValue: DEFAULT_OFFLINE_POST_BODY,
-        helpText: 'Custom markdown for the body of the offline post. Supports placeholders: {channel}, {display_name}, {youtube_url}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the body of the offline post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'offlinePostFooter',
         label: 'Offline Post Custom Footer (Markdown) (Optional)',
-        helpText: 'Custom markdown to append at the bottom of the offline post. Supports placeholders: {channel}, {youtube_url}.',
+        helpText: 'Custom markdown to append at the bottom of the offline post.',
       },
       {
         type: 'paragraph',
         name: 'offlineSidebarText',
         label: 'Offline Sidebar Widget Text (Markdown) (Optional)',
         defaultValue: DEFAULT_OFFLINE_SIDEBAR,
-        helpText: 'Custom markdown for the body of the sidebar widget when the stream is offline. Supports placeholders: {channel}, {display_name}, {youtube_url}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the body of the sidebar widget when the stream is offline. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'offlineSidebarFooter',
         label: 'Offline Sidebar Widget Custom Footer (Markdown) (Optional)',
-        helpText: 'Custom markdown to append at the bottom of the offline sidebar widget. Supports placeholders: {channel}, {youtube_url}.',
+        helpText: 'Custom markdown to append at the bottom of the offline sidebar widget.',
       }
     ]
   },
   {
     type: 'group',
     label: 'Live Stage',
-    helpText: 'Supported template placeholders: {channel}, {display_name}, {game}, {viewers}, {uptime}, {title}, {youtube_url}',
     fields: [
       {
         type: 'paragraph',
         name: 'livePostBody',
         label: 'Live Post Body (Markdown) (Optional)',
         defaultValue: DEFAULT_LIVE_POST_BODY,
-        helpText: 'Custom markdown for the body of the live post. Supports placeholders: {channel}, {display_name}, {game}, {viewers}, {uptime}, {title}, {youtube_url}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the body of the live post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'livePostFooter',
         label: 'Live Post Custom Footer (Markdown) (Optional)',
-        helpText: 'Custom markdown to append at the bottom of the live post. Supports placeholders: {channel}, {youtube_url}.',
+        helpText: 'Custom markdown to append at the bottom of the live post.',
       },
       {
         type: 'string',
         name: 'livePostTitle',
         label: 'Live Post Title (Optional)',
         defaultValue: DEFAULT_LIVE_POST_TITLE,
-        helpText: 'Custom title for the live post. Supports placeholders: {display_name}, {title}. If empty, the default template is used.',
+        helpText: 'Custom title for the live post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'liveCommentText',
         label: 'Auto-Pinned Comment Text (Optional)',
-        helpText: 'Text to automatically post and pin as a mod comment inside the live post (e.g. Discord link). Supports placeholders: {channel}, {display_name}.',
+        helpText: 'Text to automatically post and pin as a mod comment inside the live post (e.g. Discord link).',
       },
       {
         type: 'paragraph',
         name: 'liveSidebarText',
         label: 'Live Sidebar Widget Text (Markdown) (Optional)',
         defaultValue: DEFAULT_LIVE_SIDEBAR,
-        helpText: 'Custom markdown for the body of the sidebar widget when the stream is live. Supports placeholders: {channel}, {display_name}, {game}, {viewers}, {uptime}, {title}, {youtube_url}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the body of the sidebar widget when the stream is live. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'liveSidebarFooter',
         label: 'Live Sidebar Widget Custom Footer (Markdown) (Optional)',
-        helpText: 'Custom markdown to append at the bottom of the sidebar widget when the stream is live. Supports placeholders: {channel}, {youtube_url}.',
+        helpText: 'Custom markdown to append at the bottom of the sidebar widget when the stream is live.',
       },
       {
         type: 'select',
@@ -197,7 +195,6 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Post-Stream Stage',
-    helpText: 'Supported template placeholders: {channel}, {display_name}, {title}, {date}',
     fields: [
       {
         type: 'boolean',
@@ -217,36 +214,53 @@ Devvit.addSettings([
         name: 'highlightsPostTitle',
         label: 'Highlights Post Title (Optional)',
         defaultValue: DEFAULT_HIGHLIGHTS_POST_TITLE,
-        helpText: 'Custom title for the stream highlights post. Supports placeholders: {display_name}, {date}. If empty, the default template is used.',
+        helpText: 'Custom title for the stream highlights post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'concludingPostBody',
         label: 'Concluding Post Body (Markdown) (Optional)',
         defaultValue: DEFAULT_CONCLUDING_POST_BODY,
-        helpText: 'Custom markdown for the live post body after the stream ends. Supports placeholders: {channel}, {display_name}, {title}, {youtube_url}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the live post body after the stream ends. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'concludingPostFooter',
         label: 'Concluding Post Custom Footer (Markdown) (Optional)',
-        helpText: 'Custom markdown to append at the bottom of the concluding post. Supports placeholders: {channel}, {youtube_url}.',
+        helpText: 'Custom markdown to append at the bottom of the concluding post.',
       },
       {
         type: 'paragraph',
         name: 'highlightsHeader',
         label: 'Highlights Post Custom Header (Markdown) (Optional)',
         defaultValue: DEFAULT_HIGHLIGHTS_POST_HEADER,
-        helpText: 'Custom markdown for the header of the stream highlights post. Supports placeholders: {channel}, {display_name}, {title}, {date}. If empty, the default template is used.',
+        helpText: 'Custom markdown for the header of the stream highlights post. If empty, the default template is used.',
       },
       {
         type: 'paragraph',
         name: 'highlightsFooter',
         label: 'Highlights Post Custom Footer (Markdown) (Optional)',
         defaultValue: DEFAULT_HIGHLIGHTS_POST_FOOTER,
-        helpText: 'Custom markdown to append at the bottom of the stream highlights post. Supports placeholders: {channel}. If empty, the default template is used.',
+        helpText: 'Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used.',
       }
     ]
+  },
+  {
+    type: 'group',
+    label: '🏷️ Placeholder Reference',
+    helpText: [
+      'Use these placeholders in your custom templates:',
+      '',
+      '{channel} — Twitch channel login name (e.g. streamer)',
+      '{display_name} — Channel display name (e.g. Streamer)',
+      '{title} — Stream title',
+      '{game} — Game or category being streamed (live only)',
+      '{viewers} — Current viewer count (live only)',
+      '{uptime} — How long the stream has been live (live only)',
+      '{date} — Date the stream ended (post-stream only)',
+      '{youtube_url} — YouTube channel URL',
+    ].join('\n'),
+    fields: []
   }
 ]);
 
