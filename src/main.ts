@@ -24,6 +24,17 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Setup',
+    helpText: [
+      '🏷️ Template Placeholders — use these in any text field below:',
+      '{channel} — Twitch channel login name (e.g. streamer)',
+      '{display_name} — Channel display name (e.g. Streamer)',
+      '{title} — Stream title',
+      '{game} — Game or category being streamed (live only)',
+      '{viewers} — Current viewer count (live only)',
+      '{uptime} — How long the stream has been live (live only)',
+      '{date} — Date the stream ended (post-stream only)',
+      '{youtube_url} — YouTube channel URL',
+    ].join('\n'),
     fields: [
       {
         type: 'string',
@@ -242,28 +253,6 @@ Devvit.addSettings([
         label: 'Highlights Post Custom Footer (Markdown) (Optional)',
         defaultValue: DEFAULT_HIGHLIGHTS_POST_FOOTER,
         helpText: 'Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used.',
-      }
-    ]
-  },
-  {
-    type: 'group',
-    label: '🏷️ Placeholder Reference',
-    helpText: 'Use these placeholders in your custom templates — paste them directly into any text field above.',
-    fields: [
-      {
-        type: 'paragraph',
-        name: 'placeholderReference',
-        label: 'Available Placeholders',
-        defaultValue: [
-          '{channel} — Twitch channel login name (e.g. streamer)',
-          '{display_name} — Channel display name (e.g. Streamer)',
-          '{title} — Stream title',
-          '{game} — Game or category being streamed (live only)',
-          '{viewers} — Current viewer count (live only)',
-          '{uptime} — How long the stream has been live (live only)',
-          '{date} — Date the stream ended (post-stream only)',
-          '{youtube_url} — YouTube channel URL',
-        ].join('\n'),
       }
     ]
   }
