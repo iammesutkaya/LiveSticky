@@ -136,6 +136,8 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**
@@ -158,6 +160,8 @@ The stream has concluded. VODs and highlights may be available via the links bel
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**
@@ -191,6 +195,8 @@ The stream is currently offline. Check back soon or follow the channels below to
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**

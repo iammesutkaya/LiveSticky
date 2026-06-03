@@ -45,6 +45,8 @@ export const DEFAULT_CONCLUDING_POST_BODY = `\
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**
@@ -61,6 +63,8 @@ export const DEFAULT_OFFLINE_POST_BODY = `\
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**`;
@@ -93,6 +97,8 @@ export const DEFAULT_OFFLINE_SIDEBAR = `\
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
+**Watch the VODs on:**
+
 🟪 **[Twitch](https://twitch.tv/{channel})**
 
 🟥 **[YouTube]({youtube_url})**`;
