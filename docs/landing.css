@@ -45,6 +45,47 @@
   line-height: 1.6;
 }
 
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -16px;
+  margin-bottom: -16px;
+}
+
+.meta-separator {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.creator-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.creator-link svg {
+  fill: currentColor;
+  opacity: 0.75;
+  transition: var(--transition-smooth);
+}
+
+.creator-link:hover {
+  color: #ff4500;
+}
+
+.creator-link:hover svg {
+  fill: #ff4500;
+  opacity: 1;
+  transform: rotate(8deg) scale(1.15);
+}
+
 .hero-badges {
   display: flex;
   flex-wrap: wrap;
