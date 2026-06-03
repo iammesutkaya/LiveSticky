@@ -55,7 +55,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 | **Twitch Channel Name** | `String` | The Twitch username to monitor (e.g. `streamer`). |
 | **Twitch Client ID** | `String (Secret)` | Your Twitch Developer Client ID (scoped to App). |
 | **Twitch Client Secret** | `String (Secret)` | Your Twitch Developer Client Secret (scoped to App). |
-| **YouTube Channel/Live URL (Optional)** | `String` | The full link to your YouTube channel or live stream (e.g. `https://youtube.com/c/mesut/live`). |
+| **YouTube Channel Name / Handle (Optional)** | `String` | The handle of your YouTube channel (e.g. `@ChannelName` or `ChannelName`). |
 | **Live Post Flair Template ID (Optional)** | `String` | The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair). |
 
 ### 😴 Offline Stage
@@ -115,9 +115,11 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 * **Uptime:** live for {uptime}
 
 ---
-🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+**Watch the stream on:**
 
-🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **[Twitch](https://twitch.tv/{channel})**
+
+🟥 **[YouTube]({youtube_url})**
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*
@@ -134,9 +136,9 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟥 **[YouTube]({youtube_url})**
 
 ---
 *This post is now locked as the stream has ended.*
@@ -156,9 +158,9 @@ The stream has concluded. VODs and highlights may be available via the links bel
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟥 **[YouTube]({youtube_url})**
 ```
 
 #### 4. Default Live Sidebar Widget Text
@@ -174,9 +176,11 @@ The stream is currently offline. Check back soon or follow the channels below to
 * **Uptime:** live for {uptime}
 
 ---
-🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+**Watch the stream on:**
 
-🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **[Twitch](https://twitch.tv/{channel})**
+
+🟥 **[YouTube]({youtube_url})**
 ```
 
 #### 5. Default Offline Sidebar Widget Text
@@ -187,9 +191,9 @@ The stream is currently offline. Check back soon or follow the channels below to
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟥 **[YouTube]({youtube_url})**
 ```
 
 #### 6. Stream Highlights Templates

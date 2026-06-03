@@ -25,9 +25,10 @@ export const DEFAULT_LIVE_POST_BODY = `\
 * **Uptime:** live for {uptime}
 
 ---
-🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+**Watch the stream on:**
 
-🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
+🟪 **[Twitch](https://twitch.tv/{channel})**
+🟥 **[YouTube]({youtube_url})**
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*`;
@@ -44,9 +45,9 @@ export const DEFAULT_CONCLUDING_POST_BODY = `\
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
+🟥 **[YouTube]({youtube_url})**
 
 ---
 *This post is now locked as the stream has ended.*`;
@@ -60,9 +61,9 @@ export const DEFAULT_OFFLINE_POST_BODY = `\
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
+🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Live sidebar widget
@@ -78,9 +79,10 @@ export const DEFAULT_LIVE_SIDEBAR = `\
 * **Uptime:** live for {uptime}
 
 ---
-🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
+**Watch the stream on:**
 
-🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})`;
+🟪 **[Twitch](https://twitch.tv/{channel})**
+🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Offline sidebar widget
@@ -91,9 +93,9 @@ export const DEFAULT_OFFLINE_SIDEBAR = `\
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
-🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
+🟪 **[Twitch](https://twitch.tv/{channel})**
 
-🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
+🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Highlights post (shown when stream highlights are enabled)

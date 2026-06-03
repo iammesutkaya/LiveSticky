@@ -68,9 +68,9 @@ Devvit.addSettings([
       },
       {
         type: 'string',
-        name: 'youtubeUrl',
-        label: 'YouTube Channel/Live URL (Optional)',
-        helpText: 'The full URL of your YouTube channel or live stream (e.g., https://youtube.com/@ChannelName/live)',
+        name: 'youtubeChannel',
+        label: 'YouTube Channel Name / Handle (Optional)',
+        helpText: 'The name or handle of your YouTube channel (e.g., @ChannelName or ChannelName)',
       },
       {
         type: 'string',
@@ -600,7 +600,8 @@ Devvit.addSchedulerJob({
     const clientId = await context.settings.get('twitchClientId');
     const secret = await context.settings.get('twitchClientSecret');
     const liveFlairId = await context.settings.get('liveFlairId');
-    const youtubeUrl = await context.settings.get('youtubeUrl') as string | undefined;
+    const youtubeChannel = await context.settings.get('youtubeChannel') as string | undefined;
+    const youtubeUrl = youtubeChannel ? `https://www.youtube.com/@${youtubeChannel.replace(/^@/, '')}` : undefined;
     const removeOfflinePost = await context.settings.get('removeOfflinePost') as boolean | undefined;
     const deleteOfflinePost = await context.settings.get('deleteOfflinePost') as boolean | undefined;
     const stickyOfflinePost = await context.settings.get('stickyOfflinePost') as boolean | undefined;
