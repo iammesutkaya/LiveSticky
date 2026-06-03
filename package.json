@@ -6,7 +6,8 @@
   "scripts": {
     "upload": "bash scripts/upload.sh",
     "release": "bash scripts/release.sh",
-    "release:public": "bash scripts/release.sh --public"
+    "release:public": "bash scripts/release.sh --public",
+    "publish:public": "bash scripts/release.sh --public"
   },
   "dependencies": {
     "@devvit/public-api": "0.13.2"
