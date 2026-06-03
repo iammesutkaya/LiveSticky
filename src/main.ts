@@ -248,19 +248,24 @@ Devvit.addSettings([
   {
     type: 'group',
     label: '🏷️ Placeholder Reference',
-    helpText: [
-      'Use these placeholders in your custom templates:',
-      '',
-      '{channel} — Twitch channel login name (e.g. streamer)',
-      '{display_name} — Channel display name (e.g. Streamer)',
-      '{title} — Stream title',
-      '{game} — Game or category being streamed (live only)',
-      '{viewers} — Current viewer count (live only)',
-      '{uptime} — How long the stream has been live (live only)',
-      '{date} — Date the stream ended (post-stream only)',
-      '{youtube_url} — YouTube channel URL',
-    ].join('\n'),
-    fields: []
+    helpText: 'Use these placeholders in your custom templates — paste them directly into any text field above.',
+    fields: [
+      {
+        type: 'paragraph',
+        name: 'placeholderReference',
+        label: 'Available Placeholders',
+        defaultValue: [
+          '{channel} — Twitch channel login name (e.g. streamer)',
+          '{display_name} — Channel display name (e.g. Streamer)',
+          '{title} — Stream title',
+          '{game} — Game or category being streamed (live only)',
+          '{viewers} — Current viewer count (live only)',
+          '{uptime} — How long the stream has been live (live only)',
+          '{date} — Date the stream ended (post-stream only)',
+          '{youtube_url} — YouTube channel URL',
+        ].join('\n'),
+      }
+    ]
   }
 ]);
 
