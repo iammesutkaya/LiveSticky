@@ -48,7 +48,6 @@ The stream has concluded. VODs and highlights may be available via the links bel
 **Watch the VODs on:**
 
 🟪 **[Twitch](https://twitch.tv/{channel})**
-
 🟥 **[YouTube]({youtube_url})**
 
 ---
@@ -66,7 +65,6 @@ The stream is currently offline. Check back soon or follow the channels below to
 **Watch the VODs on:**
 
 🟪 **[Twitch](https://twitch.tv/{channel})**
-
 🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
@@ -100,7 +98,6 @@ Follow the channels below to get notified when {display_name} goes live!
 **Watch the VODs on:**
 
 🟪 **[Twitch](https://twitch.tv/{channel})**
-
 🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------

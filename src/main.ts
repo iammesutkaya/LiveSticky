@@ -23,25 +23,6 @@ Devvit.configure({
 Devvit.addSettings([
   {
     type: 'group',
-    label: '🏷️ Placeholder Reference',
-    fields: [
-      {
-        type: 'paragraph',
-        name: 'placeholderRef',
-        label: 'Use these in your custom post templates:',
-        defaultValue: '• {channel} — Twitch channel name (lowercase)\n' +
-          '• {display_name} — Twitch display name\n' +
-          '• {title} — Stream title\n' +
-          '• {game} — Category / game\n' +
-          '• {viewers} — Live viewer count\n' +
-          '• {uptime} — Stream uptime (e.g. 1h 23m)\n' +
-          '• {youtube_url} — YouTube channel/live link\n' +
-          '• {date} — Stream date (Highlights post only)',
-      }
-    ]
-  },
-  {
-    type: 'group',
     label: 'Setup',
     fields: [
       {
@@ -83,6 +64,7 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Offline Stage',
+    helpText: 'Supported template placeholders: {channel}, {display_name}, {youtube_url}',
     fields: [
       {
         type: 'boolean',
@@ -157,6 +139,7 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Live Stage',
+    helpText: 'Supported template placeholders: {channel}, {display_name}, {game}, {viewers}, {uptime}, {title}, {youtube_url}',
     fields: [
       {
         type: 'paragraph',
@@ -214,6 +197,7 @@ Devvit.addSettings([
   {
     type: 'group',
     label: 'Post-Stream Stage',
+    helpText: 'Supported template placeholders: {channel}, {display_name}, {title}, {date}',
     fields: [
       {
         type: 'boolean',
