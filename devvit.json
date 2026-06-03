@@ -8,6 +8,10 @@
     "icon": "assets/icon.png"
   },
   "permissions": {
+    "reddit": {
+      "scope": "moderator"
+    },
+    "redis": true,
     "http": {
       "enable": true,
       "domains": [

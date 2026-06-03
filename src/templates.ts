@@ -27,8 +27,7 @@ export const DEFAULT_LIVE_POST_BODY = `\
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**
-🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*`;
@@ -47,8 +46,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**
-🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
 
 ---
 *This post is now locked as the stream has ended.*`;
@@ -64,8 +62,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**
-🟥 **[YouTube]({youtube_url})**`;
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Live sidebar widget
@@ -83,8 +80,7 @@ export const DEFAULT_LIVE_SIDEBAR = `\
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**
-🟥 **[YouTube]({youtube_url})**`;
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Offline sidebar widget
@@ -97,8 +93,7 @@ Follow the channels below to get notified when {display_name} goes live!
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**
-🟥 **[YouTube]({youtube_url})**`;
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**`;
 
 // ---------------------------------------------------------------------------
 // Highlights post (shown when stream highlights are enabled)

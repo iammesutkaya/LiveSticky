@@ -12,7 +12,7 @@ echo "🚀 Publishing to Devvit..."
 OUTPUT=$(npx devvit publish $FLAGS 2>&1 | tee /dev/stderr)
 
 # Extract the bumped version from Devvit's output
-VERSION=$(echo "$OUTPUT" | grep -oP '(?<=Automatically bumped app version to: )\S+')
+VERSION=$(echo "$OUTPUT" | sed -n 's/.*Automatically bumped app version to: \([^[:space:]]\{1,\}\).*/\1/p')
 
 if [ -z "$VERSION" ]; then
   echo "⚠️  Could not detect bumped version — index.html not updated."

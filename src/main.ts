@@ -269,6 +269,22 @@ Devvit.addSettings([
   }
 ]);
 
+const removeYoutubeLink = (text: string): string => {
+  return text
+    .split('\n')
+    .map(line => {
+      if (line.includes('{youtube_url}')) {
+        // Try to remove YouTube link along with preceding separator/spaces on the same line
+        const cleaned = line.replace(/\s*([|•·\-‐‑⁃]|\s{2,})\s*(🟥\s*)?(\*\*)?\[.*?\]\(\{youtube_url\}\)(\*\*)?/gi, '');
+        // If the line still contains {youtube_url}, it means it was on its own line (or didn't match), so remove the whole line
+        return cleaned.includes('{youtube_url}') ? null : cleaned;
+      }
+      return line;
+    })
+    .filter(line => line !== null)
+    .join('\n');
+};
+
 const formatLivePostBody = (
   streamInfo: any,
   channelName: string,
@@ -302,11 +318,7 @@ const formatLivePostBody = (
   if (youtubeUrl) {
     result = result.replace(/{youtube_url}/g, youtubeUrl);
   } else {
-    // Remove lines containing youtube_url placeholder if not configured
-    result = result
-      .split('\n')
-      .filter(line => !line.includes('{youtube_url}'))
-      .join('\n');
+    result = removeYoutubeLink(result);
   }
 
   if (footer) {
@@ -337,11 +349,7 @@ const formatOfflinePostBody = (
   if (youtubeUrl) {
     result = result.replace(/{youtube_url}/g, youtubeUrl);
   } else {
-    // Remove lines containing youtube_url placeholder if not configured
-    result = result
-      .split('\n')
-      .filter(line => !line.includes('{youtube_url}'))
-      .join('\n');
+    result = removeYoutubeLink(result);
   }
 
   if (footer) {
@@ -389,11 +397,7 @@ const formatSidebarWidgetText = (
     if (youtubeUrl) {
       result = result.replace(/{youtube_url}/g, youtubeUrl);
     } else {
-      // Remove lines containing youtube_url placeholder if not configured
-      result = result
-        .split('\n')
-        .filter(line => !line.includes('{youtube_url}'))
-        .join('\n');
+      result = removeYoutubeLink(result);
     }
 
     if (liveFooter) {
@@ -410,11 +414,7 @@ const formatSidebarWidgetText = (
     if (youtubeUrl) {
       result = result.replace(/{youtube_url}/g, youtubeUrl);
     } else {
-      // Remove lines containing youtube_url placeholder if not configured
-      result = result
-        .split('\n')
-        .filter(line => !line.includes('{youtube_url}'))
-        .join('\n');
+      result = removeYoutubeLink(result);
     }
 
     if (offlineFooter) {
@@ -883,7 +883,6 @@ Devvit.addSchedulerJob({
           await context.redis.del('twitch_broadcaster_id');
           await context.redis.del('twitch_started_at');
           await context.redis.del('twitch_stream_title');
-          await context.redis.del('twitch_display_name');
           
           if (postId) {
             try {
