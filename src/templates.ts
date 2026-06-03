@@ -25,8 +25,6 @@ export const DEFAULT_LIVE_POST_BODY = `\
 * **Uptime:** live for {uptime}
 
 ---
-📺 **Channels:**
-
 🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
 
 🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
@@ -46,8 +44,6 @@ export const DEFAULT_CONCLUDING_POST_BODY = `\
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
-📺 **Channels:**
-
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
@@ -64,8 +60,6 @@ export const DEFAULT_OFFLINE_POST_BODY = `\
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
-📺 **Channels:**
-
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
@@ -84,8 +78,6 @@ export const DEFAULT_LIVE_SIDEBAR = `\
 * **Uptime:** live for {uptime}
 
 ---
-📺 **Channels:**
-
 🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
 
 🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})`;
@@ -99,8 +91,6 @@ export const DEFAULT_OFFLINE_SIDEBAR = `\
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
-📺 **Channels:**
-
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})`;
