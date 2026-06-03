@@ -115,7 +115,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 * **Uptime:** live for {uptime}
 
 ---
-#### 📺 Channels:
+**📺 Channels:**
 🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
 🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
 
@@ -134,7 +134,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 The stream has concluded. VODs and highlights may be available via the links below.
 
 ---
-#### 📺 Channels:
+**📺 Channels:**
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 
@@ -156,7 +156,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
 
 ---
-#### 📺 Channels:
+**📺 Channels:**
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
@@ -174,7 +174,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 * **Uptime:** live for {uptime}
 
 ---
-#### 📺 Channels:
+**📺 Channels:**
 🟪 **Twitch:** [Watch Live on Twitch](https://twitch.tv/{channel})
 🟥 **YouTube:** [Watch Live on YouTube]({youtube_url})
 ```
@@ -187,7 +187,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 Follow the channels below to get notified when {display_name} goes live!
 
 ---
-#### 📺 Channels:
+**📺 Channels:**
 🟪 **Twitch:** [Watch VODs on Twitch](https://twitch.tv/{channel})
 🟥 **YouTube:** [Watch VODs on YouTube]({youtube_url})
 ```
