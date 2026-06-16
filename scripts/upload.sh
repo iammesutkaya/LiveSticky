@@ -3,17 +3,38 @@ set -euo pipefail
 
 # -------------------------------------------------------
 # upload.sh — Upload to Devvit, auto-update version badge
-# Usage: ./scripts/upload.sh
+# Usage: ./scripts/upload.sh [--version X.Y.Z]
 # -------------------------------------------------------
 
-echo "🚀 Uploading dev version to Devvit..."
-OUTPUT=$(npx devvit upload 2>&1 | tee /dev/stderr)
+FLAGS=()
+EXPLICIT_VERSION=""
 
-# Extract the bumped version from Devvit's output
-VERSION=$(echo "$OUTPUT" | sed -n 's/.*Automatically bumped app version to: \([^[:space:]]\{1,\}\).*/\1/p')
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --version)
+      EXPLICIT_VERSION="$2"
+      FLAGS+=("--version" "$2")
+      shift 2
+      ;;
+    *)
+      FLAGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+echo "🚀 Uploading dev version to Devvit..."
+OUTPUT=$(npx devvit upload "${FLAGS[@]}" 2>&1 | tee /dev/stderr)
+
+# Determine the version: use explicit if provided, otherwise extract from output
+if [ -n "$EXPLICIT_VERSION" ]; then
+  VERSION="$EXPLICIT_VERSION"
+else
+  VERSION=$(echo "$OUTPUT" | sed -n 's/.*Automatically bumped app version to: \([^[:space:]]\{1,\}\).*/\1/p')
+fi
 
 if [ -z "$VERSION" ]; then
-  echo "⚠️  Could not detect bumped version — index.html not updated."
+  echo "⚠️  Could not detect version — index.html not updated."
   exit 0
 fi
 
