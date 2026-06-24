@@ -10,7 +10,7 @@
     "publish:public": "bash scripts/release.sh --public"
   },
   "dependencies": {
-    "@devvit/public-api": "^0.13.4"
+    "@devvit/public-api": "^0.13.5"
   },
   "devDependencies": {
     "typescript": "5.8.3"
