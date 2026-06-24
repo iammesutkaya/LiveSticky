@@ -50,6 +50,6 @@ echo "✅ docs/index.html updated to v${VERSION}"
 # Commit and push
 git add docs/index.html
 git commit -m "chore: bump website version badge to v${VERSION}"
-git push
+env -u GITHUB_TOKEN git push
 
 echo "🎉 Done! Website badge → v${VERSION}"
