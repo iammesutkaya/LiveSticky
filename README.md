@@ -7,6 +7,7 @@ LiveSticky monitors your Twitch stream and updates your community by pinning a p
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
 [![YouTube Integration](https://img.shields.io/badge/Integration-YouTube-FF0000?style=for-the-badge&logo=youtube)](https://developers.google.com/youtube)
+[![Kick Integration](https://img.shields.io/badge/Integration-Kick-53FC18?style=for-the-badge&logo=kick)](https://kick.com)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
 It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends.
@@ -18,7 +19,7 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 | 🔴 | **Automatic Live Posts** | Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live. |
 | ⚡ | **Real-Time Statistics** | Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count. |
 | 🛡️ | **Stream Crash Protection (6-Min Grace Period)** | Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly. |
-| 📺 | **Dual-Platform Promotion** | Optionally promotes your YouTube stream alongside Twitch. If configured, links to both platforms are displayed side-by-side in both live and concluding posts. |
+| 📺 | **Multi-Platform Promotion** | Optionally promotes your YouTube and Kick channels alongside Twitch. If configured, links to all platforms are displayed side-by-side in both live and concluding posts. |
 | 🏷️ | **Custom Post Flairing** | Automatically flairs the live post (e.g., "🔴 Live Now") using your community's custom post flair templates. |
 | 📌 | **Pinned Moderator Comments** | Auto-posts a customizable, pinned moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules. |
 | 🏁 | **Concluding VOD Archives** | When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it. |
@@ -46,6 +47,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 | `{viewers}` | Current live viewer count | `15,420` |
 | `{uptime}` | Stream uptime | `2h 15m` |
 | `{youtube_url}` | Configured YouTube URL | `https://youtube.com/...` |
+| `{kick_url}` | Configured Kick URL | `https://kick.com/...` |
 | `{date}` | Stream date (Highlights post only) | `June 2, 2026` |
 
 ### 🛠️ Setup
@@ -56,6 +58,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 | **Twitch Client ID** | `String (Secret)` | Your Twitch Developer Client ID (scoped to App). |
 | **Twitch Client Secret** | `String (Secret)` | Your Twitch Developer Client Secret (scoped to App). |
 | **YouTube Channel Name / Handle (Optional)** | `String` | The handle of your YouTube channel (e.g. `@ChannelName` or `ChannelName`). |
+| **Kick Channel Name (Optional)** | `String` | The name of your Kick channel (e.g. `ChannelName`). |
 | **Live Post Flair Template ID (Optional)** | `String` | The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair). |
 
 ### 😴 Offline Stage
@@ -117,7 +120,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*
@@ -136,7 +139,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 
 ---
 *This post is now locked as the stream has ended.*
@@ -158,7 +161,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 4. Default Live Sidebar Widget Text
@@ -176,7 +179,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 5. Default Offline Sidebar Widget Text
@@ -189,7 +192,7 @@ Follow the channels below to get notified when {display_name} goes live!
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**
+🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 6. Stream Highlights Templates
