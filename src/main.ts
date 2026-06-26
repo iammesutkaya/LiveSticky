@@ -1,4 +1,5 @@
 import { Devvit, SettingScope } from '@devvit/public-api';
+import { checkStreamStatus, UnifiedStreamInfo } from './platforms.js';
 import {
   DEFAULT_LIVE_POST_BODY,
   DEFAULT_CONCLUDING_POST_BODY,
@@ -55,6 +56,43 @@ Devvit.addSettings([
       },
       {
         type: 'string',
+        name: 'youtubeApiKey',
+        label: 'YouTube Data API Key (Optional)',
+        isSecret: true,
+        scope: SettingScope.App,
+        helpText: 'Your Google Developer API Key with YouTube Data API v3 enabled. Required if using YouTube Live status check.',
+      },
+      {
+        type: 'string',
+        name: 'kickChannel',
+        label: 'Kick Channel Name (Optional)',
+        helpText: 'The name of your Kick channel (e.g., ChannelName)',
+      },
+      {
+        type: 'string',
+        name: 'kickClientId',
+        label: 'Kick API Client ID (Optional)',
+        isSecret: true,
+        scope: SettingScope.App,
+        helpText: 'Your Kick Developer API Client ID. Required if using Kick status check.',
+      },
+      {
+        type: 'string',
+        name: 'kickClientSecret',
+        label: 'Kick API Client Secret (Optional)',
+        isSecret: true,
+        scope: SettingScope.App,
+        helpText: 'Your Kick Developer API Client Secret. Required if using Kick status check.',
+      },
+      {
+        type: 'boolean',
+        name: 'enableDynamicFlair',
+        label: 'Enable Dynamic Post Flair Updates',
+        defaultValue: false,
+        helpText: 'Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K]).',
+      },
+      {
+        type: 'string',
         name: 'liveFlairId',
         label: 'Live Post Flair Template ID (Optional)',
         helpText: 'The UUID of the flair template to apply to the live post (from Mod Tools ➔ Post Flair)',
@@ -79,6 +117,7 @@ Devvit.addSettings([
           '{uptime} — How long the stream has been live (live only)',
           '{date} — Date the stream ended (post-stream only)',
           '{youtube_url} — YouTube channel URL',
+          '{kick_url} — Kick channel URL',
         ].join('\n'),
       }
     ]
@@ -266,6 +305,19 @@ Devvit.addSettings([
         helpText: 'Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used.',
       }
     ]
+  },
+  {
+    type: 'group',
+    label: 'Dashboard (Custom Post)',
+    fields: [
+      {
+        type: 'boolean',
+        name: 'enableDashboard',
+        label: 'Enable Custom Post Dashboard',
+        defaultValue: false,
+        helpText: 'Creates a rich, interactive custom post that auto-updates with live stream stats, viewer count, and platform links. This is an opt-in enhancement — the existing text post flow continues to work as default.',
+      }
+    ]
   }
 ]);
 
@@ -285,10 +337,27 @@ const removeYoutubeLink = (text: string): string => {
     .join('\n');
 };
 
+const removeKickLink = (text: string): string => {
+  return text
+    .split('\n')
+    .map(line => {
+      if (line.includes('{kick_url}')) {
+        // Try to remove Kick link along with preceding separator/spaces on the same line
+        const cleaned = line.replace(/\s*([|•·\-‐‑⁃]|\s{2,})\s*(🟩\s*)?(\*\*)?\[.*?\]\(\{kick_url\}\)(\*\*)?/gi, '');
+        // If the line still contains {kick_url}, it means it was on its own line (or didn't match), so remove the whole line
+        return cleaned.includes('{kick_url}') ? null : cleaned;
+      }
+      return line;
+    })
+    .filter(line => line !== null)
+    .join('\n');
+};
+
 const formatLivePostBody = (
   streamInfo: any,
   channelName: string,
   youtubeUrl?: string,
+  kickUrl?: string,
   customBody?: string,
   footer?: string
 ): string => {
@@ -321,6 +390,12 @@ const formatLivePostBody = (
     result = removeYoutubeLink(result);
   }
 
+  if (kickUrl) {
+    result = result.replace(/{kick_url}/g, kickUrl);
+  } else {
+    result = removeKickLink(result);
+  }
+
   if (footer) {
     result += `\n\n${footer}`;
   }
@@ -331,6 +406,7 @@ const formatLivePostBody = (
 const formatOfflinePostBody = (
   channelName: string,
   youtubeUrl?: string,
+  kickUrl?: string,
   customBody?: string,
   footer?: string,
   defaultTemplate: string = DEFAULT_OFFLINE_POST_BODY,
@@ -352,6 +428,12 @@ const formatOfflinePostBody = (
     result = removeYoutubeLink(result);
   }
 
+  if (kickUrl) {
+    result = result.replace(/{kick_url}/g, kickUrl);
+  } else {
+    result = removeKickLink(result);
+  }
+
   if (footer) {
     result += `\n\n${footer}`;
   }
@@ -365,6 +447,7 @@ const formatSidebarWidgetText = (
   displayName: string,
   channelName: string,
   youtubeUrl?: string,
+  kickUrl?: string,
   customLiveText?: string,
   customOfflineText?: string,
   liveFooter?: string,
@@ -400,6 +483,12 @@ const formatSidebarWidgetText = (
       result = removeYoutubeLink(result);
     }
 
+    if (kickUrl) {
+      result = result.replace(/{kick_url}/g, kickUrl);
+    } else {
+      result = removeKickLink(result);
+    }
+
     if (liveFooter) {
       result += `\n\n${liveFooter}`;
     }
@@ -417,6 +506,12 @@ const formatSidebarWidgetText = (
       result = removeYoutubeLink(result);
     }
 
+    if (kickUrl) {
+      result = result.replace(/{kick_url}/g, kickUrl);
+    } else {
+      result = removeKickLink(result);
+    }
+
     if (offlineFooter) {
       result += `\n\n${offlineFooter}`;
     }
@@ -425,12 +520,12 @@ const formatSidebarWidgetText = (
 };
 
 // Helper to ensure the sticky offline post is created and stickied
-const ensureStickyOfflinePost = async (context: any, channel: string, youtubeUrl?: string) => {
+const ensureStickyOfflinePost = async (context: any, channel: string, youtubeUrl?: string, kickUrl?: string) => {
   const cachedDisplayName = await context.redis.get('twitch_display_name');
   const displayName = cachedDisplayName || channel;
   const customOfflineBody = await context.settings.get('offlinePostBody') as string | undefined;
   const offlinePostFooter = await context.settings.get('offlinePostFooter') as string | undefined;
-  const concludingBody = formatOfflinePostBody(channel, youtubeUrl, customOfflineBody, offlinePostFooter, DEFAULT_OFFLINE_POST_BODY, displayName);
+  const concludingBody = formatOfflinePostBody(channel, youtubeUrl, kickUrl, customOfflineBody, offlinePostFooter, DEFAULT_OFFLINE_POST_BODY, displayName);
   const customOfflineTitle = await context.settings.get('offlinePostTitle') as string | undefined;
   const templateTitle = customOfflineTitle || DEFAULT_OFFLINE_POST_TITLE;
   const offlinePostTitle = templateTitle.replace(/{display_name}/g, displayName);
@@ -594,23 +689,73 @@ const postStreamHighlights = async (
   }
 };
 
+const updateDynamicPostFlair = async (
+  context: any,
+  postId: string,
+  subredditName: string,
+  streamInfo: UnifiedStreamInfo,
+  liveFlairId?: string
+) => {
+  try {
+    const gameName = streamInfo.game_name || '';
+    const viewers = streamInfo.viewer_count;
+    let flairText = '🔴 LIVE';
+    if (gameName && viewers > 0) {
+      const formattedViewers = viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}K` : viewers.toString();
+      flairText = `🔴 LIVE: ${gameName} [${formattedViewers}]`;
+    } else if (gameName) {
+      flairText = `🔴 LIVE: ${gameName}`;
+    }
+
+    await context.reddit.setPostFlair({
+      postId,
+      subredditName,
+      text: flairText,
+      flairTemplateId: liveFlairId,
+    });
+    console.log(`Updated post ${postId} flair dynamically to: ${flairText}`);
+  } catch (flairError) {
+    console.error(`Failed to update dynamic post flair for ${postId}:`, flairError);
+  }
+};
+
+const resetDynamicPostFlair = async (
+  context: any,
+  postId: string,
+  subredditName: string,
+  liveFlairId?: string
+) => {
+  try {
+    await context.reddit.setPostFlair({
+      postId,
+      subredditName,
+      text: '⚫ OFFLINE',
+      flairTemplateId: liveFlairId,
+    });
+    console.log(`Reset post ${postId} flair to offline.`);
+  } catch (flairError) {
+    console.error(`Failed to reset dynamic post flair for ${postId}:`, flairError);
+  }
+};
+
 // Define the scheduled status checking job
 Devvit.addSchedulerJob({
   name: 'check-twitch-status',
   onRun: async (_, context) => {
     // 1. Get settings
-    const channel = await context.settings.get('twitchChannel');
-    const clientId = await context.settings.get('twitchClientId');
-    const secret = await context.settings.get('twitchClientSecret');
-    const liveFlairId = await context.settings.get('liveFlairId');
+    const twitchChannel = await context.settings.get('twitchChannel') as string | undefined;
     const youtubeChannel = await context.settings.get('youtubeChannel') as string | undefined;
+    const kickChannel = await context.settings.get('kickChannel') as string | undefined;
+
+    const liveFlairId = await context.settings.get('liveFlairId') as string | undefined;
     const youtubeUrl = youtubeChannel ? `https://www.youtube.com/@${youtubeChannel.replace(/^@/, '')}` : undefined;
+    const kickUrl = kickChannel ? `https://kick.com/${kickChannel}` : undefined;
+    
     const removeOfflinePost = await context.settings.get('removeOfflinePost') as boolean | undefined;
     const deleteOfflinePost = await context.settings.get('deleteOfflinePost') as boolean | undefined;
     const stickyOfflinePost = await context.settings.get('stickyOfflinePost') as boolean | undefined;
     const updateSidebarWidget = await context.settings.get('updateSidebarWidget') as boolean | undefined;
     const enableHighlightsPost = await context.settings.get('enableHighlightsPost') as boolean | undefined;
-    const highlightsFlairId = await context.settings.get('highlightsFlairId') as string | undefined;
     const livePostTitle = await context.settings.get('livePostTitle') as string | undefined;
     const highlightsPostTitle = await context.settings.get('highlightsPostTitle') as string | undefined;
     const livePostBody = await context.settings.get('livePostBody') as string | undefined;
@@ -623,112 +768,30 @@ Devvit.addSchedulerJob({
     const offlineSidebarFooter = await context.settings.get('offlineSidebarFooter') as string | undefined;
     const highlightsHeader = await context.settings.get('highlightsHeader') as string | undefined;
     const highlightsFooter = await context.settings.get('highlightsFooter') as string | undefined;
+    const highlightsFlairId = await context.settings.get('highlightsFlairId') as string | undefined;
     const offlineGracePeriod = await context.settings.get('offlineGracePeriod') as number | undefined;
     const suggestedSort = await context.settings.get('suggestedSort') as string | undefined;
+    const enableDashboard = await context.settings.get('enableDashboard') as boolean | undefined;
+    const enableDynamicFlair = await context.settings.get('enableDynamicFlair') as boolean | undefined;
     
-    if (!channel || !clientId || !secret) {
-      console.log(`Missing Twitch configuration - Channel: ${!!channel}, ClientID: ${!!clientId}, Secret: ${!!secret}`);
+    const defaultChannel = (twitchChannel || youtubeChannel || kickChannel || '') as string;
+    
+    if (!twitchChannel && !youtubeChannel && !kickChannel) {
+      console.log('No platform channels configured (Twitch, YouTube, or Kick). Skipping status check.');
       return;
     }
 
-    // 2. Fetch Twitch Token (Cached in Redis for 24 hours to prevent rate limiting)
-    const cachedToken = await context.redis.get('twitch_access_token');
-    let token = '';
-    
-    if (!cachedToken) {
-      console.log('Cache miss: Fetching new Twitch Access Token...');
-      try {
-        const tokenRes = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${secret}&grant_type=client_credentials`, {
-          method: 'POST'
-        });
-        
-        if (!tokenRes.ok) {
-          console.error('Failed to get Twitch Token');
-          return;
-        }
-        
-        const tokenData = await tokenRes.json();
-        const accessToken = tokenData.access_token as string | undefined;
-        
-        if (!accessToken) {
-          console.error('Twitch Access Token not found in response');
-          return;
-        }
-        
-        token = accessToken;
-        
-        // Cache token for 24 hours (86400 seconds)
-        await context.redis.set('twitch_access_token', token);
-        await context.redis.expire('twitch_access_token', 86400);
-        console.log('Successfully cached Twitch Access Token.');
-      } catch (tokenError) {
-        console.error('Error fetching Twitch token:', tokenError);
-        return;
-      }
-    } else {
-      console.log('Cache hit: Using cached Twitch Access Token.');
-      token = cachedToken;
-    }
-
-    // 2.5 Fetch and cache Twitch display name if not already cached
-    let cachedDisplayName = await context.redis.get('twitch_display_name');
-    if (!cachedDisplayName) {
-      try {
-        console.log(`Cache miss for twitch_display_name. Fetching user info for ${channel} from Twitch...`);
-        const userRes = await fetch(`https://api.twitch.tv/helix/users?login=${channel}`, {
-          headers: {
-            'Client-ID': clientId as string,
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          if (userData.data && userData.data.length > 0) {
-            const resolvedDisplayName = userData.data[0].display_name as string;
-            cachedDisplayName = resolvedDisplayName;
-            await context.redis.set('twitch_display_name', resolvedDisplayName);
-            console.log(`Successfully fetched and cached Twitch display name: ${resolvedDisplayName}`);
-          }
-        } else {
-          console.error(`Failed to fetch user info from Twitch: ${userRes.statusText}`);
-        }
-      } catch (userError) {
-        console.error('Error fetching Twitch user info:', userError);
-      }
-    }
-
-    // 3. Check Stream Status
-    let isLive = false;
-    let streamInfo: any = null;
-    try {
-      const streamRes = await fetch(`https://api.twitch.tv/helix/streams?user_login=${channel}`, {
-        headers: {
-          'Client-ID': clientId as string,
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!streamRes.ok) {
-        console.error('Failed to fetch Twitch stream status');
-        return;
-      }
-
-      const streamData = await streamRes.json();
-      isLive = streamData.data && streamData.data.length > 0;
-      if (isLive) {
-        streamInfo = streamData.data[0];
-      }
-    } catch (streamError) {
-      console.error('Error checking stream status:', streamError);
-      return;
-    }
+    // 2. Fetch Stream Status using Unified Checker
+    const streamInfo = await checkStreamStatus(context);
+    const isLive = streamInfo !== null;
     
     // 4. Update Reddit State
     const isCurrentlyPinned = await context.redis.get('is_live_pinned');
+    const subreddit = await context.reddit.getCurrentSubreddit();
     
     if (isLive && streamInfo) {
-      const postBody = formatLivePostBody(streamInfo, channel as string, youtubeUrl, livePostBody, livePostFooter);
-      const displayName = streamInfo.user_name || channel;
+      const postBody = formatLivePostBody(streamInfo, defaultChannel, youtubeUrl, kickUrl, livePostBody, livePostFooter);
+      const displayName = streamInfo.user_name || defaultChannel;
       const templateTitle = livePostTitle || DEFAULT_LIVE_POST_TITLE;
       const postTitle = templateTitle
         .replace(/{display_name}/g, displayName)
@@ -746,103 +809,157 @@ Devvit.addSchedulerJob({
         await context.redis.set('is_live_pinned', 'true');
         await context.redis.set('twitch_display_name', displayName);
 
-        // Cache stream details to fetch highlights later when the stream concludes
-        if (streamInfo.user_id) {
-          await context.redis.set('twitch_broadcaster_id', streamInfo.user_id);
-        }
-        if (streamInfo.started_at) {
-          await context.redis.set('twitch_started_at', streamInfo.started_at);
-        }
-        if (streamInfo.title) {
-          await context.redis.set('twitch_stream_title', streamInfo.title);
+        // Cache stream details to fetch highlights later when the stream concludes (only if Twitch)
+        if (streamInfo.platform === 'twitch') {
+          if (streamInfo.user_id) {
+            await context.redis.set('twitch_broadcaster_id', streamInfo.user_id);
+          }
+          if (streamInfo.started_at) {
+            await context.redis.set('twitch_started_at', streamInfo.started_at);
+          }
+          if (streamInfo.title) {
+            await context.redis.set('twitch_stream_title', streamInfo.title);
+          }
         }
 
-        console.log('Stream went live! Posting and pinning...');
-        
-        try {
-          // Unsticky offline post if active
-          if (stickyOfflinePost) {
-            await context.redis.del('is_offline_post_pinned');
-            const offlinePostId = await context.redis.get('offline_post_id');
-            if (offlinePostId) {
+        if (enableDashboard) {
+          console.log('Stream went live! Custom Dashboard Post is enabled.');
+          // Ensure the custom dashboard post is stickied if we have its ID
+          const dashPostId = await context.redis.get('dashboard_post_id');
+          if (dashPostId) {
+            try {
+              const post = await context.reddit.getPostById(dashPostId);
+              await post.sticky();
+              console.log(`Successfully stickied custom dashboard post: ${dashPostId}`);
+              
+              if (enableDynamicFlair) {
+                await updateDynamicPostFlair(context, dashPostId, subreddit.name, streamInfo, liveFlairId);
+              }
+            } catch (stickyError) {
+              console.error('Failed to sticky custom dashboard post:', stickyError);
+            }
+          }
+        } else {
+          console.log('Stream went live! Posting and pinning standard live post...');
+          try {
+            // Unsticky offline post if active
+            if (stickyOfflinePost) {
+              await context.redis.del('is_offline_post_pinned');
+              const offlinePostId = await context.redis.get('offline_post_id');
+              if (offlinePostId) {
+                try {
+                  const offlinePost = await context.reddit.getPostById(offlinePostId);
+                  await offlinePost.unsticky();
+                  console.log(`Successfully unstickied offline post: ${offlinePostId}`);
+                } catch (unstickyError) {
+                  console.error('Failed to unsticky offline post:', unstickyError);
+                }
+              }
+            }
+
+            const post = await context.reddit.submitPost({
+              title: postTitle,
+              subredditName: subreddit.name,
+              text: postBody,
+            });
+            await post.sticky();
+
+            // Set suggested comment sort
+            if (suggestedSort && suggestedSort !== 'BLANK') {
               try {
-                const offlinePost = await context.reddit.getPostById(offlinePostId);
-                await offlinePost.unsticky();
-                console.log(`Successfully unstickied offline post: ${offlinePostId}`);
-              } catch (unstickyError) {
-                console.error('Failed to unsticky offline post:', unstickyError);
+                await post.setSuggestedCommentSort(suggestedSort as any);
+                console.log(`Successfully set suggested comment sort to ${suggestedSort}.`);
+              } catch (sortError) {
+                console.error(`Failed to set suggested comment sort to ${suggestedSort}:`, sortError);
+              }
+            }
+            
+            // Apply custom flair if template ID is provided
+            if (liveFlairId) {
+              try {
+                await context.reddit.setPostFlair({
+                  postId: post.id,
+                  subredditName: subreddit.name,
+                  flairTemplateId: liveFlairId as string,
+                });
+                console.log(`Successfully applied post flair: ${liveFlairId}`);
+              } catch (flairError) {
+                console.error('Failed to set post flair:', flairError);
+              }
+            }
+
+            if (enableDynamicFlair) {
+              await updateDynamicPostFlair(context, post.id, subreddit.name, streamInfo, liveFlairId);
+            }
+
+            // Submit and sticky comment if text is provided
+            const liveCommentText = await context.settings.get('liveCommentText');
+            if (liveCommentText) {
+              try {
+                const comment = await context.reddit.submitComment({
+                  id: post.id,
+                  text: liveCommentText as string,
+                });
+                await comment.distinguish(true);
+                console.log('Successfully posted and pinned moderator comment.');
+              } catch (commentError) {
+                console.error('Failed to post moderator comment:', commentError);
+              }
+            }
+            
+            // Save post ID to redis
+            await context.redis.set('live_post_id', post.id);
+            console.log(`Successfully posted and pinned: ${post.id}`);
+          } catch (e) {
+            console.error('Failed to post stream status to Reddit, resetting lock:', e);
+            // Clear lock if the operation failed, so we can retry on next cron execution
+            await context.redis.del('is_live_pinned');
+          }
+        }
+      } else {
+        // Stream is already live. Let's update the standard post if enableDashboard is false.
+        if (!enableDashboard) {
+          console.log('Stream is still live. Updating standard post stats in real-time...');
+          const postId = await context.redis.get('live_post_id');
+          if (postId) {
+            try {
+              const post = await context.reddit.getPostById(postId);
+              await post.edit({ text: postBody });
+              console.log(`Successfully updated live post stats for: ${postId}`);
+              
+              if (enableDynamicFlair) {
+                await updateDynamicPostFlair(context, postId, subreddit.name, streamInfo, liveFlairId);
+              }
+            } catch (e) {
+              console.error('Failed to update live post stats:', e);
+            }
+          }
+        } else {
+          if (enableDynamicFlair) {
+            const dashPostId = await context.redis.get('dashboard_post_id');
+            if (dashPostId) {
+              try {
+                await updateDynamicPostFlair(context, dashPostId, subreddit.name, streamInfo, liveFlairId);
+              } catch (e) {
+                console.error('Failed to update dashboard dynamic flair:', e);
               }
             }
           }
-
-          const subreddit = await context.reddit.getCurrentSubreddit();
-          const post = await context.reddit.submitPost({
-            title: postTitle,
-            subredditName: subreddit.name,
-            text: postBody,
-          });
-          await post.sticky();
-
-          // Set suggested comment sort
-          if (suggestedSort && suggestedSort !== 'BLANK') {
-            try {
-              await post.setSuggestedCommentSort(suggestedSort as any);
-              console.log(`Successfully set suggested comment sort to ${suggestedSort}.`);
-            } catch (sortError) {
-              console.error(`Failed to set suggested comment sort to ${suggestedSort}:`, sortError);
-            }
-          }
-          
-          // Apply custom flair if template ID is provided
-          if (liveFlairId) {
-            try {
-              await context.reddit.setPostFlair({
-                postId: post.id,
-                subredditName: subreddit.name,
-                flairTemplateId: liveFlairId as string,
-              });
-              console.log(`Successfully applied post flair: ${liveFlairId}`);
-            } catch (flairError) {
-              console.error('Failed to set post flair:', flairError);
-            }
-          }
-
-          // Submit and sticky comment if text is provided
-          const liveCommentText = await context.settings.get('liveCommentText');
-          if (liveCommentText) {
-            try {
-              const comment = await context.reddit.submitComment({
-                id: post.id,
-                text: liveCommentText as string,
-              });
-              await comment.distinguish(true);
-              console.log('Successfully posted and pinned moderator comment.');
-            } catch (commentError) {
-              console.error('Failed to post moderator comment:', commentError);
-            }
-          }
-          
-          // Save post ID to redis
-          await context.redis.set('live_post_id', post.id);
-          console.log(`Successfully posted and pinned: ${post.id}`);
-        } catch (e) {
-          console.error('Failed to post stream status to Reddit, resetting lock:', e);
-          // Clear lock if the operation failed, so we can retry on next cron execution
-          await context.redis.del('is_live_pinned');
         }
-      } else {
-        // Stream is already live. Let's update the post with real-time stats (viewer count, uptime, game, etc.)
-        console.log('Stream is still live. Updating post stats in real-time...');
-        const postId = await context.redis.get('live_post_id');
-        if (postId) {
-          try {
-            const post = await context.reddit.getPostById(postId);
-            await post.edit({ text: postBody });
-            console.log(`Successfully updated live post stats for: ${postId}`);
-          } catch (e) {
-            console.error('Failed to update live post stats:', e);
-          }
-        }
+      }
+
+      // Write dashboard-specific Redis keys for the webview server endpoints
+      try {
+        const gameName = streamInfo.game_name || 'Just Chatting';
+        const viewerCount = streamInfo.viewer_count !== undefined ? streamInfo.viewer_count.toString() : '0';
+        const thumbnail = streamInfo.thumbnail_url || '';
+        await Promise.all([
+          context.redis.set('dashboard_game', gameName),
+          context.redis.set('dashboard_viewers', viewerCount),
+          context.redis.set('dashboard_thumbnail', thumbnail),
+        ]);
+      } catch (dashError) {
+        console.error('Failed to write dashboard Redis keys:', dashError);
       }
       
     } else if (!isLive && isCurrentlyPinned) {
@@ -877,14 +994,25 @@ Devvit.addSchedulerJob({
           const startedAt = await context.redis.get('twitch_started_at');
           const streamTitle = await context.redis.get('twitch_stream_title') || 'Recent Stream';
           const cachedDisplayName = await context.redis.get('twitch_display_name');
-          const displayName = cachedDisplayName || (channel as string);
+          const displayName = cachedDisplayName || defaultChannel;
           
           // Clean up the cached stream details
           await context.redis.del('twitch_broadcaster_id');
           await context.redis.del('twitch_started_at');
           await context.redis.del('twitch_stream_title');
           
-          if (postId) {
+          if (enableDynamicFlair) {
+            if (enableDashboard) {
+              const dashPostId = await context.redis.get('dashboard_post_id');
+              if (dashPostId) {
+                await resetDynamicPostFlair(context, dashPostId, subreddit.name, liveFlairId);
+              }
+            } else if (postId) {
+              await resetDynamicPostFlair(context, postId, subreddit.name, liveFlairId);
+            }
+          }
+
+          if (!enableDashboard && postId) {
             try {
               const post = await context.reddit.getPostById(postId);
               
@@ -899,8 +1027,9 @@ Devvit.addSchedulerJob({
                   // Update live post body with the concluding message
                   try {
                     const concludingBody = formatOfflinePostBody(
-                      channel as string,
+                      defaultChannel,
                       youtubeUrl,
+                      kickUrl,
                       concludingPostBody,
                       concludingPostFooter,
                       DEFAULT_CONCLUDING_POST_BODY,
@@ -931,41 +1060,58 @@ Devvit.addSchedulerJob({
             }
           }
 
-          // Trigger stream highlights compilation if enabled
+          // Trigger stream highlights compilation if enabled (Twitch only)
           if (enableHighlightsPost && broadcasterId && startedAt) {
             try {
-              await postStreamHighlights(
-                context,
-                clientId as string,
-                token,
-                broadcasterId,
-                startedAt,
-                streamTitle,
-                channel as string,
-                displayName,
-                highlightsHeader,
-                highlightsFooter,
-                highlightsFlairId,
-                highlightsPostTitle
-              );
+              // Fetch twitch access token dynamically if needed for highlights
+              const twitchClientId = await context.settings.get('twitchClientId') as string;
+              const twitchClientSecret = await context.settings.get('twitchClientSecret') as string;
+              let twitchToken = await context.redis.get('twitch_access_token');
+              if (!twitchToken && twitchClientId && twitchClientSecret) {
+                const tokenRes = await fetch(
+                  `https://id.twitch.tv/oauth2/token?client_id=${twitchClientId}&client_secret=${twitchClientSecret}&grant_type=client_credentials`,
+                  { method: 'POST' }
+                );
+                if (tokenRes.ok) {
+                  const tokenData = await tokenRes.json();
+                  twitchToken = tokenData.access_token;
+                }
+              }
+
+              if (twitchToken) {
+                await postStreamHighlights(
+                  context,
+                  twitchClientId,
+                  twitchToken,
+                  broadcasterId,
+                  startedAt,
+                  streamTitle,
+                  twitchChannel || '',
+                  displayName,
+                  highlightsHeader,
+                  highlightsFooter,
+                  highlightsFlairId,
+                  highlightsPostTitle
+                );
+              }
             } catch (highlightsError) {
               console.error('Failed to trigger postStreamHighlights:', highlightsError);
             }
           }
 
-          // Handle sticky offline post if enabled
-          if (stickyOfflinePost) {
-            await ensureStickyOfflinePost(context, channel as string, youtubeUrl);
+          // Handle sticky offline post if enabled (ONLY for standard flow)
+          if (!enableDashboard && stickyOfflinePost) {
+            await ensureStickyOfflinePost(context, defaultChannel, youtubeUrl, kickUrl);
           }
         }
       }
     } else if (!isLive && !isCurrentlyPinned) {
       // Stream is offline and we are not currently transitioning. Ensure offline post is active if enabled.
-      if (stickyOfflinePost) {
+      if (!enableDashboard && stickyOfflinePost) {
         const isOfflinePostPinned = await context.redis.get('is_offline_post_pinned');
         if (!isOfflinePostPinned) {
           console.log('Offline post is not marked as pinned in Redis. Ensuring sticky offline post is active...');
-          await ensureStickyOfflinePost(context, channel as string, youtubeUrl);
+          await ensureStickyOfflinePost(context, defaultChannel, youtubeUrl, kickUrl);
         }
       }
     }
@@ -974,13 +1120,14 @@ Devvit.addSchedulerJob({
     if (updateSidebarWidget) {
       try {
         const cachedDisplayName = await context.redis.get('twitch_display_name');
-        const displayName = isLive && streamInfo ? (streamInfo.user_name || channel) : (cachedDisplayName || channel);
+        const displayName = isLive && streamInfo ? (streamInfo.user_name || defaultChannel) : (cachedDisplayName || defaultChannel);
         const widgetText = formatSidebarWidgetText(
           isLive,
           streamInfo,
           displayName as string,
-          channel as string,
+          defaultChannel,
           youtubeUrl,
+          kickUrl,
           liveSidebarText,
           offlineSidebarText,
           liveSidebarFooter,
@@ -1016,6 +1163,34 @@ Devvit.addSchedulerJob({
       } catch (widgetError) {
         console.error('Failed to update sidebar widget:', widgetError);
       }
+    }
+
+    // 6. Sync dashboard config keys for the custom post webview
+    try {
+      const youtubeChannelRaw = await context.settings.get('youtubeChannel') as string | undefined;
+      const kickChannelRaw = await context.settings.get('kickChannel') as string | undefined;
+
+      // Sync config keys so the /api/config endpoint can serve them
+      await Promise.all([
+        context.redis.set('dashboard_twitch_channel', twitchChannel || ''),
+        youtubeChannelRaw
+          ? context.redis.set('dashboard_youtube_channel', youtubeChannelRaw)
+          : context.redis.del('dashboard_youtube_channel'),
+        kickChannelRaw
+          ? context.redis.set('dashboard_kick_channel', kickChannelRaw)
+          : context.redis.del('dashboard_kick_channel'),
+      ]);
+
+      // Clear dashboard live stats when offline
+      if (!isLive) {
+        await Promise.all([
+          context.redis.del('dashboard_game'),
+          context.redis.del('dashboard_viewers'),
+          context.redis.del('dashboard_thumbnail'),
+        ]);
+      }
+    } catch (dashSyncError) {
+      console.error('Failed to sync dashboard config:', dashSyncError);
     }
   }
 });
@@ -1092,6 +1267,85 @@ Devvit.addMenuItem({
   forUserType: 'moderator',
   onPress: async (_, context) => {
     context.ui.navigateTo('https://github.com/iammesutkaya/LiveSticky#-default-templates-for-copy-pasting');
+  },
+});
+
+// Add a moderator menu item to create or recreate the custom dashboard post
+Devvit.addMenuItem({
+  label: 'Create LiveSticky Dashboard',
+  description: 'Creates a persistent custom post dashboard that auto-updates with live stream stats and platform links.',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_, context) => {
+    const enableDashboard = await context.settings.get('enableDashboard') as boolean | undefined;
+    if (!enableDashboard) {
+      context.ui.showToast('⚠️ Enable "Custom Post Dashboard" in LiveSticky settings first!');
+      return;
+    }
+
+    try {
+      // Sync config keys before creating the post
+      const dashChannel = await context.settings.get('twitchChannel') as string;
+      const youtubeChannelRaw = await context.settings.get('youtubeChannel') as string | undefined;
+      const kickChannelRaw = await context.settings.get('kickChannel') as string | undefined;
+      if (dashChannel) {
+        await context.redis.set('dashboard_twitch_channel', dashChannel);
+      }
+      if (youtubeChannelRaw) {
+        await context.redis.set('dashboard_youtube_channel', youtubeChannelRaw);
+      }
+      if (kickChannelRaw) {
+        await context.redis.set('dashboard_kick_channel', kickChannelRaw);
+      }
+
+      // Unsticky/cleanup previous dashboard post if it exists
+      const oldDashPostId = await context.redis.get('dashboard_post_id');
+      if (oldDashPostId) {
+        try {
+          const oldPost = await context.reddit.getPostById(oldDashPostId);
+          await oldPost.unsticky();
+          console.log(`Unstickied old dashboard post: ${oldDashPostId}`);
+        } catch (e) {
+          console.log(`Failed to unsticky old dashboard post: ${oldDashPostId} (might be deleted/archived)`);
+        }
+      }
+
+      const subreddit = await context.reddit.getCurrentSubreddit();
+      
+      const response = await (Devvit as any).redditAPIPlugins.LinksAndComments.SubmitCustomPost({
+        title: '📺 LiveSticky Dashboard',
+        sr: subreddit.name,
+        kind: 'custom',
+        richtextJson: 'GgUKAxCABA==',
+        runAs: 0, // RunAs.APP
+        postData: {
+          developerData: {},
+          splash: {
+            entry: 'default',
+          },
+        },
+        customPostStyles: {
+          height: 1, // EntrypointHeight.REGULAR
+        },
+      });
+
+      let postId = response.json?.data?.name;
+      if (!postId && response.json?.data?.id) {
+        postId = `t3_${response.json.data.id}`;
+      }
+      if (!postId) {
+        throw new Error('Failed to submit custom post: ' + JSON.stringify(response));
+      }
+
+      await context.redis.set('dashboard_post_id', postId);
+      const post = await context.reddit.getPostById(postId);
+      await post.sticky();
+      context.ui.showToast('📺 LiveSticky Dashboard created and stickied!');
+      console.log(`Created new LiveSticky Dashboard post: ${postId}`);
+    } catch (e) {
+      console.error('Failed to create dashboard post:', e);
+      context.ui.showToast('❌ Failed to create dashboard. Check the logs.');
+    }
   },
 });
 

@@ -4,6 +4,20 @@
   "blocks": {
     "entry": "src/main.ts"
   },
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": {
+        "entry": "index.html",
+        "height": "regular",
+        "inline": true
+      }
+    }
+  },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
   "marketingAssets": {
     "icon": "assets/icon.png"
   },
@@ -16,7 +30,10 @@
       "enable": true,
       "domains": [
         "id.twitch.tv",
-        "api.twitch.tv"
+        "api.twitch.tv",
+        "youtube.googleapis.com",
+        "id.kick.com",
+        "api.kick.com"
       ]
     }
   },

@@ -23,8 +23,29 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "🚀 Uploading dev version to Devvit..."
-OUTPUT=$(npx devvit upload "${FLAGS[@]}" 2>&1 | tee /dev/stderr)
+# Temporarily disable local git exclusions (.git/info/exclude) so Devvit CLI uploads dist/
+EXCLUDE_FILE=".git/info/exclude"
+HAS_EXCLUDE=false
+if [ -f "$EXCLUDE_FILE" ]; then
+  mv "$EXCLUDE_FILE" "${EXCLUDE_FILE}.bak"
+  HAS_EXCLUDE=true
+fi
+
+# Run upload, ensuring we restore the exclude file even if upload fails
+set +e
+OUTPUT=$(npx devvit upload ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr)
+UPLOAD_EXIT_CODE=$?
+set -e
+
+if [ "$HAS_EXCLUDE" = true ]; then
+  mv "${EXCLUDE_FILE}.bak" "$EXCLUDE_FILE"
+fi
+
+if [ $UPLOAD_EXIT_CODE -ne 0 ]; then
+  echo "❌ Upload failed!"
+  exit $UPLOAD_EXIT_CODE
+fi
+
 
 # Determine the version: use explicit if provided, otherwise extract from output
 if [ -n "$EXPLICIT_VERSION" ]; then
