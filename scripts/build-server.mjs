@@ -10,21 +10,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
 await build({
-  configFile: false,
+  ssr: {
+    noExternal: true,
+  },
   build: {
-    lib: {
-      entry: path.resolve(root, 'server/index.ts'),
-      formats: ['cjs'],
-      fileName: () => 'index.cjs',
-    },
+    ssr: path.resolve(root, 'server/index.ts'),
+    target: 'node22',
     outDir: path.resolve(root, 'dist/server'),
     emptyOutDir: true,
     rollupOptions: {
-      external: [
-        '@devvit/web/server',
-        '@devvit/web/client',
-        /^@devvit\//,
-      ],
+      output: {
+        format: 'cjs',
+        entryFileNames: 'index.cjs',
+      },
     },
     minify: false,
     sourcemap: false,
