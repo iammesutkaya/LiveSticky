@@ -57,14 +57,6 @@ body {
   display: none !important;
 }
 
-/* Devvit's webview/playtest runtime injects a debug overlay (an absolutely
-   positioned div showing the connection token, z-index 9999) as a direct child
-   of <body> in the dev simulator. Our document only ever contains #dashboard,
-   so hide any other top-level element to keep the dashboard clean. */
-body > :not(#dashboard):not(script) {
-  display: none !important;
-}
-
 /* ==========================================================================
    Loading State
    ========================================================================== */
