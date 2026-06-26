@@ -327,7 +327,10 @@
         "api.twitch.tv",
         "youtube.googleapis.com",
         "id.kick.com",
-        "api.kick.com"
+        "api.kick.com",
+        "static-cdn.jtvnw.net",
+        "yt3.googleusercontent.com",
+        "files.kick.com"
       ]
     }
   },

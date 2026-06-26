@@ -240,6 +240,19 @@ function startPolling() {
  * Initialize the dashboard
  */
 async function init() {
+  // Add temporary debug overlay to see URL params
+  const debugEl = document.createElement('div');
+  debugEl.style.position = 'absolute';
+  debugEl.style.bottom = '4px';
+  debugEl.style.left = '4px';
+  debugEl.style.fontSize = '9px';
+  debugEl.style.color = '#888';
+  debugEl.style.zIndex = '9999';
+  debugEl.style.maxWidth = '100%';
+  debugEl.style.wordWrap = 'break-word';
+  debugEl.innerText = window.location.search || 'No URL params';
+  document.body.appendChild(debugEl);
+
   // Fetch config and initial status in parallel
   await Promise.all([fetchConfig(), fetchStatus()]);
 

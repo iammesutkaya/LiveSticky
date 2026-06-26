@@ -40,6 +40,10 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: var(--font);
   background: var(--bg-primary);
@@ -50,6 +54,14 @@ body {
 }
 
 .hidden {
+  display: none !important;
+}
+
+/* Devvit's webview/playtest runtime injects a debug overlay (an absolutely
+   positioned div showing the connection token, z-index 9999) as a direct child
+   of <body> in the dev simulator. Our document only ever contains #dashboard,
+   so hide any other top-level element to keep the dashboard clean. */
+body > :not(#dashboard):not(script) {
   display: none !important;
 }
 
@@ -99,14 +111,24 @@ body {
 .dashboard {
   width: 100%;
   max-width: 600px;
+  min-height: 100%;
   margin: 0 auto;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+/* Push the footer to the bottom of the slot so the leftover space reads as
+   padding inside the dashboard rather than dead black area below it. */
+.content .footer {
+  margin-top: auto;
 }
 
 /* ==========================================================================
@@ -477,5 +499,90 @@ body {
 
   .platform-btn {
     flex: unset;
+  }
+}
+
+/* ==========================================================================
+   Compact Mode (Community Highlights & Small Viewports)
+   ========================================================================== */
+
+@media (max-height: 290px) {
+  .dashboard {
+    padding: 8px;
+  }
+
+  .content {
+    gap: 8px;
+  }
+
+  .header {
+    margin-bottom: 2px;
+  }
+
+  .display-name {
+    font-size: 16px;
+  }
+
+  .badge {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .live-content {
+    gap: 8px;
+  }
+
+  .stream-info {
+    padding: 8px 10px;
+  }
+
+  .stream-title {
+    font-size: 13px;
+    -webkit-line-clamp: 1;
+  }
+
+  .stats-grid {
+    gap: 6px;
+  }
+
+  .stat-card {
+    padding: 8px 6px;
+    gap: 6px;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .stat-card .stat-label {
+    display: none;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .offline-message {
+    padding: 16px 10px;
+    gap: 4px;
+  }
+
+  .offline-icon {
+    font-size: 28px;
+  }
+
+  .offline-text {
+    font-size: 14px;
+  }
+
+  .offline-subtext {
+    font-size: 11px;
+  }
+
+  .platform-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .footer {
+    display: none;
   }
 }
