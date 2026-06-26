@@ -1,22 +1,253 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
   "name": "live-sticky",
-  "blocks": {
-    "entry": "src/main.ts"
-  },
   "post": {
     "dir": "dist/client",
     "entrypoints": {
       "default": {
         "entry": "index.html",
-        "height": "regular",
-        "inline": true
+        "height": "regular"
       }
     }
   },
   "server": {
     "dir": "dist/server",
     "entry": "index.cjs"
+  },
+  "scheduler": {
+    "tasks": {
+      "check-twitch-status": {
+        "endpoint": "/internal/scheduler/check-status",
+        "cron": "*/2 * * * *"
+      }
+    }
+  },
+  "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install",
+    "onAppUpgrade": "/internal/triggers/on-app-upgrade"
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Create LiveSticky Dashboard",
+        "description": "Creates a persistent custom post dashboard that auto-updates with live stream stats and platform links.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/create-dashboard"
+      },
+      {
+        "label": "Restart LiveSticky",
+        "description": "Clears cached stream status and runs an immediate status check.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/restart"
+      },
+      {
+        "label": "Get Default LiveSticky Templates",
+        "description": "Opens the GitHub page with copy-pasteable templates for your settings.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/get-templates"
+      }
+    ]
+  },
+  "settings": {
+    "subreddit": {
+      "twitchChannel": {
+        "type": "string",
+        "label": "Twitch Channel Name",
+        "helpText": "The name of the Twitch channel to monitor (e.g., streamer)"
+      },
+      "twitchClientId": {
+        "type": "string",
+        "label": "Twitch Client ID",
+        "helpText": "Your Twitch App Client ID. Register one at https://dev.twitch.tv/console (Guide: https://github.com/iammesutkaya/LiveSticky#readme). Sensitive — only mods of this community can see it."
+      },
+      "twitchClientSecret": {
+        "type": "string",
+        "label": "Twitch Client Secret",
+        "helpText": "Your Twitch App Client Secret. Sensitive — keep it confidential; only mods of this community can see it. (Guide: https://github.com/iammesutkaya/LiveSticky#readme)"
+      },
+      "youtubeChannel": {
+        "type": "string",
+        "label": "YouTube Channel Name / Handle (Optional)",
+        "helpText": "The name or handle of your YouTube channel (e.g., @ChannelName or ChannelName)"
+      },
+      "youtubeApiKey": {
+        "type": "string",
+        "label": "YouTube Data API Key (Optional)",
+        "helpText": "Your Google Developer API Key with YouTube Data API v3 enabled. Required if using YouTube Live status check. Sensitive — only mods of this community can see it."
+      },
+      "kickChannel": {
+        "type": "string",
+        "label": "Kick Channel Name (Optional)",
+        "helpText": "The name of your Kick channel (e.g., ChannelName)"
+      },
+      "kickClientId": {
+        "type": "string",
+        "label": "Kick API Client ID (Optional)",
+        "helpText": "Your Kick Developer API Client ID. Required if using Kick status check. Sensitive — only mods of this community can see it."
+      },
+      "kickClientSecret": {
+        "type": "string",
+        "label": "Kick API Client Secret (Optional)",
+        "helpText": "Your Kick Developer API Client Secret. Required if using Kick status check. Sensitive — only mods of this community can see it."
+      },
+      "enableDynamicFlair": {
+        "type": "boolean",
+        "label": "Enable Dynamic Post Flair Updates",
+        "defaultValue": false,
+        "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K])."
+      },
+      "liveFlairId": {
+        "type": "string",
+        "label": "Live Post Flair Template ID (Optional)",
+        "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Post Flair)"
+      },
+      "placeholderReference": {
+        "type": "paragraph",
+        "label": "Available Placeholders (for reference — changes here have no effect)",
+        "defaultValue": "{channel} — Twitch channel login name (e.g. streamer)\n{display_name} — Channel display name (e.g. Streamer)\n{title} — Stream title\n{game} — Game or category being streamed (live only)\n{viewers} — Current viewer count (live only)\n{uptime} — How long the stream has been live (live only)\n{date} — Date the stream ended (post-stream only)\n{twitch_url} — Twitch channel URL\n{youtube_url} — YouTube channel URL\n{kick_url} — Kick channel URL"
+      },
+      "removeOfflinePost": {
+        "type": "boolean",
+        "label": "Remove Live Post from Feed when Offline",
+        "defaultValue": false,
+        "helpText": "Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed."
+      },
+      "deleteOfflinePost": {
+        "type": "boolean",
+        "label": "Delete Live Post when Offline",
+        "defaultValue": false,
+        "helpText": "Completely deletes the live post and all its comments when the stream ends."
+      },
+      "offlineGracePeriod": {
+        "type": "number",
+        "label": "Offline Grace Period (Minutes)",
+        "defaultValue": 6,
+        "helpText": "How long (in minutes) to wait before concluding the live post after going offline. Prevents duplicate posts during brief stream crashes."
+      },
+      "stickyOfflinePost": {
+        "type": "boolean",
+        "label": "Enable Pinned Offline Post",
+        "defaultValue": true,
+        "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation."
+      },
+      "updateSidebarWidget": {
+        "type": "boolean",
+        "label": "Enable Sidebar Widget",
+        "defaultValue": false,
+        "helpText": "Creates and automatically updates a \"Stream Status\" text widget in your community sidebar."
+      },
+      "offlinePostTitle": {
+        "type": "string",
+        "label": "Offline Post Title (Optional)",
+        "helpText": "Custom title for the offline post. If empty, the default template is used."
+      },
+      "offlinePostBody": {
+        "type": "paragraph",
+        "label": "Offline Post Body (Markdown) (Optional)",
+        "helpText": "Custom markdown for the body of the offline post. If empty, the default template is used."
+      },
+      "offlinePostFooter": {
+        "type": "paragraph",
+        "label": "Offline Post Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the offline post."
+      },
+      "offlineSidebarText": {
+        "type": "paragraph",
+        "label": "Offline Sidebar Widget Text (Markdown) (Optional)",
+        "helpText": "Custom markdown for the body of the sidebar widget when the stream is offline. If empty, the default template is used."
+      },
+      "offlineSidebarFooter": {
+        "type": "paragraph",
+        "label": "Offline Sidebar Widget Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the offline sidebar widget."
+      },
+      "livePostBody": {
+        "type": "paragraph",
+        "label": "Live Post Body (Markdown) (Optional)",
+        "helpText": "Custom markdown for the body of the live post. If empty, the default template is used."
+      },
+      "livePostFooter": {
+        "type": "paragraph",
+        "label": "Live Post Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the live post."
+      },
+      "livePostTitle": {
+        "type": "string",
+        "label": "Live Post Title (Optional)",
+        "helpText": "Custom title for the live post. If empty, the default template is used."
+      },
+      "liveCommentText": {
+        "type": "paragraph",
+        "label": "Auto-Pinned Comment Text (Optional)",
+        "helpText": "Text to automatically post and pin as a mod comment inside the live post (e.g. Discord link)."
+      },
+      "liveSidebarText": {
+        "type": "paragraph",
+        "label": "Live Sidebar Widget Text (Markdown) (Optional)",
+        "helpText": "Custom markdown for the body of the sidebar widget when the stream is live. If empty, the default template is used."
+      },
+      "liveSidebarFooter": {
+        "type": "paragraph",
+        "label": "Live Sidebar Widget Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the sidebar widget when the stream is live."
+      },
+      "suggestedSort": {
+        "type": "select",
+        "label": "Suggested Comment Sort",
+        "options": [
+          { "label": "New (Recommended)", "value": "NEW" },
+          { "label": "Live", "value": "LIVE" },
+          { "label": "Q&A", "value": "QA" },
+          { "label": "None (Community default)", "value": "BLANK" }
+        ],
+        "defaultValue": "NEW"
+      },
+      "enableHighlightsPost": {
+        "type": "boolean",
+        "label": "Enable Stream Highlights Post",
+        "defaultValue": false,
+        "helpText": "Automatically posts a compilation of top Twitch clips generated during the stream when it ends."
+      },
+      "highlightsFlairId": {
+        "type": "string",
+        "label": "Highlights Post Flair Template ID (Optional)",
+        "helpText": "The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Post Flair)."
+      },
+      "highlightsPostTitle": {
+        "type": "string",
+        "label": "Highlights Post Title (Optional)",
+        "helpText": "Custom title for the stream highlights post. If empty, the default template is used."
+      },
+      "concludingPostBody": {
+        "type": "paragraph",
+        "label": "Concluding Post Body (Markdown) (Optional)",
+        "helpText": "Custom markdown for the live post body after the stream ends. If empty, the default template is used."
+      },
+      "concludingPostFooter": {
+        "type": "paragraph",
+        "label": "Concluding Post Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the concluding post."
+      },
+      "highlightsHeader": {
+        "type": "paragraph",
+        "label": "Highlights Post Custom Header (Markdown) (Optional)",
+        "helpText": "Custom markdown for the header of the stream highlights post. If empty, the default template is used."
+      },
+      "highlightsFooter": {
+        "type": "paragraph",
+        "label": "Highlights Post Custom Footer (Markdown) (Optional)",
+        "helpText": "Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used."
+      },
+      "enableDashboard": {
+        "type": "boolean",
+        "label": "Enable Custom Post Dashboard",
+        "defaultValue": false,
+        "helpText": "Creates a rich, interactive custom post that auto-updates with live stream stats, viewer count, and platform links. This is an opt-in enhancement — the existing text post flow continues to work as default."
+      }
+    }
   },
   "marketingAssets": {
     "icon": "assets/icon.png"

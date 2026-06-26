@@ -1,43 +1,57 @@
 import express from 'express';
 import { createServer, getServerPort } from '@devvit/web/server';
 import { redis } from '@devvit/web/server';
-
+import {
+  runStatusCheck,
+  createDashboardPost,
+  restartLiveSticky,
+  buildYouTubeUrl,
+} from './livesticky.js';
 
 const app = express();
 app.use(express.json());
 
+// ---------------------------------------------------------------------------
+// Webview API (consumed by the dashboard custom post client)
+// ---------------------------------------------------------------------------
+
 /**
  * GET /api/stream-status
- *
- * Returns the current stream state from Redis, used by the dashboard webview
- * to render the live/offline UI and display real-time stats.
+ * Returns the current stream state from Redis for the dashboard webview.
  */
 app.get('/api/stream-status', async (_req, res) => {
   try {
     const [
       isLivePinned,
       livePostId,
-      displayName,
-      startedAt,
-      streamTitle,
-      // Live stats stored by the scheduler
+      dashboardDisplayName,
+      dashboardStartedAt,
+      dashboardTitle,
       streamGame,
       streamViewers,
       streamThumbnail,
+      legacyDisplayName,
+      legacyStartedAt,
+      legacyTitle,
     ] = await Promise.all([
       redis.get('is_live_pinned'),
       redis.get('live_post_id'),
-      redis.get('twitch_display_name'),
-      redis.get('twitch_started_at'),
-      redis.get('twitch_stream_title'),
+      redis.get('dashboard_display_name'),
+      redis.get('dashboard_started_at'),
+      redis.get('dashboard_title'),
       redis.get('dashboard_game'),
       redis.get('dashboard_viewers'),
       redis.get('dashboard_thumbnail'),
+      redis.get('twitch_display_name'),
+      redis.get('twitch_started_at'),
+      redis.get('twitch_stream_title'),
     ]);
 
     const isLive = isLivePinned === 'true';
+    const displayName = dashboardDisplayName || legacyDisplayName || 'Streamer';
+    const startedAt = dashboardStartedAt || legacyStartedAt;
+    const streamTitle = dashboardTitle || legacyTitle || '';
 
-    // Calculate uptime if live
     let uptimeText = '';
     if (isLive && startedAt) {
       const startTime = new Date(startedAt).getTime();
@@ -49,8 +63,8 @@ app.get('/api/stream-status', async (_req, res) => {
 
     res.json({
       isLive,
-      displayName: displayName || 'Streamer',
-      title: streamTitle || '',
+      displayName,
+      title: streamTitle,
       game: streamGame || 'Just Chatting',
       viewers: streamViewers || '0',
       uptime: uptimeText,
@@ -65,34 +79,21 @@ app.get('/api/stream-status', async (_req, res) => {
 
 /**
  * GET /api/config
- *
- * Returns the channel configuration for the dashboard UI
- * (platform URLs, channel names, etc.)
+ * Returns the channel configuration (platform URLs) for the dashboard UI.
  */
 app.get('/api/config', async (_req, res) => {
   try {
-    const [
-      twitchChannel,
-      youtubeChannel,
-      kickChannel,
-    ] = await Promise.all([
+    const [twitchChannel, youtubeChannel, kickChannel] = await Promise.all([
       redis.get('dashboard_twitch_channel'),
       redis.get('dashboard_youtube_channel'),
       redis.get('dashboard_kick_channel'),
     ]);
 
-    const youtubeUrl = youtubeChannel
-      ? `https://www.youtube.com/@${youtubeChannel.replace(/^@/, '')}`
-      : null;
-    const kickUrl = kickChannel
-      ? `https://kick.com/${kickChannel}`
-      : null;
-
     res.json({
       twitchChannel: twitchChannel || '',
       twitchUrl: twitchChannel ? `https://twitch.tv/${twitchChannel}` : '',
-      youtubeUrl,
-      kickUrl,
+      youtubeUrl: buildYouTubeUrl(youtubeChannel) || null,
+      kickUrl: kickChannel ? `https://kick.com/${kickChannel}` : null,
     });
   } catch (error) {
     console.error('Error fetching config:', error);
@@ -100,7 +101,69 @@ app.get('/api/config', async (_req, res) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Scheduler — runs every 2 minutes (declared in devvit.json scheduler.tasks)
+// ---------------------------------------------------------------------------
 
-// Create the Devvit server and listen
+app.post('/internal/scheduler/check-status', async (_req, res) => {
+  try {
+    await runStatusCheck();
+    res.json({});
+  } catch (error) {
+    console.error('Scheduled status check failed:', error);
+    res.status(500).json({ error: 'status check failed' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Triggers — run an immediate check on install/upgrade so state is seeded
+// ---------------------------------------------------------------------------
+
+const onInstallOrUpgrade = async (_req: express.Request, res: express.Response) => {
+  try {
+    await runStatusCheck();
+  } catch (error) {
+    console.error('Install/upgrade status check failed:', error);
+  }
+  res.json({});
+};
+
+app.post('/internal/triggers/on-app-install', onInstallOrUpgrade);
+app.post('/internal/triggers/on-app-upgrade', onInstallOrUpgrade);
+
+// ---------------------------------------------------------------------------
+// Menu items (declared in devvit.json menu.items)
+// ---------------------------------------------------------------------------
+
+app.post('/internal/menu/create-dashboard', async (_req, res) => {
+  try {
+    const message = await createDashboardPost();
+    res.json({ showToast: message });
+  } catch (error) {
+    console.error('Failed to create dashboard post:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    res.json({ showToast: `❌ Dashboard failed: ${message.slice(0, 80)}` });
+  }
+});
+
+app.post('/internal/menu/restart', async (_req, res) => {
+  try {
+    const message = await restartLiveSticky();
+    res.json({ showToast: message });
+  } catch (error) {
+    console.error('Failed to restart LiveSticky:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    res.json({ showToast: `❌ Restart failed: ${message.slice(0, 80)}` });
+  }
+});
+
+app.post('/internal/menu/get-templates', async (_req, res) => {
+  res.json({
+    navigateTo: 'https://github.com/iammesutkaya/LiveSticky#-default-templates-for-copy-pasting',
+  });
+});
+
+// ---------------------------------------------------------------------------
+
 const server = createServer(app);
 server.listen(getServerPort());

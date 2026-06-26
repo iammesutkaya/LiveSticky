@@ -4,13 +4,14 @@
  * Fetches stream status and config from the Devvit server endpoints,
  * then subscribes to Realtime updates for instant live stat changes.
  */
-import { connectRealtime } from '@devvit/web/client';
+import { connectRealtime, navigateTo } from '@devvit/web/client';
 
 
 // DOM references
 const $ = (id) => document.getElementById(id);
 const dashboard = $('dashboard');
 const loadingEl = $('loading');
+const errorEl = $('error');
 const contentEl = $('content');
 const statusIndicator = $('status-indicator');
 const statusLabel = $('status-label');
@@ -62,6 +63,19 @@ async function fetchConfig() {
 }
 
 /**
+ * Show the error state with an optional message
+ */
+function showError(message) {
+  loadingEl.classList.add('hidden');
+  contentEl.classList.add('hidden');
+  if (errorEl) {
+    errorEl.classList.remove('hidden');
+    const msgEl = document.getElementById('error-message');
+    if (msgEl && message) msgEl.textContent = message;
+  }
+}
+
+/**
  * Fetch the current stream status from the server
  */
 async function fetchStatus() {
@@ -70,9 +84,13 @@ async function fetchStatus() {
     if (res.ok) {
       const data = await res.json();
       updateDashboard(data);
+    } else {
+      console.error('[LiveSticky] Status endpoint returned:', res.status);
+      showError('Unable to reach the LiveSticky server.');
     }
   } catch (err) {
     console.error('[LiveSticky] Failed to fetch status:', err);
+    showError('Unable to reach the LiveSticky server.');
   }
 }
 
@@ -147,20 +165,26 @@ function updateDashboard(data) {
  * Update platform link buttons based on config
  */
 function updatePlatformLinks() {
-  if (config.twitchUrl) {
-    twitchLink.href = config.twitchUrl;
-    twitchLink.classList.remove('hidden');
-  }
+  setupPlatformLink(twitchLink, config.twitchUrl);
+  setupPlatformLink(youtubeLink, config.youtubeUrl);
+  setupPlatformLink(kickLink, config.kickUrl);
+}
 
-  if (config.youtubeUrl) {
-    youtubeLink.href = config.youtubeUrl;
-    youtubeLink.classList.remove('hidden');
-  }
-
-  if (config.kickUrl) {
-    kickLink.href = config.kickUrl;
-    kickLink.classList.remove('hidden');
-  }
+/**
+ * Wire a platform button to open its URL.
+ *
+ * The dashboard runs in a sandboxed Devvit webview iframe, so a plain anchor
+ * <a target="_blank"> cannot open external URLs. Navigation must go through
+ * Devvit's navigateTo() client effect instead.
+ */
+function setupPlatformLink(el, url) {
+  if (!el || !url) return;
+  el.href = url;
+  el.classList.remove('hidden');
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo(url);
+  });
 }
 
 /**
@@ -179,7 +203,7 @@ function formatNumber(numStr) {
 async function initRealtime() {
   try {
     await connectRealtime({
-      channel: 'livesticky-dashboard',
+      channel: 'livesticky_dashboard',
       onMessage: (msg) => {
         if (msg && msg.type === 'status-update') {
           updateDashboard(msg.data);
