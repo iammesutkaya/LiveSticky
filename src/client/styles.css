@@ -574,6 +574,10 @@ body {
   flex-wrap: wrap;
 }
 
+.platform-links.all-three {
+  justify-content: space-evenly;
+}
+
 .platform-btn {
   /* Per-platform colour, set on the variant classes below. --tint is the rgb
      channel triplet (reused at different alphas); --on is the label colour. */

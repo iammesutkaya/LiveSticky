@@ -290,6 +290,15 @@ function updatePlatformLinks() {
   setupPlatformLink(twitchLink, config.twitchUrl);
   setupPlatformLink(youtubeLink, config.youtubeUrl);
   setupPlatformLink(kickLink, config.kickUrl);
+
+  // Spread buttons evenly only when all three are configured — avoids awkward
+  // gaps when only 1 or 2 platforms are set up.
+  const platformLinksNav = $('platform-links');
+  if (platformLinksNav) {
+    const visibleCount = [twitchLink, youtubeLink, kickLink]
+      .filter(el => el && !el.classList.contains('hidden')).length;
+    platformLinksNav.classList.toggle('all-three', visibleCount === 3);
+  }
 }
 
 /**
