@@ -386,11 +386,10 @@ function updateDashboard(data) {
     }
   }
 
-  // Platform button visibility: live → only the active platform; offline → all configured.
-  const livePlatform = isNowLive ? data.platform : null;
-  if (twitchLink)  twitchLink.classList.toggle('hidden',  livePlatform ? livePlatform !== 'twitch'  || !config.twitchUrl  : !config.twitchUrl);
-  if (youtubeLink) youtubeLink.classList.toggle('hidden', livePlatform ? livePlatform !== 'youtube' || !config.youtubeUrl : !config.youtubeUrl);
-  if (kickLink)    kickLink.classList.toggle('hidden',    livePlatform ? livePlatform !== 'kick'    || !config.kickUrl    : !config.kickUrl);
+  // Platform buttons: hidden when live (thumbnail is the watch CTA); all configured when offline.
+  if (twitchLink)  twitchLink.classList.toggle('hidden',  isNowLive || !config.twitchUrl);
+  if (youtubeLink) youtubeLink.classList.toggle('hidden', isNowLive || !config.youtubeUrl);
+  if (kickLink)    kickLink.classList.toggle('hidden',    isNowLive || !config.kickUrl);
   const platformLinksNav = $('platform-links');
   if (platformLinksNav) {
     const visibleCount = [twitchLink, youtubeLink, kickLink].filter(el => el && !el.classList.contains('hidden')).length;
@@ -404,34 +403,20 @@ function updateDashboard(data) {
 }
 
 /**
- * Update platform link buttons based on config
+ * Wire click handlers and hrefs for platform buttons.
+ * Visibility is managed exclusively by updateDashboard() to avoid a race
+ * where fetchConfig() running after fetchStatus() would unhide buttons that
+ * updateDashboard() already hid.
  */
 function updatePlatformLinks() {
   setupPlatformLink(twitchLink, config.twitchUrl);
   setupPlatformLink(youtubeLink, config.youtubeUrl);
   setupPlatformLink(kickLink, config.kickUrl);
-
-  // Spread buttons evenly only when all three are configured — avoids awkward
-  // gaps when only 1 or 2 platforms are set up.
-  const platformLinksNav = $('platform-links');
-  if (platformLinksNav) {
-    const visibleCount = [twitchLink, youtubeLink, kickLink]
-      .filter(el => el && !el.classList.contains('hidden')).length;
-    platformLinksNav.classList.toggle('all-three', visibleCount === 3);
-  }
 }
 
-/**
- * Wire a platform button to open its URL.
- *
- * The dashboard runs in a sandboxed Devvit webview iframe, so a plain anchor
- * <a target="_blank"> cannot open external URLs. Navigation must go through
- * Devvit's navigateTo() client effect instead.
- */
 function setupPlatformLink(el, url) {
   if (!el || !url) return;
   el.href = url;
-  el.classList.remove('hidden');
   el.addEventListener('click', (e) => {
     e.preventDefault();
     navigateTo(url);
