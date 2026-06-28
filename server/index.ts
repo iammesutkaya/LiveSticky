@@ -24,6 +24,7 @@ app.get('/api/stream-status', async (_req, res) => {
     const [
       isLivePinned,
       livePostId,
+      dashboardPlatform,
       dashboardDisplayName,
       dashboardStartedAt,
       dashboardTitle,
@@ -39,6 +40,7 @@ app.get('/api/stream-status', async (_req, res) => {
     ] = await Promise.all([
       redis.get('is_live_pinned'),
       redis.get('live_post_id'),
+      redis.get('dashboard_platform'),
       redis.get('dashboard_display_name'),
       redis.get('dashboard_started_at'),
       redis.get('dashboard_title'),
@@ -69,6 +71,7 @@ app.get('/api/stream-status', async (_req, res) => {
 
     res.json({
       isLive,
+      platform: dashboardPlatform || null,
       displayName,
       title: streamTitle,
       game: streamGame || 'Just Chatting',

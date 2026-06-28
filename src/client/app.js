@@ -36,6 +36,7 @@ const thumbnailImg = $('stream-thumbnail');
 const compactMetaEl = $('compact-meta');
 const offlineSubtextEl = $('offline-subtext');
 const updateModeEl = $('update-mode');
+const streamPlatformChipEl = $('stream-platform-chip');
 
 // Platform link elements
 const twitchLink = $('twitch-link');
@@ -63,6 +64,11 @@ let config = {
 // The current discussion post URL — kept in module scope so the single
 // click listener can always read the latest value without being re-attached.
 let discussionPostUrl = null;
+
+// URL of the live stream for the thumbnail click handler.
+let livePlatformUrl = null;
+
+const PLATFORM_LABEL = { twitch: 'Twitch', youtube: 'YouTube', kick: 'Kick' };
 
 // Timestamp of the last successful data update, for relative "Xm ago" display.
 let lastFetchTime = null;
@@ -295,6 +301,19 @@ function updateDashboard(data) {
         : `${formattedViewers} watching`;
     }
 
+    // Live platform URL — used by the thumbnail click handler
+    livePlatformUrl = null;
+    if (data.platform === 'twitch') livePlatformUrl = config.twitchUrl || null;
+    else if (data.platform === 'youtube') livePlatformUrl = config.youtubeUrl || null;
+    else if (data.platform === 'kick') livePlatformUrl = config.kickUrl || null;
+
+    // Platform chip on thumbnail
+    if (streamPlatformChipEl) {
+      const label = PLATFORM_LABEL[data.platform] || '';
+      streamPlatformChipEl.textContent = label;
+      streamPlatformChipEl.className = `stream-platform-chip${data.platform ? ` platform-${data.platform}` : ''}`;
+    }
+
     // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders.
     // Fetch via proxy using fetch() to carry Devvit auth headers.
     if (thumbnailWrap && thumbnailImg) {
@@ -336,6 +355,7 @@ function updateDashboard(data) {
 
     // Hide thumbnail when offline
     if (thumbnailWrap) thumbnailWrap.classList.add('hidden');
+    livePlatformUrl = null;
 
     // Hide discussion link when offline
     if (discussionLink) {
@@ -364,6 +384,17 @@ function updateDashboard(data) {
         ? 'Check back soon or follow the channels below!'
         : 'Check back soon!';
     }
+  }
+
+  // Platform button visibility: live → only the active platform; offline → all configured.
+  const livePlatform = isNowLive ? data.platform : null;
+  if (twitchLink)  twitchLink.classList.toggle('hidden',  livePlatform ? livePlatform !== 'twitch'  || !config.twitchUrl  : !config.twitchUrl);
+  if (youtubeLink) youtubeLink.classList.toggle('hidden', livePlatform ? livePlatform !== 'youtube' || !config.youtubeUrl : !config.youtubeUrl);
+  if (kickLink)    kickLink.classList.toggle('hidden',    livePlatform ? livePlatform !== 'kick'    || !config.kickUrl    : !config.kickUrl);
+  const platformLinksNav = $('platform-links');
+  if (platformLinksNav) {
+    const visibleCount = [twitchLink, youtubeLink, kickLink].filter(el => el && !el.classList.contains('hidden')).length;
+    platformLinksNav.classList.toggle('all-three', visibleCount === 3);
   }
 
   // Show content, hide loading/error
@@ -485,6 +516,13 @@ async function init() {
     discussionLink.addEventListener('click', (e) => {
       e.preventDefault();
       if (discussionPostUrl) navigateTo(discussionPostUrl);
+    });
+  }
+
+  // Thumbnail click → open the live stream.
+  if (thumbnailWrap) {
+    thumbnailWrap.addEventListener('click', () => {
+      if (livePlatformUrl) navigateTo(livePlatformUrl);
     });
   }
 

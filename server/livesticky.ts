@@ -948,26 +948,38 @@ export const runStatusCheck = async (): Promise<void> => {
   // Push the latest state to the dashboard Realtime channel so clients update
   // immediately without waiting for the next 30-second poll.
   try {
-    const [cachedLivePostId, cachedAvatarUrl, cachedBannerUrl] = await Promise.all([
+    const [cachedLivePostId, cachedAvatarUrl, cachedBannerUrl, cachedLastLiveAt] = await Promise.all([
       redis.get('live_post_id'),
       redis.get('dashboard_avatar_url'),
       redis.get('dashboard_banner_url'),
+      redis.get('last_live_at'),
     ]);
     const realtimeDisplayName =
       isLive && streamInfo
         ? streamInfo.user_name || defaultChannel
         : (await redis.get('twitch_display_name')) ?? defaultChannel;
+
+    let realtimeUptime = '';
+    if (isLive && streamInfo?.started_at) {
+      const elapsedMs = Date.now() - new Date(streamInfo.started_at).getTime();
+      const hours = Math.floor(elapsedMs / 3600000);
+      const minutes = Math.floor((elapsedMs % 3600000) / 60000);
+      realtimeUptime = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    }
+
     await realtime.send('livesticky_dashboard', {
       type: 'status-update' as const,
       data: {
         isLive,
+        platform: (isLive && streamInfo ? streamInfo.platform : null) ?? null,
         displayName: realtimeDisplayName,
         title: isLive && streamInfo ? streamInfo.title ?? '' : '',
         game: isLive && streamInfo ? streamInfo.game_name ?? '' : '',
         viewers: isLive && streamInfo ? (streamInfo.viewer_count ?? 0).toString() : '0',
+        uptime: realtimeUptime,
         thumbnail: isLive && streamInfo ? streamInfo.thumbnail_url ?? '' : '',
-        startedAt: (isLive && streamInfo ? streamInfo.started_at : null) ?? null,
         livePostId: (isLive ? cachedLivePostId : null) ?? null,
+        lastLiveAt: cachedLastLiveAt ?? null,
         avatarUrl: (cachedAvatarUrl && cachedAvatarUrl.length > 0) ? cachedAvatarUrl : null,
         bannerUrl: (cachedBannerUrl && cachedBannerUrl.length > 0) ? cachedBannerUrl : null,
       },
