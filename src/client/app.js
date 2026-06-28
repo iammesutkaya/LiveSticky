@@ -233,8 +233,17 @@ function updateDashboard(data) {
     });
   }
 
-  // Banner: same fetch-then-blob approach for CSS background-image.
-  if (bannerStripEl && data.bannerUrl && data.bannerUrl !== loadedBannerUrl) {
+  // Banner: the stored URL is the streamer's offline image (e.g. Twitch's
+  // offline_image_url), which says "currently offline". Only show it when the
+  // channel is actually offline; use the gradient when live.
+  if (isNowLive) {
+    if (bannerStripEl && bannerStripEl.classList.contains('has-image')) {
+      bannerStripEl.classList.remove('has-image');
+      bannerStripEl.style.removeProperty('--banner-img');
+      loadedBannerUrl = null;
+      if (bannerBlobUrl) { URL.revokeObjectURL(bannerBlobUrl); bannerBlobUrl = null; }
+    }
+  } else if (bannerStripEl && data.bannerUrl && data.bannerUrl !== loadedBannerUrl) {
     loadedBannerUrl = data.bannerUrl;
     fetchProxiedImage(data.bannerUrl).then(blobUrl => {
       if (blobUrl) {
