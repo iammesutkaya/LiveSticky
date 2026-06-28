@@ -67,6 +67,21 @@ let discussionPostUrl = null;
 // Timestamp of the last successful data update, for relative "Xm ago" display.
 let lastFetchTime = null;
 
+// Track which CDN URLs have been sent to the image proxy, so repeated
+// realtime ticks don't trigger redundant reloads for stable images.
+let loadedAvatarUrl = null;
+let loadedBannerUrl = null;
+
+/**
+ * Routes a CDN image URL through the same-origin /api/image proxy.
+ * The Devvit webview CSP blocks direct img-src from CDN domains; the server
+ * is the only party allowed to fetch from those hosts.
+ */
+function proxyImgUrl(url) {
+  if (!url) return null;
+  return `/api/image?url=${encodeURIComponent(url)}`;
+}
+
 /**
  * Fetch the channel configuration from the server
  */
@@ -165,9 +180,9 @@ function updateDashboard(data) {
   displayNameEl.textContent = displayName;
   if (avatarInitialEl) avatarInitialEl.textContent = displayName.trim().charAt(0) || 'S';
 
-  // Avatar: show real profile picture, fall back to gradient + letter on error.
-  // Only update when the URL changes (avatarUrl is absent from realtime messages).
-  if (avatarImgEl && data.avatarUrl && avatarImgEl.src !== data.avatarUrl) {
+  // Avatar: show real profile picture via proxy, fall back to gradient + letter on error.
+  if (avatarImgEl && data.avatarUrl && data.avatarUrl !== loadedAvatarUrl) {
+    loadedAvatarUrl = data.avatarUrl;
     avatarImgEl.onload = () => {
       avatarImgEl.style.display = 'block';
       if (avatarInitialEl) avatarInitialEl.style.display = 'none';
@@ -175,20 +190,25 @@ function updateDashboard(data) {
     avatarImgEl.onerror = () => {
       avatarImgEl.style.display = 'none';
       if (avatarInitialEl) avatarInitialEl.style.display = '';
+      loadedAvatarUrl = null; // permit retry on next update
     };
-    avatarImgEl.src = data.avatarUrl;
+    avatarImgEl.src = proxyImgUrl(data.avatarUrl);
   }
 
-  // Banner: test-load then apply as a CSS background; gradient fallback on error.
-  if (bannerStripEl && data.bannerUrl
-      && bannerStripEl.style.getPropertyValue('--banner-img') !== `url('${data.bannerUrl}')`) {
+  // Banner: test-load via proxy, apply as CSS background; gradient fallback on error.
+  if (bannerStripEl && data.bannerUrl && data.bannerUrl !== loadedBannerUrl) {
+    loadedBannerUrl = data.bannerUrl;
+    const proxiedBannerUrl = proxyImgUrl(data.bannerUrl);
     const testImg = new Image();
     testImg.onload = () => {
-      bannerStripEl.style.setProperty('--banner-img', `url('${data.bannerUrl}')`);
+      bannerStripEl.style.setProperty('--banner-img', `url('${proxiedBannerUrl}')`);
       bannerStripEl.classList.add('has-image');
     };
-    testImg.onerror = () => bannerStripEl.classList.remove('has-image');
-    testImg.src = data.bannerUrl;
+    testImg.onerror = () => {
+      bannerStripEl.classList.remove('has-image');
+      loadedBannerUrl = null; // permit retry
+    };
+    testImg.src = proxiedBannerUrl;
   }
 
   // Toggle dashboard-level live state (themes the banner strip, etc.)
@@ -243,10 +263,12 @@ function updateDashboard(data) {
         : `${formattedViewers} watching`;
     }
 
-    // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders
+    // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders.
+    // Route through /api/image proxy: CSP blocks direct CDN img-src loads.
     if (thumbnailWrap && thumbnailImg) {
       const rawUrl = data.thumbnail || '';
-      const src = rawUrl.replace('{width}', '320').replace('{height}', '180');
+      const cdnSrc = rawUrl.replace('{width}', '320').replace('{height}', '180');
+      const src = proxyImgUrl(cdnSrc);
       if (src) {
         thumbnailImg.src = src;
         thumbnailImg.onerror = () => thumbnailWrap.classList.add('hidden');

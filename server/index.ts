@@ -110,6 +110,40 @@ app.get('/api/config', async (_req, res) => {
   }
 });
 
+/**
+ * GET /api/image?url=https://...
+ * Proxies CDN images through the server so the Devvit webview's CSP (which
+ * blocks direct img-src loads from external CDNs) doesn't reject them.
+ * Only proxies from the explicitly approved CDN domains.
+ */
+const PROXY_ALLOWED_HOSTS = new Set([
+  'static-cdn.jtvnw.net',
+  'yt3.googleusercontent.com',
+  'i.ytimg.com',
+  'files.kick.com',
+]);
+
+app.get('/api/image', async (req, res) => {
+  const { url } = req.query;
+  if (typeof url !== 'string') { res.status(400).end(); return; }
+
+  let parsed: URL;
+  try { parsed = new URL(url); } catch { res.status(400).end(); return; }
+  if (!PROXY_ALLOWED_HOSTS.has(parsed.hostname)) { res.status(403).end(); return; }
+
+  try {
+    const upstream = await fetch(url);
+    if (!upstream.ok) { res.status(upstream.status).end(); return; }
+    const ct = upstream.headers.get('content-type');
+    if (ct) res.setHeader('Content-Type', ct);
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    res.send(Buffer.from(await upstream.arrayBuffer()));
+  } catch (err) {
+    console.error('Image proxy error:', err);
+    res.status(502).end();
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Scheduler — runs every 2 minutes (declared in devvit.json scheduler.tasks)
 // ---------------------------------------------------------------------------
