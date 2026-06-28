@@ -99,14 +99,16 @@
             </div>
           </div>
 
-          <!-- Discussion link — Reddit-native, visually distinct from external platform buttons -->
-          <a id="discussion-link" href="#" class="discussion-btn hidden"
-             aria-label="Join the live discussion thread on Reddit">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Join Discussion</span>
-          </a>
+          <!-- Discussion link — Reddit-native, compact ghost pill -->
+          <div class="discussion-wrap hidden" id="discussion-wrap">
+            <a id="discussion-link" href="#" class="discussion-btn"
+               aria-label="Join the live discussion thread on Reddit">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Join Discussion</span>
+            </a>
+          </div>
         </div>
 
         <!-- Offline state content -->

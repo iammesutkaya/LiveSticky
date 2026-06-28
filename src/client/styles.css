@@ -700,25 +700,30 @@ body {
 /* Kick green is bright — dark label keeps the text readable. */
 .platform-btn.kick       { --tint: 76, 196, 64;  --on: #0e1113; }
 /* Discussion link — Reddit-native CTA, visually distinct from external platform buttons */
-.discussion-btn {
+.discussion-wrap {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
+}
+
+.discussion-btn {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   color: var(--accent-purple);
-  background: var(--accent-purple-dim);
-  border: 1px solid rgba(145, 71, 255, 0.25);
+  background: transparent;
+  border: 1.5px solid rgba(145, 71, 255, 0.45);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .discussion-btn:hover {
-  background: rgba(145, 71, 255, 0.25);
-  border-color: rgba(145, 71, 255, 0.45);
+  background: var(--accent-purple-dim);
+  border-color: rgba(145, 71, 255, 0.7);
 }
 
 .discussion-btn:focus-visible {
@@ -728,7 +733,7 @@ body {
 
 @media (prefers-color-scheme: light) {
   .discussion-btn {
-    border-color: rgba(119, 44, 232, 0.3);
+    border-color: rgba(119, 44, 232, 0.4);
   }
 }
 

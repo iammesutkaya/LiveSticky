@@ -43,6 +43,7 @@ const twitchLink = $('twitch-link');
 const youtubeLink = $('youtube-link');
 const kickLink = $('kick-link');
 const discussionLink = $('discussion-link');
+const discussionWrap = $('discussion-wrap');
 
 // State
 let currentState = {
@@ -346,16 +347,14 @@ function updateDashboard(data) {
     }
 
     // Discussion link — shown only when live and a post ID is available
-    if (discussionLink) {
-      if (data.livePostId) {
-        const postId = String(data.livePostId).replace(/^t3_/, '');
-        discussionPostUrl = `https://www.reddit.com/comments/${postId}`;
-        discussionLink.href = discussionPostUrl;
-        discussionLink.classList.remove('hidden');
-      } else {
-        discussionPostUrl = null;
-        discussionLink.classList.add('hidden');
-      }
+    if (data.livePostId) {
+      const postId = String(data.livePostId).replace(/^t3_/, '');
+      discussionPostUrl = `https://www.reddit.com/comments/${postId}`;
+      if (discussionLink) discussionLink.href = discussionPostUrl;
+      if (discussionWrap) discussionWrap.classList.remove('hidden');
+    } else {
+      discussionPostUrl = null;
+      if (discussionWrap) discussionWrap.classList.add('hidden');
     }
   } else {
     liveContent.classList.add('hidden');
@@ -367,10 +366,8 @@ function updateDashboard(data) {
     livePlatformUrl = null;
 
     // Hide discussion link when offline
-    if (discussionLink) {
-      discussionPostUrl = null;
-      discussionLink.classList.add('hidden');
-    }
+    discussionPostUrl = null;
+    if (discussionWrap) discussionWrap.classList.add('hidden');
 
     // Clear compact meta
     if (compactMetaEl) compactMetaEl.textContent = '';
