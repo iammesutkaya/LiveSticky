@@ -29,6 +29,8 @@ const offlineNameEl = $('offline-name');
 const lastLiveEl = $('last-live');
 const lastUpdatedEl = $('last-updated');
 const avatarInitialEl = $('avatar-initial');
+const avatarImgEl = $('avatar-img');
+const bannerStripEl = document.querySelector('.banner-strip');
 const thumbnailWrap = $('stream-thumbnail-wrap');
 const thumbnailImg = $('stream-thumbnail');
 const compactMetaEl = $('compact-meta');
@@ -162,6 +164,32 @@ function updateDashboard(data) {
   const displayName = data.displayName || 'Streamer';
   displayNameEl.textContent = displayName;
   if (avatarInitialEl) avatarInitialEl.textContent = displayName.trim().charAt(0) || 'S';
+
+  // Avatar: show real profile picture, fall back to gradient + letter on error.
+  // Only update when the URL changes (avatarUrl is absent from realtime messages).
+  if (avatarImgEl && data.avatarUrl && avatarImgEl.src !== data.avatarUrl) {
+    avatarImgEl.onload = () => {
+      avatarImgEl.style.display = 'block';
+      if (avatarInitialEl) avatarInitialEl.style.display = 'none';
+    };
+    avatarImgEl.onerror = () => {
+      avatarImgEl.style.display = 'none';
+      if (avatarInitialEl) avatarInitialEl.style.display = '';
+    };
+    avatarImgEl.src = data.avatarUrl;
+  }
+
+  // Banner: test-load then apply as a CSS background; gradient fallback on error.
+  if (bannerStripEl && data.bannerUrl
+      && bannerStripEl.style.getPropertyValue('--banner-img') !== `url('${data.bannerUrl}')`) {
+    const testImg = new Image();
+    testImg.onload = () => {
+      bannerStripEl.style.setProperty('--banner-img', `url('${data.bannerUrl}')`);
+      bannerStripEl.classList.add('has-image');
+    };
+    testImg.onerror = () => bannerStripEl.classList.remove('has-image');
+    testImg.src = data.bannerUrl;
+  }
 
   // Toggle dashboard-level live state (themes the banner strip, etc.)
   dashboard.classList.toggle('is-live', isNowLive);

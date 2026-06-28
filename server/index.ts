@@ -34,6 +34,8 @@ app.get('/api/stream-status', async (_req, res) => {
       legacyStartedAt,
       legacyTitle,
       lastLiveAt,
+      avatarUrl,
+      bannerUrl,
     ] = await Promise.all([
       redis.get('is_live_pinned'),
       redis.get('live_post_id'),
@@ -47,6 +49,8 @@ app.get('/api/stream-status', async (_req, res) => {
       redis.get('twitch_started_at'),
       redis.get('twitch_stream_title'),
       redis.get('last_live_at'),
+      redis.get('dashboard_avatar_url'),
+      redis.get('dashboard_banner_url'),
     ]);
 
     const isLive = isLivePinned === 'true';
@@ -73,6 +77,8 @@ app.get('/api/stream-status', async (_req, res) => {
       thumbnail: streamThumbnail || '',
       livePostId: livePostId || null,
       lastLiveAt: lastLiveAt || null,
+      avatarUrl: (avatarUrl && avatarUrl.length > 0) ? avatarUrl : null,
+      bannerUrl: (bannerUrl && bannerUrl.length > 0) ? bannerUrl : null,
     });
   } catch (error) {
     console.error('Error fetching stream status:', error);

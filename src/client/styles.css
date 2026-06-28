@@ -212,6 +212,15 @@ body {
   background: linear-gradient(120deg, var(--accent-live) 0%, #2a0f12 50%, var(--bg-secondary) 100%);
 }
 
+/* Real streamer banner: crops the image into the existing thin strip.
+   Higher specificity than both .banner-strip and .dashboard.is-live .banner-strip
+   so it wins in both live and offline states when the image is available. */
+.dashboard .banner-strip.has-image {
+  background-image: var(--banner-img);
+  background-size: cover;
+  background-position: center;
+}
+
 /* Profile row: avatar overlapping the banner, name + status pill beside it */
 .profile {
   display: flex;
@@ -260,6 +269,16 @@ body {
 
 .dashboard.is-live .avatar {
   background: linear-gradient(135deg, var(--accent-live) 0%, #5a1414 100%);
+}
+
+.avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: none;
 }
 
 .avatar-initial {

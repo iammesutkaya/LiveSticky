@@ -14,7 +14,7 @@ import {
   type LinksAndComments,
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
-import { checkStreamStatus, getOrRefreshTwitchToken, type UnifiedStreamInfo } from '../src/platforms.js';
+import { checkStreamStatus, getOrRefreshTwitchToken, refreshChannelImages, type UnifiedStreamInfo } from '../src/platforms.js';
 import {
   removeYoutubeLink,
   removeTwitchLink,
@@ -938,10 +938,21 @@ export const runStatusCheck = async (): Promise<void> => {
     console.error('Failed to sync dashboard config:', dashSyncError);
   }
 
+  // Refresh channel images (avatar + banner) once every 12 hours via Redis TTL.
+  try {
+    await refreshChannelImages({ settings, redis });
+  } catch (imgErr) {
+    console.error('Failed to refresh channel images:', imgErr);
+  }
+
   // Push the latest state to the dashboard Realtime channel so clients update
   // immediately without waiting for the next 30-second poll.
   try {
-    const cachedLivePostId = await redis.get('live_post_id');
+    const [cachedLivePostId, cachedAvatarUrl, cachedBannerUrl] = await Promise.all([
+      redis.get('live_post_id'),
+      redis.get('dashboard_avatar_url'),
+      redis.get('dashboard_banner_url'),
+    ]);
     const realtimeDisplayName =
       isLive && streamInfo
         ? streamInfo.user_name || defaultChannel
@@ -957,6 +968,8 @@ export const runStatusCheck = async (): Promise<void> => {
         thumbnail: isLive && streamInfo ? streamInfo.thumbnail_url ?? '' : '',
         startedAt: (isLive && streamInfo ? streamInfo.started_at : null) ?? null,
         livePostId: (isLive ? cachedLivePostId : null) ?? null,
+        avatarUrl: (cachedAvatarUrl && cachedAvatarUrl.length > 0) ? cachedAvatarUrl : null,
+        bannerUrl: (cachedBannerUrl && cachedBannerUrl.length > 0) ? cachedBannerUrl : null,
       },
     });
   } catch (realtimeErr) {
