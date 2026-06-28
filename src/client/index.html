@@ -14,9 +14,11 @@
       <span class="loading-text">Connecting to LiveSticky…</span>
     </div>
 
-    <!-- Error state -->
+    <!-- Error state — includes a retry hint since polling auto-recovers in the background -->
     <div id="error" class="loading-state hidden" role="alert">
+      <div class="loading-pulse"></div>
       <span class="loading-text" id="error-message">Something went wrong.</span>
+      <p class="error-retry-hint">Retrying automatically…</p>
     </div>
 
     <!-- Main content (hidden until loaded) -->
@@ -27,7 +29,8 @@
       <div class="banner-strip" aria-hidden="true"></div>
 
       <!-- Profile header: placeholder avatar overlapping the banner, with the
-           display name beside it and the status pill beneath the name. -->
+           display name and status pill beside it.
+           Badge removed from header — attribution lives in the footer instead. -->
       <header class="profile">
         <div id="avatar" class="avatar" aria-hidden="true">
           <span id="avatar-initial" class="avatar-initial">S</span>
@@ -39,26 +42,24 @@
             <span class="status-dot" aria-hidden="true"></span>
             <span id="status-label" class="status-label">OFFLINE</span>
           </div>
-        </div>
-        <div class="header-right">
-          <div id="livesticky-badge" class="badge" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6"/>
-              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            LiveSticky
-          </div>
+          <!-- Compact mode one-liner: only rendered at height ≤ 290px (Community Highlights) -->
+          <div id="compact-meta" class="compact-meta" aria-hidden="true"></div>
         </div>
       </header>
 
       <main>
         <!-- Live state content -->
         <div id="live-content" class="live-content hidden">
-          <!-- Stream info bar -->
+          <!-- Stream info bar — thumbnail + title + summary -->
           <div class="stream-info">
-            <div id="stream-title" class="stream-title">Stream Title</div>
-            <div id="live-summary" class="live-summary" aria-live="polite"></div>
+            <!-- Thumbnail: bleed to card edges, hidden by default and on onerror -->
+            <div id="stream-thumbnail-wrap" class="stream-thumbnail-wrap hidden">
+              <img id="stream-thumbnail" class="stream-thumbnail" alt="Stream preview">
+            </div>
+            <div class="stream-info-text">
+              <div id="stream-title" class="stream-title">Stream Title</div>
+              <div id="live-summary" class="live-summary" aria-live="polite"></div>
+            </div>
           </div>
 
           <!-- Stats grid -->
@@ -95,21 +96,31 @@
               <div class="stat-label">Uptime</div>
             </div>
           </div>
+
+          <!-- Discussion link — Reddit-native, visually distinct from external platform buttons -->
+          <a id="discussion-link" href="#" class="discussion-btn hidden"
+             aria-label="Join the live discussion thread on Reddit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Join live discussion on Reddit</span>
+          </a>
         </div>
 
         <!-- Offline state content -->
         <div id="offline-content" class="offline-content hidden">
           <div class="offline-message">
             <div class="offline-icon" aria-hidden="true">😴</div>
+            <!-- Last-live shown prominently right after the icon so it's immediately visible -->
+            <p id="last-live" class="last-live hidden" aria-live="polite"></p>
             <p class="offline-text">
               <span id="offline-name">Streamer</span> is currently offline.
             </p>
-            <p class="offline-subtext">Check back soon or follow the channels below!</p>
-            <p id="last-live" class="last-live hidden" aria-live="polite"></p>
+            <p id="offline-subtext" class="offline-subtext">Check back soon!</p>
           </div>
         </div>
 
-        <!-- Platform links (shown in both states) -->
+        <!-- Platform links (shown in both states) — external streaming destinations only -->
         <nav id="platform-links" class="platform-links" aria-label="Stream platform links">
           <a id="twitch-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn twitch hidden" aria-label="Watch on Twitch">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -129,18 +140,15 @@
             </svg>
             <span>Kick</span>
           </a>
-          <a id="discussion-link" href="#" class="platform-btn discussion hidden" aria-label="Go to live discussion thread">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Live Discussion</span>
-          </a>
         </nav>
       </main>
 
       <!-- Footer -->
       <footer class="footer">
-        <span class="footer-text">Auto-updated by LiveSticky</span>
+        <div class="footer-left">
+          <span id="update-mode" class="update-mode" aria-hidden="true"></span>
+          <span class="footer-text">LiveSticky</span>
+        </div>
         <div class="footer-right">
           <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh status">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

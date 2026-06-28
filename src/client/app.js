@@ -29,6 +29,11 @@ const offlineNameEl = $('offline-name');
 const lastLiveEl = $('last-live');
 const lastUpdatedEl = $('last-updated');
 const avatarInitialEl = $('avatar-initial');
+const thumbnailWrap = $('stream-thumbnail-wrap');
+const thumbnailImg = $('stream-thumbnail');
+const compactMetaEl = $('compact-meta');
+const offlineSubtextEl = $('offline-subtext');
+const updateModeEl = $('update-mode');
 
 // Platform link elements
 const twitchLink = $('twitch-link');
@@ -52,6 +57,13 @@ let config = {
   youtubeUrl: null,
   kickUrl: null,
 };
+
+// The current discussion post URL — kept in module scope so the single
+// click listener can always read the latest value without being re-attached.
+let discussionPostUrl = null;
+
+// Timestamp of the last successful data update, for relative "Xm ago" display.
+let lastFetchTime = null;
 
 /**
  * Fetch the channel configuration from the server
@@ -79,6 +91,29 @@ function showError(message) {
     const msgEl = document.getElementById('error-message');
     if (msgEl && message) msgEl.textContent = message;
   }
+}
+
+/**
+ * Render the footer "last updated" label as a relative age ("2m ago").
+ * Called immediately after each update and on a 30s interval.
+ */
+function updateTimestampDisplay() {
+  if (!lastUpdatedEl || !lastFetchTime) return;
+  const diffMs = Date.now() - lastFetchTime.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) lastUpdatedEl.textContent = 'just now';
+  else if (diffMin === 1) lastUpdatedEl.textContent = '1m ago';
+  else lastUpdatedEl.textContent = `${diffMin}m ago`;
+}
+
+/**
+ * Update the footer connection-mode dot.
+ * 'realtime' → green pulsing dot; 'polling' → neutral grey dot.
+ */
+function setUpdateMode(mode) {
+  if (!updateModeEl) return;
+  updateModeEl.className = `update-mode ${mode}`;
+  updateModeEl.title = mode === 'realtime' ? 'Real-time updates' : 'Polling every 30s';
 }
 
 /**
@@ -117,6 +152,10 @@ function updateDashboard(data) {
   // Update state
   currentState = { ...currentState, ...data };
 
+  // Track when data last arrived for the relative footer timestamp
+  lastFetchTime = new Date();
+  updateTimestampDisplay();
+
   // Update header
   const displayName = data.displayName || 'Streamer';
   displayNameEl.textContent = displayName;
@@ -146,7 +185,7 @@ function updateDashboard(data) {
     liveContent.classList.remove('hidden');
     offlineContent.classList.add('hidden');
 
-    // Update live stats
+    // Stream title (1-line truncated in CSS)
     streamTitleEl.textContent = data.title || 'Live Stream';
     gameNameEl.textContent = data.game || 'Just Chatting';
     uptimeValueEl.textContent = data.uptime || '0m';
@@ -165,12 +204,58 @@ function updateDashboard(data) {
       const since = data.uptime ? ` · Live for ${data.uptime}` : '';
       liveSummaryEl.textContent = `${watching}${since}`;
     }
+
+    // Compact mode one-liner (shown only at height ≤ 290px in profile section)
+    if (compactMetaEl) {
+      const uptime = data.uptime || '';
+      compactMetaEl.textContent = uptime
+        ? `${formattedViewers} watching · ${uptime}`
+        : `${formattedViewers} watching`;
+    }
+
+    // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders
+    if (thumbnailWrap && thumbnailImg) {
+      const rawUrl = data.thumbnail || '';
+      const src = rawUrl.replace('{width}', '320').replace('{height}', '180');
+      if (src) {
+        thumbnailImg.src = src;
+        thumbnailImg.onerror = () => thumbnailWrap.classList.add('hidden');
+        thumbnailWrap.classList.remove('hidden');
+      } else {
+        thumbnailWrap.classList.add('hidden');
+      }
+    }
+
+    // Discussion link — shown only when live and a post ID is available
+    if (discussionLink) {
+      if (data.livePostId) {
+        const postId = String(data.livePostId).replace(/^t3_/, '');
+        discussionPostUrl = `https://www.reddit.com/comments/${postId}`;
+        discussionLink.href = discussionPostUrl;
+        discussionLink.classList.remove('hidden');
+      } else {
+        discussionPostUrl = null;
+        discussionLink.classList.add('hidden');
+      }
+    }
   } else {
     liveContent.classList.add('hidden');
     offlineContent.classList.remove('hidden');
     offlineNameEl.textContent = data.displayName || 'Streamer';
 
-    // "Last live X ago" — shown only if we have a recorded last-live time
+    // Hide thumbnail when offline
+    if (thumbnailWrap) thumbnailWrap.classList.add('hidden');
+
+    // Hide discussion link when offline
+    if (discussionLink) {
+      discussionPostUrl = null;
+      discussionLink.classList.add('hidden');
+    }
+
+    // Clear compact meta
+    if (compactMetaEl) compactMetaEl.textContent = '';
+
+    // "Last live X ago" — prominent, just below the offline icon
     if (lastLiveEl) {
       const ago = formatTimeAgo(data.lastLiveAt);
       if (ago) {
@@ -180,36 +265,19 @@ function updateDashboard(data) {
         lastLiveEl.classList.add('hidden');
       }
     }
-  }
 
-  // Wire up "Go to live discussion" button
-  if (discussionLink) {
-    if (isNowLive && data.livePostId) {
-      const postId = String(data.livePostId).replace(/^t3_/, '');
-      const postUrl = `https://www.reddit.com/comments/${postId}`;
-      discussionLink.href = postUrl;
-      // Replace event listener by cloning to avoid duplicates
-      const fresh = discussionLink.cloneNode(true);
-      fresh.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigateTo(postUrl);
-      });
-      discussionLink.parentNode?.replaceChild(fresh, discussionLink);
-      fresh.classList.remove('hidden');
-    } else {
-      discussionLink.classList.add('hidden');
+    // Conditional subtext: only mention "channels below" if any are configured
+    if (offlineSubtextEl) {
+      const hasChannels = config.twitchUrl || config.youtubeUrl || config.kickUrl;
+      offlineSubtextEl.textContent = hasChannels
+        ? 'Check back soon or follow the channels below!'
+        : 'Check back soon!';
     }
   }
 
-  // Update timestamp
-  const now = new Date();
-  lastUpdatedEl.textContent = now.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  // Show content, hide loading
+  // Show content, hide loading/error
   loadingEl.classList.add('hidden');
+  errorEl.classList.add('hidden');
   contentEl.classList.remove('hidden');
 }
 
@@ -255,6 +323,7 @@ async function initRealtime() {
       onConnect: () => {
         console.log('[LiveSticky] Realtime connected — stopping poll fallback');
         stopPolling();
+        setUpdateMode('realtime');
       },
       onDisconnect: () => {
         console.log('[LiveSticky] Realtime disconnected, falling back to polling');
@@ -278,6 +347,7 @@ function startPolling() {
   if (pollingInterval) return;
   console.log('[LiveSticky] Starting polling fallback (30s interval)');
   pollingInterval = setInterval(fetchStatus, 30000);
+  setUpdateMode('polling');
 }
 
 function stopPolling() {
@@ -311,6 +381,17 @@ async function handleRefresh() {
  */
 async function init() {
   if (refreshBtn) refreshBtn.addEventListener('click', handleRefresh);
+
+  // Single, persistent click listener for the discussion link (no cloneNode needed).
+  if (discussionLink) {
+    discussionLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (discussionPostUrl) navigateTo(discussionPostUrl);
+    });
+  }
+
+  // Keep the relative "Xm ago" footer text fresh without requiring a server call.
+  setInterval(updateTimestampDisplay, 30000);
 
   // Fetch config and initial status in parallel
   const [, statusOk] = await Promise.all([fetchConfig(), fetchStatus()]);

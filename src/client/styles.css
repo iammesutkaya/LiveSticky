@@ -136,6 +136,13 @@ body {
   letter-spacing: 0.02em;
 }
 
+.error-retry-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: -4px;
+}
+
 /* ==========================================================================
    Dashboard Container
    ========================================================================== */
@@ -347,6 +354,18 @@ body {
   flex-shrink: 0;
 }
 
+/* Compact mode one-liner: viewer count + uptime in a single text line.
+   Hidden by default; shown only in height ≤ 290px (Community Highlights slot). */
+.compact-meta {
+  display: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ==========================================================================
    Live Content
    ========================================================================== */
@@ -375,6 +394,23 @@ body {
   background: var(--bg-card);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+/* Stream thumbnail — bleeds to card edges; hidden until a URL is available */
+.stream-thumbnail-wrap {
+  margin: -12px -14px 10px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-secondary);
+}
+
+.stream-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .stream-title {
@@ -382,10 +418,9 @@ body {
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .live-summary {
@@ -437,7 +472,7 @@ body {
 }
 
 .stat-card.uptime .stat-icon {
-  color: var(--kick-color);
+  color: var(--text-secondary);
 }
 
 .stat-value {
@@ -451,6 +486,15 @@ body {
 
 .stat-card.viewers .stat-value {
   font-variant-numeric: tabular-nums;
+}
+
+/* Game names can be long — cap at 13px and ellipsis so they don't break the card */
+.stat-card.category .stat-value {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .stat-label {
@@ -514,11 +558,10 @@ body {
 }
 
 .last-live {
-  margin-top: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
 }
 
 /* ==========================================================================
@@ -595,8 +638,38 @@ body {
 .platform-btn.youtube    { --tint: 200, 56, 56;  --on: #ffffff; }
 /* Kick green is bright — dark label keeps the text readable. */
 .platform-btn.kick       { --tint: 76, 196, 64;  --on: #0e1113; }
-/* Discussion link — neutral grey; lives below platform links, only shown live. */
-.platform-btn.discussion { --tint: 120, 120, 140; --on: #ffffff; }
+/* Discussion link — Reddit-native CTA, visually distinct from external platform buttons */
+.discussion-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--accent-purple);
+  background: var(--accent-purple-dim);
+  border: 1px solid rgba(145, 71, 255, 0.25);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.discussion-btn:hover {
+  background: rgba(145, 71, 255, 0.25);
+  border-color: rgba(145, 71, 255, 0.45);
+}
+
+.discussion-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-purple);
+}
+
+@media (prefers-color-scheme: light) {
+  .discussion-btn {
+    border-color: rgba(119, 44, 232, 0.3);
+  }
+}
 
 /* ==========================================================================
    Footer
@@ -608,6 +681,27 @@ body {
   justify-content: space-between;
   padding-top: 6px;
   border-top: 1px solid var(--border-subtle);
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Connection status dot: grey when polling, green + pulsing when realtime is live */
+.update-mode {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-medium);
+  flex-shrink: 0;
+  transition: background 0.4s ease;
+}
+
+.update-mode.realtime {
+  background: #4cc440;
+  animation: live-blink 2s ease-in-out infinite;
 }
 
 .footer-text {
@@ -693,6 +787,16 @@ body {
     font-size: 16px;
   }
 
+  /* Shrink avatar on narrow screens to give the display name more room */
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .avatar-initial {
+    font-size: 32px;
+  }
+
   .platform-btn {
     flex: unset;
   }
@@ -717,6 +821,11 @@ body {
 
   .display-name {
     font-size: 16px;
+  }
+
+  /* Show the compact one-liner (viewer count + uptime) in the profile section */
+  .compact-meta {
+    display: block;
   }
 
   .badge {
