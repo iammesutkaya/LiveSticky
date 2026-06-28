@@ -43,6 +43,13 @@
         "endpoint": "/internal/menu/restart"
       },
       {
+        "label": "Refresh Profile Images",
+        "description": "Clears the cached avatar and banner URLs and re-fetches them from the platform API immediately.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/refresh-images"
+      },
+      {
         "label": "Get Default LiveSticky Templates",
         "description": "Opens the GitHub page with copy-pasteable templates for your settings.",
         "location": "subreddit",

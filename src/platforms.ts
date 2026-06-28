@@ -599,11 +599,12 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
     }
   }
 
-  // Always write the avatar key (even if empty) so the TTL prevents re-fetching
-  // for the next 12 hours regardless of whether the API returned anything.
+  // Write avatar key with TTL: 12h on success, 5 min on failure so the next cron
+  // tick retries quickly rather than waiting the full cache window.
+  const avatarTtl = avatarUrl ? IMAGE_TTL : 300;
   await Promise.all([
     context.redis.set('dashboard_avatar_url', avatarUrl),
-    context.redis.expire('dashboard_avatar_url', IMAGE_TTL),
+    context.redis.expire('dashboard_avatar_url', avatarTtl),
     ...(bannerUrl ? [
       context.redis.set('dashboard_banner_url', bannerUrl),
       context.redis.expire('dashboard_banner_url', IMAGE_TTL),

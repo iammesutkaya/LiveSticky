@@ -200,6 +200,22 @@ app.post('/internal/menu/restart', async (_req, res) => {
   }
 });
 
+app.post('/internal/menu/refresh-images', async (_req, res) => {
+  try {
+    // Clear the image cache so the next status check re-fetches from the platform API.
+    await Promise.all([
+      redis.del('dashboard_avatar_url'),
+      redis.del('dashboard_banner_url'),
+    ]);
+    await runStatusCheck();
+    res.json({ showToast: '✅ Profile images refreshed!' });
+  } catch (error) {
+    console.error('Failed to refresh profile images:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    res.json({ showToast: `❌ Image refresh failed: ${message.slice(0, 80)}` });
+  }
+});
+
 app.post('/internal/menu/get-templates', async (_req, res) => {
   res.json({
     navigateTo: 'https://github.com/iammesutkaya/LiveSticky#-default-templates-for-copy-pasting',
