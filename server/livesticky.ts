@@ -7,18 +7,25 @@
  * (no Blocks runtime), which is required for the custom-post webview dashboard
  * to render.
  */
-import { reddit, redis, settings } from '@devvit/web/server';
+import { reddit, redis, settings, realtime } from '@devvit/web/server';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 import {
   LinksAndCommentsDefinition,
   type LinksAndComments,
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
-import { checkStreamStatus, UnifiedStreamInfo } from '../src/platforms.js';
+import { checkStreamStatus, getOrRefreshTwitchToken, type UnifiedStreamInfo } from '../src/platforms.js';
 import {
-  DEFAULT_LIVE_POST_BODY,
+  removeYoutubeLink,
+  removeTwitchLink,
+  removeKickLink,
+  buildYouTubeUrl,
+  buildKickUrl,
+  formatLivePostBody,
+  formatOfflinePostBody,
+} from '../src/formatters.js';
+import {
   DEFAULT_CONCLUDING_POST_BODY,
-  DEFAULT_OFFLINE_POST_BODY,
   DEFAULT_LIVE_SIDEBAR,
   DEFAULT_OFFLINE_SIDEBAR,
   DEFAULT_HIGHLIGHTS_POST_HEADER,
@@ -28,150 +35,11 @@ import {
   DEFAULT_HIGHLIGHTS_POST_TITLE,
 } from '../src/templates.js';
 
-// ---------------------------------------------------------------------------
-// Placeholder / URL helpers
-// ---------------------------------------------------------------------------
-
-const removeYoutubeLink = (text: string): string =>
-  text
-    .split('\n')
-    .map((line) => {
-      if (line.includes('{youtube_url}')) {
-        const cleaned = line.replace(
-          /\s*([|•·\-‐‑⁃]|\s{2,})\s*(🟥\s*)?(\*\*)?\[.*?\]\(\{youtube_url\}\)(\*\*)?/gi,
-          ''
-        );
-        return cleaned.includes('{youtube_url}') ? null : cleaned;
-      }
-      return line;
-    })
-    .filter((line) => line !== null)
-    .join('\n');
-
-const removeTwitchLink = (text: string): string =>
-  text
-    .split('\n')
-    .map((line) => {
-      if (line.includes('twitch.tv/{channel}') || line.includes('{twitch_url}')) {
-        const cleaned = line
-          .replace(
-            /\s*([|•·\-‐‑⁃]|\s{2,})?\s*(🟪\s*)?(\*\*)?\[.*?\]\((https:\/\/twitch\.tv\/\{channel\}|\{twitch_url\})\)(\*\*)?/gi,
-            ''
-          )
-          .replace(/^\s*([|•·\-‐‑⁃])\s*/, '')
-          .replace(/\s*([|•·\-‐‑⁃])\s*$/, '');
-        return cleaned.includes('twitch.tv/{channel}') || cleaned.includes('{twitch_url}')
-          ? null
-          : cleaned;
-      }
-      return line;
-    })
-    .filter((line) => line !== null)
-    .join('\n');
-
-const removeKickLink = (text: string): string =>
-  text
-    .split('\n')
-    .map((line) => {
-      if (line.includes('{kick_url}')) {
-        const cleaned = line.replace(
-          /\s*([|•·\-‐‑⁃]|\s{2,})\s*(🟩\s*)?(\*\*)?\[.*?\]\(\{kick_url\}\)(\*\*)?/gi,
-          ''
-        );
-        return cleaned.includes('{kick_url}') ? null : cleaned;
-      }
-      return line;
-    })
-    .filter((line) => line !== null)
-    .join('\n');
-
-export const buildYouTubeUrl = (channel?: string | null): string | undefined => {
-  const trimmed = channel?.trim();
-  if (!trimmed) return undefined;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (/^UC[a-zA-Z0-9_-]{22}$/.test(trimmed)) {
-    return `https://www.youtube.com/channel/${trimmed}`;
-  }
-  return `https://www.youtube.com/@${trimmed.replace(/^@/, '')}`;
-};
-
-export const buildKickUrl = (channel?: string | null): string | undefined => {
-  const trimmed = channel?.trim();
-  return trimmed ? `https://kick.com/${trimmed}` : undefined;
-};
-
 const get = <T = string>(name: string) => settings.get<T>(name);
-
-// ---------------------------------------------------------------------------
-// Body / sidebar formatters
-// ---------------------------------------------------------------------------
-
-const formatLivePostBody = (
-  streamInfo: any,
-  channelName: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
-  customBody?: string,
-  footer?: string
-): string => {
-  const title = streamInfo.title || 'Live Stream';
-  const gameName = streamInfo.game_name || 'Just Chatting';
-  const viewerCount =
-    streamInfo.viewer_count !== undefined ? streamInfo.viewer_count.toLocaleString() : '0';
-  const startedAt = streamInfo.started_at ? new Date(streamInfo.started_at) : new Date();
-
-  const elapsedMs = Date.now() - startedAt.getTime();
-  const hours = Math.floor(elapsedMs / 3600000);
-  const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-  const uptimeText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-
-  const displayName = streamInfo.user_name || channelName;
-  const content = customBody || DEFAULT_LIVE_POST_BODY;
-
-  let result = content
-    .replace(/{channel}/g, channelName)
-    .replace(/{display_name}/g, displayName)
-    .replace(/{game}/g, gameName)
-    .replace(/{viewers}/g, viewerCount)
-    .replace(/{uptime}/g, uptimeText)
-    .replace(/{title}/g, title);
-
-  result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-  result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-  result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-  if (footer) result += `\n\n${footer}`;
-  return result;
-};
-
-const formatOfflinePostBody = (
-  channelName: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
-  customBody?: string,
-  footer?: string,
-  defaultTemplate: string = DEFAULT_OFFLINE_POST_BODY,
-  displayName?: string,
-  title?: string
-): string => {
-  const content = customBody || defaultTemplate;
-  let result = content.replace(/{channel}/g, channelName);
-
-  result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-  if (displayName) result = result.replace(/{display_name}/g, displayName);
-  if (title) result = result.replace(/{title}/g, title);
-  result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-  result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-  if (footer) result += `\n\n${footer}`;
-  return result;
-};
 
 const formatSidebarWidgetText = (
   isLive: boolean,
-  streamInfo: any,
+  streamInfo: UnifiedStreamInfo | null,
   displayName: string,
   channelName: string,
   twitchUrl?: string,
@@ -233,24 +101,24 @@ const ensureStickyOfflinePost = async (
   channel: string,
   twitchUrl?: string,
   youtubeUrl?: string,
-  kickUrl?: string
+  kickUrl?: string,
+  preloadedOfflineBody?: string,
+  preloadedOfflineFooter?: string,
+  preloadedOfflineTitle?: string
 ) => {
   const cachedDisplayName = await redis.get('twitch_display_name');
   const displayName = cachedDisplayName || channel;
-  const customOfflineBody = await get('offlinePostBody');
-  const offlinePostFooter = await get('offlinePostFooter');
   const concludingBody = formatOfflinePostBody(
     channel,
     twitchUrl,
     youtubeUrl,
     kickUrl,
-    customOfflineBody,
-    offlinePostFooter,
-    DEFAULT_OFFLINE_POST_BODY,
+    preloadedOfflineBody,
+    preloadedOfflineFooter,
+    undefined,
     displayName
   );
-  const customOfflineTitle = await get('offlinePostTitle');
-  const templateTitle = customOfflineTitle || DEFAULT_OFFLINE_POST_TITLE;
+  const templateTitle = preloadedOfflineTitle || DEFAULT_OFFLINE_POST_TITLE;
   const offlinePostTitle = templateTitle.replace(/{display_name}/g, displayName);
   const offlinePostId = await redis.get('offline_post_id');
   let offlinePostExists = false;
@@ -545,13 +413,14 @@ const updateDynamicPostFlair = async (
 const resetDynamicPostFlair = async (
   postId: string,
   subredditName: string,
-  liveFlairId?: string
+  liveFlairId?: string,
+  offlineFlairText?: string
 ) => {
   try {
     await reddit.setPostFlair({
       postId,
       subredditName,
-      text: '⚫ OFFLINE',
+      text: offlineFlairText || '⚫ OFFLINE',
       flairTemplateId: liveFlairId,
     });
     console.log(`Reset post ${postId} flair to offline.`);
@@ -587,38 +456,76 @@ const syncDashboardConfig = async (
 // ---------------------------------------------------------------------------
 
 export const runStatusCheck = async (): Promise<void> => {
-  const twitchChannel = await get('twitchChannel');
-  const youtubeChannel = await get('youtubeChannel');
-  const kickChannel = await get('kickChannel');
+  const [
+    twitchChannel,
+    youtubeChannel,
+    kickChannel,
+    liveFlairId,
+    offlineFlairText,
+    removeOfflinePost,
+    deleteOfflinePost,
+    stickyOfflinePost,
+    updateSidebarWidget,
+    enableHighlightsPost,
+    livePostTitle,
+    highlightsPostTitle,
+    livePostBody,
+    livePostFooter,
+    concludingPostBody,
+    concludingPostFooter,
+    liveSidebarText,
+    liveSidebarFooter,
+    offlineSidebarText,
+    offlineSidebarFooter,
+    highlightsHeader,
+    highlightsFooter,
+    highlightsFlairId,
+    offlineGracePeriod,
+    suggestedSort,
+    enableDashboard,
+    enableLivePostRaw,
+    enableDynamicFlair,
+    offlinePostBody,
+    offlinePostFooter,
+    offlinePostTitle,
+  ] = await Promise.all([
+    get('twitchChannel'),
+    get('youtubeChannel'),
+    get('kickChannel'),
+    get('liveFlairId'),
+    get('offlineFlairText'),
+    get<boolean>('removeOfflinePost'),
+    get<boolean>('deleteOfflinePost'),
+    get<boolean>('stickyOfflinePost'),
+    get<boolean>('updateSidebarWidget'),
+    get<boolean>('enableHighlightsPost'),
+    get('livePostTitle'),
+    get('highlightsPostTitle'),
+    get('livePostBody'),
+    get('livePostFooter'),
+    get('concludingPostBody'),
+    get('concludingPostFooter'),
+    get('liveSidebarText'),
+    get('liveSidebarFooter'),
+    get('offlineSidebarText'),
+    get('offlineSidebarFooter'),
+    get('highlightsHeader'),
+    get('highlightsFooter'),
+    get('highlightsFlairId'),
+    get<number>('offlineGracePeriod'),
+    get('suggestedSort'),
+    get<boolean>('enableDashboard'),
+    get<boolean>('enableLivePost'),
+    get<boolean>('enableDynamicFlair'),
+    get('offlinePostBody'),
+    get('offlinePostFooter'),
+    get('offlinePostTitle'),
+  ]);
+  const enableLivePost = enableLivePostRaw ?? true;
 
-  const liveFlairId = await get('liveFlairId');
   const twitchUrl = twitchChannel ? `https://twitch.tv/${twitchChannel.trim()}` : undefined;
   const youtubeUrl = buildYouTubeUrl(youtubeChannel);
   const kickUrl = buildKickUrl(kickChannel);
-
-  const removeOfflinePost = await get<boolean>('removeOfflinePost');
-  const deleteOfflinePost = await get<boolean>('deleteOfflinePost');
-  const stickyOfflinePost = await get<boolean>('stickyOfflinePost');
-  const updateSidebarWidget = await get<boolean>('updateSidebarWidget');
-  const enableHighlightsPost = await get<boolean>('enableHighlightsPost');
-  const livePostTitle = await get('livePostTitle');
-  const highlightsPostTitle = await get('highlightsPostTitle');
-  const livePostBody = await get('livePostBody');
-  const livePostFooter = await get('livePostFooter');
-  const concludingPostBody = await get('concludingPostBody');
-  const concludingPostFooter = await get('concludingPostFooter');
-  const liveSidebarText = await get('liveSidebarText');
-  const liveSidebarFooter = await get('liveSidebarFooter');
-  const offlineSidebarText = await get('offlineSidebarText');
-  const offlineSidebarFooter = await get('offlineSidebarFooter');
-  const highlightsHeader = await get('highlightsHeader');
-  const highlightsFooter = await get('highlightsFooter');
-  const highlightsFlairId = await get('highlightsFlairId');
-  const offlineGracePeriod = await get<number>('offlineGracePeriod');
-  const suggestedSort = await get('suggestedSort');
-  const enableDashboard = await get<boolean>('enableDashboard');
-  const enableLivePost = (await get<boolean>('enableLivePost')) ?? true;
-  const enableDynamicFlair = await get<boolean>('enableDynamicFlair');
 
   const defaultChannel = (twitchChannel || youtubeChannel || kickChannel || '') as string;
 
@@ -760,11 +667,31 @@ export const runStatusCheck = async (): Promise<void> => {
           } catch (e) {
             console.error('Failed to update live post stats:', e);
           }
-          // Re-verify that the live post is still pinned every cron tick.
-          try {
-            await verifyAndRepinIfNeeded(postId, 'live');
-          } catch (verifyErr) {
-            console.error('Failed to verify/re-pin live post:', verifyErr);
+          // Re-verify that the live post is still pinned — throttled to every 10 minutes.
+          const PIN_VERIFY_INTERVAL_MS = 10 * 60 * 1000;
+          const lastPinVerified = await redis.get('last_pin_verified');
+          const shouldVerifyPin =
+            !lastPinVerified ||
+            Date.now() - parseInt(lastPinVerified, 10) > PIN_VERIFY_INTERVAL_MS;
+
+          if (shouldVerifyPin) {
+            await redis.set('last_pin_verified', Date.now().toString());
+            try {
+              await verifyAndRepinIfNeeded(postId, 'live');
+            } catch (verifyErr) {
+              console.error('Failed to verify/re-pin live post:', verifyErr);
+            }
+
+            if (enableDashboard) {
+              const dashPostId = await redis.get('dashboard_post_id');
+              if (dashPostId) {
+                try {
+                  await verifyAndRepinIfNeeded(dashPostId, 'dashboard');
+                } catch (verifyErr) {
+                  console.error('Failed to verify/re-pin dashboard post:', verifyErr);
+                }
+              }
+            }
           }
         }
       }
@@ -778,12 +705,6 @@ export const runStatusCheck = async (): Promise<void> => {
             } catch (flairError) {
               console.error('Failed to update dynamic flair on dashboard post:', flairError);
             }
-          }
-          // Re-verify that the dashboard post is still pinned every cron tick.
-          try {
-            await verifyAndRepinIfNeeded(dashPostId, 'dashboard');
-          } catch (verifyErr) {
-            console.error('Failed to verify/re-pin dashboard post:', verifyErr);
           }
         }
       }
@@ -846,10 +767,10 @@ export const runStatusCheck = async (): Promise<void> => {
         if (enableDynamicFlair) {
           if (enableDashboard) {
             const dashPostId = await redis.get('dashboard_post_id');
-            if (dashPostId) await resetDynamicPostFlair(dashPostId, subreddit.name, liveFlairId);
+            if (dashPostId) await resetDynamicPostFlair(dashPostId, subreddit.name, liveFlairId, offlineFlairText);
           }
           if (enableLivePost && postId) {
-            await resetDynamicPostFlair(postId, subreddit.name, liveFlairId);
+            await resetDynamicPostFlair(postId, subreddit.name, liveFlairId, offlineFlairText);
           }
         }
 
@@ -901,17 +822,9 @@ export const runStatusCheck = async (): Promise<void> => {
           try {
             const twitchClientId = await get('twitchClientId');
             const twitchClientSecret = await get('twitchClientSecret');
-            let twitchToken = await redis.get('twitch_access_token');
-            if (!twitchToken && twitchClientId && twitchClientSecret) {
-              const tokenRes = await fetch(
-                `https://id.twitch.tv/oauth2/token?client_id=${twitchClientId}&client_secret=${twitchClientSecret}&grant_type=client_credentials`,
-                { method: 'POST' }
-              );
-              if (tokenRes.ok) {
-                const tokenData = await tokenRes.json();
-                twitchToken = tokenData.access_token;
-              }
-            }
+            const twitchToken = twitchClientId && twitchClientSecret
+              ? await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis)
+              : null;
 
             if (twitchToken) {
               await postStreamHighlights(
@@ -934,7 +847,7 @@ export const runStatusCheck = async (): Promise<void> => {
         }
 
         if (!enableDashboard && stickyOfflinePost) {
-          await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl);
+          await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
         }
       }
     }
@@ -943,7 +856,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const isOfflinePostPinned = await redis.get('is_offline_post_pinned');
       if (!isOfflinePostPinned) {
         console.log('Offline post is not marked as pinned in Redis. Ensuring sticky offline post is active...');
-        await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl);
+        await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
       }
     }
   }
@@ -1015,6 +928,31 @@ export const runStatusCheck = async (): Promise<void> => {
     }
   } catch (dashSyncError) {
     console.error('Failed to sync dashboard config:', dashSyncError);
+  }
+
+  // Push the latest state to the dashboard Realtime channel so clients update
+  // immediately without waiting for the next 30-second poll.
+  try {
+    const cachedLivePostId = await redis.get('live_post_id');
+    const realtimeDisplayName =
+      isLive && streamInfo
+        ? streamInfo.user_name || defaultChannel
+        : (await redis.get('twitch_display_name')) ?? defaultChannel;
+    await realtime.send('livesticky_dashboard', {
+      type: 'status-update' as const,
+      data: {
+        isLive,
+        displayName: realtimeDisplayName,
+        title: isLive && streamInfo ? streamInfo.title ?? '' : '',
+        game: isLive && streamInfo ? streamInfo.game_name ?? '' : '',
+        viewers: isLive && streamInfo ? (streamInfo.viewer_count ?? 0).toString() : '0',
+        thumbnail: isLive && streamInfo ? streamInfo.thumbnail_url ?? '' : '',
+        startedAt: (isLive && streamInfo ? streamInfo.started_at : null) ?? null,
+        livePostId: (isLive ? cachedLivePostId : null) ?? null,
+      },
+    });
+  } catch (realtimeErr) {
+    console.error('Failed to publish to Realtime channel:', realtimeErr);
   }
 };
 

@@ -5,8 +5,8 @@ import {
   runStatusCheck,
   createDashboardPost,
   restartLiveSticky,
-  buildYouTubeUrl,
 } from './livesticky.js';
+import { buildYouTubeUrl } from '../src/formatters.js';
 
 const app = express();
 app.use(express.json());
@@ -33,6 +33,7 @@ app.get('/api/stream-status', async (_req, res) => {
       legacyDisplayName,
       legacyStartedAt,
       legacyTitle,
+      lastLiveAt,
     ] = await Promise.all([
       redis.get('is_live_pinned'),
       redis.get('live_post_id'),
@@ -45,6 +46,7 @@ app.get('/api/stream-status', async (_req, res) => {
       redis.get('twitch_display_name'),
       redis.get('twitch_started_at'),
       redis.get('twitch_stream_title'),
+      redis.get('last_live_at'),
     ]);
 
     const isLive = isLivePinned === 'true';
@@ -70,6 +72,7 @@ app.get('/api/stream-status', async (_req, res) => {
       uptime: uptimeText,
       thumbnail: streamThumbnail || '',
       livePostId: livePostId || null,
+      lastLiveAt: lastLiveAt || null,
     });
   } catch (error) {
     console.error('Error fetching stream status:', error);

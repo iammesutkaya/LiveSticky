@@ -3,8 +3,10 @@
    ========================================================================== */
 
 :root {
-  /* Color palette */
-  --bg-primary: #0e0e10;
+  /* Color palette — bg-primary matches Reddit's dark feed background (#0e1113,
+     sampled from the live post) so the embedded webview reads as native rather
+     than an island. */
+  --bg-primary: #0e1113;
   --bg-secondary: #18181b;
   --bg-card: #1f1f23;
   --bg-card-hover: #26262c;
@@ -34,6 +36,43 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* ==========================================================================
+   Light theme — follows the user's OS/browser color scheme. Devvit does not
+   expose Reddit's in-app theme toggle to the webview, so this tracks the
+   system setting (which matches Reddit for anyone on the "auto" theme).
+   ========================================================================== */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f4f6;
+    --bg-card: #eef0f2;
+    --bg-card-hover: #e4e6ea;
+
+    --text-primary: #1a1a1b;
+    --text-secondary: #545456;
+    --text-muted: #76767a;
+
+    /* Darkened accents/platform colors for contrast on a light background */
+    --accent-purple: #772ce8;
+    --accent-purple-dim: rgba(119, 44, 232, 0.12);
+    --twitch-color: #772ce8;
+    --youtube-color: #e60000;
+    --kick-color: #2c9e10;
+
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-medium: rgba(0, 0, 0, 0.14);
+  }
+
+  /* Re-tune the gradient strips for light: more stops so the saturated purple
+     glides smoothly to a soft lavender instead of banding to near-white. */
+  .banner-strip {
+    background: linear-gradient(115deg, #7c2ce8 0%, #9147ff 30%, #b189ff 55%, #d6c5ff 78%, #f2ecff 100%);
+  }
+  .dashboard.is-live .banner-strip {
+    background: linear-gradient(115deg, #d80f29 0%, #ff4d4d 38%, #ff8f86 66%, #ffd6d1 100%);
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -42,6 +81,7 @@
 
 html, body {
   height: 100%;
+  color-scheme: light dark;
 }
 
 body {
@@ -117,10 +157,105 @@ body {
   gap: 14px;
 }
 
+/* main and footer are semantic elements inside .content — inherit the flex column layout */
+.content main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
 /* Push the footer to the bottom of the slot so the leftover space reads as
    padding inside the dashboard rather than dead black area below it. */
-.content .footer {
+.content footer.footer {
   margin-top: auto;
+}
+
+/* ==========================================================================
+   Placeholder Banner Strip (CSS gradient — no external image)
+   ========================================================================== */
+
+.banner-strip {
+  position: relative;
+  /* Full-bleed: cancel the dashboard's 16px padding on the top and sides so
+     the strip runs edge-to-edge like a cover photo. */
+  margin: -16px -16px 0;
+  height: 96px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow: hidden;
+  background: linear-gradient(120deg, var(--accent-purple) 0%, #241844 50%, var(--bg-secondary) 100%);
+  transition: background 0.5s ease;
+}
+
+/* Soft top-left sheen so the strip doesn't read as a flat block */
+.banner-strip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 18% 25%, rgba(255, 255, 255, 0.1), transparent 45%);
+}
+
+.dashboard.is-live .banner-strip {
+  background: linear-gradient(120deg, var(--accent-live) 0%, #2a0f12 50%, var(--bg-secondary) 100%);
+}
+
+/* Profile row: avatar overlapping the banner, name + status pill beside it */
+.profile {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  /* Small overlap so the avatar dips into the banner but the name/pill sit
+     comfortably below it rather than crowding the banner edge. */
+  margin-top: -28px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0; /* allow the name to ellipsis instead of pushing the badge */
+  /* Larger bottom padding lifts the name + pill up toward the banner so they
+     don't float low against the avatar's bottom edge. */
+  padding-bottom: 16px;
+}
+
+.profile-info .status-indicator {
+  align-self: flex-start;
+}
+
+.profile .header-right {
+  margin-left: auto;
+  padding-bottom: 16px;
+}
+
+/* Placeholder avatar overlapping the banner's bottom-left */
+.avatar {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--bg-primary);
+  background: linear-gradient(135deg, var(--accent-purple) 0%, #3a2a6a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: background 0.5s ease;
+}
+
+.dashboard.is-live .avatar {
+  background: linear-gradient(135deg, var(--accent-live) 0%, #5a1414 100%);
+}
+
+.avatar-initial {
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
 }
 
 /* ==========================================================================
@@ -190,7 +325,7 @@ body {
 }
 
 .display-name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
@@ -251,6 +386,14 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.live-summary {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Stats grid */
@@ -370,6 +513,14 @@ body {
   color: var(--text-secondary);
 }
 
+.last-live {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
 /* ==========================================================================
    Platform Links
    ========================================================================== */
@@ -381,59 +532,71 @@ body {
 }
 
 .platform-btn {
+  /* Per-platform colour, set on the variant classes below. --tint is the rgb
+     channel triplet (reused at different alphas); --on is the label colour. */
+  --tint: 145, 71, 255;
+  --on: #ffffff;
+
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);  /* friendly rounded corners */
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
-  transition: all 0.25s ease;
-  flex: 1;
-  justify-content: center;
-  min-width: 0;
+  justify-content: center;          /* hug content — no flex-grow */
+
+  color: var(--on);
+  border: 1px solid rgba(var(--tint), 0.9);
+  /* Solid brand fill, gently top-lit so the face reads as a soft, raised surface
+     without looking glossy. */
+  background: linear-gradient(180deg, rgba(var(--tint), 0.95), rgba(var(--tint), 0.82));
+  /* Emboss: a subtle lip along the top edge + a soft drop shadow underneath so
+     the button sits up off the surface as a tactile, pressable object. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.30);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .platform-btn span {
   white-space: nowrap;
 }
 
-.platform-btn.twitch {
-  background: rgba(145, 71, 255, 0.12);
-  color: var(--twitch-color);
-  border: 1px solid rgba(145, 71, 255, 0.2);
-}
-.platform-btn.twitch:hover {
-  background: rgba(145, 71, 255, 0.22);
-  border-color: rgba(145, 71, 255, 0.4);
+/* Hover: fill darkens and mutes (Material-style state layer), with a small lift. */
+.platform-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(145, 71, 255, 0.15);
+  filter: brightness(0.90);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
-.platform-btn.youtube {
-  background: rgba(255, 0, 0, 0.1);
-  color: var(--youtube-color);
-  border: 1px solid rgba(255, 0, 0, 0.18);
-}
-.platform-btn.youtube:hover {
-  background: rgba(255, 0, 0, 0.18);
-  border-color: rgba(255, 0, 0, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.12);
+/* Pressed: darkest fill, lift drops, and the face sinks into an inner shadow. */
+.platform-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.74);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 
-.platform-btn.kick {
-  background: rgba(83, 252, 24, 0.08);
-  color: var(--kick-color);
-  border: 1px solid rgba(83, 252, 24, 0.15);
+/* Keyboard focus: a haloed ring offset from the pill by the page colour. */
+.platform-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px rgba(var(--tint), 0.95);
 }
-.platform-btn.kick:hover {
-  background: rgba(83, 252, 24, 0.16);
-  border-color: rgba(83, 252, 24, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(83, 252, 24, 0.1);
-}
+
+/* Muted, deepened brand fills — recognisable but balanced in weight, so no one
+   button shouts over the calm dashboard (full-neon red/purple was too loud). */
+.platform-btn.twitch     { --tint: 126, 74, 214; --on: #ffffff; }
+.platform-btn.youtube    { --tint: 200, 56, 56;  --on: #ffffff; }
+/* Kick green is bright — dark label keeps the text readable. */
+.platform-btn.kick       { --tint: 76, 196, 64;  --on: #0e1113; }
+/* Discussion link — neutral grey; lives below platform links, only shown live. */
+.platform-btn.discussion { --tint: 120, 120, 140; --on: #ffffff; }
 
 /* ==========================================================================
    Footer
@@ -457,6 +620,47 @@ body {
   font-size: 11px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.refresh-btn:disabled {
+  cursor: default;
+}
+
+.refresh-btn.spinning svg {
+  animation: refresh-spin 0.6s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================

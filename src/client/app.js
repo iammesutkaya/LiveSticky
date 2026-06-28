@@ -5,6 +5,7 @@
  * then subscribes to Realtime updates for instant live stat changes.
  */
 import { connectRealtime, navigateTo } from '@devvit/web/client';
+import { formatTimeAgo, formatNumber } from './utils.js';
 
 
 // DOM references
@@ -19,16 +20,21 @@ const displayNameEl = $('display-name');
 const liveContent = $('live-content');
 const offlineContent = $('offline-content');
 const streamTitleEl = $('stream-title');
+const liveSummaryEl = $('live-summary');
+const refreshBtn = $('refresh-btn');
 const viewerCountEl = $('viewer-count');
 const gameNameEl = $('game-name');
 const uptimeValueEl = $('uptime-value');
 const offlineNameEl = $('offline-name');
+const lastLiveEl = $('last-live');
 const lastUpdatedEl = $('last-updated');
+const avatarInitialEl = $('avatar-initial');
 
 // Platform link elements
 const twitchLink = $('twitch-link');
 const youtubeLink = $('youtube-link');
 const kickLink = $('kick-link');
+const discussionLink = $('discussion-link');
 
 // State
 let currentState = {
@@ -76,7 +82,8 @@ function showError(message) {
 }
 
 /**
- * Fetch the current stream status from the server
+ * Fetch the current stream status from the server.
+ * Returns true on success, false on failure.
  */
 async function fetchStatus() {
   try {
@@ -84,13 +91,16 @@ async function fetchStatus() {
     if (res.ok) {
       const data = await res.json();
       updateDashboard(data);
+      return true;
     } else {
       console.error('[LiveSticky] Status endpoint returned:', res.status);
       showError('Unable to reach the LiveSticky server.');
+      return false;
     }
   } catch (err) {
     console.error('[LiveSticky] Failed to fetch status:', err);
     showError('Unable to reach the LiveSticky server.');
+    return false;
   }
 }
 
@@ -108,7 +118,12 @@ function updateDashboard(data) {
   currentState = { ...currentState, ...data };
 
   // Update header
-  displayNameEl.textContent = data.displayName || 'Streamer';
+  const displayName = data.displayName || 'Streamer';
+  displayNameEl.textContent = displayName;
+  if (avatarInitialEl) avatarInitialEl.textContent = displayName.trim().charAt(0) || 'S';
+
+  // Toggle dashboard-level live state (themes the banner strip, etc.)
+  dashboard.classList.toggle('is-live', isNowLive);
 
   // Update status indicator
   if (isNowLive) {
@@ -143,10 +158,47 @@ function updateDashboard(data) {
       setTimeout(() => viewerCountEl.classList.remove('updating'), 300);
     }
     viewerCountEl.textContent = formattedViewers;
+
+    // Compact at-a-glance summary line, e.g. "5.1K watching · Live for 52m"
+    if (liveSummaryEl) {
+      const watching = `${formattedViewers} watching`;
+      const since = data.uptime ? ` · Live for ${data.uptime}` : '';
+      liveSummaryEl.textContent = `${watching}${since}`;
+    }
   } else {
     liveContent.classList.add('hidden');
     offlineContent.classList.remove('hidden');
     offlineNameEl.textContent = data.displayName || 'Streamer';
+
+    // "Last live X ago" — shown only if we have a recorded last-live time
+    if (lastLiveEl) {
+      const ago = formatTimeAgo(data.lastLiveAt);
+      if (ago) {
+        lastLiveEl.textContent = `Last live ${ago}`;
+        lastLiveEl.classList.remove('hidden');
+      } else {
+        lastLiveEl.classList.add('hidden');
+      }
+    }
+  }
+
+  // Wire up "Go to live discussion" button
+  if (discussionLink) {
+    if (isNowLive && data.livePostId) {
+      const postId = String(data.livePostId).replace(/^t3_/, '');
+      const postUrl = `https://www.reddit.com/comments/${postId}`;
+      discussionLink.href = postUrl;
+      // Replace event listener by cloning to avoid duplicates
+      const fresh = discussionLink.cloneNode(true);
+      fresh.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo(postUrl);
+      });
+      discussionLink.parentNode?.replaceChild(fresh, discussionLink);
+      fresh.classList.remove('hidden');
+    } else {
+      discussionLink.classList.add('hidden');
+    }
   }
 
   // Update timestamp
@@ -188,15 +240,6 @@ function setupPlatformLink(el, url) {
 }
 
 /**
- * Format a number string with commas (e.g., "15420" -> "15,420")
- */
-function formatNumber(numStr) {
-  const num = parseInt(numStr, 10);
-  if (isNaN(num)) return numStr || '0';
-  return num.toLocaleString();
-}
-
-/**
  * Try to connect to Realtime for instant updates.
  * Falls back to polling if Realtime is not available.
  */
@@ -210,7 +253,8 @@ async function initRealtime() {
         }
       },
       onConnect: () => {
-        console.log('[LiveSticky] Realtime connected');
+        console.log('[LiveSticky] Realtime connected — stopping poll fallback');
+        stopPolling();
       },
       onDisconnect: () => {
         console.log('[LiveSticky] Realtime disconnected, falling back to polling');
@@ -236,14 +280,46 @@ function startPolling() {
   pollingInterval = setInterval(fetchStatus, 30000);
 }
 
+function stopPolling() {
+  if (!pollingInterval) return;
+  clearInterval(pollingInterval);
+  pollingInterval = null;
+  console.log('[LiveSticky] Stopped polling fallback');
+}
+
+/**
+ * Manual refresh — re-pull the latest server state on demand and give visual
+ * feedback. The server state itself is refreshed by the scheduler every 2 min;
+ * this lets viewers grab the latest without reloading the whole post.
+ */
+async function handleRefresh() {
+  if (!refreshBtn || refreshBtn.classList.contains('spinning')) return;
+  refreshBtn.classList.add('spinning');
+  refreshBtn.disabled = true;
+  try {
+    await fetchStatus();
+  } finally {
+    setTimeout(() => {
+      refreshBtn.classList.remove('spinning');
+      refreshBtn.disabled = false;
+    }, 500);
+  }
+}
+
 /**
  * Initialize the dashboard
  */
 async function init() {
-  // Fetch config and initial status in parallel
-  await Promise.all([fetchConfig(), fetchStatus()]);
+  if (refreshBtn) refreshBtn.addEventListener('click', handleRefresh);
 
-  // Try Realtime, fall back to polling
+  // Fetch config and initial status in parallel
+  const [, statusOk] = await Promise.all([fetchConfig(), fetchStatus()]);
+
+  // If initial status fetch failed, start polling immediately so the dashboard
+  // auto-recovers without requiring a manual refresh.
+  if (!statusOk) startPolling();
+
+  // Try Realtime, fall back to polling on disconnect
   initRealtime();
 }
 

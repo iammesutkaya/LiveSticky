@@ -9,30 +9,40 @@
 <body>
   <div id="dashboard" class="dashboard">
     <!-- Loading state -->
-    <div id="loading" class="loading-state">
+    <div id="loading" class="loading-state" role="status" aria-live="polite">
       <div class="loading-pulse"></div>
       <span class="loading-text">Connecting to LiveSticky…</span>
     </div>
 
     <!-- Error state -->
-    <div id="error" class="loading-state hidden">
+    <div id="error" class="loading-state hidden" role="alert">
       <span class="loading-text" id="error-message">Something went wrong.</span>
     </div>
 
     <!-- Main content (hidden until loaded) -->
     <div id="content" class="content hidden">
-      <!-- Header bar -->
-      <div class="header">
-        <div class="header-left">
-          <div id="status-indicator" class="status-indicator offline">
-            <span class="status-dot"></span>
+      <!-- Placeholder banner strip (CSS gradient — adapts to live/offline).
+           A same-origin decorative header; a real streamer image could drop
+           into this slot later if a platform CDN domain gets approved. -->
+      <div class="banner-strip" aria-hidden="true"></div>
+
+      <!-- Profile header: placeholder avatar overlapping the banner, with the
+           display name beside it and the status pill beneath the name. -->
+      <header class="profile">
+        <div id="avatar" class="avatar" aria-hidden="true">
+          <span id="avatar-initial" class="avatar-initial">S</span>
+        </div>
+        <div class="profile-info">
+          <h1 id="display-name" class="display-name">Streamer</h1>
+          <div id="status-indicator" class="status-indicator offline"
+               role="status" aria-live="polite" aria-label="Stream status: offline">
+            <span class="status-dot" aria-hidden="true"></span>
             <span id="status-label" class="status-label">OFFLINE</span>
           </div>
-          <h1 id="display-name" class="display-name">Streamer</h1>
         </div>
         <div class="header-right">
-          <div id="livesticky-badge" class="badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div id="livesticky-badge" class="badge" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6"/>
               <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -40,89 +50,108 @@
             LiveSticky
           </div>
         </div>
-      </div>
+      </header>
 
-      <!-- Live state content -->
-      <div id="live-content" class="live-content hidden">
-        <!-- Stream info bar -->
-        <div class="stream-info">
-          <div id="stream-title" class="stream-title">Stream Title</div>
+      <main>
+        <!-- Live state content -->
+        <div id="live-content" class="live-content hidden">
+          <!-- Stream info bar -->
+          <div class="stream-info">
+            <div id="stream-title" class="stream-title">Stream Title</div>
+            <div id="live-summary" class="live-summary" aria-live="polite"></div>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="stats-grid" role="list">
+            <div class="stat-card viewers" role="listitem" aria-label="Viewers">
+              <div class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="stat-value" id="viewer-count" aria-live="polite">0</div>
+              <div class="stat-label">Viewers</div>
+            </div>
+            <div class="stat-card category" role="listitem" aria-label="Category">
+              <div class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 21H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M12 17V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="stat-value" id="game-name">Just Chatting</div>
+              <div class="stat-label">Category</div>
+            </div>
+            <div class="stat-card uptime" role="listitem" aria-label="Uptime">
+              <div class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="stat-value" id="uptime-value">0m</div>
+              <div class="stat-label">Uptime</div>
+            </div>
+          </div>
         </div>
 
-        <!-- Stats grid -->
-        <div class="stats-grid">
-          <div class="stat-card viewers">
-            <div class="stat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </div>
-            <div class="stat-value" id="viewer-count">0</div>
-            <div class="stat-label">Viewers</div>
-          </div>
-          <div class="stat-card category">
-            <div class="stat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
-                <path d="M8 21H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M12 17V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="stat-value" id="game-name">Just Chatting</div>
-            <div class="stat-label">Category</div>
-          </div>
-          <div class="stat-card uptime">
-            <div class="stat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="stat-value" id="uptime-value">0m</div>
-            <div class="stat-label">Uptime</div>
+        <!-- Offline state content -->
+        <div id="offline-content" class="offline-content hidden">
+          <div class="offline-message">
+            <div class="offline-icon" aria-hidden="true">😴</div>
+            <p class="offline-text">
+              <span id="offline-name">Streamer</span> is currently offline.
+            </p>
+            <p class="offline-subtext">Check back soon or follow the channels below!</p>
+            <p id="last-live" class="last-live hidden" aria-live="polite"></p>
           </div>
         </div>
-      </div>
 
-      <!-- Offline state content -->
-      <div id="offline-content" class="offline-content hidden">
-        <div class="offline-message">
-          <div class="offline-icon">😴</div>
-          <p class="offline-text">
-            <span id="offline-name">Streamer</span> is currently offline.
-          </p>
-          <p class="offline-subtext">Check back soon or follow the channels below!</p>
-        </div>
-      </div>
-
-      <!-- Platform links (shown in both states) -->
-      <div id="platform-links" class="platform-links">
-        <a id="twitch-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn twitch hidden">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
-          </svg>
-          <span>Twitch</span>
-        </a>
-        <a id="youtube-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn youtube hidden">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-          <span>YouTube</span>
-        </a>
-        <a id="kick-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn kick hidden">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/>
-          </svg>
-          <span>Kick</span>
-        </a>
-      </div>
+        <!-- Platform links (shown in both states) -->
+        <nav id="platform-links" class="platform-links" aria-label="Stream platform links">
+          <a id="twitch-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn twitch hidden" aria-label="Watch on Twitch">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+            </svg>
+            <span>Twitch</span>
+          </a>
+          <a id="youtube-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn youtube hidden" aria-label="Watch on YouTube">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span>YouTube</span>
+          </a>
+          <a id="kick-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn kick hidden" aria-label="Watch on Kick">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/>
+            </svg>
+            <span>Kick</span>
+          </a>
+          <a id="discussion-link" href="#" class="platform-btn discussion hidden" aria-label="Go to live discussion thread">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Live Discussion</span>
+          </a>
+        </nav>
+      </main>
 
       <!-- Footer -->
-      <div class="footer">
+      <footer class="footer">
         <span class="footer-text">Auto-updated by LiveSticky</span>
-        <span id="last-updated" class="footer-timestamp"></span>
-      </div>
+        <div class="footer-right">
+          <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh status">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Refresh</span>
+          </button>
+          <span id="last-updated" class="footer-timestamp" aria-live="polite"></span>
+        </div>
+      </footer>
     </div>
   </div>
 

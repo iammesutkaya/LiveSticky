@@ -53,56 +53,63 @@
   },
   "settings": {
     "subreddit": {
-      "setupDivider": {
-        "type": "string",
-        "label": "━━━━━━━━━━  🔧  SETUP  ━━━━━━━━━━",
-        "helpText": "Section header — no value needed."
+      "enableDashboard": {
+        "type": "boolean",
+        "label": "📊 Enable Custom Post Dashboard",
+        "defaultValue": false,
+        "helpText": "If enabled, LiveSticky will power a persistent interactive dashboard post."
+      },
+      "enableLivePost": {
+        "type": "boolean",
+        "label": "📝 Enable Live Text Post",
+        "defaultValue": true,
+        "helpText": "If enabled, automatically creates and pins a standard text post when the stream goes live."
       },
       "twitchChannel": {
         "type": "string",
-        "label": "🔧 Twitch Channel Name",
+        "label": "🟪 Twitch Channel Name (Optional)",
         "helpText": "The name of the Twitch channel to monitor (e.g., streamer)",
         "placeholder": "streamer"
       },
       "twitchClientId": {
         "type": "string",
-        "label": "🔧 Twitch Client ID",
+        "label": "🟪 Twitch Client ID (Optional)",
         "helpText": "Your Twitch App Client ID. Register one at https://dev.twitch.tv/console (Guide: https://github.com/iammesutkaya/LiveSticky#readme). Sensitive — only mods of this community can see it.",
         "placeholder": "your Twitch app Client ID"
       },
       "twitchClientSecret": {
         "type": "string",
-        "label": "🔧 Twitch Client Secret",
+        "label": "🟪 Twitch Client Secret (Optional)",
         "helpText": "Your Twitch App Client Secret. Sensitive — keep it confidential; only mods of this community can see it. (Guide: https://github.com/iammesutkaya/LiveSticky#readme)",
         "placeholder": "your Twitch app Client Secret"
       },
       "youtubeChannel": {
         "type": "string",
-        "label": "🔧 YouTube Channel Name / Handle (Optional)",
+        "label": "🟥 YouTube Channel Name / Handle (Optional)",
         "helpText": "The name or handle of your YouTube channel (e.g., @ChannelName or ChannelName)",
         "placeholder": "@ChannelName"
       },
       "youtubeApiKey": {
         "type": "string",
-        "label": "🔧 YouTube Data API Key (Optional)",
+        "label": "🟥 YouTube Data API Key (Optional)",
         "helpText": "Your Google Developer API Key with YouTube Data API v3 enabled. Required if using YouTube Live status check. Sensitive — only mods of this community can see it.",
         "placeholder": "your YouTube Data API v3 key"
       },
       "kickChannel": {
         "type": "string",
-        "label": "🔧 Kick Channel Name (Optional)",
+        "label": "🟩 Kick Channel Name (Optional)",
         "helpText": "The name of your Kick channel (e.g., ChannelName)",
         "placeholder": "ChannelName"
       },
       "kickClientId": {
         "type": "string",
-        "label": "🔧 Kick API Client ID (Optional)",
+        "label": "🟩 Kick API Client ID (Optional)",
         "helpText": "Your Kick Developer API Client ID. Required if using Kick status check. Sensitive — only mods of this community can see it.",
         "placeholder": "your Kick Client ID"
       },
       "kickClientSecret": {
         "type": "string",
-        "label": "🔧 Kick API Client Secret (Optional)",
+        "label": "🟩 Kick API Client Secret (Optional)",
         "helpText": "Your Kick Developer API Client Secret. Required if using Kick status check. Sensitive — only mods of this community can see it.",
         "placeholder": "your Kick Client Secret"
       },
@@ -118,15 +125,16 @@
         "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Post Flair)",
         "placeholder": "e.g. 11111111-2222-3333-4444-555555555555"
       },
+      "offlineFlairText": {
+        "type": "string",
+        "label": "🔧 Offline Flair Text (Optional)",
+        "helpText": "Text to set as the post flair when the stream goes offline. Defaults to '⚫ OFFLINE' if left empty.",
+        "placeholder": "e.g. ⚫ OFFLINE"
+      },
       "placeholderReference": {
         "type": "paragraph",
         "label": "Available Placeholders (for reference — changes here have no effect)",
         "defaultValue": "{channel} — Twitch channel login name (e.g. streamer)\n{display_name} — Channel display name (e.g. Streamer)\n{title} — Stream title\n{game} — Game or category being streamed (live only)\n{viewers} — Current viewer count (live only)\n{uptime} — How long the stream has been live (live only)\n{date} — Date the stream ended (post-stream only)\n{twitch_url} — Twitch channel URL\n{youtube_url} — YouTube channel URL\n{kick_url} — Kick channel URL"
-      },
-      "offlineDivider": {
-        "type": "string",
-        "label": "━━━━━━━━━━  😴  OFFLINE STAGE  ━━━━━━━━━━",
-        "helpText": "Section header — no value needed."
       },
       "removeOfflinePost": {
         "type": "boolean",
@@ -188,11 +196,6 @@
         "helpText": "Custom markdown to append at the bottom of the offline sidebar widget.",
         "placeholder": "Optional — appended below the offline sidebar widget"
       },
-      "liveDivider": {
-        "type": "string",
-        "label": "━━━━━━━━━━  🔴  LIVE STAGE  ━━━━━━━━━━",
-        "helpText": "Section header — no value needed."
-      },
       "livePostTitle": {
         "type": "string",
         "label": "🔴 Live Post Title (Optional)",
@@ -252,11 +255,6 @@
         ],
         "defaultValue": "NEW"
       },
-      "postStreamDivider": {
-        "type": "string",
-        "label": "━━━━━━━━━━  🎬  POST-STREAM STAGE  ━━━━━━━━━━",
-        "helpText": "Section header — no value needed."
-      },
       "enableHighlightsPost": {
         "type": "boolean",
         "label": "🎬 Enable Stream Highlights Post",
@@ -298,17 +296,6 @@
         "label": "🎬 Highlights Post Custom Footer (Markdown) (Optional)",
         "helpText": "Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used.",
         "defaultValue": "---\n*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*"
-      },
-      "dashboardDivider": {
-        "type": "string",
-        "label": "━━━━━━━━━━  📊  DASHBOARD  ━━━━━━━━━━",
-        "helpText": "Section header — no value needed."
-      },
-      "enableDashboard": {
-        "type": "boolean",
-        "label": "📊 Enable Custom Post Dashboard",
-        "defaultValue": false,
-        "helpText": "Creates a rich, interactive custom post that auto-updates with live stream stats, viewer count, and platform links. This is an opt-in enhancement — the existing text post flow continues to work as default."
       }
     }
   },
