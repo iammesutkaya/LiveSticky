@@ -62,19 +62,31 @@ describe('formatTimeAgo', () => {
 });
 
 describe('formatNumber', () => {
-  it('formats plain integers with commas', () => {
-    expect(formatNumber('15420')).toBe('15,420');
+  it('abbreviates thousands with K', () => {
+    expect(formatNumber('15420')).toBe('15.4K');
   });
 
-  it('handles numeric input', () => {
-    expect(formatNumber(1000)).toBe('1,000');
+  it('strips trailing .0 from K values', () => {
+    expect(formatNumber(1000)).toBe('1K');
+  });
+
+  it('abbreviates exact 10K', () => {
+    expect(formatNumber(10000)).toBe('10K');
+  });
+
+  it('abbreviates millions with M', () => {
+    expect(formatNumber(1500000)).toBe('1.5M');
+  });
+
+  it('strips trailing .0 from M values', () => {
+    expect(formatNumber(1000000)).toBe('1M');
   });
 
   it('handles zero', () => {
     expect(formatNumber('0')).toBe('0');
   });
 
-  it('handles small numbers', () => {
+  it('handles small numbers without abbreviation', () => {
     expect(formatNumber('999')).toBe('999');
   });
 

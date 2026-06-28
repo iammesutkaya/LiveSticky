@@ -71,6 +71,12 @@
   .dashboard.is-live .banner-strip {
     background: linear-gradient(115deg, #d80f29 0%, #ff4d4d 38%, #ff8f86 66%, #ffd6d1 100%);
   }
+
+  /* Health dot: the dark-mode #4cc440 is too neon on white — match the
+     darkened kick-color already defined for the light palette. */
+  .update-mode.healthy {
+    background: #2c9e10;
+  }
 }
 
 * {

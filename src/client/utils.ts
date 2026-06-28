@@ -30,12 +30,15 @@ export function formatTimeAgo(iso: string | null | undefined): string {
 }
 
 /**
- * Format a number (or numeric string) with locale-aware commas (e.g. "15420" → "15,420").
+ * Format a viewer count with K/M abbreviations (e.g. 15420 → "15.4K", 842 → "842").
+ * Trailing ".0" is stripped so "1.0K" becomes "1K".
  */
 export function formatNumber(numStr: string | number | null | undefined): string {
   const num = parseInt(String(numStr ?? ''), 10);
   if (isNaN(num)) return String(numStr ?? '0') || '0';
-  return num.toLocaleString();
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
+  return num.toString();
 }
 
 /**
