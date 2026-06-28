@@ -72,6 +72,29 @@ let lastFetchTime = null;
 let loadedAvatarUrl = null;
 let loadedBannerUrl = null;
 
+// Blob URLs created from proxy fetches — revoked when replaced to avoid leaks.
+let avatarBlobUrl = null;
+let bannerBlobUrl = null;
+let thumbnailBlobUrl = null;
+
+/**
+ * Fetch an image through the proxy using fetch() (which carries Devvit auth
+ * headers) and return a local blob URL. Plain <img src> requests don't get
+ * Devvit's injected auth header, so they always 401.
+ */
+async function fetchProxiedImage(cdnUrl) {
+  const proxyUrl = proxyImgUrl(cdnUrl);
+  if (!proxyUrl) return null;
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Routes a CDN image URL through the same-origin /api/image proxy.
  * The Devvit webview CSP blocks direct img-src from CDN domains; the server
@@ -183,35 +206,41 @@ function updateDashboard(data) {
   displayNameEl.textContent = displayName;
   if (avatarInitialEl) avatarInitialEl.textContent = displayName.trim().charAt(0) || 'S';
 
-  // Avatar: show real profile picture via proxy, fall back to gradient + letter on error.
+  // Avatar: fetch via proxy using fetch() so Devvit auth headers are included,
+  // then display as a local blob URL. Plain <img src> doesn't carry auth headers.
   if (avatarImgEl && data.avatarUrl && data.avatarUrl !== loadedAvatarUrl) {
     loadedAvatarUrl = data.avatarUrl;
-    avatarImgEl.onload = () => {
-      avatarImgEl.style.display = 'block';
-      if (avatarInitialEl) avatarInitialEl.style.display = 'none';
-    };
-    avatarImgEl.onerror = () => {
-      avatarImgEl.style.display = 'none';
-      if (avatarInitialEl) avatarInitialEl.style.display = '';
-      loadedAvatarUrl = null; // permit retry on next update
-    };
-    avatarImgEl.src = proxyImgUrl(data.avatarUrl);
+    fetchProxiedImage(data.avatarUrl).then(blobUrl => {
+      if (blobUrl) {
+        if (avatarBlobUrl) URL.revokeObjectURL(avatarBlobUrl);
+        avatarBlobUrl = blobUrl;
+        avatarImgEl.onload = () => {
+          avatarImgEl.style.display = 'block';
+          if (avatarInitialEl) avatarInitialEl.style.display = 'none';
+        };
+        avatarImgEl.src = blobUrl;
+      } else {
+        avatarImgEl.style.display = 'none';
+        if (avatarInitialEl) avatarInitialEl.style.display = '';
+        loadedAvatarUrl = null;
+      }
+    });
   }
 
-  // Banner: test-load via proxy, apply as CSS background; gradient fallback on error.
+  // Banner: same fetch-then-blob approach for CSS background-image.
   if (bannerStripEl && data.bannerUrl && data.bannerUrl !== loadedBannerUrl) {
     loadedBannerUrl = data.bannerUrl;
-    const proxiedBannerUrl = proxyImgUrl(data.bannerUrl);
-    const testImg = new Image();
-    testImg.onload = () => {
-      bannerStripEl.style.setProperty('--banner-img', `url('${proxiedBannerUrl}')`);
-      bannerStripEl.classList.add('has-image');
-    };
-    testImg.onerror = () => {
-      bannerStripEl.classList.remove('has-image');
-      loadedBannerUrl = null; // permit retry
-    };
-    testImg.src = proxiedBannerUrl;
+    fetchProxiedImage(data.bannerUrl).then(blobUrl => {
+      if (blobUrl) {
+        if (bannerBlobUrl) URL.revokeObjectURL(bannerBlobUrl);
+        bannerBlobUrl = blobUrl;
+        bannerStripEl.style.setProperty('--banner-img', `url('${blobUrl}')`);
+        bannerStripEl.classList.add('has-image');
+      } else {
+        bannerStripEl.classList.remove('has-image');
+        loadedBannerUrl = null;
+      }
+    });
   }
 
   // Toggle dashboard-level live state (themes the banner strip, etc.)
@@ -267,15 +296,22 @@ function updateDashboard(data) {
     }
 
     // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders.
-    // Route through /api/image proxy: CSP blocks direct CDN img-src loads.
+    // Fetch via proxy using fetch() to carry Devvit auth headers.
     if (thumbnailWrap && thumbnailImg) {
       const rawUrl = data.thumbnail || '';
       const cdnSrc = rawUrl.replace('{width}', '320').replace('{height}', '180');
-      const src = proxyImgUrl(cdnSrc);
-      if (src) {
-        thumbnailImg.src = src;
-        thumbnailImg.onerror = () => thumbnailWrap.classList.add('hidden');
-        thumbnailWrap.classList.remove('hidden');
+      if (cdnSrc) {
+        fetchProxiedImage(cdnSrc).then(blobUrl => {
+          if (blobUrl) {
+            if (thumbnailBlobUrl) URL.revokeObjectURL(thumbnailBlobUrl);
+            thumbnailBlobUrl = blobUrl;
+            thumbnailImg.onload = () => thumbnailWrap.classList.remove('hidden');
+            thumbnailImg.onerror = () => thumbnailWrap.classList.add('hidden');
+            thumbnailImg.src = blobUrl;
+          } else {
+            thumbnailWrap.classList.add('hidden');
+          }
+        });
       } else {
         thumbnailWrap.classList.add('hidden');
       }
