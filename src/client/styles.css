@@ -413,8 +413,12 @@ body {
   }
 }
 
-/* Stream info */
+/* Stream info — thumbnail left, title+summary right */
 .stream-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   padding: 12px 14px;
   background: var(--bg-card);
   border-radius: var(--radius-md);
@@ -422,13 +426,18 @@ body {
   overflow: hidden;
 }
 
-/* Stream thumbnail — bleeds to card edges; hidden until a URL is available */
+.stream-info-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Stream thumbnail — compact fixed-width preview beside stream info */
 .stream-thumbnail-wrap {
-  margin: -12px -14px 10px;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  overflow: hidden;
+  flex-shrink: 0;
+  width: 140px;
   aspect-ratio: 16 / 9;
-  max-height: 160px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
   background: var(--bg-secondary);
 }
 
