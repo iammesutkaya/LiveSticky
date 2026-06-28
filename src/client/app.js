@@ -107,13 +107,14 @@ function updateTimestampDisplay() {
 }
 
 /**
- * Update the footer connection-mode dot.
- * 'realtime' → green pulsing dot; 'polling' → neutral grey dot.
+ * Update the health dot in the footer.
+ * 'healthy' → green pulsing (data arrived recently); '' → grey (stale or no data yet).
+ * Driven by whether updateDashboard() has run recently, not by transport mode.
  */
 function setUpdateMode(mode) {
   if (!updateModeEl) return;
   updateModeEl.className = `update-mode ${mode}`;
-  updateModeEl.title = mode === 'realtime' ? 'Real-time updates' : 'Polling every 30s';
+  updateModeEl.title = mode === 'healthy' ? 'Dashboard is up to date' : 'Waiting for update…';
 }
 
 /**
@@ -152,9 +153,10 @@ function updateDashboard(data) {
   // Update state
   currentState = { ...currentState, ...data };
 
-  // Track when data last arrived for the relative footer timestamp
+  // Track when data last arrived for the relative footer timestamp and health dot
   lastFetchTime = new Date();
   updateTimestampDisplay();
+  setUpdateMode('healthy');
 
   // Update header
   const displayName = data.displayName || 'Streamer';
@@ -323,7 +325,6 @@ async function initRealtime() {
       onConnect: () => {
         console.log('[LiveSticky] Realtime connected — stopping poll fallback');
         stopPolling();
-        setUpdateMode('realtime');
       },
       onDisconnect: () => {
         console.log('[LiveSticky] Realtime disconnected, falling back to polling');
@@ -347,7 +348,6 @@ function startPolling() {
   if (pollingInterval) return;
   console.log('[LiveSticky] Starting polling fallback (30s interval)');
   pollingInterval = setInterval(fetchStatus, 30000);
-  setUpdateMode('polling');
 }
 
 function stopPolling() {
@@ -392,6 +392,14 @@ async function init() {
 
   // Keep the relative "Xm ago" footer text fresh without requiring a server call.
   setInterval(updateTimestampDisplay, 30000);
+
+  // Health dot: go grey if no successful update has landed in the last 60s
+  // (one full missed poll cycle). Checked every 15s so the transition is prompt.
+  setInterval(() => {
+    if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 60000) {
+      setUpdateMode('');
+    }
+  }, 15000);
 
   // Fetch config and initial status in parallel
   const [, statusOk] = await Promise.all([fetchConfig(), fetchStatus()]);

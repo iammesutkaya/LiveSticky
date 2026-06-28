@@ -917,7 +917,15 @@ export const runStatusCheck = async (): Promise<void> => {
   try {
     await syncDashboardConfig(twitchChannel, youtubeChannel, kickChannel);
     if (!isLive) {
+      // Keep dashboard_display_name fresh in the offline path so the
+      // /api/stream-status endpoint never falls back to the generic 'Streamer'
+      // placeholder. twitch_display_name is written on the first live tick and
+      // persists across sessions; defaultChannel (the channel login) covers the
+      // case where no live session has occurred yet on this installation.
+      const offlineDisplayName =
+        (await redis.get('twitch_display_name')) || defaultChannel;
       await Promise.all([
+        redis.set('dashboard_display_name', offlineDisplayName),
         redis.del('dashboard_platform'),
         redis.del('dashboard_title'),
         redis.del('dashboard_started_at'),

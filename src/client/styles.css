@@ -699,7 +699,7 @@ body {
   transition: background 0.4s ease;
 }
 
-.update-mode.realtime {
+.update-mode.healthy {
   background: #4cc440;
   animation: live-blink 2s ease-in-out infinite;
 }
