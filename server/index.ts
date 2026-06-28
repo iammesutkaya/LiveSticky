@@ -123,9 +123,15 @@ const PROXY_ALLOWED_HOSTS = new Set([
   'files.kick.com',
 ]);
 
-app.get('/api/image', async (req, res) => {
-  const { url } = req.query;
-  if (typeof url !== 'string') { res.status(400).end(); return; }
+// URL is passed as a base64url path segment to avoid WAF blocks on query
+// parameters that look like full URLs (e.g. ?url=https://...).
+app.get('/api/image/:encoded', async (req, res) => {
+  const { encoded } = req.params;
+  let url: string;
+  try {
+    const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    url = Buffer.from(b64, 'base64').toString('utf8');
+  } catch { res.status(400).end(); return; }
 
   let parsed: URL;
   try { parsed = new URL(url); } catch { res.status(400).end(); return; }

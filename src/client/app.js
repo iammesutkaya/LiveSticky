@@ -76,10 +76,13 @@ let loadedBannerUrl = null;
  * Routes a CDN image URL through the same-origin /api/image proxy.
  * The Devvit webview CSP blocks direct img-src from CDN domains; the server
  * is the only party allowed to fetch from those hosts.
+ * URL is base64url-encoded as a path segment — Devvit's WAF blocks query
+ * parameters that look like full URLs (e.g. ?url=https://...).
  */
 function proxyImgUrl(url) {
   if (!url) return null;
-  return `/api/image?url=${encodeURIComponent(url)}`;
+  const b64 = btoa(url).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `/api/image/${b64}`;
 }
 
 /**
