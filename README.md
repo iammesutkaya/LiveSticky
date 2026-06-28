@@ -265,6 +265,30 @@ To configure LiveSticky, you need a **Twitch Client ID** and **Twitch Client Sec
 > [!IMPORTANT]
 > Never share your Client Secret publicly. It is stored as a per-subreddit setting, which means it is **not** masked or encrypted the way app-wide secrets are — the moderators of your community can see it in the settings form. Regular subreddit visitors cannot. If you'd rather not share a secret with your mod team, register a dedicated Twitch application just for this bot and rotate the secret if needed.
 
+## 🔑 How to Get YouTube Credentials
+
+To configure LiveSticky for YouTube, you need a **YouTube Data API Key**:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project (or select an existing one).
+3. Navigate to **APIs & Services** ➔ **Library**.
+4. Search for **YouTube Data API v3** and click **Enable**.
+5. Navigate to **APIs & Services** ➔ **Credentials**.
+6. Click **Create Credentials** ➔ **API key**.
+7. Copy the generated API Key and paste it into the LiveSticky settings.
+
+> [!TIP]
+> It is highly recommended to restrict your API key to the "YouTube Data API v3" in the Google Cloud Console to prevent unauthorized usage.
+
+## 🔑 How to Get Kick Credentials
+
+To configure LiveSticky for Kick, you need a **Kick Client ID** and **Kick Client Secret**:
+
+1. Access the Kick Developer Portal (or contact Kick support to request API access if it is in closed beta).
+2. Register a new Application.
+3. Select **Client Credentials** as the authentication flow (if prompted).
+4. Copy your **Client ID** and **Client Secret** and paste them into the LiveSticky settings.
+
 ## 🌐 Fetch Domains
 
 This app makes HTTP requests to the following external domains (declared in [`devvit.json`](./devvit.json)):
@@ -278,6 +302,19 @@ This app makes HTTP requests to the following external domains (declared in [`de
 | `api.kick.com` | Kick public API. Used (when configured) to poll the configured channel's live status and metadata. |
 
 No user data is sent to these external services. Only the moderator-configured Client IDs, Client Secrets, and API keys are used for authentication.
+
+---
+
+## 📌 A Note on Pinned Posts & Third-Party Clients
+
+Reddit has two pinning systems:
+
+- **Legacy Sticky** (2 slots max): Sets `stickied=true` on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.
+- **Community Highlights** (6 slots): A newer carousel visible in the official Reddit app. Legacy stickies auto-fill the first 2 carousel slots; slots 3–6 are Highlights-only and do **not** set `stickied=true`.
+
+LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an `ANNOUNCEMENT` label — ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.
+
+**If your subreddit already has 2 legacy-stickied posts** (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but **not** at the top of the classic feed. Third-party Reddit clients that only read the `stickied` boolean will not surface the post. The solution is to free up a legacy sticky slot.
 
 ---
 

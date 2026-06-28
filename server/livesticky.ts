@@ -8,6 +8,12 @@
  * to render.
  */
 import { reddit, redis, settings } from '@devvit/web/server';
+import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
+import {
+  LinksAndCommentsDefinition,
+  type LinksAndComments,
+} from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkStreamStatus, UnifiedStreamInfo } from '../src/platforms.js';
 import {
   DEFAULT_LIVE_POST_BODY,
@@ -267,7 +273,7 @@ const ensureStickyOfflinePost = async (
       }
 
       await offlinePost.edit({ text: concludingBody });
-      await offlinePost.sticky();
+      await pinPostWithFallback(offlinePostId);
       console.log(`Successfully updated and stickied existing offline post: ${offlinePostId}`);
       offlinePostExists = true;
     } catch (fetchError) {
@@ -283,7 +289,7 @@ const ensureStickyOfflinePost = async (
         subredditName: subreddit.name,
         text: concludingBody,
       });
-      await offlinePost.sticky();
+      await pinPostWithFallback(offlinePost.id);
       await redis.set('offline_post_id', offlinePost.id);
       console.log(`Successfully created, stickied, and cached new offline post: ${offlinePost.id}`);
     } catch (createError) {
@@ -398,6 +404,118 @@ const postStreamHighlights = async (
 // ---------------------------------------------------------------------------
 // Dynamic flair
 // ---------------------------------------------------------------------------
+// Sticky / highlights helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Pins a post using Reddit's legacy sticky system and, if that slot is already
+ * taken (both slots full → post gets no `stickied=true` flag), explicitly adds
+ * the post to Community Highlights so it is visible in the official Reddit app
+ * even when third-party clients miss it.
+ *
+ * Reddit's sticky system caps at 2 legacy slots; Community Highlights supports
+ * up to 6 slots. Legacy stickies auto-sync into Highlights slots 1-2, but
+ * Highlights-only slots 3-6 do NOT set `stickied=true` — that's why third-
+ * party clients that only read the `stickied` boolean may see nothing.
+ */
+const pinPostWithFallback = async (postId: string): Promise<void> => {
+  const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
+  const t3Id = postId as `t3_${string}`;
+
+  // 1. Try legacy sticky first.
+  try {
+    const post = await reddit.getPostById(t3Id);
+    await post.sticky();
+  } catch (stickyErr) {
+    console.warn(`[pin] Legacy sticky failed for ${postId}:`, stickyErr);
+  }
+
+  // 2. Re-fetch to see if the legacy slot was actually granted.
+  let isLegacyStickied = false;
+  try {
+    const refreshed = await reddit.getPostById(t3Id);
+    isLegacyStickied = refreshed.stickied;
+  } catch (fetchErr) {
+    console.warn(`[pin] Could not re-fetch post ${postId} to check stickied flag:`, fetchErr);
+  }
+
+  if (isLegacyStickied) {
+    console.log(`[pin] Post ${postId} is legacy-stickied (third-party clients will see it).`);
+    return;
+  }
+
+  // 3. Legacy slot was not granted — explicitly add to Community Highlights.
+  console.log(
+    `[pin] Post ${postId} did not get a legacy sticky slot. ` +
+      `Adding to Community Highlights as ANNOUNCEMENT (visible in official app).`
+  );
+  try {
+    await linksAndComments.AddPostToHighlights({
+      postId,
+      label: HighlightedPostLabel.ANNOUNCEMENT,
+    });
+  } catch (hlErr) {
+    console.error(`[pin] AddPostToHighlights failed for ${postId}:`, hlErr);
+    console.warn(
+      `[pin] WARNING: Post ${postId} could not be pinned via legacy sticky OR Community Highlights. ` +
+        `It may not be visible at the top of the subreddit. Check mod permissions.`
+    );
+    return;
+  }
+
+  // 4. Verify the highlights add actually landed.
+  try {
+    const { isHighlighted } = await linksAndComments.GetIsPostHighlighted({ postId });
+    if (isHighlighted) {
+      console.log(`[pin] Confirmed: post ${postId} is in Community Highlights.`);
+    } else {
+      console.warn(
+        `[pin] WARNING: AddPostToHighlights returned success but GetIsPostHighlighted ` +
+          `reports post ${postId} is NOT highlighted. Investigate mod permissions.`
+      );
+    }
+  } catch (verifyErr) {
+    console.warn(`[pin] Could not verify highlight status for ${postId}:`, verifyErr);
+  }
+};
+
+/**
+ * Verifies that a previously pinned post is still visible (legacy stickied or
+ * in Community Highlights). If neither is true, re-pins via pinPostWithFallback.
+ * Called from the 2-minute cron to catch slots that slipped.
+ */
+const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<void> => {
+  const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
+
+  let isStickied = false;
+  let isHighlighted = false;
+
+  try {
+    const post = await reddit.getPostById(postId as `t3_${string}`);
+    isStickied = post.stickied;
+  } catch {
+    // Post may have been deleted — caller handles missing-post logic separately.
+    return;
+  }
+
+  if (!isStickied) {
+    try {
+      const result = await linksAndComments.GetIsPostHighlighted({ postId });
+      isHighlighted = result.isHighlighted;
+    } catch (err) {
+      console.warn(`[verify] GetIsPostHighlighted failed for ${label} post ${postId}:`, err);
+    }
+  }
+
+  if (!isStickied && !isHighlighted) {
+    console.warn(
+      `[verify] ${label} post ${postId} is neither legacy-stickied nor in Community Highlights — re-pinning.`
+    );
+    await pinPostWithFallback(postId);
+  }
+};
+
+// ---------------------------------------------------------------------------
 
 const updateDynamicPostFlair = async (
   postId: string,
@@ -499,6 +617,7 @@ export const runStatusCheck = async (): Promise<void> => {
   const offlineGracePeriod = await get<number>('offlineGracePeriod');
   const suggestedSort = await get('suggestedSort');
   const enableDashboard = await get<boolean>('enableDashboard');
+  const enableLivePost = (await get<boolean>('enableLivePost')) ?? true;
   const enableDynamicFlair = await get<boolean>('enableDynamicFlair');
 
   const defaultChannel = (twitchChannel || youtubeChannel || kickChannel || '') as string;
@@ -549,19 +668,16 @@ export const runStatusCheck = async (): Promise<void> => {
       if (enableDashboard) {
         console.log('Stream went live! Custom Dashboard Post is enabled.');
         const dashPostId = await redis.get('dashboard_post_id');
-        if (dashPostId) {
+        if (dashPostId && enableDynamicFlair) {
           try {
-            const post = await reddit.getPostById(dashPostId);
-            await post.sticky();
-            console.log(`Successfully stickied custom dashboard post: ${dashPostId}`);
-            if (enableDynamicFlair) {
-              await updateDynamicPostFlair(dashPostId, subreddit.name, streamInfo, liveFlairId);
-            }
-          } catch (stickyError) {
-            console.error('Failed to sticky custom dashboard post:', stickyError);
+            await updateDynamicPostFlair(dashPostId, subreddit.name, streamInfo, liveFlairId);
+          } catch (flairError) {
+            console.error('Failed to update dashboard flair on go-live:', flairError);
           }
         }
-      } else {
+      }
+
+      if (enableLivePost) {
         console.log('Stream went live! Posting and pinning standard live post...');
         try {
           if (stickyOfflinePost) {
@@ -583,7 +699,7 @@ export const runStatusCheck = async (): Promise<void> => {
             subredditName: subreddit.name,
             text: postBody,
           });
-          await post.sticky();
+          await pinPostWithFallback(post.id);
 
           if (suggestedSort && suggestedSort !== 'BLANK') {
             try {
@@ -630,7 +746,7 @@ export const runStatusCheck = async (): Promise<void> => {
         }
       }
     } else {
-      if (!enableDashboard) {
+      if (enableLivePost) {
         console.log('Stream is still live. Updating standard post stats in real-time...');
         const postId = await redis.get('live_post_id');
         if (postId) {
@@ -644,14 +760,30 @@ export const runStatusCheck = async (): Promise<void> => {
           } catch (e) {
             console.error('Failed to update live post stats:', e);
           }
+          // Re-verify that the live post is still pinned every cron tick.
+          try {
+            await verifyAndRepinIfNeeded(postId, 'live');
+          } catch (verifyErr) {
+            console.error('Failed to verify/re-pin live post:', verifyErr);
+          }
         }
-      } else if (enableDynamicFlair) {
+      }
+
+      if (enableDashboard) {
         const dashPostId = await redis.get('dashboard_post_id');
         if (dashPostId) {
+          if (enableDynamicFlair) {
+            try {
+              await updateDynamicPostFlair(dashPostId, subreddit.name, streamInfo, liveFlairId);
+            } catch (flairError) {
+              console.error('Failed to update dynamic flair on dashboard post:', flairError);
+            }
+          }
+          // Re-verify that the dashboard post is still pinned every cron tick.
           try {
-            await updateDynamicPostFlair(dashPostId, subreddit.name, streamInfo, liveFlairId);
-          } catch (e) {
-            console.error('Failed to update dashboard dynamic flair:', e);
+            await verifyAndRepinIfNeeded(dashPostId, 'dashboard');
+          } catch (verifyErr) {
+            console.error('Failed to verify/re-pin dashboard post:', verifyErr);
           }
         }
       }
@@ -692,6 +824,10 @@ export const runStatusCheck = async (): Promise<void> => {
       if (elapsedMinutes >= gracePeriodMin) {
         console.log('Grace period expired! Concluding post and unpinning...');
 
+        // Record when the stream actually went offline (first offline detection)
+        // so the dashboard can show "Last live X ago".
+        await redis.set('last_live_at', new Date(firstOfflineTime).toISOString());
+
         await redis.del('is_live_pinned');
         await redis.del('offline_since');
         const postId = await redis.get('live_post_id');
@@ -711,12 +847,13 @@ export const runStatusCheck = async (): Promise<void> => {
           if (enableDashboard) {
             const dashPostId = await redis.get('dashboard_post_id');
             if (dashPostId) await resetDynamicPostFlair(dashPostId, subreddit.name, liveFlairId);
-          } else if (postId) {
+          }
+          if (enableLivePost && postId) {
             await resetDynamicPostFlair(postId, subreddit.name, liveFlairId);
           }
         }
 
-        if (!enableDashboard && postId) {
+        if (enableLivePost && postId) {
           try {
             const post = await reddit.getPostById(postId);
             if (deleteOfflinePost) {
@@ -921,7 +1058,7 @@ export const createDashboardPost = async (): Promise<string> => {
   });
 
   await redis.set('dashboard_post_id', post.id);
-  await post.sticky();
+  await pinPostWithFallback(post.id);
   console.log(`Created new LiveSticky Dashboard post: ${post.id}`);
   return '📺 LiveSticky Dashboard created and stickied!';
 };
