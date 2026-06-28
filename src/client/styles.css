@@ -428,6 +428,7 @@ body {
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   overflow: hidden;
   aspect-ratio: 16 / 9;
+  max-height: 160px;
   background: var(--bg-secondary);
 }
 
