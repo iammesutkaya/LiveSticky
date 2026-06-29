@@ -25,6 +25,7 @@ app.get('/api/stream-status', async (_req, res) => {
       isLivePinned,
       livePostId,
       dashboardPlatform,
+      dashboardLivePlatforms,
       dashboardDisplayName,
       dashboardStartedAt,
       dashboardTitle,
@@ -37,10 +38,13 @@ app.get('/api/stream-status', async (_req, res) => {
       lastLiveAt,
       avatarUrl,
       bannerUrl,
+      postComments,
+      postScore,
     ] = await Promise.all([
       redis.get('is_live_pinned'),
       redis.get('live_post_id'),
       redis.get('dashboard_platform'),
+      redis.get('dashboard_live_platforms'),
       redis.get('dashboard_display_name'),
       redis.get('dashboard_started_at'),
       redis.get('dashboard_title'),
@@ -53,6 +57,8 @@ app.get('/api/stream-status', async (_req, res) => {
       redis.get('last_live_at'),
       redis.get('dashboard_avatar_url'),
       redis.get('dashboard_banner_url'),
+      redis.get('dashboard_post_comments'),
+      redis.get('dashboard_post_score'),
     ]);
 
     const isLive = isLivePinned === 'true';
@@ -60,18 +66,55 @@ app.get('/api/stream-status', async (_req, res) => {
     const startedAt = dashboardStartedAt || legacyStartedAt;
     const streamTitle = dashboardTitle || legacyTitle || '';
 
-    let uptimeText = '';
-    if (isLive && startedAt) {
-      const startTime = new Date(startedAt).getTime();
-      const elapsedMs = Date.now() - startTime;
+    const uptimeFrom = (iso?: string): string => {
+      if (!iso) return '';
+      const elapsedMs = Date.now() - new Date(iso).getTime();
+      if (!Number.isFinite(elapsedMs) || elapsedMs < 0) return '';
       const hours = Math.floor(elapsedMs / 3600000);
       const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-      uptimeText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+      return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    };
+
+    const uptimeText = isLive ? uptimeFrom(startedAt) : '';
+
+    // Per-platform list for multistream. Each stored entry carries its own
+    // startedAt so uptime is computed fresh here on every poll.
+    interface StoredPlatform {
+      platform: 'twitch' | 'youtube' | 'kick';
+      title: string;
+      game: string;
+      viewers: string;
+      startedAt: string;
+      thumbnail: string;
+    }
+    let platforms: Array<{
+      platform: string;
+      title: string;
+      game: string;
+      viewers: string;
+      uptime: string;
+      thumbnail: string;
+    }> = [];
+    if (isLive && dashboardLivePlatforms) {
+      try {
+        const parsed = JSON.parse(dashboardLivePlatforms) as StoredPlatform[];
+        platforms = parsed.map((p) => ({
+          platform: p.platform,
+          title: p.title || '',
+          game: p.game || '',
+          viewers: p.viewers || '0',
+          uptime: uptimeFrom(p.startedAt),
+          thumbnail: p.thumbnail || '',
+        }));
+      } catch (parseErr) {
+        console.error('Failed to parse dashboard_live_platforms:', parseErr);
+      }
     }
 
     res.json({
       isLive,
       platform: dashboardPlatform || null,
+      platforms,
       displayName,
       title: streamTitle,
       game: streamGame || 'Just Chatting',
@@ -79,6 +122,8 @@ app.get('/api/stream-status', async (_req, res) => {
       uptime: uptimeText,
       thumbnail: streamThumbnail || '',
       livePostId: livePostId || null,
+      postComments: postComments ? parseInt(postComments, 10) : 0,
+      postScore: postScore ? parseInt(postScore, 10) : 0,
       lastLiveAt: lastLiveAt || null,
       avatarUrl: (avatarUrl && avatarUrl.length > 0) ? avatarUrl : null,
       bannerUrl: (bannerUrl && bannerUrl.length > 0) ? bannerUrl : null,

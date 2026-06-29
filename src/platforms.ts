@@ -471,6 +471,60 @@ export async function checkStreamStatus(
   return null;
 }
 
+/**
+ * Polls EVERY configured platform in parallel and returns all that are
+ * currently live, ordered Twitch > YouTube > Kick.
+ *
+ * Unlike checkStreamStatus (which short-circuits at the first live platform to
+ * conserve API quota), this is used by the multistream dashboard, which needs
+ * the full set of simultaneously-live platforms so viewers can choose which one
+ * to watch.
+ *
+ * NOTE: when a YouTube channel is configured this calls the YouTube Data API on
+ * every check (~100 quota units), even if another platform is already live —
+ * that's the cost of knowing whether YouTube is *also* live for multistreaming.
+ */
+export async function checkAllStreamStatuses(
+  context: PlatformContext
+): Promise<UnifiedStreamInfo[]> {
+  const [
+    twitchChannel,
+    twitchClientId,
+    twitchClientSecret,
+    youtubeChannel,
+    youtubeApiKey,
+    kickChannel,
+    kickClientId,
+    kickClientSecret,
+  ] = await Promise.all([
+    context.settings.get('twitchChannel') as Promise<string | undefined>,
+    context.settings.get('twitchClientId') as Promise<string | undefined>,
+    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
+    context.settings.get('youtubeChannel') as Promise<string | undefined>,
+    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
+    context.settings.get('kickChannel') as Promise<string | undefined>,
+    context.settings.get('kickClientId') as Promise<string | undefined>,
+    context.settings.get('kickClientSecret') as Promise<string | undefined>,
+  ]);
+
+  // Build the checks in priority order so the resulting array stays
+  // Twitch > YouTube > Kick after the nulls are filtered out.
+  const checks: Array<Promise<UnifiedStreamInfo | null>> = [];
+
+  if (twitchChannel && twitchClientId && twitchClientSecret) {
+    checks.push(fetchTwitchStatus(twitchChannel, twitchClientId, twitchClientSecret, context.redis));
+  }
+  if (youtubeChannel && youtubeApiKey) {
+    checks.push(fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis));
+  }
+  if (kickChannel && kickClientId && kickClientSecret) {
+    checks.push(fetchKickStatus(kickChannel, kickClientId, kickClientSecret, context.redis));
+  }
+
+  const results = await Promise.all(checks);
+  return results.filter((r): r is UnifiedStreamInfo => r !== null);
+}
+
 // ---------------------------------------------------------------------------
 // Channel image refresh — avatar + offline banner, cached 12 hours in Redis
 // ---------------------------------------------------------------------------

@@ -14,7 +14,7 @@ import {
   type LinksAndComments,
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
-import { checkStreamStatus, getOrRefreshTwitchToken, refreshChannelImages, type UnifiedStreamInfo } from '../src/platforms.js';
+import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, type UnifiedStreamInfo } from '../src/platforms.js';
 import {
   removeYoutubeLink,
   removeTwitchLink,
@@ -36,6 +36,38 @@ import {
 } from '../src/templates.js';
 
 const get = <T = string>(name: string) => settings.get<T>(name);
+
+/** Formats elapsed time since `startedAt` as a compact "4h 19m" / "47m" string. */
+const computeUptime = (startedAt?: string): string => {
+  if (!startedAt) return '';
+  const elapsedMs = Date.now() - new Date(startedAt).getTime();
+  if (!Number.isFinite(elapsedMs) || elapsedMs < 0) return '';
+  const hours = Math.floor(elapsedMs / 3600000);
+  const minutes = Math.floor((elapsedMs % 3600000) / 60000);
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
+/**
+ * Shape persisted to Redis (`dashboard_live_platforms`) and returned to the
+ * dashboard webview — one entry per simultaneously-live platform.
+ */
+interface DashboardPlatform {
+  platform: 'twitch' | 'youtube' | 'kick';
+  title: string;
+  game: string;
+  viewers: string;
+  startedAt: string;
+  thumbnail: string;
+}
+
+const toDashboardPlatform = (s: UnifiedStreamInfo): DashboardPlatform => ({
+  platform: s.platform,
+  title: s.title || '',
+  game: s.game_name || '',
+  viewers: (s.viewer_count ?? 0).toString(),
+  startedAt: s.started_at || '',
+  thumbnail: s.thumbnail_url || '',
+});
 
 const formatSidebarWidgetText = (
   isLive: boolean,
@@ -534,7 +566,12 @@ export const runStatusCheck = async (): Promise<void> => {
     return;
   }
 
-  const streamInfo = await checkStreamStatus({ settings, redis });
+  // Poll every configured platform so the dashboard can show all simultaneous
+  // streams. The first entry (highest priority that's live) is the "primary"
+  // stream that drives the Reddit live post, flair, sidebar, and highlights —
+  // all of which remain single-stream concepts.
+  const liveStreams = await checkAllStreamStatuses({ settings, redis });
+  const streamInfo = liveStreams[0] ?? null;
   const isLive = streamInfo !== null;
 
   const isCurrentlyPinned = await redis.get('is_live_pinned');
@@ -715,6 +752,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const gameName = streamInfo.game_name || 'Just Chatting';
       const viewerCount = streamInfo.viewer_count !== undefined ? streamInfo.viewer_count.toString() : '0';
       const thumbnail = streamInfo.thumbnail_url || '';
+      const livePlatformsJson = JSON.stringify(liveStreams.map(toDashboardPlatform));
       await Promise.all([
         redis.set('dashboard_platform', streamInfo.platform),
         redis.set('dashboard_display_name', displayName),
@@ -723,6 +761,7 @@ export const runStatusCheck = async (): Promise<void> => {
         redis.set('dashboard_game', gameName),
         redis.set('dashboard_viewers', viewerCount),
         redis.set('dashboard_thumbnail', thumbnail),
+        redis.set('dashboard_live_platforms', livePlatformsJson),
       ]);
     } catch (dashError) {
       console.error('Failed to write dashboard Redis keys:', dashError);
@@ -932,6 +971,7 @@ export const runStatusCheck = async (): Promise<void> => {
         redis.del('dashboard_game'),
         redis.del('dashboard_viewers'),
         redis.del('dashboard_thumbnail'),
+        redis.del('dashboard_live_platforms'),
       ]);
     }
   } catch (dashSyncError) {
@@ -959,12 +999,39 @@ export const runStatusCheck = async (): Promise<void> => {
         ? streamInfo.user_name || defaultChannel
         : (await redis.get('twitch_display_name')) ?? defaultChannel;
 
-    let realtimeUptime = '';
-    if (isLive && streamInfo?.started_at) {
-      const elapsedMs = Date.now() - new Date(streamInfo.started_at).getTime();
-      const hours = Math.floor(elapsedMs / 3600000);
-      const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-      realtimeUptime = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    // Per-platform payload (uptime computed fresh at push time).
+    const platforms = liveStreams.map((s) => ({
+      platform: s.platform,
+      title: s.title || '',
+      game: s.game_name || '',
+      viewers: (s.viewer_count ?? 0).toString(),
+      uptime: computeUptime(s.started_at),
+      thumbnail: s.thumbnail_url || '',
+    }));
+
+    // Reddit live-post engagement (comments + score) for the "Join the live
+    // thread" row. Fetched once here (not per dashboard poll) and cached so the
+    // /api/stream-status endpoint can serve it cheaply. Only the live post is
+    // relevant — there's nothing to show once the stream concludes.
+    let postComments = 0;
+    let postScore = 0;
+    if (isLive && cachedLivePostId) {
+      try {
+        const livePost = await reddit.getPostById(cachedLivePostId);
+        postComments = livePost.numberOfComments ?? 0;
+        postScore = livePost.score ?? 0;
+        await Promise.all([
+          redis.set('dashboard_post_comments', postComments.toString()),
+          redis.set('dashboard_post_score', postScore.toString()),
+        ]);
+      } catch (postErr) {
+        console.error('Failed to read live post engagement stats:', postErr);
+      }
+    } else {
+      await Promise.all([
+        redis.del('dashboard_post_comments'),
+        redis.del('dashboard_post_score'),
+      ]);
     }
 
     await realtime.send('livesticky_dashboard', {
@@ -972,13 +1039,16 @@ export const runStatusCheck = async (): Promise<void> => {
       data: {
         isLive,
         platform: (isLive && streamInfo ? streamInfo.platform : null) ?? null,
+        platforms,
         displayName: realtimeDisplayName,
         title: isLive && streamInfo ? streamInfo.title ?? '' : '',
         game: isLive && streamInfo ? streamInfo.game_name ?? '' : '',
         viewers: isLive && streamInfo ? (streamInfo.viewer_count ?? 0).toString() : '0',
-        uptime: realtimeUptime,
+        uptime: computeUptime(streamInfo?.started_at),
         thumbnail: isLive && streamInfo ? streamInfo.thumbnail_url ?? '' : '',
         livePostId: (isLive ? cachedLivePostId : null) ?? null,
+        postComments,
+        postScore,
         lastLiveAt: cachedLastLiveAt ?? null,
         avatarUrl: (cachedAvatarUrl && cachedAvatarUrl.length > 0) ? cachedAvatarUrl : null,
         bannerUrl: (cachedBannerUrl && cachedBannerUrl.length > 0) ? cachedBannerUrl : null,
@@ -1025,7 +1095,7 @@ export const createDashboardPost = async (): Promise<string> => {
     title: '📺 LiveSticky Dashboard',
     entry: 'default',
     textFallback: { text: 'LiveSticky Dashboard' },
-    styles: { height: 'regular' },
+    styles: { height: 'tall' },
   });
 
   await redis.set('dashboard_post_id', post.id);
@@ -1050,6 +1120,9 @@ export const restartLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_game'),
     redis.del('dashboard_viewers'),
     redis.del('dashboard_thumbnail'),
+    redis.del('dashboard_live_platforms'),
+    redis.del('dashboard_post_comments'),
+    redis.del('dashboard_post_score'),
   ]);
 
   // Run one immediate check so state is rebuilt without waiting for the cron.

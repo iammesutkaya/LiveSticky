@@ -1,14 +1,38 @@
 /**
  * LiveSticky Dashboard — Client App
  *
- * Fetches stream status and config from the Devvit server endpoints,
- * then subscribes to Realtime updates for instant live stat changes.
+ * Fetches stream status and config from the Devvit server endpoints, then
+ * subscribes to Realtime updates for instant live stat changes.
+ *
+ * Live view renders one card per simultaneously-live platform (multistream);
+ * a single live platform gets a larger "cinematic" card. Below the cards sits
+ * the Reddit live-thread row with the post's comment/upvote counts.
  */
 import { connectRealtime, navigateTo } from '@devvit/web/client';
 import { formatTimeAgo, formatNumber } from './utils.js';
 
+// ---------------------------------------------------------------------------
+// Platform metadata
+// ---------------------------------------------------------------------------
 
+const PLATFORM_NAME = { twitch: 'Twitch', youtube: 'YouTube', kick: 'Kick' };
+
+const PLATFORM_LOGO = {
+  twitch:
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>',
+  youtube:
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+  kick:
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/></svg>',
+};
+
+const ARROW_SVG =
+  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+// ---------------------------------------------------------------------------
 // DOM references
+// ---------------------------------------------------------------------------
+
 const $ = (id) => document.getElementById(id);
 const dashboard = $('dashboard');
 const loadingEl = $('loading');
@@ -17,43 +41,33 @@ const contentEl = $('content');
 const statusIndicator = $('status-indicator');
 const statusLabel = $('status-label');
 const displayNameEl = $('display-name');
+const headerSubEl = $('header-sub');
 const liveContent = $('live-content');
 const offlineContent = $('offline-content');
-const streamTitleEl = $('stream-title');
-const liveSummaryEl = $('live-summary');
+const platformListEl = $('platform-list');
 const refreshBtn = $('refresh-btn');
-const viewerCountEl = $('viewer-count');
-const gameNameEl = $('game-name');
-const uptimeValueEl = $('uptime-value');
 const offlineNameEl = $('offline-name');
 const lastLiveEl = $('last-live');
+const offlineSubtextEl = $('offline-subtext');
 const lastUpdatedEl = $('last-updated');
 const avatarInitialEl = $('avatar-initial');
 const avatarImgEl = $('avatar-img');
-const bannerStripEl = document.querySelector('.banner-strip');
-const thumbnailWrap = $('stream-thumbnail-wrap');
-const thumbnailImg = $('stream-thumbnail');
-const compactMetaEl = $('compact-meta');
-const offlineSubtextEl = $('offline-subtext');
 const updateModeEl = $('update-mode');
-const streamPlatformChipEl = $('stream-platform-chip');
 
-// Platform link elements
+// Reddit live-thread row
+const redditThreadEl = $('reddit-thread');
+const redditThreadMetaEl = $('reddit-thread-meta');
+
+// Platform link elements (offline only)
 const twitchLink = $('twitch-link');
 const youtubeLink = $('youtube-link');
 const kickLink = $('kick-link');
-const discussionLink = $('discussion-link');
-const discussionWrap = $('discussion-wrap');
 
+// ---------------------------------------------------------------------------
 // State
-let currentState = {
-  isLive: false,
-  displayName: 'Streamer',
-  title: '',
-  game: 'Just Chatting',
-  viewers: '0',
-  uptime: '0m',
-};
+// ---------------------------------------------------------------------------
+
+let currentState = { isLive: false };
 
 let config = {
   twitchChannel: '',
@@ -62,32 +76,45 @@ let config = {
   kickUrl: null,
 };
 
-// The current discussion post URL — kept in module scope so the single
-// click listener can always read the latest value without being re-attached.
-let discussionPostUrl = null;
+// Reddit discussion post URL for the live-thread row.
+let redditThreadUrl = null;
 
-// URL of the live stream for the thumbnail click handler.
-let livePlatformUrl = null;
-
-const PLATFORM_LABEL = { twitch: 'Twitch', youtube: 'YouTube', kick: 'Kick' };
-
-// Timestamp of the last successful data update, for relative "Xm ago" display.
+// Timestamp of the last successful data update, for the relative footer label.
 let lastFetchTime = null;
 
-// Track which CDN URLs have been sent to the image proxy, so repeated
-// realtime ticks don't trigger redundant reloads for stable images.
+// Avatar proxying — track the loaded CDN url + its blob URL so repeated ticks
+// don't re-fetch a stable image.
 let loadedAvatarUrl = null;
-let loadedBannerUrl = null;
-
-// Blob URLs created from proxy fetches — revoked when replaced to avoid leaks.
 let avatarBlobUrl = null;
-let bannerBlobUrl = null;
-let thumbnailBlobUrl = null;
+
+// Thumbnail blobs cached by CDN url so re-renders don't refetch (and to avoid
+// flicker). Devvit's webview CSP blocks direct <img src> from CDN hosts, and
+// plain <img src> requests don't carry Devvit's injected auth header — so every
+// image is fetched through the same-origin /api/image proxy and shown as a blob.
+const thumbBlobCache = new Map();
+
+// Signature of the currently-rendered card set, so we only rebuild the card DOM
+// when the platform line-up changes (otherwise we update fields in place).
+let lastListSignature = '';
+
+// ---------------------------------------------------------------------------
+// Image proxy helpers
+// ---------------------------------------------------------------------------
 
 /**
- * Fetch an image through the proxy using fetch() (which carries Devvit auth
- * headers) and return a local blob URL. Plain <img src> requests don't get
- * Devvit's injected auth header, so they always 401.
+ * Routes a CDN image URL through the same-origin /api/image proxy. The URL is
+ * base64url-encoded as a path segment — Devvit's WAF blocks query params that
+ * look like full URLs (e.g. ?url=https://...).
+ */
+function proxyImgUrl(url) {
+  if (!url) return null;
+  const b64 = btoa(url).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `/api/image/${b64}`;
+}
+
+/**
+ * Fetch an image through the proxy with fetch() (which carries Devvit auth
+ * headers) and return a local blob URL, or null on failure.
  */
 async function fetchProxiedImage(cdnUrl) {
   const proxyUrl = proxyImgUrl(cdnUrl);
@@ -102,22 +129,18 @@ async function fetchProxiedImage(cdnUrl) {
   }
 }
 
-/**
- * Routes a CDN image URL through the same-origin /api/image proxy.
- * The Devvit webview CSP blocks direct img-src from CDN domains; the server
- * is the only party allowed to fetch from those hosts.
- * URL is base64url-encoded as a path segment — Devvit's WAF blocks query
- * parameters that look like full URLs (e.g. ?url=https://...).
- */
-function proxyImgUrl(url) {
-  if (!url) return null;
-  const b64 = btoa(url).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  return `/api/image/${b64}`;
+/** Cached proxy fetch for thumbnails — one blob per distinct CDN url. */
+async function getThumbBlob(cdnUrl) {
+  if (thumbBlobCache.has(cdnUrl)) return thumbBlobCache.get(cdnUrl);
+  const blob = await fetchProxiedImage(cdnUrl);
+  if (blob) thumbBlobCache.set(cdnUrl, blob);
+  return blob;
 }
 
-/**
- * Fetch the channel configuration from the server
- */
+// ---------------------------------------------------------------------------
+// Config + status fetching
+// ---------------------------------------------------------------------------
+
 async function fetchConfig() {
   try {
     const res = await fetch('/api/config');
@@ -130,9 +153,24 @@ async function fetchConfig() {
   }
 }
 
-/**
- * Show the error state with an optional message
- */
+async function fetchStatus() {
+  try {
+    const res = await fetch('/api/stream-status');
+    if (res.ok) {
+      const data = await res.json();
+      updateDashboard(data);
+      return true;
+    }
+    console.error('[LiveSticky] Status endpoint returned:', res.status);
+    showError('Unable to reach the LiveSticky server.');
+    return false;
+  } catch (err) {
+    console.error('[LiveSticky] Failed to fetch status:', err);
+    showError('Unable to reach the LiveSticky server.');
+    return false;
+  }
+}
+
 function showError(message) {
   loadingEl.classList.add('hidden');
   contentEl.classList.add('hidden');
@@ -143,81 +181,201 @@ function showError(message) {
   }
 }
 
-/**
- * Render the footer "last updated" label as a relative age ("2m ago").
- * Called immediately after each update and on a 30s interval.
- */
+// ---------------------------------------------------------------------------
+// Footer health + timestamp
+// ---------------------------------------------------------------------------
+
 function updateTimestampDisplay() {
   if (!lastUpdatedEl || !lastFetchTime) return;
-  const diffMs = Date.now() - lastFetchTime.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
+  const diffMin = Math.floor((Date.now() - lastFetchTime.getTime()) / 60000);
   if (diffMin < 1) lastUpdatedEl.textContent = 'just now';
   else if (diffMin === 1) lastUpdatedEl.textContent = '1m ago';
   else lastUpdatedEl.textContent = `${diffMin}m ago`;
 }
 
-/**
- * Update the health dot in the footer.
- * 'healthy' → green pulsing (data arrived recently); '' → grey (stale or no data yet).
- * Driven by whether updateDashboard() has run recently, not by transport mode.
- */
 function setUpdateMode(mode) {
   if (!updateModeEl) return;
   updateModeEl.className = `update-mode ${mode}`;
   updateModeEl.title = mode === 'healthy' ? 'Dashboard is up to date' : 'Waiting for update…';
 }
 
-/**
- * Fetch the current stream status from the server.
- * Returns true on success, false on failure.
- */
-async function fetchStatus() {
-  try {
-    const res = await fetch('/api/stream-status');
-    if (res.ok) {
-      const data = await res.json();
-      updateDashboard(data);
-      return true;
-    } else {
-      console.error('[LiveSticky] Status endpoint returned:', res.status);
-      showError('Unable to reach the LiveSticky server.');
-      return false;
-    }
-  } catch (err) {
-    console.error('[LiveSticky] Failed to fetch status:', err);
-    showError('Unable to reach the LiveSticky server.');
-    return false;
-  }
+// ---------------------------------------------------------------------------
+// Platform URL resolution
+// ---------------------------------------------------------------------------
+
+function platformUrl(platform) {
+  if (platform === 'twitch') return config.twitchUrl || null;
+  if (platform === 'youtube') return config.youtubeUrl || null;
+  if (platform === 'kick') return config.kickUrl || null;
+  return null;
 }
 
 /**
- * Update the dashboard UI with new stream data
+ * Normalize the server payload into a platforms array. Prefers the new
+ * `platforms` list; falls back to building a single entry from the flat
+ * fields (older realtime payloads).
  */
+function platformsFromData(data) {
+  if (Array.isArray(data.platforms) && data.platforms.length > 0) return data.platforms;
+  if (data.isLive && data.platform) {
+    return [{
+      platform: data.platform,
+      title: data.title || '',
+      game: data.game || '',
+      viewers: data.viewers || '0',
+      uptime: data.uptime || '',
+      thumbnail: data.thumbnail || '',
+    }];
+  }
+  return [];
+}
+
+// ---------------------------------------------------------------------------
+// Card rendering
+// ---------------------------------------------------------------------------
+
+function buildCard(p, cinematic) {
+  const card = document.createElement('div');
+  card.className = `stream-card${cinematic ? ' cinematic' : ''}`;
+  card.dataset.platform = p.platform;
+  const name = PLATFORM_NAME[p.platform] || p.platform;
+  const logo = PLATFORM_LOGO[p.platform] || '';
+
+  card.innerHTML = `
+    <div class="stream-card-main">
+      <div class="thumb">
+        <img alt="" class="thumb-img" style="display:none">
+        <span class="platform-badge platform-${p.platform}">${logo}</span>
+      </div>
+      <div class="stream-card-info">
+        <div class="stream-card-title"></div>
+        <div class="stream-card-meta">
+          <span class="viewer-chip"><span class="vc-num">0</span><span class="vc-label">viewers</span></span>
+          <span class="meta-text meta-cat"></span>
+          <span class="meta-sep">·</span>
+          <span class="meta-text meta-up"></span>
+        </div>
+      </div>
+    </div>
+    <a class="watch-btn platform-${p.platform}" href="#" aria-label="Watch on ${name}">
+      <span class="wb-logo">${logo}</span>
+      <span>Watch on ${name}</span>
+      <span class="wb-arrow">${ARROW_SVG}</span>
+    </a>`;
+
+  const watch = card.querySelector('.watch-btn');
+  watch.addEventListener('click', (e) => {
+    e.preventDefault();
+    const url = platformUrl(p.platform);
+    if (url) navigateTo(url);
+  });
+
+  return card;
+}
+
+function updateCard(p) {
+  const card = platformListEl.querySelector(`[data-platform="${p.platform}"]`);
+  if (!card) return;
+
+  card.querySelector('.stream-card-title').textContent = p.title || 'Live Stream';
+  card.querySelector('.vc-num').textContent = formatNumber(p.viewers);
+
+  const cat = card.querySelector('.meta-cat');
+  const sep = card.querySelector('.meta-sep');
+  const up = card.querySelector('.meta-up');
+  const game = p.game || '';
+  const uptime = p.uptime || '';
+  cat.textContent = game;
+  up.textContent = uptime;
+  cat.style.display = game ? '' : 'none';
+  up.style.display = uptime ? '' : 'none';
+  sep.style.display = game && uptime ? '' : 'none';
+
+  // Watch button destination
+  const url = platformUrl(p.platform);
+  const watch = card.querySelector('.watch-btn');
+  if (url) watch.href = url;
+
+  // Thumbnail — Twitch URLs carry {width}x{height} placeholders.
+  const img = card.querySelector('.thumb-img');
+  const cdnSrc = (p.thumbnail || '').replace('{width}', '480').replace('{height}', '270');
+  if (!cdnSrc) {
+    img.style.display = 'none';
+    img.dataset.src = '';
+    return;
+  }
+  if (img.dataset.src === cdnSrc) return; // already loaded/loading this exact url
+  img.dataset.src = cdnSrc;
+  getThumbBlob(cdnSrc).then((blobUrl) => {
+    if (img.dataset.src !== cdnSrc) return; // url changed while fetching
+    if (blobUrl) {
+      img.onload = () => { img.style.display = 'block'; };
+      img.src = blobUrl;
+    } else {
+      img.style.display = 'none';
+    }
+  });
+}
+
+function renderPlatformList(platforms) {
+  const cinematic = platforms.length === 1;
+  const signature = platforms.map((p) => p.platform).join(',') + (cinematic ? '|c' : '');
+
+  if (signature !== lastListSignature) {
+    platformListEl.innerHTML = '';
+    platforms.forEach((p) => platformListEl.appendChild(buildCard(p, cinematic)));
+    lastListSignature = signature;
+  }
+
+  platforms.forEach(updateCard);
+}
+
+// ---------------------------------------------------------------------------
+// Reddit live-thread row
+// ---------------------------------------------------------------------------
+
+function updateRedditThread(data) {
+  if (!redditThreadEl) return;
+  if (data.isLive && data.livePostId) {
+    const postId = String(data.livePostId).replace(/^t3_/, '');
+    redditThreadUrl = `https://www.reddit.com/comments/${postId}`;
+    redditThreadEl.href = redditThreadUrl;
+
+    const parts = [];
+    const comments = Number(data.postComments) || 0;
+    const score = Number(data.postScore) || 0;
+    if (comments > 0) parts.push(`${formatNumber(comments)} comment${comments === 1 ? '' : 's'}`);
+    if (score > 0) parts.push(`${formatNumber(score)} upvote${score === 1 ? '' : 's'}`);
+    if (redditThreadMetaEl) redditThreadMetaEl.textContent = parts.join(' · ');
+
+    redditThreadEl.classList.remove('hidden');
+  } else {
+    redditThreadUrl = null;
+    if (redditThreadMetaEl) redditThreadMetaEl.textContent = '';
+    redditThreadEl.classList.add('hidden');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Main dashboard update
+// ---------------------------------------------------------------------------
+
 function updateDashboard(data) {
-  const wasLive = currentState.isLive;
   const isNowLive = data.isLive;
-
-  // Detect viewer count change for animation
-  const viewersChanged = currentState.viewers !== data.viewers;
-
-  // Update state
   currentState = { ...currentState, ...data };
 
-  // Track when data last arrived for the relative footer timestamp and health dot
   lastFetchTime = new Date();
   updateTimestampDisplay();
   setUpdateMode('healthy');
 
-  // Update header
+  // Header: name + avatar
   const displayName = data.displayName || 'Streamer';
   displayNameEl.textContent = displayName;
   if (avatarInitialEl) avatarInitialEl.textContent = displayName.trim().charAt(0) || 'S';
 
-  // Avatar: fetch via proxy using fetch() so Devvit auth headers are included,
-  // then display as a local blob URL. Plain <img src> doesn't carry auth headers.
   if (avatarImgEl && data.avatarUrl && data.avatarUrl !== loadedAvatarUrl) {
     loadedAvatarUrl = data.avatarUrl;
-    fetchProxiedImage(data.avatarUrl).then(blobUrl => {
+    fetchProxiedImage(data.avatarUrl).then((blobUrl) => {
       if (blobUrl) {
         if (avatarBlobUrl) URL.revokeObjectURL(avatarBlobUrl);
         avatarBlobUrl = blobUrl;
@@ -234,35 +392,9 @@ function updateDashboard(data) {
     });
   }
 
-  // Banner: the stored URL is the streamer's offline image (e.g. Twitch's
-  // offline_image_url), which says "currently offline". Only show it when the
-  // channel is actually offline; use the gradient when live.
-  if (isNowLive) {
-    if (bannerStripEl && bannerStripEl.classList.contains('has-image')) {
-      bannerStripEl.classList.remove('has-image');
-      bannerStripEl.style.removeProperty('--banner-img');
-      loadedBannerUrl = null;
-      if (bannerBlobUrl) { URL.revokeObjectURL(bannerBlobUrl); bannerBlobUrl = null; }
-    }
-  } else if (bannerStripEl && data.bannerUrl && data.bannerUrl !== loadedBannerUrl) {
-    loadedBannerUrl = data.bannerUrl;
-    fetchProxiedImage(data.bannerUrl).then(blobUrl => {
-      if (blobUrl) {
-        if (bannerBlobUrl) URL.revokeObjectURL(bannerBlobUrl);
-        bannerBlobUrl = blobUrl;
-        bannerStripEl.style.setProperty('--banner-img', `url('${blobUrl}')`);
-        bannerStripEl.classList.add('has-image');
-      } else {
-        bannerStripEl.classList.remove('has-image');
-        loadedBannerUrl = null;
-      }
-    });
-  }
-
-  // Toggle dashboard-level live state (themes the banner strip, etc.)
   dashboard.classList.toggle('is-live', isNowLive);
 
-  // Update status indicator
+  // Status pill
   if (isNowLive) {
     statusIndicator.classList.remove('offline');
     statusIndicator.classList.add('live');
@@ -273,106 +405,33 @@ function updateDashboard(data) {
     statusLabel.textContent = 'OFFLINE';
   }
 
-  // Show/hide live vs offline content with transition
-  if (wasLive !== isNowLive) {
-    dashboard.classList.add('transitioning');
-    setTimeout(() => dashboard.classList.remove('transitioning'), 600);
+  const platforms = platformsFromData(data);
+
+  // Header subtitle
+  if (headerSubEl) {
+    if (isNowLive && platforms.length > 1) {
+      headerSubEl.textContent = `Live on ${platforms.length} platforms`;
+    } else if (isNowLive && platforms.length === 1) {
+      headerSubEl.textContent = `Live on ${PLATFORM_NAME[platforms[0].platform] || 'stream'}`;
+    } else if (isNowLive) {
+      headerSubEl.textContent = 'Live now';
+    } else {
+      headerSubEl.textContent = '';
+    }
   }
 
   if (isNowLive) {
     liveContent.classList.remove('hidden');
     offlineContent.classList.add('hidden');
-
-    // Stream title (1-line truncated in CSS)
-    streamTitleEl.textContent = data.title || 'Live Stream';
-    gameNameEl.textContent = data.game || 'Just Chatting';
-    uptimeValueEl.textContent = data.uptime || '0m';
-
-    // Update viewer count with animation
-    const formattedViewers = formatNumber(data.viewers);
-    if (viewersChanged) {
-      viewerCountEl.classList.add('updating');
-      setTimeout(() => viewerCountEl.classList.remove('updating'), 300);
-    }
-    viewerCountEl.textContent = formattedViewers;
-
-    // Compact at-a-glance summary line, e.g. "5.1K watching · Live for 52m"
-    if (liveSummaryEl) {
-      const watching = `${formattedViewers} watching`;
-      const since = data.uptime ? ` · Live for ${data.uptime}` : '';
-      liveSummaryEl.textContent = `${watching}${since}`;
-    }
-
-    // Compact mode one-liner (shown only at height ≤ 290px in profile section)
-    if (compactMetaEl) {
-      const uptime = data.uptime || '';
-      compactMetaEl.textContent = uptime
-        ? `${formattedViewers} watching · ${uptime}`
-        : `${formattedViewers} watching`;
-    }
-
-    // Live platform URL — used by the thumbnail click handler
-    livePlatformUrl = null;
-    if (data.platform === 'twitch') livePlatformUrl = config.twitchUrl || null;
-    else if (data.platform === 'youtube') livePlatformUrl = config.youtubeUrl || null;
-    else if (data.platform === 'kick') livePlatformUrl = config.kickUrl || null;
-
-    // Platform chip on thumbnail
-    if (streamPlatformChipEl) {
-      const label = PLATFORM_LABEL[data.platform] || '';
-      streamPlatformChipEl.textContent = label;
-      streamPlatformChipEl.className = `stream-platform-chip${data.platform ? ` platform-${data.platform}` : ''}`;
-    }
-
-    // Stream thumbnail — Twitch URLs contain {width}x{height} placeholders.
-    // Fetch via proxy using fetch() to carry Devvit auth headers.
-    if (thumbnailWrap && thumbnailImg) {
-      const rawUrl = data.thumbnail || '';
-      const cdnSrc = rawUrl.replace('{width}', '320').replace('{height}', '180');
-      if (cdnSrc) {
-        fetchProxiedImage(cdnSrc).then(blobUrl => {
-          if (blobUrl) {
-            if (thumbnailBlobUrl) URL.revokeObjectURL(thumbnailBlobUrl);
-            thumbnailBlobUrl = blobUrl;
-            thumbnailImg.onload = () => thumbnailWrap.classList.remove('hidden');
-            thumbnailImg.onerror = () => thumbnailWrap.classList.add('hidden');
-            thumbnailImg.src = blobUrl;
-          } else {
-            thumbnailWrap.classList.add('hidden');
-          }
-        });
-      } else {
-        thumbnailWrap.classList.add('hidden');
-      }
-    }
-
-    // Discussion link — shown only when live and a post ID is available
-    if (data.livePostId) {
-      const postId = String(data.livePostId).replace(/^t3_/, '');
-      discussionPostUrl = `https://www.reddit.com/comments/${postId}`;
-      if (discussionLink) discussionLink.href = discussionPostUrl;
-      if (discussionWrap) discussionWrap.classList.remove('hidden');
-    } else {
-      discussionPostUrl = null;
-      if (discussionWrap) discussionWrap.classList.add('hidden');
-    }
+    renderPlatformList(platforms);
+    updateRedditThread(data);
   } else {
     liveContent.classList.add('hidden');
     offlineContent.classList.remove('hidden');
-    offlineNameEl.textContent = data.displayName || 'Streamer';
+    lastListSignature = '';
+    offlineNameEl.textContent = displayName;
+    updateRedditThread(data);
 
-    // Hide thumbnail when offline
-    if (thumbnailWrap) thumbnailWrap.classList.add('hidden');
-    livePlatformUrl = null;
-
-    // Hide discussion link when offline
-    discussionPostUrl = null;
-    if (discussionWrap) discussionWrap.classList.add('hidden');
-
-    // Clear compact meta
-    if (compactMetaEl) compactMetaEl.textContent = '';
-
-    // "Last live X ago" — prominent, just below the offline icon
     if (lastLiveEl) {
       const ago = formatTimeAgo(data.lastLiveAt);
       if (ago) {
@@ -383,7 +442,6 @@ function updateDashboard(data) {
       }
     }
 
-    // Conditional subtext: only mention "channels below" if any are configured
     if (offlineSubtextEl) {
       const hasChannels = config.twitchUrl || config.youtubeUrl || config.kickUrl;
       offlineSubtextEl.textContent = hasChannels
@@ -392,28 +450,20 @@ function updateDashboard(data) {
     }
   }
 
-  // Platform buttons: hidden when live (thumbnail is the watch CTA); all configured when offline.
+  // Platform links: only shown when offline (live cards carry their own watch CTAs)
   if (twitchLink)  twitchLink.classList.toggle('hidden',  isNowLive || !config.twitchUrl);
   if (youtubeLink) youtubeLink.classList.toggle('hidden', isNowLive || !config.youtubeUrl);
   if (kickLink)    kickLink.classList.toggle('hidden',    isNowLive || !config.kickUrl);
-  const platformLinksNav = $('platform-links');
-  if (platformLinksNav) {
-    const visibleCount = [twitchLink, youtubeLink, kickLink].filter(el => el && !el.classList.contains('hidden')).length;
-    platformLinksNav.classList.toggle('all-three', visibleCount === 3);
-  }
 
-  // Show content, hide loading/error
   loadingEl.classList.add('hidden');
   errorEl.classList.add('hidden');
   contentEl.classList.remove('hidden');
 }
 
-/**
- * Wire click handlers and hrefs for platform buttons.
- * Visibility is managed exclusively by updateDashboard() to avoid a race
- * where fetchConfig() running after fetchStatus() would unhide buttons that
- * updateDashboard() already hid.
- */
+// ---------------------------------------------------------------------------
+// Platform link wiring (offline buttons)
+// ---------------------------------------------------------------------------
+
 function updatePlatformLinks() {
   setupPlatformLink(twitchLink, config.twitchUrl);
   setupPlatformLink(youtubeLink, config.youtubeUrl);
@@ -429,18 +479,16 @@ function setupPlatformLink(el, url) {
   });
 }
 
-/**
- * Try to connect to Realtime for instant updates.
- * Falls back to polling if Realtime is not available.
- */
+// ---------------------------------------------------------------------------
+// Realtime + polling
+// ---------------------------------------------------------------------------
+
 async function initRealtime() {
   try {
     await connectRealtime({
       channel: 'livesticky_dashboard',
       onMessage: (msg) => {
-        if (msg && msg.type === 'status-update') {
-          updateDashboard(msg.data);
-        }
+        if (msg && msg.type === 'status-update') updateDashboard(msg.data);
       },
       onConnect: () => {
         console.log('[LiveSticky] Realtime connected — stopping poll fallback');
@@ -451,7 +499,6 @@ async function initRealtime() {
         startPolling();
       },
     });
-
     console.log('[LiveSticky] Realtime initialized');
   } catch (err) {
     console.warn('[LiveSticky] Realtime not available, using polling:', err);
@@ -459,9 +506,6 @@ async function initRealtime() {
   }
 }
 
-/**
- * Fallback: poll the server every 30 seconds
- */
 let pollingInterval = null;
 
 function startPolling() {
@@ -477,11 +521,6 @@ function stopPolling() {
   console.log('[LiveSticky] Stopped polling fallback');
 }
 
-/**
- * Manual refresh — re-pull the latest server state on demand and give visual
- * feedback. The server state itself is refreshed by the scheduler every 2 min;
- * this lets viewers grab the latest without reloading the whole post.
- */
 async function handleRefresh() {
   if (!refreshBtn || refreshBtn.classList.contains('spinning')) return;
   refreshBtn.classList.add('spinning');
@@ -496,48 +535,31 @@ async function handleRefresh() {
   }
 }
 
-/**
- * Initialize the dashboard
- */
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
 async function init() {
   if (refreshBtn) refreshBtn.addEventListener('click', handleRefresh);
 
-  // Single, persistent click listener for the discussion link (no cloneNode needed).
-  if (discussionLink) {
-    discussionLink.addEventListener('click', (e) => {
+  // Reddit live-thread row → open the discussion post.
+  if (redditThreadEl) {
+    redditThreadEl.addEventListener('click', (e) => {
       e.preventDefault();
-      if (discussionPostUrl) navigateTo(discussionPostUrl);
+      if (redditThreadUrl) navigateTo(redditThreadUrl);
     });
   }
 
-  // Thumbnail click → open the live stream.
-  if (thumbnailWrap) {
-    thumbnailWrap.addEventListener('click', () => {
-      if (livePlatformUrl) navigateTo(livePlatformUrl);
-    });
-  }
-
-  // Keep the relative "Xm ago" footer text fresh without requiring a server call.
   setInterval(updateTimestampDisplay, 30000);
 
-  // Health dot: go grey if no successful update has landed in the last 60s
-  // (one full missed poll cycle). Checked every 15s so the transition is prompt.
   setInterval(() => {
-    if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 60000) {
-      setUpdateMode('');
-    }
+    if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 60000) setUpdateMode('');
   }, 15000);
 
-  // Fetch config and initial status in parallel
   const [, statusOk] = await Promise.all([fetchConfig(), fetchStatus()]);
-
-  // If initial status fetch failed, start polling immediately so the dashboard
-  // auto-recovers without requiring a manual refresh.
   if (!statusOk) startPolling();
 
-  // Try Realtime, fall back to polling on disconnect
   initRealtime();
 }
 
-// Boot
 init();
