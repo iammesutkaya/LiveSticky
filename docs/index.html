@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveSticky — Automatic Reddit Live Posts for Twitch Streamers</title>
+  <title>LiveSticky — Live Reddit Posts + Multistream Dashboard for Twitch, YouTube & Kick</title>
   <meta name="description"
-    content="LiveSticky automatically pins a live post to your subreddit when you go live on Twitch, updates real-time stats, and archives the stream when you go offline. Built on the Reddit Developer Platform.">
+    content="LiveSticky pins an auto-updating live post to your subreddit and powers an interactive multistream dashboard — showing every platform you're live on across Twitch, YouTube, and Kick. Built on the Reddit Developer Platform.">
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="landing.css">
@@ -33,8 +33,9 @@
         </svg>
         by u/iammesutkaya
       </a>
-      <p class="subtitle">LiveSticky monitors your Twitch stream and updates your community by pinning a post, updating
-        your sidebar, and sharing highlights when the stream ends.</p>
+      <p class="subtitle">The moment you go live on Twitch, YouTube, or Kick, LiveSticky pins an auto-updating post to
+        your subreddit and powers an interactive dashboard that shows every stream you're on — so your community jumps
+        straight to whichever platform they prefer.</p>
       <div class="hero-badges">
         <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer"
           class="badge badge-orange">
@@ -70,9 +71,9 @@
     <section class="showcase">
       <!-- Showcase Tabs -->
       <div class="showcase-tabs">
-        <button class="tab-btn active" onclick="setDashboardView('offline', this)">Offline</button>
-        <button class="tab-btn" onclick="setDashboardView('stream', this)">Stream</button>
+        <button class="tab-btn active" onclick="setDashboardView('stream', this)">Stream</button>
         <button class="tab-btn" onclick="setDashboardView('multistream', this)">Multistream</button>
+        <button class="tab-btn" onclick="setDashboardView('offline', this)">Offline</button>
       </div>
 
       <div class="showcase-container">
@@ -83,15 +84,43 @@
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
         <div id="showcase-content" class="showcase-content">
-          <img id="dashboard-img" src="dashboard-offline.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <img id="dashboard-img" src="dashboard-stream.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="showcase-placeholder" style="display: none;">
             <div class="placeholder-icon">📸</div>
-            <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-offline.png</strong></p>
+            <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-stream.png</strong></p>
           </div>
         </div>
       </div>
     </section>
     </div> <!-- /hero-split -->
+
+    <!-- Interactive Dashboard (flagship) -->
+    <section class="section">
+      <h2 class="section-title">📺 The Interactive Live Dashboard</h2>
+      <p class="section-intro">LiveSticky isn't just a text post. It installs a live, auto-updating dashboard right inside
+        your community — and when you multistream, it shows <em>every</em> platform you're live on at once, so viewers
+        jump straight to the one they prefer.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎬</div>
+          <h3>Multistream view</h3>
+          <p>Live on Twitch, YouTube, and Kick at the same time? Each stream gets its own card with thumbnail, live
+            viewer count, and a one-tap <em>Watch on</em> button.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Real-time, no refresh</h3>
+          <p>Viewer count, category, and uptime update live for every platform via Reddit Realtime — the moment they
+            change.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>Join the live thread</h3>
+          <p>A built-in link into the pinned discussion post, complete with live comment and upvote counts — your whole
+            community in one tap.</p>
+        </div>
+      </div>
+    </section>
 
     <!-- What is LiveSticky -->
     <section class="section card">
@@ -99,9 +128,13 @@
         <h2>What is LiveSticky?</h2>
 
         <p>
-          It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go
-          live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream
-          ends.
+          LiveSticky handles your entire stream lifecycle on Reddit automatically. Go live on <strong>Twitch, YouTube,
+          or Kick</strong> and it pins a fresh post, keeps an interactive dashboard updated in real-time, and archives
+          everything with a highlights post when you wrap.
+        </p>
+        <p>
+          The standout is the <strong>multistream dashboard</strong> — a live custom post that surfaces every platform
+          you're broadcasting on side by side, so your community never has to guess where to watch.
         </p>
         <p>
           Built on the <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer">Reddit
@@ -121,8 +154,8 @@
         <div class="feature-card">
           <div class="feature-icon">🔴</div>
           <h3>Automatic Live Posts</h3>
-          <p>Polls your Twitch stream every 2 minutes and pins a new post the moment you go live — no manual action
-            needed.</p>
+          <p>Checks Twitch, YouTube, and Kick every 2 minutes and pins a new post the moment you go live — on any
+            platform, no manual action needed.</p>
         </div>
 
         <div class="feature-card">
@@ -142,8 +175,9 @@
 
         <div class="feature-card">
           <div class="feature-icon">📺</div>
-          <h3>Multi-Platform Promotion</h3>
-          <p>Optionally links your YouTube and Kick channels alongside Twitch — side-by-side in both live and archive posts.</p>
+          <h3>Multistream Aware</h3>
+          <p>Tracks Twitch, YouTube, and Kick together — the dashboard shows every platform you're live on so viewers
+            pick where to watch.</p>
         </div>
 
         <div class="feature-card">
@@ -219,15 +253,15 @@
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Connect your Twitch channel</strong> by entering your Client ID and Client Secret in Mod Tools →
-              Apps → live-sticky → Settings. Takes 2 minutes.
+              <strong>Connect your channels</strong> — Twitch, YouTube, and/or Kick — by entering your API keys in Mod
+              Tools → Apps → live-sticky → Settings. Takes 2 minutes.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Hit "Go Live" on Twitch.</strong> Within 2 minutes, LiveSticky pins a live post to your subreddit
-              automatically — flaired, sorted by New, with a pinned mod comment.
+              <strong>Go live on any platform.</strong> Within 2 minutes, LiveSticky pins a live post and lights up the
+              dashboard automatically — flaired, sorted by New, with a pinned mod comment.
             </div>
           </li>
           <li>
