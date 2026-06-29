@@ -33,43 +33,130 @@
       <p class="subtitle mt-2">How to install and connect LiveSticky in under 5 minutes.</p>
     </div>
 
-    <!-- How It Works -->
     <section class="section unboxed-section pt-0">
       <div class="content article-content">
+        <p>LiveSticky operates entirely within the Reddit Developer Platform, meaning there is no external server to manage, no code to write, and no bot account to invite. However, to pull real-time live data from platforms like Twitch, YouTube, and Kick, you must provide your own API credentials.</p>
+        
+        <h2>Step 1: Install & Basic Config</h2>
+        <p>First, install the app on your subreddit.</p>
         <ol class="steps-list">
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Install the app</strong> on your subreddit from the Reddit Developer Platform. No server, no
-              hosting, no code.
+              Navigate to the <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer">LiveSticky App Page</a> and click <strong>Install</strong>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Connect your channels</strong> — Twitch, YouTube, and/or Kick — by entering your channel usernames in Mod
-              Tools → Apps → live-sticky → Settings. Takes 2 minutes.
+              Open your subreddit, go to <strong>Mod Tools</strong> → <strong>Apps</strong> → <strong>live-sticky</strong> → <strong>Settings</strong>.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Go live on any platform.</strong> Within 2 minutes, LiveSticky pins a live post and lights up the
-              dashboard automatically — flaired, sorted by New, with a pinned mod comment.
+              Fill out the basic settings such as the <strong>Twitch Channel Name</strong>, <strong>YouTube Channel Name</strong>, or <strong>Kick Channel Name</strong>.
+            </div>
+          </li>
+        </ol>
+
+        <h2>Step 2: Twitch API Setup (Required for Twitch)</h2>
+        <p>If you want LiveSticky to detect when you are live on Twitch, you must provide a Client ID and Secret.</p>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              Go to the <a href="https://dev.twitch.tv/console" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a> and log in.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              Click <strong>Register Your Application</strong>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              Set Name to anything (e.g. <code>MySubreddit LiveSticky</code>), set OAuth Redirect URLs to <code>http://localhost</code>, and select <strong>Website Integration</strong> as the category. Click Create.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Just stream.</strong> Viewer counts, uptime, and category stay current without you lifting a
-              finger. Your sidebar widget updates too.
+              Click Manage on your new app. Copy the <strong>Client ID</strong> and generate a new <strong>Client Secret</strong>. Paste both into the LiveSticky app settings.
+            </div>
+          </li>
+        </ol>
+
+        <h2>Step 3: YouTube API Setup (Required for YouTube)</h2>
+        <p>To detect live broadcasts on YouTube, you must generate a YouTube Data API Key.</p>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>.
             </div>
           </li>
           <li>
-            <span class="step-num">5</span>
+            <span class="step-num">2</span>
             <div>
-              <strong>End the stream.</strong> LiveSticky waits 6 minutes, then archives the post with VOD links,
-              compiles your top 5 Twitch clips into a highlights post, locks it, and unpins cleanly.
+              Create a new project (or use an existing one).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              In the sidebar, go to <strong>APIs & Services</strong> → <strong>Library</strong>. Search for <strong>YouTube Data API v3</strong> and click Enable.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div>
+              Go to <strong>APIs & Services</strong> → <strong>Credentials</strong>. Click <strong>Create Credentials</strong> → <strong>API Key</strong>. Copy the key and paste it into the LiveSticky app settings.
+            </div>
+          </li>
+        </ol>
+
+        <h2>Step 4: Kick API Setup (Required for Kick)</h2>
+        <p>To detect live broadcasts on Kick, you need a Kick API application.</p>
+        <div style="background: rgba(255, 69, 0, 0.1); border-left: 4px solid #ff4500; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+          <strong>Note:</strong> The Kick Developer API is currently in closed beta or restricted to verified partners. If you cannot access the developer portal, you may need to contact Kick support to request API access.
+        </div>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              Navigate to your Kick Developer portal or dashboard.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              Generate a new <strong>Client ID</strong> and <strong>Client Secret</strong>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              Paste them into the LiveSticky app settings.
+            </div>
+          </li>
+        </ol>
+
+        <h2>Step 5: Testing It Out</h2>
+        <p>Once your API credentials are saved, LiveSticky will automatically start polling your channels every 2 minutes. You can also manually test your setup using the Mod Menu actions.</p>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              On your subreddit homepage, click the <strong>Mod Actions</strong> (shield icon) and select <strong>Create Dashboard</strong> to spawn the interactive multistream dashboard.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              If any of your API keys expire or hit a quota limit, LiveSticky will automatically send a <strong>ModMail alert</strong> to your subreddit so you can fix it immediately.
             </div>
           </li>
         </ol>
