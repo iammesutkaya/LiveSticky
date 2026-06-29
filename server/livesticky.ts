@@ -1074,7 +1074,7 @@ export const runStatusCheck = async (): Promise<void> => {
     let postScore = 0;
     if (isLive && cachedLivePostId) {
       try {
-        const livePost = await reddit.getPostById(cachedLivePostId);
+        const livePost = await reddit.getPostById(cachedLivePostId as `t3_${string}`);
         postComments = livePost.numberOfComments ?? 0;
         postScore = livePost.score ?? 0;
         await Promise.all([
