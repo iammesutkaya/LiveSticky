@@ -150,25 +150,50 @@
   border: 1px solid var(--border-line);
 }
 
+.badge-purple {
+  background: var(--twitch-color);
+  color: #ffffff;
+  border-color: transparent;
+}
 .badge-purple svg {
-  fill: var(--twitch-color);
+  fill: #ffffff;
+}
+.badge-purple:hover {
+  background: #772ce8;
+  color: #ffffff;
 }
 
+.badge-orange {
+  background: var(--reddit-color);
+  color: #ffffff;
+  border-color: transparent;
+}
 .badge-orange svg {
-  fill: var(--reddit-color);
+  fill: #ffffff;
+}
+.badge-orange:hover {
+  background: #e03d00;
+  color: #ffffff;
 }
 
 .badge-neutral {
-  color: var(--text-secondary);
+  background: #2b3137;
+  color: #ffffff;
+  border-color: transparent;
+}
+.badge-neutral:hover {
+  background: #444d56;
+  color: #ffffff;
 }
 
 .badge-green {
   color: #3fb950;
+  background: rgba(63, 185, 80, 0.1);
+  border-color: rgba(63, 185, 80, 0.3);
 }
-
-.badge:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
+.badge-green:hover {
+  background: rgba(63, 185, 80, 0.15);
+  color: #3fb950;
 }
 
 /* ── Showcase ───────────────────────────────────────────── */
