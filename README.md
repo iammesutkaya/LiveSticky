@@ -10,7 +10,7 @@ LiveSticky monitors your Twitch stream and updates your community by pinning a p
 [![Kick Integration](https://img.shields.io/badge/Integration-Kick-53FC18?style=for-the-badge&logo=kick)](https://kick.com)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends.
+It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends. It can also pin an interactive **dashboard** — a live-updating custom post showing your current status, viewer count, category, uptime, and platform links.
 
 ## ✨ Core Features
 
@@ -26,6 +26,7 @@ It handles the entire stream lifecycle automatically: from flairing and pinning 
 | 💬 | **Auto-Suggested Comment Sort** | Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat. |
 | 🎥 | **Stream Highlights Post** | Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post. |
 | 🚀 | **Speed & Rate-Limit Protection** | Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API. |
+| 📊 | **Interactive Live Dashboard** | An optional pinned custom post (webview) that auto-updates with the live/offline state, viewer count, category, uptime, and clickable platform links. Create it from the **Create LiveSticky Dashboard** mod menu item. |
 | 🛠️ | **One-Click Moderator Reset** | Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your community. |
 
 ---
@@ -46,19 +47,27 @@ You can use these placeholders to dynamically insert stream info into your custo
 | `{game}` | Category or game name | `Just Chatting` |
 | `{viewers}` | Current live viewer count | `15,420` |
 | `{uptime}` | Stream uptime | `2h 15m` |
+| `{twitch_url}` | Configured Twitch URL | `https://twitch.tv/...` |
 | `{youtube_url}` | Configured YouTube URL | `https://youtube.com/...` |
 | `{kick_url}` | Configured Kick URL | `https://kick.com/...` |
 | `{date}` | Stream date (Highlights post only) | `June 2, 2026` |
 
 ### 🛠️ Setup
 
+> [!IMPORTANT]
+> The API credential fields below are **per-community settings** — each subreddit's moderators enter their own keys, and they are only used for that community. Because Devvit only encrypts *app-wide* secrets (not per-subreddit settings), these values are **visible to the moderators of your subreddit** in the settings form. Treat them like any shared moderator credential, and rotate them if your mod team changes.
+
 | Setting Name | Type | Description |
 | :--- | :--- | :--- |
 | **Twitch Channel Name** | `String` | The Twitch username to monitor (e.g. `streamer`). |
-| **Twitch Client ID** | `String (Secret)` | Your Twitch Developer Client ID (scoped to App). |
-| **Twitch Client Secret** | `String (Secret)` | Your Twitch Developer Client Secret (scoped to App). |
+| **Twitch Client ID** | `String` | Your Twitch Developer Client ID. Required for Twitch status checks. |
+| **Twitch Client Secret** | `String` | Your Twitch Developer Client Secret. Required for Twitch status checks. |
 | **YouTube Channel Name / Handle (Optional)** | `String` | The handle of your YouTube channel (e.g. `@ChannelName` or `ChannelName`). |
+| **YouTube Data API Key (Optional)** | `String` | Your Google Developer API key with YouTube Data API v3 enabled. Required for YouTube status checks. |
 | **Kick Channel Name (Optional)** | `String` | The name of your Kick channel (e.g. `ChannelName`). |
+| **Kick API Client ID (Optional)** | `String` | Your Kick Developer Client ID. Required for Kick status checks. |
+| **Kick API Client Secret (Optional)** | `String` | Your Kick Developer Client Secret. Required for Kick status checks. |
+| **Enable Dynamic Post Flair Updates** | `Boolean` | Periodically updates the live (or dashboard) post flair with the active game and viewer count (e.g. `🔴 LIVE: Just Chatting [15.4K]`). |
 | **Live Post Flair Template ID (Optional)** | `String` | The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair). |
 
 ### 😴 Offline Stage
@@ -98,6 +107,24 @@ You can use these placeholders to dynamically insert stream info into your custo
 | **Highlights Post Custom Header (Optional)** | `Paragraph` | Custom markdown for the header of the stream highlights post. If empty, the default template is used. You can use `{channel}`, `{display_name}`, `{title}`, and `{date}` as dynamic placeholders. |
 | **Highlights Post Custom Footer (Optional)** | `Paragraph` | Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used. You can use `{channel}` as a dynamic placeholder. |
 
+### 📊 Dashboard (Custom Post)
+
+| Setting Name | Type | Description |
+| :--- | :--- | :--- |
+| **Enable Custom Post Dashboard** | `Boolean` | Enables the interactive dashboard custom post. This is an opt-in enhancement — the standard text-post flow continues to work as the default. When enabled, LiveSticky stickies the dashboard (instead of a standard live post) while you're live. |
+
+Once enabled, create the post from **Mod Tools** ➔ the **Create LiveSticky Dashboard** menu item. Running it again replaces the existing dashboard rather than creating a duplicate.
+
+### 🛠️ Moderator Menu Items
+
+LiveSticky adds these actions under your community's mod menu:
+
+| Menu Item | Action |
+| :--- | :--- |
+| **Create LiveSticky Dashboard** | Creates (or recreates) the pinned interactive dashboard custom post. |
+| **Restart LiveSticky** | Clears cached stream state and runs an immediate status check. Use this after changing settings to refresh right away instead of waiting for the next 2-minute poll. |
+| **Get Default LiveSticky Templates** | Opens this README's copy-paste templates section. |
+
 ### 📝 Default Templates for Copy-Pasting
 
 If you need to restore or tweak the default texts, you can copy these markdown templates:
@@ -120,7 +147,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*
@@ -139,7 +166,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 
 ---
 *This post is now locked as the stream has ended.*
@@ -161,7 +188,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 4. Default Live Sidebar Widget Text
@@ -179,7 +206,7 @@ The stream is currently offline. Check back soon or follow the channels below to
 ---
 **Watch the stream on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 5. Default Offline Sidebar Widget Text
@@ -192,7 +219,7 @@ Follow the channels below to get notified when {display_name} goes live!
 ---
 **Watch the VODs on:**
 
-🟪 **[Twitch](https://twitch.tv/{channel})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
 ```
 
 #### 6. Stream Highlights Templates
@@ -236,7 +263,31 @@ To configure LiveSticky, you need a **Twitch Client ID** and **Twitch Client Sec
    * Click **New Secret** to generate a secret. Copy the **Client Secret** and paste it into the LiveSticky settings.
 
 > [!IMPORTANT]
-> Never share your Client Secret. Reddit securely encrypts this secret so it is never exposed to regular users or shown in plain text on the page once saved.
+> Never share your Client Secret publicly. It is stored as a per-subreddit setting, which means it is **not** masked or encrypted the way app-wide secrets are — the moderators of your community can see it in the settings form. Regular subreddit visitors cannot. If you'd rather not share a secret with your mod team, register a dedicated Twitch application just for this bot and rotate the secret if needed.
+
+## 🔑 How to Get YouTube Credentials
+
+To configure LiveSticky for YouTube, you need a **YouTube Data API Key**:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project (or select an existing one).
+3. Navigate to **APIs & Services** ➔ **Library**.
+4. Search for **YouTube Data API v3** and click **Enable**.
+5. Navigate to **APIs & Services** ➔ **Credentials**.
+6. Click **Create Credentials** ➔ **API key**.
+7. Copy the generated API Key and paste it into the LiveSticky settings.
+
+> [!TIP]
+> It is highly recommended to restrict your API key to the "YouTube Data API v3" in the Google Cloud Console to prevent unauthorized usage.
+
+## 🔑 How to Get Kick Credentials
+
+To configure LiveSticky for Kick, you need a **Kick Client ID** and **Kick Client Secret**:
+
+1. Access the Kick Developer Portal (or contact Kick support to request API access if it is in closed beta).
+2. Register a new Application.
+3. Select **Client Credentials** as the authentication flow (if prompted).
+4. Copy your **Client ID** and **Client Secret** and paste them into the LiveSticky settings.
 
 ## 🌐 Fetch Domains
 
@@ -246,8 +297,24 @@ This app makes HTTP requests to the following external domains (declared in [`de
 | :--- | :--- |
 | `id.twitch.tv` | Twitch OAuth 2.0 token endpoint. Used to obtain a short-lived App Access Token via the Client Credentials flow, which is required to authenticate all Twitch Helix API requests. |
 | `api.twitch.tv` | Twitch Helix REST API. Used to poll the live status of the configured channel (`/streams`), fetch stream metadata (title, game, viewer count), and retrieve top clips (`/clips`) for the post-stream highlights post. |
+| `youtube.googleapis.com` | YouTube Data API v3. Used (when configured) to resolve the channel handle and poll YouTube Live status, title, and viewer count. |
+| `id.kick.com` | Kick OAuth 2.0 token endpoint. Used (when configured) to obtain an access token via the Client Credentials flow. |
+| `api.kick.com` | Kick public API. Used (when configured) to poll the configured channel's live status and metadata. |
 
-No user data is sent to these external services. Only LiveSticky's own Client ID and Client Secret (configured by the moderator) are used for authentication.
+No user data is sent to these external services. Only the moderator-configured Client IDs, Client Secrets, and API keys are used for authentication.
+
+---
+
+## 📌 A Note on Pinned Posts & Third-Party Clients
+
+Reddit has two pinning systems:
+
+- **Legacy Sticky** (2 slots max): Sets `stickied=true` on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.
+- **Community Highlights** (6 slots): A newer carousel visible in the official Reddit app. Legacy stickies auto-fill the first 2 carousel slots; slots 3–6 are Highlights-only and do **not** set `stickied=true`.
+
+LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an `ANNOUNCEMENT` label — ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.
+
+**If your subreddit already has 2 legacy-stickied posts** (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but **not** at the top of the classic feed. Third-party Reddit clients that only read the `stickied` boolean will not surface the post. The solution is to free up a legacy sticky slot.
 
 ---
 
