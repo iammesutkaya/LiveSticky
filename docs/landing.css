@@ -653,12 +653,18 @@
 
 /* ── Lightweight Feature Items (No Box) ─────────────────── */
 .feature-item {
-  padding: 16px 8px;
+  padding: 24px 16px;
   position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .feature-item .feature-icon {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
 }
 
 .feature-item:hover .feature-icon {
