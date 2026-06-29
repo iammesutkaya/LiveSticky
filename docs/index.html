@@ -7,6 +7,14 @@
   <title>LiveSticky — Live Reddit Posts + Multistream Dashboard for Twitch, YouTube & Kick</title>
   <meta name="description"
     content="LiveSticky pins an auto-updating live post to your subreddit and powers an interactive multistream dashboard — showing every platform you're live on across Twitch, YouTube, and Kick. Built on the Reddit Developer Platform.">
+  
+  <meta property="og:title" content="LiveSticky — Live Reddit Posts + Multistream Dashboard">
+  <meta property="og:description" content="LiveSticky pins an auto-updating live post to your subreddit and powers an interactive multistream dashboard for Twitch, YouTube, and Kick.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://livesticky.com">
+  <meta property="og:image" content="https://livesticky.com/icon.png">
+  <meta name="twitter:card" content="summary">
+
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="landing.css">
@@ -72,6 +80,10 @@
             <path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/>
           </svg>
         </a>
+      </div>
+      
+      <div class="social-proof">
+        <span>Built natively for the Reddit Developer Platform</span>
       </div>
     </header>
 
@@ -221,6 +233,40 @@
     </section>
 
   </div>
+
+  <!-- FAQ Section -->
+  <section class="section faq-section" style="max-width: 800px; margin: 0 auto 80px; padding: 0 24px;">
+    <h2 class="section-title"><i data-lucide="help-circle"></i> Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <details class="faq-item">
+        <summary>Is LiveSticky really free? <i data-lucide="chevron-down" class="faq-icon"></i></summary>
+        <div class="faq-content">
+          <p>Yes. LiveSticky is 100% free and open-source. Because it runs on the Reddit Developer Platform, Reddit handles all the hosting and infrastructure automatically.</p>
+        </div>
+      </details>
+      
+      <details class="faq-item">
+        <summary>Do I need coding experience or a server? <i data-lucide="chevron-down" class="faq-icon"></i></summary>
+        <div class="faq-content">
+          <p>Not at all! You don't need a server, and you don't need to touch any code. You just click "Install" on the Reddit Developer Portal, enter your Twitch/YouTube/Kick usernames in your Mod Tools, and you're done.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if I stream to multiple platforms at the same time? <i data-lucide="chevron-down" class="faq-icon"></i></summary>
+        <div class="faq-content">
+          <p>LiveSticky handles multistreaming perfectly. The dashboard will automatically update to show every platform you are currently live on, displaying them side-by-side so your viewers can choose their preferred player.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Will this spam my subreddit if my stream disconnects? <i data-lucide="chevron-down" class="faq-icon"></i></summary>
+        <div class="faq-content">
+          <p>No. LiveSticky has a built-in 6-minute grace period. If your OBS crashes or your internet blips, the post stays live. It only converts into an offline VOD archive after you've been offline for 6 straight minutes.</p>
+        </div>
+      </details>
+    </div>
+  </section>
 
   <!-- Pre-Footer CTA -->
   <section class="cta-section">
