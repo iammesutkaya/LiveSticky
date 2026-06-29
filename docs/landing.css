@@ -1107,3 +1107,17 @@
 .pt-0 {
   padding-top: 0 !important;
 }
+
+/* Swatch colors for design.html */
+.swatch-bg-primary { background: #0e1113; }
+.swatch-bg-card { background: #15191c; }
+.swatch-bg-surface { background: #1c2125; }
+.swatch-bg-card-hover { background: #191e21; }
+.swatch-text-primary { background: #ffffff; }
+.swatch-text-secondary { background: #a0a0a5; }
+.swatch-text-muted { background: #707075; }
+.swatch-text-faint { background: #444448; }
+.swatch-accent-gold { background: #f5d474; }
+.swatch-twitch-color { background: #9147ff; }
+.swatch-youtube-color { background: #ff0000; }
+.swatch-kick-color { background: #53fc18; }
