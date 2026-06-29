@@ -1,37 +1,66 @@
 /* ==========================================================================
-   LiveSticky Dashboard — Premium Dark Theme
+   LiveSticky Dashboard — Neutral dark theme with a single pale-gold accent.
+   The chrome stays understated so the streamer's own thumbnails, avatar, and
+   platform brand colors are what the eye lands on.
    ========================================================================== */
 
 :root {
-  /* Color palette */
-  --bg-primary: #0e0e10;
-  --bg-secondary: #18181b;
-  --bg-card: #1f1f23;
-  --bg-card-hover: #26262c;
+  /* Neutral surfaces — no color tint, so any streamer's brand assets sit on a
+     truly neutral ground. */
+  --bg-primary: #0e1113;   /* perfectly match Reddit background */
+  --bg-card: #15191c;      /* stream cards, reddit row */
+  --bg-surface: #1c2125;   /* elevated bits: thumbnails, watch bar */
+  --bg-card-hover: #191e21;
 
-  --text-primary: #efeff1;
-  --text-secondary: #adadb8;
-  --text-muted: #848494;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a5;
+  --text-muted: #707075;
+  --text-faint: #444448;
 
-  --accent-live: #eb0400;
-  --accent-live-glow: rgba(235, 4, 0, 0.35);
-  --accent-purple: #9147ff;
-  --accent-purple-dim: rgba(145, 71, 255, 0.15);
+  /* The one accent. Gold is a fill (dark content on top); gold-text is the
+     readable-on-surface variant. */
+  --accent-gold: #f5d474;
+  --gold-text: #f5d474;
+  --gold-dim: rgba(245, 212, 116, 0.10);
+  --gold-border: rgba(245, 212, 116, 0.30);
 
+  /* Platform brand colors — only ever used inside contained badges/logos. */
   --twitch-color: #9147ff;
   --youtube-color: #ff0000;
   --kick-color: #53fc18;
 
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-line: rgba(255, 255, 255, 0.06);
 
-  /* Sizing */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 
-  /* Typography */
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Light theme — tracks the OS/browser scheme (Reddit's webview doesn't expose
+   its in-app toggle). Same structure, light neutrals, darker gold for text. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-card: #f6f6f7;
+    --bg-surface: #eaeaec;
+    --bg-card-hover: #efeff0;
+
+    --text-primary: #1a1a1b;
+    --text-secondary: #545456;
+    --text-muted: #76767a;
+    --text-faint: #9a9aa0;
+
+    --accent-gold: #f5d474;          /* still a fill with dark content on top */
+    --gold-text: #8a6a12;            /* readable on light surfaces */
+    --gold-dim: rgba(168, 123, 24, 0.12);
+    --gold-border: rgba(168, 123, 24, 0.32);
+
+    --border-subtle: #e6e6e8;
+    --border-line: #dcdcde;
+  }
 }
 
 * {
@@ -40,13 +69,21 @@
   box-sizing: border-box;
 }
 
+html, body {
+  min-height: 100%;
+  color-scheme: light dark;
+}
+
 body {
   font-family: var(--font);
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  /* Multistream can stack 3 cards — let the webview scroll vertically rather
+     than clipping. */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .hidden {
@@ -54,7 +91,7 @@ body {
 }
 
 /* ==========================================================================
-   Loading State
+   Loading / error state
    ========================================================================== */
 
 .loading-state {
@@ -70,19 +107,13 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--accent-purple);
+  background: var(--accent-gold);
   animation: pulse 1.4s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1); opacity: 1; }
 }
 
 .loading-text {
@@ -92,78 +123,155 @@ body {
   letter-spacing: 0.02em;
 }
 
+.error-retry-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: -4px;
+}
+
 /* ==========================================================================
-   Dashboard Container
+   Dashboard container
    ========================================================================== */
 
 .dashboard {
   width: 100%;
   max-width: 600px;
+  min-height: 100vh;
   margin: 0 auto;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
+.content main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.content footer.footer {
+  margin-top: auto;
+}
+
 /* ==========================================================================
-   Header
+   Compact profile header
    ========================================================================== */
 
-.header {
+.app-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
 }
 
-.header-left {
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-gold);
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.avatar-initial {
+  font-size: 18px;
+  font-weight: 800;
+  color: #131313;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* Offline: the gold avatar fallback goes neutral so gold only ever signals
+   "active". A real profile image, when present, covers this in both states. */
+.dashboard:not(.is-live) .avatar {
+  background: var(--bg-surface);
+}
+
+.dashboard:not(.is-live) .avatar-initial {
+  color: var(--text-muted);
+}
+
+.header-info {
+  flex: 1;
   min-width: 0;
 }
 
+.display-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.15;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* LIVE / OFFLINE status pill */
 .status-indicator {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 5px 11px;
+  border-radius: 6px;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   flex-shrink: 0;
-  transition: all 0.4s ease;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .status-indicator.live {
-  background: rgba(235, 4, 0, 0.15);
-  color: var(--accent-live);
-  box-shadow: 0 0 12px var(--accent-live-glow), inset 0 0 8px var(--accent-live-glow);
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-text);
 }
 
 .status-indicator.offline {
-  background: rgba(132, 132, 148, 0.12);
+  background: var(--bg-surface);
   color: var(--text-muted);
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  transition: background 0.4s ease;
 }
 
 .status-indicator.live .status-dot {
-  background: var(--accent-live);
+  background: #ef4444;
   animation: live-blink 1.5s ease-in-out infinite;
-  box-shadow: 0 0 6px var(--accent-live-glow);
 }
 
 .status-indicator.offline .status-dot {
@@ -172,64 +280,85 @@ body {
 
 @keyframes live-blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.display-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.badge {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: var(--accent-purple-dim);
-  color: var(--accent-purple);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
+  50% { opacity: 0.35; }
 }
 
 /* ==========================================================================
-   Live Content
+   Live content — platform cards
    ========================================================================== */
 
 .live-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  animation: fadeSlideIn 0.5s ease;
+  gap: 10px;
+  animation: fadeSlideIn 0.4s ease;
 }
 
 @keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stream info */
-.stream-info {
-  padding: 12px 14px;
+.platform-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stream-card {
   background: var(--bg-card);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  overflow: hidden;
 }
 
-.stream-title {
-  font-size: 14px;
+/* Top section — compact (row) layout is the multistream default */
+.stream-card-main {
+  display: flex;
+  gap: 13px;
+  padding: 12px;
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 112px;
+  height: 63px;
+  background: var(--bg-surface);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Brand corner badge anchored flush to the thumbnail's top-left */
+.platform-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.platform-badge.platform-twitch  { background: var(--twitch-color);  color: #ffffff; }
+.platform-badge.platform-youtube { background: var(--youtube-color); color: #ffffff; }
+.platform-badge.platform-kick    { background: var(--kick-color);    color: #131313; }
+
+.stream-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stream-card-title {
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
@@ -237,127 +366,226 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-bottom: 8px;
 }
 
-/* Stats grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.stat-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 10px;
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-medium);
-  transform: translateY(-1px);
-}
-
-.stat-icon {
-  color: var(--text-muted);
+.stream-card-meta {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 7px;
+  flex-wrap: wrap;
 }
 
-.stat-card.viewers .stat-icon {
-  color: var(--accent-live);
+/* Viewer count chip — the gold number on a deep ground */
+.viewer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 9px;
 }
 
-.stat-card.category .stat-icon {
-  color: var(--accent-purple);
-}
-
-.stat-card.uptime .stat-icon {
-  color: var(--kick-color);
-}
-
-.stat-value {
-  font-size: 16px;
+.viewer-chip .vc-num {
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-primary);
-  text-align: center;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-.stat-card.viewers .stat-value {
+  color: var(--gold-text);
   font-variant-numeric: tabular-nums;
 }
 
-.stat-label {
+.viewer-chip .vc-label {
   font-size: 11px;
-  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.meta-text {
+  font-size: 11px;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
-/* Viewer count update animation */
-.stat-value.updating {
-  animation: countPop 0.3s ease;
+.meta-sep {
+  font-size: 11px;
+  color: var(--text-faint);
 }
 
-@keyframes countPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.12); color: var(--accent-live); }
-  100% { transform: scale(1); }
+/* Watch CTA bar */
+.watch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.watch-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.watch-btn .wb-logo {
+  display: flex;
+  align-items: center;
+}
+
+.watch-btn.platform-twitch  .wb-logo { color: var(--twitch-color); }
+.watch-btn.platform-youtube .wb-logo { color: var(--youtube-color); }
+.watch-btn.platform-kick    .wb-logo { color: var(--kick-color); }
+
+.watch-btn .wb-arrow {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* Cinematic single-stream layout: full-width thumbnail on top */
+.stream-card.cinematic .stream-card-main {
+  display: block;
+  padding: 0;
+}
+
+.stream-card.cinematic .thumb {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+}
+
+.stream-card.cinematic .platform-badge {
+  width: 30px;
+  height: 30px;
+}
+
+.stream-card.cinematic .stream-card-info {
+  padding: 13px 14px 14px;
+}
+
+.stream-card.cinematic .stream-card-title {
+  font-size: 13px;
 }
 
 /* ==========================================================================
-   Offline Content
+   Reddit live thread row
+   ========================================================================== */
+
+.reddit-thread {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.reddit-thread:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--text-faint);
+}
+
+.reddit-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: #131313;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.reddit-thread-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.reddit-thread-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.reddit-thread-meta {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.reddit-thread-meta:empty {
+  display: none;
+}
+
+.reddit-thread-chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Offline content
    ========================================================================== */
 
 .offline-content {
-  animation: fadeSlideIn 0.5s ease;
+  animation: fadeSlideIn 0.4s ease;
 }
 
 .offline-message {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 28px 20px;
+  gap: 6px;
+  padding: 22px 16px;
   background: var(--bg-card);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
   text-align: center;
 }
 
+/* Outline moon in a neutral circle — matches the SVG/badge icon language
+   rather than a system emoji. */
 .offline-icon {
-  font-size: 36px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-text);
+  margin-bottom: 2px;
   animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-5px); }
 }
 
 .offline-text {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .offline-subtext {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 /* ==========================================================================
-   Platform Links
+   Platform links (offline only) — neutral cards with brand logos
    ========================================================================== */
 
 .platform-links {
@@ -367,58 +595,39 @@ body {
 }
 
 .platform-btn {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.25s ease;
-  flex: 1;
-  justify-content: center;
-  min-width: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.platform-btn:hover {
+  background: var(--bg-card-hover);
 }
 
 .platform-btn span {
   white-space: nowrap;
 }
 
-.platform-btn.twitch {
-  background: rgba(145, 71, 255, 0.12);
-  color: var(--twitch-color);
-  border: 1px solid rgba(145, 71, 255, 0.2);
-}
-.platform-btn.twitch:hover {
-  background: rgba(145, 71, 255, 0.22);
-  border-color: rgba(145, 71, 255, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(145, 71, 255, 0.15);
-}
+.platform-btn.twitch  { color: var(--text-primary); }
+.platform-btn.twitch  svg { color: var(--twitch-color); }
+.platform-btn.youtube svg { color: var(--youtube-color); }
+.platform-btn.kick    svg { color: var(--kick-color); }
 
-.platform-btn.youtube {
-  background: rgba(255, 0, 0, 0.1);
-  color: var(--youtube-color);
-  border: 1px solid rgba(255, 0, 0, 0.18);
-}
-.platform-btn.youtube:hover {
-  background: rgba(255, 0, 0, 0.18);
-  border-color: rgba(255, 0, 0, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.12);
-}
-
-.platform-btn.kick {
-  background: rgba(83, 252, 24, 0.08);
-  color: var(--kick-color);
-  border: 1px solid rgba(83, 252, 24, 0.15);
-}
-.platform-btn.kick:hover {
-  background: rgba(83, 252, 24, 0.16);
-  border-color: rgba(83, 252, 24, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(83, 252, 24, 0.1);
+.platform-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--gold-border);
 }
 
 /* ==========================================================================
@@ -429,8 +638,28 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 6px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.update-mode {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-line);
+  flex-shrink: 0;
+  transition: background 0.4s ease;
+}
+
+.update-mode.healthy {
+  background: #3fb950;
+  animation: live-blink 2s ease-in-out infinite;
 }
 
 .footer-text {
@@ -441,41 +670,108 @@ body {
 
 .footer-timestamp {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-/* ==========================================================================
-   Transitions between live/offline states
-   ========================================================================== */
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.dashboard.transitioning .live-content,
-.dashboard.transitioning .offline-content {
-  animation: fadeSlideIn 0.5s ease;
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.refresh-btn:disabled {
+  cursor: default;
+}
+
+.refresh-btn.spinning svg {
+  animation: refresh-spin 0.6s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ==========================================================================
-   Responsive adjustments
+   Responsive
    ========================================================================== */
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .dashboard {
     padding: 12px;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .stat-card.uptime {
-    grid-column: 1 / -1;
+  .avatar {
+    width: 40px;
+    height: 40px;
   }
 
   .display-name {
     font-size: 16px;
   }
 
-  .platform-btn {
-    flex: unset;
+  .thumb {
+    width: 100px;
+    height: 56px;
+  }
+}
+
+/* Compact slot (Community Highlights) — keep it from overflowing a short frame */
+@media (max-height: 320px) {
+  .dashboard {
+    padding: 10px;
+  }
+
+  .content,
+  .content main,
+  .live-content,
+  .platform-list {
+    gap: 8px;
+  }
+
+  .watch-btn {
+    display: none;
+  }
+
+  .stream-card.cinematic .stream-card-main {
+    display: flex;
+    padding: 10px;
+    gap: 11px;
+  }
+
+  .stream-card.cinematic .thumb {
+    width: 100px;
+    height: 56px;
+    aspect-ratio: auto;
+    border-radius: 7px;
+  }
+
+  .stream-card.cinematic .stream-card-info {
+    padding: 0;
+  }
+
+  .footer {
+    display: none;
   }
 }

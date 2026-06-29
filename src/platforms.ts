@@ -10,22 +10,71 @@ export interface UnifiedStreamInfo {
   user_id?: string;
 }
 
-/**
- * Resolves a YouTube handle, URL, or custom name to a YouTube Channel ID (starts with UC...)
- */
+// ---------------------------------------------------------------------------
+// Minimal interfaces so this module can be tested without the Devvit runtime
+// ---------------------------------------------------------------------------
+
+export interface RedisClient {
+  get(key: string): Promise<string | undefined>;
+  set(key: string, value: string): Promise<unknown>;
+  expire(key: string, seconds: number): Promise<unknown>;
+}
+
+export interface SettingsClient {
+  get<T = string>(name: string): Promise<T | undefined>;
+}
+
+export interface PlatformContext {
+  settings: SettingsClient;
+  redis: RedisClient;
+}
+
+// ---------------------------------------------------------------------------
+// YouTube response shapes (partial — only the fields we use)
+// ---------------------------------------------------------------------------
+
+interface YouTubeChannelContentItem {
+  id?: string;
+  contentDetails?: { relatedPlaylists?: { uploads?: string } };
+}
+
+interface YouTubePlaylistItem {
+  contentDetails?: { videoId?: string };
+}
+
+interface YouTubeVideoItem {
+  id?: string;
+  snippet?: {
+    title?: string;
+    channelTitle?: string;
+    liveBroadcastContent?: string;
+    thumbnails?: {
+      high?: { url?: string };
+      medium?: { url?: string };
+    };
+  };
+  liveStreamingDetails?: {
+    concurrentViewers?: string;
+    actualStartTime?: string;
+    actualEndTime?: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// YouTube channel-ID resolution
+// ---------------------------------------------------------------------------
+
 async function resolveYouTubeChannelId(
   channel: string,
   apiKey: string,
-  redis: any
+  redis: RedisClient
 ): Promise<string | null> {
   const trimmed = channel.trim();
 
-  // If it's already a channel ID (e.g. UC...)
   if (/^UC[a-zA-Z0-9_-]{22}$/.test(trimmed)) {
     return trimmed;
   }
 
-  // Extract handle from URL or direct input
   let handle = trimmed;
   if (trimmed.includes('youtube.com/')) {
     const parts = trimmed.split('/');
@@ -33,13 +82,10 @@ async function resolveYouTubeChannelId(
     if (lastPart && lastPart.startsWith('@')) {
       handle = lastPart;
     } else {
-      // Look for channel ID in URL parts
       const channelIdx = parts.indexOf('channel');
       if (channelIdx !== -1 && channelIdx + 1 < parts.length) {
         const potentialId = parts[channelIdx + 1];
-        if (potentialId) {
-          return potentialId;
-        }
+        if (potentialId) return potentialId;
       }
     }
   }
@@ -50,29 +96,48 @@ async function resolveYouTubeChannelId(
 
   const cacheKey = `yt_resolved_id_${handle.toLowerCase()}`;
   const cachedId = await redis.get(cacheKey);
-  if (cachedId) {
-    return cachedId;
+  if (cachedId) return cachedId;
+
+  // Cheap path first: channels.list?forHandle costs 1 quota unit, vs 100 for
+  // search.list. Most handles resolve here, so search becomes a rare fallback.
+  try {
+    console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via forHandle (1 unit)...`);
+    const url = `https://youtube.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(handle)}`;
+    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (res.ok) {
+      const data = await res.json() as { items?: Array<{ id?: string }> };
+      const channelId = data.items?.[0]?.id;
+      if (channelId) {
+        await redis.set(cacheKey, channelId);
+        await redis.expire(cacheKey, 2592000); // 30 days
+        console.log(`Resolved YouTube handle ${handle} to channel ID via forHandle: ${channelId}`);
+        return channelId;
+      }
+    }
+  } catch (err) {
+    console.error('YouTube forHandle resolution failed, falling back to search:', err);
   }
 
+  // Fallback: search.list (100 quota units) — only when forHandle didn't match
+  // (e.g. the setting holds a display name rather than an exact @handle).
   try {
-    console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via Search API...`);
-    const searchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel&key=${apiKey}`;
-    const res = await fetch(searchUrl);
+    console.log(`forHandle did not resolve ${handle}. Falling back to Search API (100 units)...`);
+    const searchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel`;
+    const res = await fetch(searchUrl, {
+      headers: { 'x-goog-api-key': apiKey },
+    });
     if (!res.ok) {
       console.error(`YouTube handle resolution request failed: ${res.statusText}`);
       return null;
     }
 
-    const data = await res.json();
-    if (data.items && data.items.length > 0) {
-      const channelId = data.items[0].id.channelId;
-      if (channelId) {
-        // Cache the channel ID for 30 days (2592000 seconds)
-        await redis.set(cacheKey, channelId);
-        await redis.expire(cacheKey, 2592000);
-        console.log(`Resolved YouTube handle ${handle} to channel ID: ${channelId}`);
-        return channelId;
-      }
+    const data = await res.json() as { items?: Array<{ id?: { channelId?: string } }> };
+    const channelId = data.items?.[0]?.id?.channelId;
+    if (channelId) {
+      await redis.set(cacheKey, channelId);
+      await redis.expire(cacheKey, 2592000); // 30 days
+      console.log(`Resolved YouTube handle ${handle} to channel ID via search: ${channelId}`);
+      return channelId;
     }
   } catch (err) {
     console.error(`Error resolving YouTube channel handle:`, err);
@@ -82,54 +147,96 @@ async function resolveYouTubeChannelId(
 }
 
 /**
- * Checks YouTube Live status via Data API v3
+ * Resolves a channel to its "uploads" playlist ID (where live broadcasts also
+ * appear). Cached 30 days in Redis since it never changes for a channel. Costs
+ * 1 quota unit on a cache miss.
  */
+async function resolveYouTubeUploadsPlaylist(
+  channel: string,
+  apiKey: string,
+  redis: RedisClient
+): Promise<string | null> {
+  const channelId = await resolveYouTubeChannelId(channel, apiKey, redis);
+  if (!channelId) return null;
+
+  const cacheKey = `yt_uploads_${channelId}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const url = `https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}`;
+    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (!res.ok) {
+      console.error(`YouTube uploads-playlist request failed: ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json() as { items?: YouTubeChannelContentItem[] };
+    const uploads = data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (uploads) {
+      await redis.set(cacheKey, uploads);
+      await redis.expire(cacheKey, 2592000); // 30 days
+      return uploads;
+    }
+  } catch (err) {
+    console.error('Error resolving YouTube uploads playlist:', err);
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// YouTube live status
+// ---------------------------------------------------------------------------
+
 async function fetchYouTubeStatus(
   channel: string,
   apiKey: string,
-  redis: any
+  redis: RedisClient
 ): Promise<UnifiedStreamInfo | null> {
-  const channelId = await resolveYouTubeChannelId(channel, apiKey, redis);
-  if (!channelId) {
-    return null;
-  }
+  // A live broadcast appears in the channel's public uploads playlist, so we can
+  // detect it with two 1-unit calls (playlistItems + videos) instead of the
+  // 100-unit search.list call. ~2 quota units per poll vs ~100.
+  const uploadsPlaylist = await resolveYouTubeUploadsPlaylist(channel, apiKey, redis);
+  if (!uploadsPlaylist) return null;
 
   try {
-    // Check if channel is live
-    const liveSearchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`;
-    const searchRes = await fetch(liveSearchUrl);
-    if (!searchRes.ok) {
-      console.error(`YouTube Live search request failed: ${searchRes.statusText}`);
+    // 1 unit: the most recent uploads — a live stream sits at the top.
+    const plUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=5&playlistId=${uploadsPlaylist}`;
+    const plRes = await fetch(plUrl, { headers: { 'x-goog-api-key': apiKey } });
+    if (!plRes.ok) {
+      console.error(`YouTube playlistItems request failed: ${plRes.statusText}`);
       return null;
     }
+    const plData = await plRes.json() as { items?: YouTubePlaylistItem[] };
+    const videoIds = (plData.items ?? [])
+      .map((i) => i.contentDetails?.videoId)
+      .filter((id): id is string => !!id);
+    if (videoIds.length === 0) return null;
 
-    const searchData = await searchRes.json();
-    if (!searchData.items || searchData.items.length === 0) {
+    // 1 unit: resolve live status + viewer details for those candidate videos.
+    const vUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(',')}`;
+    const vRes = await fetch(vUrl, { headers: { 'x-goog-api-key': apiKey } });
+    if (!vRes.ok) {
+      console.error(`YouTube videos request failed: ${vRes.statusText}`);
       return null;
     }
+    const vData = await vRes.json() as { items?: YouTubeVideoItem[] };
 
-    const liveItem = searchData.items[0];
-    const videoId = liveItem.id.videoId;
-    const title = liveItem.snippet.title || 'YouTube Livestream';
-    const thumbnail = liveItem.snippet.thumbnails?.high?.url || liveItem.snippet.thumbnails?.medium?.url || '';
-    const userName = liveItem.snippet.channelTitle || channel;
+    // liveBroadcastContent flips to 'none' once a stream ends (the VOD remains
+    // in uploads), so this cleanly excludes finished streams.
+    const liveItem = (vData.items ?? []).find(
+      (i) => i.snippet?.liveBroadcastContent === 'live' && !i.liveStreamingDetails?.actualEndTime
+    );
+    if (!liveItem) return null;
 
-    // Fetch live details (viewers and actual start time)
-    const videoDetailsUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=liveStreamingDetails,snippet&id=${videoId}&key=${apiKey}`;
-    const videoRes = await fetch(videoDetailsUrl);
-    let viewers = 0;
-    let startedAt = new Date().toISOString();
-
-    if (videoRes.ok) {
-      const videoData = await videoRes.json();
-      if (videoData.items && videoData.items.length > 0) {
-        const details = videoData.items[0].liveStreamingDetails;
-        if (details) {
-          viewers = details.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
-          startedAt = details.actualStartTime || startedAt;
-        }
-      }
-    }
+    const details = liveItem.liveStreamingDetails;
+    const title = liveItem.snippet?.title || 'YouTube Livestream';
+    const thumbnail =
+      liveItem.snippet?.thumbnails?.high?.url ??
+      liveItem.snippet?.thumbnails?.medium?.url ??
+      '';
+    const userName = liveItem.snippet?.channelTitle || channel;
+    const viewers = details?.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
+    const startedAt = details?.actualStartTime || new Date().toISOString();
 
     return {
       isLive: true,
@@ -148,14 +255,29 @@ async function fetchYouTubeStatus(
   return null;
 }
 
-/**
- * Checks Kick stream status via Kick's official API
- */
+// ---------------------------------------------------------------------------
+// Kick live status
+// ---------------------------------------------------------------------------
+
+interface KickLivestream {
+  title?: string;
+  viewers?: string | number;
+  created_at?: string;
+  category?: { name?: string };
+  thumbnail?: { url?: string };
+}
+
+interface KickChannelResponse {
+  is_live?: boolean;
+  livestream?: KickLivestream | null;
+  user?: { username?: string };
+}
+
 async function fetchKickStatus(
   channel: string,
   clientId: string,
   clientSecret: string,
-  redis: any
+  redis: RedisClient
 ): Promise<UnifiedStreamInfo | null> {
   const channelSlug = channel.trim().toLowerCase();
   let accessToken = await redis.get('kick_access_token');
@@ -163,12 +285,9 @@ async function fetchKickStatus(
   if (!accessToken) {
     try {
       console.log('Kick API token cache miss. Requesting Kick OAuth access token...');
-      const tokenUrl = 'https://id.kick.com/oauth/token';
-      const response = await fetch(tokenUrl, {
+      const response = await fetch('https://id.kick.com/oauth/token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           client_id: clientId,
           client_secret: clientSecret,
@@ -181,12 +300,11 @@ async function fetchKickStatus(
         return null;
       }
 
-      const tokenData = await response.json();
+      const tokenData = await response.json() as { access_token?: string; expires_in?: number };
       accessToken = tokenData.access_token;
-      const expiresIn = tokenData.expires_in || 3600;
+      const expiresIn = tokenData.expires_in ?? 3600;
 
       if (accessToken) {
-        // Cache Kick token in Redis, expiring 1 minute early
         await redis.set('kick_access_token', accessToken);
         await redis.expire('kick_access_token', Math.max(expiresIn - 60, 60));
         console.log('Successfully cached Kick OAuth access token.');
@@ -197,12 +315,13 @@ async function fetchKickStatus(
     }
   }
 
+  if (!accessToken) return null;
+
   try {
-    const channelUrl = `https://api.kick.com/public/v1/channels/${channelSlug}`;
-    const res = await fetch(channelUrl, {
+    const res = await fetch(`https://api.kick.com/public/v1/channels/${channelSlug}`, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
       },
     });
 
@@ -211,12 +330,13 @@ async function fetchKickStatus(
       return null;
     }
 
-    const channelData = await res.json();
-    const isLive = channelData.is_live === true || channelData.livestream !== null;
+    const channelData = await res.json() as KickChannelResponse;
+    const isLive = channelData.is_live === true || channelData.livestream != null;
     if (isLive && channelData.livestream) {
       const stream = channelData.livestream;
       const title = stream.title || 'Kick Livestream';
-      const viewers = stream.viewers !== undefined ? parseInt(stream.viewers, 10) : 0;
+      const viewers =
+        stream.viewers !== undefined ? parseInt(String(stream.viewers), 10) : 0;
       const startedAt = stream.created_at || new Date().toISOString();
       const gameName = stream.category?.name || 'Kick Stream';
       const thumbnail = stream.thumbnail?.url || '';
@@ -240,124 +360,375 @@ async function fetchKickStatus(
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Twitch — shared token management (exported so livesticky.ts can reuse it)
+// ---------------------------------------------------------------------------
+
+interface TwitchTokenResponse {
+  access_token?: string;
+}
+
 /**
- * Checks Twitch stream status via Helix API
+ * Returns a valid Twitch App Access Token, fetching a new one if the cache is
+ * empty. Shared by both the stream-status poller and the post-stream highlights
+ * path so there is exactly one place that manages Twitch credentials.
  */
+export async function getOrRefreshTwitchToken(
+  clientId: string,
+  clientSecret: string,
+  redis: RedisClient
+): Promise<string | null> {
+  const cached = await redis.get('twitch_access_token');
+  if (cached) return cached;
+
+  try {
+    console.log('Twitch token cache miss. Fetching new Twitch Access Token...');
+    const tokenRes = await fetch(
+      'https://id.twitch.tv/oauth2/token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          grant_type: 'client_credentials',
+        }).toString(),
+      }
+    );
+
+    if (!tokenRes.ok) {
+      console.error('Failed to get Twitch Token');
+      return null;
+    }
+
+    const tokenData = await tokenRes.json() as TwitchTokenResponse;
+    const token = tokenData.access_token;
+    if (!token) {
+      console.error('Twitch Access Token not found in response');
+      return null;
+    }
+
+    await redis.set('twitch_access_token', token);
+    await redis.expire('twitch_access_token', 86400);
+    console.log('Successfully cached Twitch Access Token.');
+    return token;
+  } catch (err) {
+    console.error('Error fetching Twitch token:', err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Twitch live status
+// ---------------------------------------------------------------------------
+
+interface TwitchStreamData {
+  user_name?: string;
+  title?: string;
+  game_name?: string;
+  viewer_count?: number;
+  started_at?: string;
+  thumbnail_url?: string;
+  user_id?: string;
+}
+
+interface TwitchStreamsResponse {
+  data?: TwitchStreamData[];
+}
+
 async function fetchTwitchStatus(
   channel: string,
   clientId: string,
   clientSecret: string,
-  redis: any
+  redis: RedisClient
 ): Promise<UnifiedStreamInfo | null> {
   const channelName = channel.trim().toLowerCase();
-  let token = await redis.get('twitch_access_token');
-
-  if (!token) {
-    try {
-      console.log('Twitch token cache miss. Fetching new Twitch Access Token...');
-      const tokenRes = await fetch(
-        `https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`,
-        { method: 'POST' }
-      );
-
-      if (!tokenRes.ok) {
-        console.error('Failed to get Twitch Token');
-        return null;
-      }
-
-      const tokenData = await tokenRes.json();
-      const accessToken = tokenData.access_token;
-
-      if (!accessToken) {
-        console.error('Twitch Access Token not found in response');
-        return null;
-      }
-
-      token = accessToken;
-      // Cache token for 24 hours (86400 seconds)
-      await redis.set('twitch_access_token', token);
-      await redis.expire('twitch_access_token', 86400);
-      console.log('Successfully cached Twitch Access Token.');
-    } catch (tokenError) {
-      console.error('Error fetching Twitch token:', tokenError);
-      return null;
-    }
-  }
+  const token = await getOrRefreshTwitchToken(clientId, clientSecret, redis);
+  if (!token) return null;
 
   try {
-    const streamRes = await fetch(`https://api.twitch.tv/helix/streams?user_login=${channelName}`, {
-      headers: {
-        'Client-ID': clientId,
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const streamRes = await fetch(
+      `https://api.twitch.tv/helix/streams?user_login=${channelName}`,
+      {
+        headers: {
+          'Client-ID': clientId,
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!streamRes.ok) {
       console.error(`Failed to fetch Twitch stream status: ${streamRes.statusText}`);
       return null;
     }
 
-    const streamData = await streamRes.json();
+    const streamData = await streamRes.json() as TwitchStreamsResponse;
     const isLive = streamData.data && streamData.data.length > 0;
-    if (isLive) {
-      const streamInfo = streamData.data[0];
+    if (isLive && streamData.data) {
+      const info = streamData.data[0];
+      if (!info) return null;
       return {
         isLive: true,
         platform: 'twitch',
-        user_name: streamInfo.user_name || channel,
-        title: streamInfo.title || 'Twitch Stream',
-        game_name: streamInfo.game_name || 'Just Chatting',
-        viewer_count: streamInfo.viewer_count !== undefined ? streamInfo.viewer_count : 0,
-        started_at: streamInfo.started_at || new Date().toISOString(),
-        thumbnail_url: streamInfo.thumbnail_url || '',
-        user_id: streamInfo.user_id,
+        user_name: info.user_name || channel,
+        title: info.title || 'Twitch Stream',
+        game_name: info.game_name || 'Just Chatting',
+        viewer_count: info.viewer_count ?? 0,
+        started_at: info.started_at || new Date().toISOString(),
+        thumbnail_url: info.thumbnail_url || '',
+        user_id: info.user_id,
       };
     }
-  } catch (streamError) {
-    console.error('Error checking Twitch stream status:', streamError);
+  } catch (err) {
+    console.error('Error checking Twitch stream status:', err);
+  }
+
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Main entry point
+// ---------------------------------------------------------------------------
+
+/**
+ * Polls status across configured platforms in order of priority: Twitch > YouTube > Kick
+ */
+export async function checkStreamStatus(
+  context: PlatformContext
+): Promise<UnifiedStreamInfo | null> {
+  const [
+    twitchChannel,
+    twitchClientId,
+    twitchClientSecret,
+    youtubeChannel,
+    youtubeApiKey,
+    kickChannel,
+    kickClientId,
+    kickClientSecret,
+  ] = await Promise.all([
+    context.settings.get('twitchChannel') as Promise<string | undefined>,
+    context.settings.get('twitchClientId') as Promise<string | undefined>,
+    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
+    context.settings.get('youtubeChannel') as Promise<string | undefined>,
+    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
+    context.settings.get('kickChannel') as Promise<string | undefined>,
+    context.settings.get('kickClientId') as Promise<string | undefined>,
+    context.settings.get('kickClientSecret') as Promise<string | undefined>,
+  ]);
+
+  if (twitchChannel && twitchClientId && twitchClientSecret) {
+    const twitchStatus = await fetchTwitchStatus(
+      twitchChannel, twitchClientId, twitchClientSecret, context.redis
+    );
+    if (twitchStatus) return twitchStatus;
+  }
+
+  if (youtubeChannel && youtubeApiKey) {
+    const youtubeStatus = await fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis);
+    if (youtubeStatus) return youtubeStatus;
+  }
+
+  if (kickChannel && kickClientId && kickClientSecret) {
+    const kickStatus = await fetchKickStatus(
+      kickChannel, kickClientId, kickClientSecret, context.redis
+    );
+    if (kickStatus) return kickStatus;
   }
 
   return null;
 }
 
 /**
- * Polls status across configured platforms in order of priority: Twitch > YouTube > Kick
+ * Polls EVERY configured platform in parallel and returns all that are
+ * currently live, ordered Twitch > YouTube > Kick.
+ *
+ * Unlike checkStreamStatus (which short-circuits at the first live platform to
+ * conserve API quota), this is used by the multistream dashboard, which needs
+ * the full set of simultaneously-live platforms so viewers can choose which one
+ * to watch.
+ *
+ * NOTE: when a YouTube channel is configured this calls the YouTube Data API on
+ * every check (~100 quota units), even if another platform is already live —
+ * that's the cost of knowing whether YouTube is *also* live for multistreaming.
  */
-export async function checkStreamStatus(context: any): Promise<UnifiedStreamInfo | null> {
-  const twitchChannel = await context.settings.get('twitchChannel') as string | undefined;
-  const twitchClientId = await context.settings.get('twitchClientId') as string | undefined;
-  const twitchClientSecret = await context.settings.get('twitchClientSecret') as string | undefined;
+export async function checkAllStreamStatuses(
+  context: PlatformContext
+): Promise<UnifiedStreamInfo[]> {
+  const [
+    twitchChannel,
+    twitchClientId,
+    twitchClientSecret,
+    youtubeChannel,
+    youtubeApiKey,
+    kickChannel,
+    kickClientId,
+    kickClientSecret,
+  ] = await Promise.all([
+    context.settings.get('twitchChannel') as Promise<string | undefined>,
+    context.settings.get('twitchClientId') as Promise<string | undefined>,
+    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
+    context.settings.get('youtubeChannel') as Promise<string | undefined>,
+    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
+    context.settings.get('kickChannel') as Promise<string | undefined>,
+    context.settings.get('kickClientId') as Promise<string | undefined>,
+    context.settings.get('kickClientSecret') as Promise<string | undefined>,
+  ]);
 
-  const youtubeChannel = await context.settings.get('youtubeChannel') as string | undefined;
-  const youtubeApiKey = await context.settings.get('youtubeApiKey') as string | undefined;
+  // Build the checks in priority order so the resulting array stays
+  // Twitch > YouTube > Kick after the nulls are filtered out.
+  const checks: Array<Promise<UnifiedStreamInfo | null>> = [];
 
-  const kickChannel = await context.settings.get('kickChannel') as string | undefined;
-  const kickClientId = await context.settings.get('kickClientId') as string | undefined;
-  const kickClientSecret = await context.settings.get('kickClientSecret') as string | undefined;
-
-  // 1. Check Twitch if configured
   if (twitchChannel && twitchClientId && twitchClientSecret) {
-    const twitchStatus = await fetchTwitchStatus(twitchChannel, twitchClientId, twitchClientSecret, context.redis);
-    if (twitchStatus) {
-      return twitchStatus;
-    }
+    checks.push(fetchTwitchStatus(twitchChannel, twitchClientId, twitchClientSecret, context.redis));
   }
-
-  // 2. Check YouTube if configured
   if (youtubeChannel && youtubeApiKey) {
-    const youtubeStatus = await fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis);
-    if (youtubeStatus) {
-      return youtubeStatus;
-    }
+    checks.push(fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis));
   }
-
-  // 3. Check Kick if configured
   if (kickChannel && kickClientId && kickClientSecret) {
-    const kickStatus = await fetchKickStatus(kickChannel, kickClientId, kickClientSecret, context.redis);
-    if (kickStatus) {
-      return kickStatus;
+    checks.push(fetchKickStatus(kickChannel, kickClientId, kickClientSecret, context.redis));
+  }
+
+  const results = await Promise.all(checks);
+  return results.filter((r): r is UnifiedStreamInfo => r !== null);
+}
+
+// ---------------------------------------------------------------------------
+// Channel image refresh — avatar + offline banner, cached 12 hours in Redis
+// ---------------------------------------------------------------------------
+
+interface TwitchUsersResponse {
+  data?: Array<{ profile_image_url?: string; offline_image_url?: string }>;
+}
+
+interface YouTubeChannelItem {
+  snippet?: { thumbnails?: { high?: { url?: string }; medium?: { url?: string } } };
+  brandingSettings?: { image?: { bannerExternalUrl?: string } };
+}
+
+interface YouTubeChannelsResponse {
+  items?: YouTubeChannelItem[];
+}
+
+interface KickChannelImagesResponse {
+  user?: { profile_pic?: string; banner_image?: string };
+  banner_image?: string;
+}
+
+const IMAGE_TTL = 43200; // 12 hours
+
+/**
+ * Fetches and caches avatar + banner URLs for the active platform.
+ * Skips the API call if the cached avatar key is still alive in Redis.
+ * Priority mirrors checkStreamStatus: Twitch > YouTube > Kick.
+ */
+export async function refreshChannelImages(context: PlatformContext): Promise<void> {
+  const cached = await context.redis.get('dashboard_avatar_url');
+  if (cached !== undefined) return; // still within TTL
+
+  const [
+    twitchChannel, twitchClientId, twitchClientSecret,
+    youtubeChannel, youtubeApiKey,
+    kickChannel, kickClientId, kickClientSecret,
+  ] = await Promise.all([
+    context.settings.get('twitchChannel') as Promise<string | undefined>,
+    context.settings.get('twitchClientId') as Promise<string | undefined>,
+    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
+    context.settings.get('youtubeChannel') as Promise<string | undefined>,
+    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
+    context.settings.get('kickChannel') as Promise<string | undefined>,
+    context.settings.get('kickClientId') as Promise<string | undefined>,
+    context.settings.get('kickClientSecret') as Promise<string | undefined>,
+  ]);
+
+  let avatarUrl = '';
+  let bannerUrl = '';
+
+  if (twitchChannel && twitchClientId && twitchClientSecret) {
+    try {
+      const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, context.redis);
+      if (token) {
+        const res = await fetch(
+          `https://api.twitch.tv/helix/users?login=${encodeURIComponent(twitchChannel.trim().toLowerCase())}`,
+          { headers: { 'Client-ID': twitchClientId, Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json() as TwitchUsersResponse;
+          const user = data.data?.[0];
+          avatarUrl = user?.profile_image_url ?? '';
+          bannerUrl = user?.offline_image_url ?? '';
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch Twitch user images:', err);
+    }
+  } else if (youtubeChannel && youtubeApiKey) {
+    try {
+      const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
+      if (channelId) {
+        const res = await fetch(
+          `https://youtube.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
+          { headers: { 'x-goog-api-key': youtubeApiKey } }
+        );
+        if (res.ok) {
+          const data = await res.json() as YouTubeChannelsResponse;
+          const item = data.items?.[0];
+          avatarUrl = item?.snippet?.thumbnails?.high?.url
+            ?? item?.snippet?.thumbnails?.medium?.url
+            ?? '';
+          bannerUrl = item?.brandingSettings?.image?.bannerExternalUrl ?? '';
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch YouTube channel images:', err);
+    }
+  } else if (kickChannel && kickClientId && kickClientSecret) {
+    try {
+      let accessToken = await context.redis.get('kick_access_token');
+      if (!accessToken) {
+        const tokenRes = await fetch('https://id.kick.com/oauth/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: kickClientId,
+            client_secret: kickClientSecret,
+            grant_type: 'client_credentials',
+          }).toString(),
+        });
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json() as { access_token?: string; expires_in?: number };
+          if (tokenData.access_token) {
+            accessToken = tokenData.access_token;
+            const expiresIn = tokenData.expires_in ?? 3600;
+            await context.redis.set('kick_access_token', accessToken);
+            await context.redis.expire('kick_access_token', Math.max(expiresIn - 60, 60));
+          }
+        }
+      }
+      if (accessToken) {
+        const res = await fetch(
+          `https://api.kick.com/public/v1/channels/${encodeURIComponent(kickChannel.trim().toLowerCase())}`,
+          { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
+        );
+        if (res.ok) {
+          const data = await res.json() as KickChannelImagesResponse;
+          avatarUrl = data.user?.profile_pic ?? '';
+          bannerUrl = data.user?.banner_image ?? data.banner_image ?? '';
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch Kick channel images:', err);
     }
   }
 
-  return null;
+  // Write avatar key with TTL: 12h on success, 5 min on failure so the next cron
+  // tick retries quickly rather than waiting the full cache window.
+  const avatarTtl = avatarUrl ? IMAGE_TTL : 300;
+  await Promise.all([
+    context.redis.set('dashboard_avatar_url', avatarUrl),
+    context.redis.expire('dashboard_avatar_url', avatarTtl),
+    ...(bannerUrl ? [
+      context.redis.set('dashboard_banner_url', bannerUrl),
+      context.redis.expire('dashboard_banner_url', IMAGE_TTL),
+    ] : []),
+  ]);
 }
