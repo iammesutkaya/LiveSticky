@@ -197,16 +197,16 @@
 
 .feature-checklist {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 8px;
   list-style: none;
   padding: 0;
-  margin: 0 0 16px 0;
+  margin: 16px 0 24px 0;
   color: var(--text-secondary);
   font-size: 0.95rem;
   font-weight: 500;
-  flex-wrap: wrap;
 }
 
 .feature-checklist li {
