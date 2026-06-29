@@ -164,6 +164,94 @@
   color: var(--text-primary);
 }
 
+/* ── Showcase ───────────────────────────────────────────── */
+.showcase {
+  width: 100%;
+  max-width: 860px;
+  margin: 16px auto 32px;
+  perspective: 1200px;
+}
+
+.showcase-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  transform: rotateX(2deg) scale(0.98);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.showcase-container:hover {
+  transform: rotateX(0deg) scale(1);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.showcase-header {
+  background: var(--bg-surface);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-line);
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.5;
+}
+
+.dots span:nth-child(1) { background: #ff5f56; opacity: 1; }
+.dots span:nth-child(2) { background: #ffbd2e; opacity: 1; }
+.dots span:nth-child(3) { background: #27c93f; opacity: 1; }
+
+.showcase-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-right: 52px; /* visual balance for the dots */
+}
+
+.showcase-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.showcase-placeholder {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 32px;
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.showcase-placeholder strong {
+  color: var(--gold-text);
+}
+
 /* ── Section titles ─────────────────────────────────────── */
 .section-title {
   font-family: 'Inter', sans-serif;
