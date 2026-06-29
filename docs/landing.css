@@ -271,6 +271,15 @@
   margin-right: 52px; /* visual balance for the dots */
 }
 
+.showcase-content {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.showcase-content.fade-out {
+  opacity: 0;
+}
+
 .showcase-img {
   display: block;
   width: 100%;
