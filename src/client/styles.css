@@ -200,6 +200,7 @@ body {
   color: #131313;
   line-height: 1;
   text-transform: uppercase;
+  -webkit-user-select: none;
   user-select: none;
 }
 

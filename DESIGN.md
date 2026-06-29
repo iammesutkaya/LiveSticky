@@ -29,7 +29,7 @@ thumbnails, and platform brand colors — are what the eye lands on.
 ### Color
 
 | Token | Dark | Light | Use |
-|-------|------|-------|-----|
+| --- | --- | --- | --- |
 | `--bg-primary` | `#0e1113` | `#ffffff` | Page; the deep ground inside viewer chips |
 | `--bg-card` | `#15191c` | `#f6f6f7` | Stream cards, Reddit row, offline card |
 | `--bg-surface` | `#1c2125` | `#eaeaec` | Thumbnails, watch bar, muted avatar, chips |
@@ -56,7 +56,7 @@ Font: Inter, system-ui fallback. Two weights carry everything: 600 (bold) and
 700 (display). Nothing below 11px.
 
 | Role | Size / weight |
-|------|---------------|
+| --- | --- |
 | Display name | 17 / 700 |
 | Section · cinematic card title | 13 / 600 |
 | Card title · body | 12 / 600 |
@@ -65,7 +65,7 @@ Font: Inter, system-ui fallback. Two weights carry everything: 600 (bold) and
 ### Radius
 
 | Token | Value | Use |
-|-------|-------|-----|
+| --- | --- | --- |
 | `--radius-sm` | 8px | Chips, status pill |
 | thumbnail | 7px | Stream thumbnails |
 | `--radius-md` | 14px | Cards, buttons |
@@ -84,7 +84,7 @@ Rhythm: **8 · 10 · 12 · 14 · 16**. Card padding 12px; header/offline padding
 ## Components
 
 - **Avatar** — 44px circle. Gold fill + dark initial when live; `--bg-surface`
-  + muted initial when offline. A real profile image covers the fill in both.
+  and muted initial when offline. A real profile image covers the fill in both.
 - **Status pill** — `live`: `--gold-dim` bg, `--gold-border`, `--gold-text`,
   red pulsing dot. `offline`: `--bg-surface` bg, muted text + dot.
 - **Stream card** — `--bg-card`, radius 10. Multistream = compact row
@@ -123,12 +123,12 @@ SVG language (moon, chevrons, refresh). Emoji are reserved for the README only.
 Every state is built from the tokens and components above.
 
 | State | Header | Body |
-|-------|--------|------|
+| --- | --- | --- |
 | **Loading** | — | Gold pulse + "Connecting…" |
 | **Error** | — | Gold pulse + message + "Retrying…" hint |
-| **Live (single)** | Avatar gold · name · "Live on <platform>" · LIVE pill | One cinematic card + Reddit row |
+| **Live (single)** | Avatar gold · name · "Live on `<platform>`" · LIVE pill | One cinematic card + Reddit row |
 | **Live (multi)** | Avatar gold · name · "Live on N platforms" · LIVE pill | One card per platform + Reddit row |
-| **Offline** | Avatar muted · name · "Last live Xh ago" · OFFLINE pill | Moon icon + "<name> is offline" + follow buttons |
+| **Offline** | Avatar muted · name · "Last live Xh ago" · OFFLINE pill | Moon icon + "`<name>` is offline" + follow buttons |
 
 The offline state mirrors the live state's structure: the header subtitle slot
 shows "Last live Xh ago" where live shows "Live on N platforms", and the follow
