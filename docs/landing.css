@@ -5,7 +5,7 @@
 
 /* Landing container */
 .landing-container {
-  max-width: 960px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 48px 24px 64px;
@@ -16,11 +16,18 @@
 }
 
 /* ── Hero ────────────────────────────────────────────────── */
+.hero-split {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  margin-bottom: 24px;
+}
+
 .hero {
-  text-align: center;
+  text-align: left;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 36px;
   padding-top: 28px;
 }
@@ -53,7 +60,7 @@
 .logo-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: -16px;
 }
@@ -96,7 +103,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* Install CTA Button */
@@ -168,7 +175,8 @@
 .showcase {
   width: 100%;
   max-width: 860px;
-  margin: 16px auto 32px;
+  margin: 0;
+  flex: 1.2;
   perspective: 1200px;
 }
 
@@ -446,7 +454,30 @@
 }
 
 /* ── Responsive ─────────────────────────────────────────── */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
+  .hero-split {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+  }
+
+  .hero {
+    text-align: center;
+    align-items: center;
+  }
+
+  .logo-group {
+    align-items: center;
+  }
+
+  .hero-badges {
+    justify-content: center;
+  }
+
+  .showcase {
+    margin: 16px auto 32px;
+  }
+
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
