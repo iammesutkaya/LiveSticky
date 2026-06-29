@@ -101,6 +101,23 @@
         ],
         "defaultValue": "NEW"
       },
+      "primaryPlatform": {
+        "type": "select",
+        "label": "👑 Primary Platform",
+        "options": [
+          { "label": "Twitch", "value": "Twitch" },
+          { "label": "YouTube", "value": "YouTube" },
+          { "label": "Kick", "value": "Kick" }
+        ],
+        "defaultValue": "Twitch",
+        "helpText": "This platform will always appear at the top of the multistream dashboard."
+      },
+      "customAvatarUrl": {
+        "type": "string",
+        "label": "👑 Custom Avatar Image URL (Optional)",
+        "helpText": "Override your platform profile picture with a direct image URL (e.g., Imgur link). Leave blank to auto-fetch from your primary platform.",
+        "placeholder": "https://..."
+      },
       "twitchChannel": {
         "type": "string",
         "label": "🟪 Twitch Channel Name (Optional)",

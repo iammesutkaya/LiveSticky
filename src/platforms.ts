@@ -563,6 +563,7 @@ export async function checkAllStreamStatuses(
     kickChannel,
     kickClientId,
     kickClientSecret,
+    primaryPlatform,
   ] = await Promise.all([
     context.settings.get('twitchChannel') as Promise<string | undefined>,
     context.settings.get('twitchClientId') as Promise<string | undefined>,
@@ -572,6 +573,7 @@ export async function checkAllStreamStatuses(
     context.settings.get('kickChannel') as Promise<string | undefined>,
     context.settings.get('kickClientId') as Promise<string | undefined>,
     context.settings.get('kickClientSecret') as Promise<string | undefined>,
+    context.settings.get('primaryPlatform') as Promise<string | undefined>,
   ]);
 
   // Build the checks in priority order so the resulting array stays
@@ -589,7 +591,20 @@ export async function checkAllStreamStatuses(
   }
 
   const results = await Promise.all(checks);
-  return results.filter((r): r is UnifiedStreamInfo => r !== null);
+  const validResults = results.filter((r): r is UnifiedStreamInfo => r !== null);
+  
+  if (primaryPlatform) {
+    validResults.sort((a, b) => {
+      // If a is the primary platform, it comes first
+      if (a.platform.toLowerCase() === primaryPlatform.toLowerCase()) return -1;
+      // If b is the primary platform, it comes first
+      if (b.platform.toLowerCase() === primaryPlatform.toLowerCase()) return 1;
+      // Otherwise, maintain original order (Twitch > YouTube > Kick)
+      return 0;
+    });
+  }
+
+  return validResults;
 }
 
 // ---------------------------------------------------------------------------
@@ -629,6 +644,8 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
     twitchChannel, twitchClientId, twitchClientSecret,
     youtubeChannel, youtubeApiKey,
     kickChannel, kickClientId, kickClientSecret,
+    customAvatarUrl,
+    primaryPlatform,
   ] = await Promise.all([
     context.settings.get('twitchChannel') as Promise<string | undefined>,
     context.settings.get('twitchClientId') as Promise<string | undefined>,
@@ -638,86 +655,100 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
     context.settings.get('kickChannel') as Promise<string | undefined>,
     context.settings.get('kickClientId') as Promise<string | undefined>,
     context.settings.get('kickClientSecret') as Promise<string | undefined>,
+    context.settings.get('customAvatarUrl') as Promise<string | undefined>,
+    context.settings.get('primaryPlatform') as Promise<string | undefined>,
   ]);
 
-  let avatarUrl = '';
+  let avatarUrl = customAvatarUrl?.trim() ?? '';
   let bannerUrl = '';
 
-  if (twitchChannel && twitchClientId && twitchClientSecret) {
-    try {
-      const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, context.redis);
-      if (token) {
-        const res = await fetch(
-          `https://api.twitch.tv/helix/users?login=${encodeURIComponent(twitchChannel.trim().toLowerCase())}`,
-          { headers: { 'Client-ID': twitchClientId, Authorization: `Bearer ${token}` } }
-        );
-        if (res.ok) {
-          const data = await res.json() as TwitchUsersResponse;
-          const user = data.data?.[0];
-          avatarUrl = user?.profile_image_url ?? '';
-          bannerUrl = user?.offline_image_url ?? '';
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch Twitch user images:', err);
-    }
-  } else if (youtubeChannel && youtubeApiKey) {
-    try {
-      const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
-      if (channelId) {
-        const res = await fetch(
-          `https://youtube.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
-          { headers: { 'x-goog-api-key': youtubeApiKey } }
-        );
-        if (res.ok) {
-          const data = await res.json() as YouTubeChannelsResponse;
-          const item = data.items?.[0];
-          avatarUrl = item?.snippet?.thumbnails?.high?.url
-            ?? item?.snippet?.thumbnails?.medium?.url
-            ?? '';
-          bannerUrl = item?.brandingSettings?.image?.bannerExternalUrl ?? '';
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch YouTube channel images:', err);
-    }
-  } else if (kickChannel && kickClientId && kickClientSecret) {
-    try {
-      let accessToken = await context.redis.get('kick_access_token');
-      if (!accessToken) {
-        const tokenRes = await fetch('https://id.kick.com/oauth/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            client_id: kickClientId,
-            client_secret: kickClientSecret,
-            grant_type: 'client_credentials',
-          }).toString(),
-        });
-        if (tokenRes.ok) {
-          const tokenData = await tokenRes.json() as { access_token?: string; expires_in?: number };
-          if (tokenData.access_token) {
-            accessToken = tokenData.access_token;
-            const expiresIn = tokenData.expires_in ?? 3600;
-            await context.redis.set('kick_access_token', accessToken);
-            await context.redis.expire('kick_access_token', Math.max(expiresIn - 60, 60));
+  const fetchOrder = primaryPlatform === 'YouTube' ? ['youtube', 'twitch', 'kick']
+    : primaryPlatform === 'Kick' ? ['kick', 'twitch', 'youtube']
+    : ['twitch', 'youtube', 'kick'];
+
+  if (!avatarUrl) {
+    for (const p of fetchOrder) {
+      if (p === 'twitch' && twitchChannel && twitchClientId && twitchClientSecret) {
+        try {
+          const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, context.redis);
+          if (token) {
+            const res = await fetch(
+              `https://api.twitch.tv/helix/users?login=${encodeURIComponent(twitchChannel.trim().toLowerCase())}`,
+              { headers: { 'Client-ID': twitchClientId, Authorization: `Bearer ${token}` } }
+            );
+            if (res.ok) {
+              const data = await res.json() as TwitchUsersResponse;
+              const user = data.data?.[0];
+              avatarUrl = user?.profile_image_url ?? '';
+              bannerUrl = user?.offline_image_url ?? '';
+            }
           }
+        } catch (err) {
+          console.error('Failed to fetch Twitch user images:', err);
         }
-      }
-      if (accessToken) {
-        const res = await fetch(
-          `https://api.kick.com/public/v1/channels/${encodeURIComponent(kickChannel.trim().toLowerCase())}`,
-          { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
-        );
-        if (res.ok) {
-          const data = await res.json() as KickChannelImagesResponse;
-          avatarUrl = data.user?.profile_pic ?? '';
-          bannerUrl = data.user?.banner_image ?? data.banner_image ?? '';
+        if (avatarUrl) break;
+      } else if (p === 'youtube' && youtubeChannel && youtubeApiKey) {
+        try {
+          const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
+          if (channelId) {
+            const res = await fetch(
+              `https://youtube.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
+              { headers: { 'x-goog-api-key': youtubeApiKey } }
+            );
+            if (res.ok) {
+              const data = await res.json() as YouTubeChannelsResponse;
+              const item = data.items?.[0];
+              avatarUrl = item?.snippet?.thumbnails?.high?.url
+                ?? item?.snippet?.thumbnails?.medium?.url
+                ?? '';
+              bannerUrl = item?.brandingSettings?.image?.bannerExternalUrl ?? '';
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch YouTube channel images:', err);
         }
+        if (avatarUrl) break;
+      } else if (p === 'kick' && kickChannel && kickClientId && kickClientSecret) {
+        try {
+          let accessToken = await context.redis.get('kick_access_token');
+          if (!accessToken) {
+            const tokenRes = await fetch('https://id.kick.com/oauth/token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                client_id: kickClientId,
+                client_secret: kickClientSecret,
+                grant_type: 'client_credentials',
+              }).toString(),
+            });
+            if (tokenRes.ok) {
+              const tokenData = await tokenRes.json() as { access_token?: string; expires_in?: number };
+              if (tokenData.access_token) {
+                accessToken = tokenData.access_token;
+                const expiresIn = tokenData.expires_in ?? 3600;
+                await context.redis.set('kick_access_token', accessToken);
+                await context.redis.expire('kick_access_token', Math.max(expiresIn - 60, 60));
+              }
+            }
+          }
+          if (accessToken) {
+            const res = await fetch(
+              `https://api.kick.com/public/v1/channels/${encodeURIComponent(kickChannel.trim().toLowerCase())}`,
+              { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
+            );
+            if (res.ok) {
+              const data = await res.json() as KickChannelImagesResponse;
+              avatarUrl = data.user?.profile_pic ?? '';
+              bannerUrl = data.user?.banner_image ?? data.banner_image ?? '';
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch Kick channel images:', err);
+        }
+        if (avatarUrl) break;
       }
-    } catch (err) {
-      console.error('Failed to fetch Kick channel images:', err);
     }
+
   }
 
   // Write avatar key with TTL: 12h on success, 5 min on failure so the next cron
