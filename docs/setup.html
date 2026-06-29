@@ -60,91 +60,121 @@
           </li>
         </ol>
 
-        <h2>Step 2: Twitch API Setup (Required for Twitch)</h2>
-        <p>If you want LiveSticky to detect when you are live on Twitch, you must provide a Client ID and Secret.</p>
-        <ol class="steps-list">
-          <li>
-            <span class="step-num">1</span>
-            <div>
-              Go to the <a href="https://dev.twitch.tv/console" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a> and log in.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">2</span>
-            <div>
-              Click <strong>Register Your Application</strong>.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">3</span>
-            <div>
-              Set Name to anything (e.g. <code>MySubreddit LiveSticky</code>), set OAuth Redirect URLs to <code>http://localhost</code>, and select <strong>Website Integration</strong> as the category. Click Create.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">4</span>
-            <div>
-              Click Manage on your new app. Copy the <strong>Client ID</strong> and generate a new <strong>Client Secret</strong>. Paste both into the LiveSticky app settings.
-            </div>
-          </li>
-        </ol>
+        <h2>Step 2: Platform API Setup</h2>
+        <p>Select your streaming platform below to see the specific instructions for generating your API keys.</p>
 
-        <h2>Step 3: YouTube API Setup (Required for YouTube)</h2>
-        <p>To detect live broadcasts on YouTube, you must generate a YouTube Data API Key.</p>
-        <ol class="steps-list">
-          <li>
-            <span class="step-num">1</span>
-            <div>
-              Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">2</span>
-            <div>
-              Create a new project (or use an existing one).
-            </div>
-          </li>
-          <li>
-            <span class="step-num">3</span>
-            <div>
-              In the sidebar, go to <strong>APIs & Services</strong> → <strong>Library</strong>. Search for <strong>YouTube Data API v3</strong> and click Enable.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">4</span>
-            <div>
-              Go to <strong>APIs & Services</strong> → <strong>Credentials</strong>. Click <strong>Create Credentials</strong> → <strong>API Key</strong>. Copy the key and paste it into the LiveSticky app settings.
-            </div>
-          </li>
-        </ol>
+        <div class="tabs-container">
+          <!-- Tab Navigation -->
+          <div class="tab-nav">
+            <button class="tab-btn twitch active" data-target="tab-twitch">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+              Twitch
+            </button>
+            <button class="tab-btn youtube" data-target="tab-youtube">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+              YouTube
+            </button>
+            <button class="tab-btn kick" data-target="tab-kick">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path d="M10.286 0H0v24h10.286l5.143-6h5.142V18h3.429v-6h-3.429V6h-5.142V0zm-6.857 3.429h3.428v17.142H3.429zm6.857 0h3.428V6h3.429v6h3.428v6H17.14v6h-3.428v-6h-3.429V3.429z"/></svg>
+              Kick
+            </button>
+          </div>
 
-        <h2>Step 4: Kick API Setup (Required for Kick)</h2>
-        <p>To detect live broadcasts on Kick, you need a Kick API application.</p>
-        <div style="background: rgba(255, 69, 0, 0.1); border-left: 4px solid #ff4500; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
-          <strong>Note:</strong> The Kick Developer API is currently in closed beta or restricted to verified partners. If you cannot access the developer portal, you may need to contact Kick support to request API access.
+          <!-- Tab Content: Twitch -->
+          <div class="tab-content active" id="tab-twitch">
+            <h3>Step 2A: Twitch API Setup</h3>
+            <p>If you want LiveSticky to detect when you are live on Twitch, you must provide a Client ID and Secret.</p>
+            <ol class="steps-list">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  Go to the <a href="https://dev.twitch.tv/console" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a> and log in.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  Click <strong>Register Your Application</strong>.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  Set Name to anything (e.g. <code>MySubreddit LiveSticky</code>), set OAuth Redirect URLs to <code>http://localhost</code>, and select <strong>Website Integration</strong> as the category. Click Create.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  Click Manage on your new app. Copy the <strong>Client ID</strong> and generate a new <strong>Client Secret</strong>. Paste both into the LiveSticky app settings.
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Tab Content: YouTube -->
+          <div class="tab-content" id="tab-youtube">
+            <h3>Step 2B: YouTube API Setup</h3>
+            <p>To detect live broadcasts on YouTube, you must generate a YouTube Data API Key.</p>
+            <ol class="steps-list">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  Create a new project (or use an existing one).
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  In the sidebar, go to <strong>APIs & Services</strong> → <strong>Library</strong>. Search for <strong>YouTube Data API v3</strong> and click Enable.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  Go to <strong>APIs & Services</strong> → <strong>Credentials</strong>. Click <strong>Create Credentials</strong> → <strong>API Key</strong>. Copy the key and paste it into the LiveSticky app settings.
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Tab Content: Kick -->
+          <div class="tab-content" id="tab-kick">
+            <h3>Step 2C: Kick API Setup</h3>
+            <p>To detect live broadcasts on Kick, you need a Kick API application.</p>
+            <div style="background: rgba(255, 69, 0, 0.1); border-left: 4px solid #ff4500; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+              <strong>Note:</strong> The Kick Developer API is currently in closed beta or restricted to verified partners. If you cannot access the developer portal, you may need to contact Kick support to request API access.
+            </div>
+            <ol class="steps-list">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  Navigate to your Kick Developer portal or dashboard.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  Generate a new <strong>Client ID</strong> and <strong>Client Secret</strong>.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  Paste them into the LiveSticky app settings.
+                </div>
+              </li>
+            </ol>
+          </div>
         </div>
-        <ol class="steps-list">
-          <li>
-            <span class="step-num">1</span>
-            <div>
-              Navigate to your Kick Developer portal or dashboard.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">2</span>
-            <div>
-              Generate a new <strong>Client ID</strong> and <strong>Client Secret</strong>.
-            </div>
-          </li>
-          <li>
-            <span class="step-num">3</span>
-            <div>
-              Paste them into the LiveSticky app settings.
-            </div>
-          </li>
-        </ol>
 
-        <h2>Step 5: Testing It Out</h2>
+        <h2>Step 3: Testing It Out</h2>
         <p>Once your API credentials are saved, LiveSticky will automatically start polling your channels every 2 minutes. You can also manually test your setup using the Mod Menu actions.</p>
         <ol class="steps-list">
           <li>
@@ -200,5 +230,28 @@
     </div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Remove active classes
+          tabBtns.forEach(b => b.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+
+          // Add active class to clicked button
+          btn.classList.add('active');
+
+          // Add active class to target content
+          const targetId = btn.getAttribute('data-target');
+          if (targetId) {
+            document.getElementById(targetId).classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
