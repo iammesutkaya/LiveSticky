@@ -57,6 +57,21 @@
   line-height: 1.6;
 }
 
+.inline-brand {
+  display: inline-block;
+  padding: 0px 8px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 2px;
+  transform: translateY(-1px);
+}
+
+.inline-twitch { background: var(--twitch-color); }
+.inline-youtube { background: var(--youtube-color); }
+.inline-kick { background: var(--kick-color); color: #111111; }
+
 .logo-group {
   display: flex;
   flex-direction: column;
