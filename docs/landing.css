@@ -17,23 +17,30 @@
 
 /* ── Top Nav ────────────────────────────────────────────── */
 .top-nav {
-  position: absolute;
-  top: 32px;
-  right: 48px;
-  z-index: 100;
+  align-self: flex-end;
+  margin-top: -16px;
+  margin-bottom: -16px;
+  z-index: 10;
 }
 
 .top-nav .nav-link {
-  color: var(--text-secondary);
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
   text-decoration: none;
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .top-nav .nav-link:hover {
-  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  color: var(--accent-gold);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ── Hero ────────────────────────────────────────────────── */
@@ -1013,11 +1020,6 @@
 }
 
 @media (max-width: 600px) {
-  .top-nav {
-    top: 24px;
-    right: 24px;
-  }
-
   .landing-container {
     padding: 32px 16px 48px;
     gap: 36px;
