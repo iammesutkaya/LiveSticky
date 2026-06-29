@@ -44,6 +44,32 @@
     .component-list li {
       margin-bottom: 16px;
     }
+    .icon-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .icon-chip {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: color 0.25s ease, transform 0.25s ease;
+    }
+    .icon-chip:hover {
+      color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+    .icon-chip svg {
+      width: 22px;
+      height: 22px;
+    }
   </style>
 </head>
 <body>
@@ -215,7 +241,32 @@
           <li><strong>Platform badge</strong> — brand-color corner badge, <code>border-radius: 0 0 8px 0</code>, flush to the thumbnail's top-left, logo only.</li>
           <li><strong>Viewer chip</strong> — <code>--bg-primary</code> ground, gold count + <code>--text-faint</code> "viewers" label.</li>
           <li><strong>Watch / follow button</strong> — <code>--bg-surface</code> (live, as a card's bottom bar) or <code>--bg-card</code> (offline, standalone). Brand-colored logo + label. No border.</li>
+          <li><strong>Reddit thread row</strong> — <code>--bg-card</code> + <code>--border-line</code>, gold circular badge with the Snoo, title plus <code>comments · upvotes</code> meta, and a chevron.</li>
+          <li><strong>Footer</strong> — health dot + "LiveSticky" on the left; timestamp + Refresh button on the right.</li>
         </ul>
+
+        <hr>
+
+        <h2>Iconography</h2>
+        <p>
+          The product UI uses <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer">Lucide</a> — outline
+          icons with a consistent 1.75px stroke that share the dashboard's own SVG language. Emoji are reserved for the
+          README; the website and app render real icons.
+        </p>
+        <div class="icon-row">
+          <span class="icon-chip"><i data-lucide="radio-tower"></i></span>
+          <span class="icon-chip"><i data-lucide="activity"></i></span>
+          <span class="icon-chip"><i data-lucide="cast"></i></span>
+          <span class="icon-chip"><i data-lucide="film"></i></span>
+          <span class="icon-chip"><i data-lucide="panel-right"></i></span>
+          <span class="icon-chip"><i data-lucide="shield-check"></i></span>
+          <span class="icon-chip"><i data-lucide="message-circle"></i></span>
+        </div>
+        <p>
+          Icons sit in <code>--text-secondary</code> and ease to <code>--accent-gold</code> with a slight lift on hover —
+          the one moment of motion in an otherwise flat system. Platform marks (Twitch, YouTube, Kick, Reddit) keep their
+          official brand SVGs, since Lucide has no brand logos.
+        </p>
 
       </div>
     </main>
@@ -224,6 +275,11 @@
   <footer>
     <p>&copy; 2026 Mesut Kaya. All rights reserved. Official Website: <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a> | Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a>.</p>
   </footer>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 
 </body>
 </html>

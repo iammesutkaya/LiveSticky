@@ -445,10 +445,98 @@
 }
 
 .feature-icon {
-  font-size: 1.8rem;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   position: relative;
   z-index: 1;
+  color: var(--text-secondary);
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.feature-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.75;
+  display: block;
+}
+
+/* Subtle micro-interaction: the icon eases to gold and lifts on card hover */
+.feature-card:hover .feature-icon {
+  color: var(--accent-gold);
+  transform: translateY(-2px) scale(1.06);
+}
+
+/* One-line summary shown above the "Learn more" toggle */
+.feature-summary {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* "Learn more" toggle */
+.learn-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--gold-text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  position: relative;
+  z-index: 1;
+}
+
+.learn-more:hover {
+  color: var(--text-primary);
+}
+
+.learn-more svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s ease;
+}
+
+.feature-card.expanded .learn-more svg {
+  transform: rotate(180deg);
+}
+
+/* Expanded detail */
+.feature-detail {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-line);
+  position: relative;
+  z-index: 1;
+}
+
+.feature-detail p {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.feature-detail em {
+  color: var(--gold-text);
+  font-style: normal;
+}
+
+/* Lucide icon inside a centered section title */
+.section-title svg {
+  width: 22px;
+  height: 22px;
+  vertical-align: -3px;
+  margin-right: 8px;
+  color: var(--accent-gold);
+  stroke-width: 2;
 }
 
 .feature-card h3 {
