@@ -274,6 +274,9 @@
 .showcase-content {
   opacity: 1;
   transition: opacity 0.2s ease;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
 .showcase-content.fade-out {
