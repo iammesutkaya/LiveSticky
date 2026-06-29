@@ -30,14 +30,14 @@ thumbnails, and platform brand colors — are what the eye lands on.
 
 | Token | Dark | Light | Use |
 |-------|------|-------|-----|
-| `--bg-primary` | `#131313` | `#ffffff` | Page; the deep ground inside viewer chips |
-| `--bg-card` | `#1e1e1e` | `#f6f6f7` | Stream cards, Reddit row, offline card |
-| `--bg-surface` | `#282828` | `#eaeaec` | Thumbnails, watch bar, muted avatar, chips |
-| `--bg-card-hover` | `#242424` | `#efeff0` | Hover state of cards/buttons |
-| `--text-primary` | `#f5f5f5` | `#1a1a1b` | Titles, names |
-| `--text-secondary` | `#aaaaaa` | `#545456` | Supporting copy |
-| `--text-muted` | `#888888` | `#76767a` | Meta, labels, footer |
-| `--text-faint` | `#555555` | `#9a9aa0` | Separators, the "viewers" label |
+| `--bg-primary` | `#111111` | `#ffffff` | Page; the deep ground inside viewer chips |
+| `--bg-card` | `#1c1c1e` | `#f6f6f7` | Stream cards, Reddit row, offline card |
+| `--bg-surface` | `#262628` | `#eaeaec` | Thumbnails, watch bar, muted avatar, chips |
+| `--bg-card-hover` | `#242426` | `#efeff0` | Hover state of cards/buttons |
+| `--text-primary` | `#ffffff` | `#1a1a1b` | Titles, names |
+| `--text-secondary` | `#a0a0a5` | `#545456` | Supporting copy |
+| `--text-muted` | `#707075` | `#76767a` | Meta, labels, footer |
+| `--text-faint` | `#444448` | `#9a9aa0` | Separators, the "viewers" label |
 | `--accent-gold` | `#f5d474` | `#f5d474` | Fill (avatar, Reddit badge, LIVE pill) — dark content on top |
 | `--gold-text` | `#f5d474` | `#8a6a12` | Gold as **text** on a surface (viewer counts, last-live) |
 | `--twitch-color` | `#9147ff` | `#9147ff` | Badge/logo only |
@@ -66,12 +66,13 @@ Font: Inter, system-ui fallback. Two weights carry everything: 600 (bold) and
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--radius-sm` | 5px | Chips, status pill |
+| `--radius-sm` | 8px | Chips, status pill |
 | thumbnail | 7px | Stream thumbnails |
-| `--radius-md` | 10px | Cards, buttons |
-| `--radius-lg` | 12px | (reserved / outer containers) |
+| `--radius-md` | 14px | Cards, buttons |
+| `--radius-lg` | 20px | Outer cards, bento widgets |
+| `--radius-xl` | 28px | Hero containers, main dashboard |
 | corner badge | `0 0 8px 0` | Platform badge, flush to the thumbnail's top-left corner |
-| full | 50% | Avatar, Reddit badge |
+| full | 9999px | Avatar, Reddit badge, active buttons |
 
 ### Spacing
 
