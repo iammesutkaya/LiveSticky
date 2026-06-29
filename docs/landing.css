@@ -28,9 +28,10 @@
 .hero .logo-glow {
   width: 144px;
   height: 144px;
-  border-radius: var(--radius-lg);
-  box-shadow: none;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
   background: var(--bg-card);
+  border: 1px solid var(--border-line);
 }
 
 .hero h1 {
@@ -104,25 +105,26 @@
   align-items: center;
   gap: 10px;
   margin-top: 16px;
-  padding: 16px 44px;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  color: var(--text-primary);
+  padding: 18px 48px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gold);
+  color: #111111;
   font-family: 'Inter', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   text-decoration: none;
   letter-spacing: 0.01em;
   transition: var(--transition-smooth);
 }
 
 .install-btn:hover {
-  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 212, 116, 0.2);
 }
 
 .install-btn svg {
   flex-shrink: 0;
-  fill: var(--reddit-color);
+  fill: #111111;
 }
 
 .badge {
@@ -130,14 +132,15 @@
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-decoration: none;
   transition: var(--transition-smooth);
   background: var(--bg-surface);
   color: var(--text-secondary);
+  border: 1px solid var(--border-line);
 }
 
 .badge-purple svg {
@@ -253,20 +256,25 @@
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .feature-card {
   background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: 28px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-line);
+  padding: 36px 32px;
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-card:hover {
   background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .feature-icon {
