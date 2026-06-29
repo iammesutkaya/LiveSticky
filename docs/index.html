@@ -82,10 +82,12 @@
           </div>
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
-        <img id="dashboard-img" src="dashboard-offline.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="showcase-placeholder" style="display: none;">
-          <div class="placeholder-icon">📸</div>
-          <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-offline.png</strong></p>
+        <div id="showcase-content" class="showcase-content">
+          <img id="dashboard-img" src="dashboard-offline.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="showcase-placeholder" style="display: none;">
+            <div class="placeholder-icon">📸</div>
+            <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-offline.png</strong></p>
+          </div>
         </div>
       </div>
     </section>
@@ -289,18 +291,29 @@
 
   <script>
     function setDashboardView(view, btn) {
+      if (btn.classList.contains('active')) return;
+      
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
+      const content = document.getElementById('showcase-content');
       const img = document.getElementById('dashboard-img');
       const placeholder = document.getElementById('placeholder-filename');
       const filename = 'dashboard-' + view + '.png';
       
-      img.src = filename;
-      placeholder.textContent = filename;
+      // Fade out
+      content.classList.add('fade-out');
       
-      img.style.display = 'block';
-      img.nextElementSibling.style.display = 'none';
+      // Wait for fade out to complete, then swap content and fade back in
+      setTimeout(() => {
+        img.src = filename;
+        placeholder.textContent = filename;
+        
+        img.style.display = 'block';
+        img.nextElementSibling.style.display = 'none';
+        
+        content.classList.remove('fade-out');
+      }, 200);
     }
   </script>
 </body>
