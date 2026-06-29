@@ -120,8 +120,8 @@
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
         <div id="showcase-content" class="showcase-content">
-          <img id="dashboard-img" src="dashboard-stream.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="showcase-placeholder" style="display: none;">
+          <img id="dashboard-img" src="dashboard-stream.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+          <div class="showcase-placeholder" hidden>
             <div class="placeholder-icon">📸</div>
             <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-stream.png</strong></p>
           </div>
@@ -342,8 +342,8 @@
         img.src = filename;
         placeholder.textContent = filename;
         
-        img.style.display = 'block';
-        img.nextElementSibling.style.display = 'none';
+        img.hidden = false;
+        img.nextElementSibling.hidden = true;
         
         content.classList.remove('fade-out');
       }, 200);
