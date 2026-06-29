@@ -149,6 +149,41 @@
   fill: #111111;
 }
 
+.action-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.hero .action-group {
+  justify-content: flex-start;
+}
+
+.cta-section .action-group {
+  justify-content: center;
+}
+
+.action-group .install-btn {
+  margin-top: 0;
+}
+
+.secondary-btn {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-line);
+  box-shadow: none;
+}
+
+.secondary-btn:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-btn svg {
+  fill: var(--text-secondary);
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
