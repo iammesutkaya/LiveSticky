@@ -27,6 +27,7 @@ export interface SettingsClient {
 export interface PlatformContext {
   settings: SettingsClient;
   redis: RedisClient;
+  onError?: (platform: string, msg: string) => Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
@@ -190,7 +191,8 @@ async function resolveYouTubeUploadsPlaylist(
 async function fetchYouTubeStatus(
   channel: string,
   apiKey: string,
-  redis: RedisClient
+  redis: RedisClient,
+  onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<UnifiedStreamInfo | null> {
   // A live broadcast appears in the channel's public uploads playlist, so we can
   // detect it with two 1-unit calls (playlistItems + videos) instead of the
@@ -216,7 +218,10 @@ async function fetchYouTubeStatus(
     const vUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(',')}`;
     const vRes = await fetch(vUrl, { headers: { 'x-goog-api-key': apiKey } });
     if (!vRes.ok) {
-      console.error(`YouTube videos request failed: ${vRes.statusText}`);
+      if (vRes.status === 403) {
+        console.error('YouTube API quota exceeded or forbidden (403).');
+        if (onError) await onError('YouTube', 'YouTube API quota exceeded (HTTP 403). LiveSticky cannot fetch your stream status until your quota resets.');
+      }
       return null;
     }
     const vData = await vRes.json() as { items?: YouTubeVideoItem[] };
@@ -277,7 +282,8 @@ async function fetchKickStatus(
   channel: string,
   clientId: string,
   clientSecret: string,
-  redis: RedisClient
+  redis: RedisClient,
+  onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<UnifiedStreamInfo | null> {
   const channelSlug = channel.trim().toLowerCase();
   let accessToken = await redis.get('kick_access_token');
@@ -326,7 +332,10 @@ async function fetchKickStatus(
     });
 
     if (!res.ok) {
-      console.error(`Kick channel API request failed: ${res.statusText}`);
+      if (res.status === 401 || res.status === 403) {
+        console.error(`Kick API Unauthorized (HTTP ${res.status}).`);
+        if (onError) await onError('Kick', `Kick API Unauthorized (HTTP ${res.status}). Please check your Kick Client ID and Secret in LiveSticky settings.`);
+      }
       return null;
     }
 
@@ -376,7 +385,8 @@ interface TwitchTokenResponse {
 export async function getOrRefreshTwitchToken(
   clientId: string,
   clientSecret: string,
-  redis: RedisClient
+  redis: RedisClient,
+  onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<string | null> {
   const cached = await redis.get('twitch_access_token');
   if (cached) return cached;
@@ -397,7 +407,10 @@ export async function getOrRefreshTwitchToken(
     );
 
     if (!tokenRes.ok) {
-      console.error('Failed to get Twitch Token');
+      console.error(`Failed to refresh Twitch token: ${tokenRes.status}`);
+      if (tokenRes.status === 401 || tokenRes.status === 403) {
+        if (onError) await onError('Twitch', `Twitch Auth Error (HTTP ${tokenRes.status}). Please verify your Twitch Client ID and Client Secret in LiveSticky settings.`);
+      }
       return null;
     }
 
@@ -440,13 +453,14 @@ async function fetchTwitchStatus(
   channel: string,
   clientId: string,
   clientSecret: string,
-  redis: RedisClient
+  redis: RedisClient,
+  onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<UnifiedStreamInfo | null> {
   const channelName = channel.trim().toLowerCase();
-  const token = await getOrRefreshTwitchToken(clientId, clientSecret, redis);
-  if (!token) return null;
-
   try {
+    const token = await getOrRefreshTwitchToken(clientId, clientSecret, redis, onError);
+    if (!token) return null;
+
     const streamRes = await fetch(
       `https://api.twitch.tv/helix/streams?user_login=${channelName}`,
       {
@@ -581,13 +595,13 @@ export async function checkAllStreamStatuses(
   const checks: Array<Promise<UnifiedStreamInfo | null>> = [];
 
   if (twitchChannel && twitchClientId && twitchClientSecret) {
-    checks.push(fetchTwitchStatus(twitchChannel, twitchClientId, twitchClientSecret, context.redis));
+    checks.push(fetchTwitchStatus(twitchChannel, twitchClientId, twitchClientSecret, context.redis, context.onError));
   }
   if (youtubeChannel && youtubeApiKey) {
-    checks.push(fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis));
+    checks.push(fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis, context.onError));
   }
   if (kickChannel && kickClientId && kickClientSecret) {
-    checks.push(fetchKickStatus(kickChannel, kickClientId, kickClientSecret, context.redis));
+    checks.push(fetchKickStatus(kickChannel, kickClientId, kickClientSecret, context.redis, context.onError));
   }
 
   const results = await Promise.all(checks);

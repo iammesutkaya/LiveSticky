@@ -118,6 +118,24 @@
         "helpText": "Override your platform profile picture with a direct image URL (e.g., Imgur link). Leave blank to auto-fetch from your primary platform.",
         "placeholder": "https://..."
       },
+      "streamerRedditUsername": {
+        "type": "string",
+        "label": "👤 Streamer Reddit Username (Optional)",
+        "helpText": "The exact Reddit username of the streamer (without the u/). Used for User Flair updates.",
+        "placeholder": "iammesutkaya"
+      },
+      "liveUserFlairText": {
+        "type": "string",
+        "label": "👤 Live User Flair Text (Optional)",
+        "helpText": "The User Flair text applied to the Streamer when they go live.",
+        "defaultValue": "🔴 LIVE NOW"
+      },
+      "offlineUserFlairText": {
+        "type": "string",
+        "label": "👤 Offline User Flair Text (Optional)",
+        "helpText": "The User Flair text applied to the Streamer when they go offline. Leave blank to clear their flair completely.",
+        "defaultValue": " "
+      },
       "twitchChannel": {
         "type": "string",
         "label": "🟪 Twitch Channel Name (Optional)",
@@ -170,6 +188,12 @@
         "type": "paragraph",
         "label": "ℹ️ Available Placeholders (for reference)",
         "defaultValue": "{channel} — Twitch channel login name (e.g. streamer)\n{display_name} — Channel display name (e.g. Streamer)\n{title} — Stream title\n{game} — Game or category being streamed (live only)\n{viewers} — Current viewer count (live only)\n{uptime} — How long the stream has been live (live only)\n{date} — Date the stream ended (post-stream only)\n{twitch_url} — Twitch channel URL\n{youtube_url} — YouTube channel URL\n{kick_url} — Kick channel URL"
+      },
+      "dashboardPostTitle": {
+        "type": "string",
+        "label": "📺 Dashboard Post Title (Optional)",
+        "helpText": "Custom title for the persistent dashboard post. If empty, the default is used.",
+        "defaultValue": "LiveSticky Dashboard"
       },
       "livePostTitle": {
         "type": "string",

@@ -520,6 +520,9 @@ export const runStatusCheck = async (): Promise<void> => {
     offlinePostBody,
     offlinePostFooter,
     offlinePostTitle,
+    streamerRedditUsername,
+    liveUserFlairText,
+    offlineUserFlairText,
   ] = await Promise.all([
     get('twitchChannel'),
     get('youtubeChannel'),
@@ -552,6 +555,9 @@ export const runStatusCheck = async (): Promise<void> => {
     get('offlinePostBody'),
     get('offlinePostFooter'),
     get('offlinePostTitle'),
+    get('streamerRedditUsername'),
+    get('liveUserFlairText'),
+    get('offlineUserFlairText'),
   ]);
   const enableLivePost = enableLivePostRaw ?? true;
 
@@ -566,16 +572,41 @@ export const runStatusCheck = async (): Promise<void> => {
     return;
   }
 
+  // Fetch subreddit early for ModMail alerts
+  const subreddit = await reddit.getCurrentSubreddit();
+
   // Poll every configured platform so the dashboard can show all simultaneous
   // streams. The first entry (highest priority that's live) is the "primary"
   // stream that drives the Reddit live post, flair, sidebar, and highlights —
   // all of which remain single-stream concepts.
-  const liveStreams = await checkAllStreamStatuses({ settings, redis });
+  const liveStreams = await checkAllStreamStatuses({
+    settings,
+    redis,
+    onError: async (platform: string, msg: string) => {
+      const cooldownKey = `modmail_cooldown_${platform.toLowerCase()}`;
+      const hasCooldown = await redis.get(cooldownKey);
+      if (!hasCooldown) {
+        try {
+          await reddit.modMail.createConversation({
+            subredditName: subreddit.name,
+            subject: `⚠️ LiveSticky API Alert: ${platform}`,
+            body: `Hello,\n\nLiveSticky encountered an error while trying to check your ${platform} stream status:\n\n> **${msg}**\n\nThis usually happens when API credentials expire or a free quota is exceeded. Please check your LiveSticky settings.\n\n*(This alert is rate-limited to once per 24 hours per platform.)*`,
+            isAuthorHidden: true,
+          });
+          await redis.set(cooldownKey, 'true');
+          await redis.expire(cooldownKey, 86400); // 24 hours
+          console.log(`Sent ModMail alert for ${platform}`);
+        } catch (err) {
+          console.error(`Failed to send ModMail alert for ${platform}:`, err);
+        }
+      }
+    }
+  });
+  
   const streamInfo = liveStreams[0] ?? null;
   const isLive = streamInfo !== null;
 
   const isCurrentlyPinned = await redis.get('is_live_pinned');
-  const subreddit = await reddit.getCurrentSubreddit();
 
   if (isLive && streamInfo) {
     const postBody = formatLivePostBody(
@@ -607,6 +638,19 @@ export const runStatusCheck = async (): Promise<void> => {
         if (streamInfo.user_id) await redis.set('twitch_broadcaster_id', streamInfo.user_id);
         if (streamInfo.started_at) await redis.set('twitch_started_at', streamInfo.started_at);
         if (streamInfo.title) await redis.set('twitch_stream_title', streamInfo.title);
+      }
+
+      if (streamerRedditUsername && liveUserFlairText) {
+        try {
+          await reddit.setUserFlair({
+            subredditName: subreddit.name,
+            username: streamerRedditUsername as string,
+            text: liveUserFlairText as string,
+          });
+          console.log(`Applied LIVE user flair to ${streamerRedditUsername}`);
+        } catch (err) {
+          console.error(`Failed to apply LIVE user flair to ${streamerRedditUsername}:`, err);
+        }
       }
 
       if (enableDashboard) {
@@ -810,6 +854,19 @@ export const runStatusCheck = async (): Promise<void> => {
           }
           if (enableLivePost && postId) {
             await resetDynamicPostFlair(postId, subreddit.name, liveFlairId, offlineFlairText);
+          }
+        }
+
+        if (streamerRedditUsername) {
+          try {
+            await reddit.setUserFlair({
+              subredditName: subreddit.name,
+              username: streamerRedditUsername as string,
+              text: (offlineUserFlairText as string) || '',
+            });
+            console.log(`Applied OFFLINE user flair to ${streamerRedditUsername}`);
+          } catch (err) {
+            console.error(`Failed to apply OFFLINE user flair to ${streamerRedditUsername}:`, err);
           }
         }
 
@@ -1090,18 +1147,20 @@ export const createDashboardPost = async (): Promise<string> => {
     }
   }
 
+  const dashboardTitle = await get<string>('dashboardPostTitle') || 'LiveSticky Dashboard';
+
   const post = await reddit.submitCustomPost({
     subredditName: subreddit.name,
-    title: '📺 LiveSticky Dashboard',
+    title: dashboardTitle,
     entry: 'default',
-    textFallback: { text: 'LiveSticky Dashboard' },
+    textFallback: { text: dashboardTitle },
     styles: { height: 'tall' },
   });
 
   await redis.set('dashboard_post_id', post.id);
   await pinPostWithFallback(post.id);
   console.log(`Created new LiveSticky Dashboard post: ${post.id}`);
-  return '📺 LiveSticky Dashboard created and stickied!';
+  return `Dashboard created and stickied: ${dashboardTitle}`;
 };
 
 export const restartLiveSticky = async (): Promise<string> => {
