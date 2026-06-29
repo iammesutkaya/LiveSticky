@@ -123,9 +123,9 @@
     </section>
 
     <!-- What is LiveSticky -->
-    <section class="section card">
-      <div class="content">
-        <h2>What is LiveSticky?</h2>
+    <section class="section unboxed-section">
+      <div class="content article-content">
+        <h2 class="section-title"><i data-lucide="info"></i> What is LiveSticky?</h2>
 
         <p>
           LiveSticky handles your entire stream lifecycle on Reddit automatically. Go live on <strong>Twitch, YouTube,
@@ -149,9 +149,9 @@
     <!-- Core Features -->
     <section class="section">
       <h2 class="section-title"><i data-lucide="layout-grid"></i> Core features</h2>
-      <div class="features-grid">
+      <div class="features-grid core-features-grid">
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="radio-tower"></i></div>
           <h3>Automatic live posts</h3>
           <p class="feature-summary">Pins a fresh post the second you go live — on any platform.</p>
@@ -165,7 +165,7 @@
           </div>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="activity"></i></div>
           <h3>Real-time stats</h3>
           <p class="feature-summary">Viewer count, category, and uptime stay current — no refresh.</p>
@@ -178,7 +178,7 @@
           </div>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="cast"></i></div>
           <h3>Multistream aware</h3>
           <p class="feature-summary">Tracks Twitch, YouTube, and Kick together in one dashboard.</p>
@@ -191,7 +191,7 @@
           </div>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="film"></i></div>
           <h3>Clean archive when you wrap</h3>
           <p class="feature-summary">Grace period, VOD archive, and a top-clips highlights post.</p>
@@ -205,7 +205,7 @@
           </div>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="panel-right"></i></div>
           <h3>Sidebar widget</h3>
           <p class="feature-summary">A live STREAM STATUS widget in your community sidebar.</p>
@@ -218,7 +218,7 @@
           </div>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-item">
           <div class="feature-icon"><i data-lucide="shield-check"></i></div>
           <h3>Built for mods</h3>
           <p class="feature-summary">Pinned mod comment, one-click reset, and rate-limit safety.</p>
@@ -235,9 +235,9 @@
     </section>
 
     <!-- How It Works -->
-    <section class="section card">
-      <div class="content">
-        <h2>How It Works</h2>
+    <section class="section unboxed-section">
+      <div class="content article-content">
+        <h2 class="section-title"><i data-lucide="git-pull-request"></i> How It Works</h2>
         <ol class="steps-list">
           <li>
             <span class="step-num">1</span>
@@ -280,6 +280,20 @@
 
   </div>
 
+  <!-- Pre-Footer CTA -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to upgrade your subreddit?</h2>
+      <p>Give your community the premium stream experience they deserve.</p>
+      <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer" class="install-btn cta-btn">
+        Install on Reddit
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -319,14 +333,14 @@
     // Render all <i data-lucide="..."> placeholders as inline SVGs.
     if (window.lucide) lucide.createIcons();
 
-    // Expand/collapse a feature card's detail.
+    // Expand/collapse a feature card or item's detail.
     function toggleFeature(btn) {
-      const card = btn.closest('.feature-card');
-      const detail = card.querySelector('.feature-detail');
+      const parent = btn.closest('.feature-card') || btn.closest('.feature-item');
+      const detail = parent.querySelector('.feature-detail');
       const expanded = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!expanded));
       detail.hidden = expanded;
-      card.classList.toggle('expanded', !expanded);
+      parent.classList.toggle('expanded', !expanded);
       btn.querySelector('.lm-text').textContent = expanded ? 'Learn more' : 'Show less';
     }
 
