@@ -3,10 +3,10 @@
 
 :root {
   /* Neutral Amber Design System Tokens (Premium) */
-  --bg-primary: #111111; /* Slightly darker to make cards pop */
-  --bg-card: #1c1c1e; /* Smooth dark gray for cards */
-  --bg-surface: #262628;
-  --bg-card-hover: #242426;
+  --bg-primary: #0b1416; /* Reddit dark mode background */
+  --bg-card: #131f23;    /* Reddit elevated surface */
+  --bg-surface: #1a282d; /* Reddit higher surface */
+  --bg-card-hover: #172328;
   --border-line: rgba(255, 255, 255, 0.06); /* Subtle inner borders for depth */
   
   --text-primary: #ffffff;
