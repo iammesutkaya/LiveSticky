@@ -47,7 +47,6 @@ const offlineContent = $('offline-content');
 const platformListEl = $('platform-list');
 const refreshBtn = $('refresh-btn');
 const offlineNameEl = $('offline-name');
-const lastLiveEl = $('last-live');
 const offlineSubtextEl = $('offline-subtext');
 const lastUpdatedEl = $('last-updated');
 const avatarInitialEl = $('avatar-initial');
@@ -407,7 +406,7 @@ function updateDashboard(data) {
 
   const platforms = platformsFromData(data);
 
-  // Header subtitle
+  // Header subtitle — live: how/where they're streaming; offline: last-live time
   if (headerSubEl) {
     if (isNowLive && platforms.length > 1) {
       headerSubEl.textContent = `Live on ${platforms.length} platforms`;
@@ -416,7 +415,8 @@ function updateDashboard(data) {
     } else if (isNowLive) {
       headerSubEl.textContent = 'Live now';
     } else {
-      headerSubEl.textContent = '';
+      const ago = formatTimeAgo(data.lastLiveAt);
+      headerSubEl.textContent = ago ? `Last live ${ago}` : 'Offline';
     }
   }
 
@@ -432,20 +432,10 @@ function updateDashboard(data) {
     offlineNameEl.textContent = displayName;
     updateRedditThread(data);
 
-    if (lastLiveEl) {
-      const ago = formatTimeAgo(data.lastLiveAt);
-      if (ago) {
-        lastLiveEl.textContent = `Last live ${ago}`;
-        lastLiveEl.classList.remove('hidden');
-      } else {
-        lastLiveEl.classList.add('hidden');
-      }
-    }
-
     if (offlineSubtextEl) {
       const hasChannels = config.twitchUrl || config.youtubeUrl || config.kickUrl;
       offlineSubtextEl.textContent = hasChannels
-        ? 'Check back soon or follow the channels below!'
+        ? 'Follow below to get notified when the stream goes live.'
         : 'Check back soon!';
     }
   }

@@ -66,10 +66,13 @@
         <!-- Offline state content -->
         <div id="offline-content" class="offline-content hidden">
           <div class="offline-message">
-            <div class="offline-icon" aria-hidden="true">😴</div>
-            <p id="last-live" class="last-live hidden" aria-live="polite"></p>
+            <div class="offline-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
             <p class="offline-text">
-              <span id="offline-name">Streamer</span> is currently offline.
+              <span id="offline-name">Streamer</span> is offline
             </p>
             <p id="offline-subtext" class="offline-subtext">Check back soon!</p>
           </div>
