@@ -157,7 +157,7 @@ const ensureStickyOfflinePost = async (
 
   if (offlinePostId) {
     try {
-      const offlinePost = await reddit.getPostById(offlinePostId);
+      const offlinePost = await reddit.getPostById(offlinePostId as `t3_${string}`);
       try {
         const comments = await offlinePost.comments.all();
         for (const comment of comments) {
@@ -435,7 +435,7 @@ const updateDynamicPostFlair = async (
       flairText = `🔴 LIVE: ${gameName}`;
     }
 
-    await reddit.setPostFlair({ postId, subredditName, text: flairText, flairTemplateId: liveFlairId });
+    await reddit.setPostFlair({ postId: postId as `t3_${string}`, subredditName, text: flairText, flairTemplateId: liveFlairId });
     console.log(`Updated post ${postId} flair dynamically to: ${flairText}`);
   } catch (flairError) {
     console.error(`Failed to update dynamic post flair for ${postId}:`, flairError);
@@ -450,7 +450,7 @@ const resetDynamicPostFlair = async (
 ) => {
   try {
     await reddit.setPostFlair({
-      postId,
+      postId: postId as `t3_${string}`,
       subredditName,
       text: offlineFlairText || '⚫ OFFLINE',
       flairTemplateId: liveFlairId,
@@ -673,7 +673,7 @@ export const runStatusCheck = async (): Promise<void> => {
             const offlinePostId = await redis.get('offline_post_id');
             if (offlinePostId) {
               try {
-                const offlinePost = await reddit.getPostById(offlinePostId);
+                const offlinePost = await reddit.getPostById(offlinePostId as `t3_${string}`);
                 await offlinePost.unsticky();
                 console.log(`Successfully unstickied offline post: ${offlinePostId}`);
               } catch (unstickyError) {
@@ -739,7 +739,7 @@ export const runStatusCheck = async (): Promise<void> => {
         const postId = await redis.get('live_post_id');
         if (postId) {
           try {
-            const post = await reddit.getPostById(postId);
+            const post = await reddit.getPostById(postId as `t3_${string}`);
             await post.edit({ text: postBody });
             console.log(`Successfully updated live post stats for: ${postId}`);
             if (enableDynamicFlair) {
@@ -872,7 +872,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
         if (enableLivePost && postId) {
           try {
-            const post = await reddit.getPostById(postId);
+            const post = await reddit.getPostById(postId as `t3_${string}`);
             if (deleteOfflinePost) {
               console.log(`Deleting post completely: ${postId}`);
               await post.delete();
@@ -1138,7 +1138,7 @@ export const createDashboardPost = async (): Promise<string> => {
   const oldDashPostId = await redis.get('dashboard_post_id');
   if (oldDashPostId) {
     try {
-      const oldPost = await reddit.getPostById(oldDashPostId);
+      const oldPost = await reddit.getPostById(oldDashPostId as `t3_${string}`);
       await oldPost.unsticky().catch(() => {});
       await oldPost.delete();
       console.log(`Deleted old dashboard post: ${oldDashPostId}`);
@@ -1154,7 +1154,7 @@ export const createDashboardPost = async (): Promise<string> => {
     title: dashboardTitle,
     entry: 'default',
     textFallback: { text: dashboardTitle },
-    styles: { height: 'tall' },
+    styles: { height: 'tall' as any },
   });
 
   await redis.set('dashboard_post_id', post.id);
