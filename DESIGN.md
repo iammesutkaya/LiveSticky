@@ -103,6 +103,21 @@ Rhythm: **8 · 10 · 12 · 14 · 16**. Card padding 12px; header/offline padding
 
 ---
 
+## Iconography
+
+The product UI (dashboard + website) uses **[Lucide](https://lucide.dev)** —
+outline icons with a consistent ~1.75px stroke that share the dashboard's own
+SVG language (moon, chevrons, refresh). Emoji are reserved for the README only.
+
+- Icons sit in `--text-secondary` and ease to `--accent-gold` with a slight lift
+  on hover — the one moment of motion in an otherwise flat system.
+- Platform marks (Twitch, YouTube, Kick, Reddit) keep their **official brand
+  SVGs**, since Lucide has no brand logos.
+- On the static website, Lucide loads via CDN (`unpkg.com/lucide`) and renders
+  `<i data-lucide="name">` placeholders with `lucide.createIcons()`.
+
+---
+
 ## States
 
 Every state is built from the tokens and components above.

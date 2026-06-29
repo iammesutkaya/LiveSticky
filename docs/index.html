@@ -96,28 +96,28 @@
 
     <!-- Interactive Dashboard (flagship) -->
     <section class="section">
-      <h2 class="section-title">📺 The Interactive Live Dashboard</h2>
+      <h2 class="section-title"><i data-lucide="monitor-play"></i> The Interactive Live Dashboard</h2>
       <p class="section-intro">LiveSticky isn't just a text post. It installs a live, auto-updating dashboard right inside
         your community — and when you multistream, it shows <em>every</em> platform you're live on at once, so viewers
         jump straight to the one they prefer.</p>
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">🎬</div>
+          <div class="feature-icon"><i data-lucide="clapperboard"></i></div>
           <h3>Multistream view</h3>
-          <p>Live on Twitch, YouTube, and Kick at the same time? Each stream gets its own card with thumbnail, live
-            viewer count, and a one-tap <em>Watch on</em> button.</p>
+          <p class="feature-summary">Live on Twitch, YouTube, and Kick at the same time? Each stream gets its own card
+            with thumbnail, live viewer count, and a one-tap <em>Watch on</em> button.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon"><i data-lucide="zap"></i></div>
           <h3>Real-time, no refresh</h3>
-          <p>Viewer count, category, and uptime update live for every platform via Reddit Realtime — the moment they
-            change.</p>
+          <p class="feature-summary">Viewer count, category, and uptime update live for every platform via Reddit
+            Realtime — the moment they change.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">💬</div>
+          <div class="feature-icon"><i data-lucide="message-circle"></i></div>
           <h3>Join the live thread</h3>
-          <p>A built-in link into the pinned discussion post, complete with live comment and upvote counts — your whole
-            community in one tap.</p>
+          <p class="feature-summary">A built-in link into the pinned discussion post, complete with live comment and
+            upvote counts — your whole community in one tap.</p>
         </div>
       </div>
     </section>
@@ -148,91 +148,87 @@
 
     <!-- Core Features -->
     <section class="section">
-      <h2 class="section-title">✨ Core Features</h2>
+      <h2 class="section-title"><i data-lucide="layout-grid"></i> Core features</h2>
       <div class="features-grid">
 
         <div class="feature-card">
-          <div class="feature-icon">🔴</div>
-          <h3>Automatic Live Posts</h3>
-          <p>Checks Twitch, YouTube, and Kick every 2 minutes and pins a new post the moment you go live — on any
-            platform, no manual action needed.</p>
+          <div class="feature-icon"><i data-lucide="radio-tower"></i></div>
+          <h3>Automatic live posts</h3>
+          <p class="feature-summary">Pins a fresh post the second you go live — on any platform.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>Checks Twitch, YouTube, and Kick every 2 minutes. The moment you go live it submits the post, applies your
+              custom flair, sets the suggested sort to <em>New</em> so comments behave like live chat, and pins it — no
+              manual action needed.</p>
+          </div>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Real-Time Statistics</h3>
-          <p>Keeps the live post body up-to-date with current viewer count, uptime, and current game or category like
-            <em>Just Chatting</em>.
-          </p>
+          <div class="feature-icon"><i data-lucide="activity"></i></div>
+          <h3>Real-time stats</h3>
+          <p class="feature-summary">Viewer count, category, and uptime stay current — no refresh.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>The live post body, the interactive dashboard, and your sidebar widget all update through Reddit Realtime
+              as your numbers change — viewers see the latest without reloading.</p>
+          </div>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">🛡️</div>
-          <h3>Crash Grace Period</h3>
-          <p>Waits 6 minutes before concluding — so a brief OBS restart or Twitch hiccup won't spam your community with
-            duplicate posts.</p>
+          <div class="feature-icon"><i data-lucide="cast"></i></div>
+          <h3>Multistream aware</h3>
+          <p class="feature-summary">Tracks Twitch, YouTube, and Kick together in one dashboard.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>Broadcasting to several platforms at once? The dashboard lists each live stream with its own thumbnail,
+              viewer count, and one-tap watch button, so your community picks where to watch.</p>
+          </div>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">📺</div>
-          <h3>Multistream Aware</h3>
-          <p>Tracks Twitch, YouTube, and Kick together — the dashboard shows every platform you're live on so viewers
-            pick where to watch.</p>
+          <div class="feature-icon"><i data-lucide="film"></i></div>
+          <h3>Clean archive when you wrap</h3>
+          <p class="feature-summary">Grace period, VOD archive, and a top-clips highlights post.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>Waits 6 minutes first, so a brief OBS restart or platform hiccup won't spam duplicate posts. Then it edits
+              the post into an offline archive with VOD links, locks and unpins it, and compiles your top 5 Twitch clips
+              into a standalone highlights post.</p>
+          </div>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">🏁</div>
-          <h3>Concluding VOD Archives</h3>
-          <p>When the stream ends, LiveSticky edits the post to an offline archive state with VOD links, locks it, and
-            unpins it automatically.</p>
+          <div class="feature-icon"><i data-lucide="panel-right"></i></div>
+          <h3>Sidebar widget</h3>
+          <p class="feature-summary">A live STREAM STATUS widget in your community sidebar.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>Keeps a "STREAM STATUS" sidebar widget updated automatically with live/offline state, category, viewers,
+              and uptime — right alongside the pinned post.</p>
+          </div>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">🎥</div>
-          <h3>Stream Highlights Post</h3>
-          <p>Queries the Twitch Clips API on stream end to compile the top 5 clips into a standalone highlights post for
-            your community.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📌</div>
-          <h3>Pinned Mod Comment</h3>
-          <p>Auto-posts a customizable, pinned moderator comment — great for Discord links, community rules, or social
-            callouts.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🏷️</div>
-          <h3>Custom Post Flair</h3>
-          <p>Applies your community's custom post flair template to the live post automatically — e.g., <em>"🔴 Live
-              Now"</em>.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3>Sidebar Widget</h3>
-          <p>Keeps a "STREAM STATUS" sidebar widget updated in real-time with live/offline state, category, viewers, and
-            uptime.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">💬</div>
-          <h3>New Comment Sort</h3>
-          <p>Sets the suggested sort to "New" automatically so the live post comment section behaves like a real-time
-            stream chat.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🚀</div>
-          <h3>Rate-Limit Protection</h3>
-          <p>Uses Redis caching to keep status checks fast, lightweight, and safe from Twitch API rate limits.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🛠️</div>
-          <h3>One-Click Mod Reset</h3>
-          <p>Restart the status checker or clear the cache instantly using a custom shortcut directly in your
-            community's mod tools.</p>
+          <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+          <h3>Built for mods</h3>
+          <p class="feature-summary">Pinned mod comment, one-click reset, and rate-limit safety.</p>
+          <button class="learn-more" type="button" aria-expanded="false" onclick="toggleFeature(this)">
+            <span class="lm-text">Learn more</span><i data-lucide="chevron-down"></i>
+          </button>
+          <div class="feature-detail" hidden>
+            <p>Auto-pins a customizable moderator comment (Discord links, rules, socials), gives you a one-click status
+              reset right in mod tools, and uses Redis caching to stay fast and safely within platform API limits.</p>
+          </div>
         </div>
 
       </div>
@@ -284,7 +280,7 @@
 
     <!-- Legal Portal -->
     <section class="section">
-      <h2 class="section-title">⚖️ Legal</h2>
+      <h2 class="section-title"><i data-lucide="scale"></i> Legal</h2>
       <div class="portal-grid">
         <a href="privacy.html" class="portal-btn" id="privacy-btn">
           <div class="btn-icon">
@@ -323,7 +319,22 @@
     </p>
   </footer>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
+    // Render all <i data-lucide="..."> placeholders as inline SVGs.
+    if (window.lucide) lucide.createIcons();
+
+    // Expand/collapse a feature card's detail.
+    function toggleFeature(btn) {
+      const card = btn.closest('.feature-card');
+      const detail = card.querySelector('.feature-detail');
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      detail.hidden = expanded;
+      card.classList.toggle('expanded', !expanded);
+      btn.querySelector('.lm-text').textContent = expanded ? 'Learn more' : 'Show less';
+    }
+
     function setDashboardView(view, btn) {
       if (btn.classList.contains('active')) return;
       
