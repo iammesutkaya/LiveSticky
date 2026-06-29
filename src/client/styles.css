@@ -7,10 +7,10 @@
 :root {
   /* Neutral surfaces — no color tint, so any streamer's brand assets sit on a
      truly neutral ground. */
-  --bg-primary: #0b1416;   /* perfectly match Reddit background */
-  --bg-card: #131f23;      /* stream cards, reddit row */
-  --bg-surface: #1a282d;   /* elevated bits: thumbnails, watch bar */
-  --bg-card-hover: #172328;
+  --bg-primary: #0e1113;   /* perfectly match Reddit background */
+  --bg-card: #15191c;      /* stream cards, reddit row */
+  --bg-surface: #1c2125;   /* elevated bits: thumbnails, watch bar */
+  --bg-card-hover: #191e21;
 
   --text-primary: #ffffff;
   --text-secondary: #a0a0a5;
