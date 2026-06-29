@@ -33,25 +33,31 @@ export interface PlatformContext {
 // YouTube response shapes (partial — only the fields we use)
 // ---------------------------------------------------------------------------
 
-interface YouTubeSearchItem {
-  id: { channelId?: string; videoId?: string };
-  snippet: {
+interface YouTubeChannelContentItem {
+  id?: string;
+  contentDetails?: { relatedPlaylists?: { uploads?: string } };
+}
+
+interface YouTubePlaylistItem {
+  contentDetails?: { videoId?: string };
+}
+
+interface YouTubeVideoItem {
+  id?: string;
+  snippet?: {
     title?: string;
     channelTitle?: string;
+    liveBroadcastContent?: string;
     thumbnails?: {
       high?: { url?: string };
       medium?: { url?: string };
     };
   };
-}
-
-interface YouTubeLiveDetails {
-  concurrentViewers?: string;
-  actualStartTime?: string;
-}
-
-interface YouTubeVideoItem {
-  liveStreamingDetails?: YouTubeLiveDetails;
+  liveStreamingDetails?: {
+    concurrentViewers?: string;
+    actualStartTime?: string;
+    actualEndTime?: string;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -92,8 +98,30 @@ async function resolveYouTubeChannelId(
   const cachedId = await redis.get(cacheKey);
   if (cachedId) return cachedId;
 
+  // Cheap path first: channels.list?forHandle costs 1 quota unit, vs 100 for
+  // search.list. Most handles resolve here, so search becomes a rare fallback.
   try {
-    console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via Search API...`);
+    console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via forHandle (1 unit)...`);
+    const url = `https://youtube.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(handle)}`;
+    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (res.ok) {
+      const data = await res.json() as { items?: Array<{ id?: string }> };
+      const channelId = data.items?.[0]?.id;
+      if (channelId) {
+        await redis.set(cacheKey, channelId);
+        await redis.expire(cacheKey, 2592000); // 30 days
+        console.log(`Resolved YouTube handle ${handle} to channel ID via forHandle: ${channelId}`);
+        return channelId;
+      }
+    }
+  } catch (err) {
+    console.error('YouTube forHandle resolution failed, falling back to search:', err);
+  }
+
+  // Fallback: search.list (100 quota units) — only when forHandle didn't match
+  // (e.g. the setting holds a display name rather than an exact @handle).
+  try {
+    console.log(`forHandle did not resolve ${handle}. Falling back to Search API (100 units)...`);
     const searchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel`;
     const res = await fetch(searchUrl, {
       headers: { 'x-goog-api-key': apiKey },
@@ -103,20 +131,55 @@ async function resolveYouTubeChannelId(
       return null;
     }
 
-    const data = await res.json() as { items?: YouTubeSearchItem[] };
-    if (data.items && data.items.length > 0) {
-      const channelId = data.items[0]?.id.channelId;
-      if (channelId) {
-        await redis.set(cacheKey, channelId);
-        await redis.expire(cacheKey, 2592000); // 30 days
-        console.log(`Resolved YouTube handle ${handle} to channel ID: ${channelId}`);
-        return channelId;
-      }
+    const data = await res.json() as { items?: Array<{ id?: { channelId?: string } }> };
+    const channelId = data.items?.[0]?.id?.channelId;
+    if (channelId) {
+      await redis.set(cacheKey, channelId);
+      await redis.expire(cacheKey, 2592000); // 30 days
+      console.log(`Resolved YouTube handle ${handle} to channel ID via search: ${channelId}`);
+      return channelId;
     }
   } catch (err) {
     console.error(`Error resolving YouTube channel handle:`, err);
   }
 
+  return null;
+}
+
+/**
+ * Resolves a channel to its "uploads" playlist ID (where live broadcasts also
+ * appear). Cached 30 days in Redis since it never changes for a channel. Costs
+ * 1 quota unit on a cache miss.
+ */
+async function resolveYouTubeUploadsPlaylist(
+  channel: string,
+  apiKey: string,
+  redis: RedisClient
+): Promise<string | null> {
+  const channelId = await resolveYouTubeChannelId(channel, apiKey, redis);
+  if (!channelId) return null;
+
+  const cacheKey = `yt_uploads_${channelId}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const url = `https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}`;
+    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (!res.ok) {
+      console.error(`YouTube uploads-playlist request failed: ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json() as { items?: YouTubeChannelContentItem[] };
+    const uploads = data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (uploads) {
+      await redis.set(cacheKey, uploads);
+      await redis.expire(cacheKey, 2592000); // 30 days
+      return uploads;
+    }
+  } catch (err) {
+    console.error('Error resolving YouTube uploads playlist:', err);
+  }
   return null;
 }
 
@@ -129,47 +192,51 @@ async function fetchYouTubeStatus(
   apiKey: string,
   redis: RedisClient
 ): Promise<UnifiedStreamInfo | null> {
-  const channelId = await resolveYouTubeChannelId(channel, apiKey, redis);
-  if (!channelId) return null;
+  // A live broadcast appears in the channel's public uploads playlist, so we can
+  // detect it with two 1-unit calls (playlistItems + videos) instead of the
+  // 100-unit search.list call. ~2 quota units per poll vs ~100.
+  const uploadsPlaylist = await resolveYouTubeUploadsPlaylist(channel, apiKey, redis);
+  if (!uploadsPlaylist) return null;
 
   try {
-    const liveSearchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video`;
-    const searchRes = await fetch(liveSearchUrl, {
-      headers: { 'x-goog-api-key': apiKey },
-    });
-    if (!searchRes.ok) {
-      console.error(`YouTube Live search request failed: ${searchRes.statusText}`);
+    // 1 unit: the most recent uploads — a live stream sits at the top.
+    const plUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=5&playlistId=${uploadsPlaylist}`;
+    const plRes = await fetch(plUrl, { headers: { 'x-goog-api-key': apiKey } });
+    if (!plRes.ok) {
+      console.error(`YouTube playlistItems request failed: ${plRes.statusText}`);
       return null;
     }
+    const plData = await plRes.json() as { items?: YouTubePlaylistItem[] };
+    const videoIds = (plData.items ?? [])
+      .map((i) => i.contentDetails?.videoId)
+      .filter((id): id is string => !!id);
+    if (videoIds.length === 0) return null;
 
-    const searchData = await searchRes.json() as { items?: YouTubeSearchItem[] };
-    if (!searchData.items || searchData.items.length === 0) return null;
-
-    const liveItem = searchData.items[0];
-    if (!liveItem) return null;
-    const videoId = liveItem.id.videoId;
-    const title = liveItem.snippet.title || 'YouTube Livestream';
-    const thumbnail =
-      liveItem.snippet.thumbnails?.high?.url ??
-      liveItem.snippet.thumbnails?.medium?.url ??
-      '';
-    const userName = liveItem.snippet.channelTitle || channel;
-
-    const videoDetailsUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=liveStreamingDetails,snippet&id=${videoId}`;
-    const videoRes = await fetch(videoDetailsUrl, {
-      headers: { 'x-goog-api-key': apiKey },
-    });
-    let viewers = 0;
-    let startedAt = new Date().toISOString();
-
-    if (videoRes.ok) {
-      const videoData = await videoRes.json() as { items?: YouTubeVideoItem[] };
-      const details = videoData.items?.[0]?.liveStreamingDetails;
-      if (details) {
-        viewers = details.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
-        startedAt = details.actualStartTime || startedAt;
-      }
+    // 1 unit: resolve live status + viewer details for those candidate videos.
+    const vUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(',')}`;
+    const vRes = await fetch(vUrl, { headers: { 'x-goog-api-key': apiKey } });
+    if (!vRes.ok) {
+      console.error(`YouTube videos request failed: ${vRes.statusText}`);
+      return null;
     }
+    const vData = await vRes.json() as { items?: YouTubeVideoItem[] };
+
+    // liveBroadcastContent flips to 'none' once a stream ends (the VOD remains
+    // in uploads), so this cleanly excludes finished streams.
+    const liveItem = (vData.items ?? []).find(
+      (i) => i.snippet?.liveBroadcastContent === 'live' && !i.liveStreamingDetails?.actualEndTime
+    );
+    if (!liveItem) return null;
+
+    const details = liveItem.liveStreamingDetails;
+    const title = liveItem.snippet?.title || 'YouTube Livestream';
+    const thumbnail =
+      liveItem.snippet?.thumbnails?.high?.url ??
+      liveItem.snippet?.thumbnails?.medium?.url ??
+      '';
+    const userName = liveItem.snippet?.channelTitle || channel;
+    const viewers = details?.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
+    const startedAt = details?.actualStartTime || new Date().toISOString();
 
     return {
       isLive: true,
