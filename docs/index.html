@@ -24,7 +24,10 @@
 
   <!-- Hero & Showcase Split Layout -->
   <div class="landing-container">
-    <nav class="top-nav">
+    <button class="mobile-menu-btn" onclick="document.getElementById('topNav').classList.toggle('open')" aria-label="Toggle menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="top-nav" id="topNav">
       <a href="#features" class="nav-link">Features</a>
       <a href="setup.html" class="nav-link">Setup Guide</a>
       <a href="faq.html" class="nav-link">FAQ</a>
@@ -48,7 +51,7 @@
         by u/iammesutkaya
       </a>
       <p class="subtitle">
-        The moment you go live on <span class="inline-brand inline-twitch">Twitch</span>, <span class="inline-brand inline-youtube">YouTube</span>, or <span class="inline-brand inline-kick">Kick</span>, LiveSticky pins an auto-updating post to your subreddit and powers an interactive dashboard that shows every stream you're on — so your community jumps straight to whichever platform they prefer.
+        Automatically pin a live, interactive multistream dashboard to your subreddit the second you go live. No more dead links, no more manual posts.
       </p>
       <div class="hero-badges">
         <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer"
@@ -72,8 +75,14 @@
           Open Source
         </a>
       </div>
-      <div class="action-group">
-        <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer"
+
+      <div class="action-group-container">
+        <div class="pricing-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          100% Free & Open Source
+        </div>
+        <div class="action-group">
+          <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer"
           class="install-btn">
           Install on Reddit
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -86,6 +95,7 @@
             <path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/>
           </svg>
         </a>
+      </div>
       </div>
       
       <div class="social-proof">
@@ -109,12 +119,61 @@
           </div>
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
-        <div id="showcase-content" class="showcase-content">
-          <img id="dashboard-img" src="dashboard-stream.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="showcase-placeholder" style="display: none;">
-            <div class="placeholder-icon">📸</div>
-            <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-stream.png</strong></p>
+        <div id="showcase-content" class="showcase-content mock-dashboard">
+          
+          <!-- Shared Mock Post Header -->
+          <div class="mock-post-header">
+            <div class="mock-avatar">r/</div>
+            <div class="mock-meta">
+              <span class="mock-sub">r/yourcommunity</span> • <span class="mock-pinned">📌 Pinned by moderators</span>
+            </div>
           </div>
+          <h3 class="mock-title">🔴 LIVE: Weekend stream! Come hang out</h3>
+
+          <!-- View: Stream -->
+          <div id="view-stream" class="mock-view active-view">
+            <div class="mock-player">
+              <div class="mock-stream-badge live-pulse">LIVE</div>
+              <div class="mock-viewers"><i data-lucide="users"></i> <span class="ticker">1,245</span></div>
+              <div class="mock-play-btn"><i data-lucide="play"></i></div>
+            </div>
+            <div class="mock-footer">
+              <div class="mock-game">Playing <strong>Just Chatting</strong></div>
+              <button class="mock-watch-btn">Watch on Twitch <i data-lucide="external-link"></i></button>
+            </div>
+          </div>
+
+          <!-- View: Multistream -->
+          <div id="view-multistream" class="mock-view" style="display: none;">
+            <div class="mock-multi-grid">
+               <div class="mock-card twitch">
+                 <div class="mock-card-thumb">
+                    <div class="mock-stream-badge live-pulse">LIVE</div>
+                    <div class="mock-viewers"><i data-lucide="users"></i> <span class="ticker">890</span></div>
+                 </div>
+                 <button class="mock-watch-btn">Watch on Twitch <i data-lucide="external-link"></i></button>
+               </div>
+               <div class="mock-card youtube">
+                 <div class="mock-card-thumb">
+                    <div class="mock-stream-badge live-pulse">LIVE</div>
+                    <div class="mock-viewers"><i data-lucide="users"></i> <span class="ticker">350</span></div>
+                 </div>
+                 <button class="mock-watch-btn">Watch on YouTube <i data-lucide="external-link"></i></button>
+               </div>
+            </div>
+          </div>
+
+          <!-- View: Offline -->
+          <div id="view-offline" class="mock-view" style="display: none;">
+             <div class="mock-player offline">
+               <div class="mock-stream-badge gray">OFFLINE</div>
+               <div class="mock-offline-text">Stream ended. Thanks for watching!</div>
+             </div>
+             <div class="mock-footer">
+                <button class="mock-watch-btn secondary">Watch VODs <i data-lucide="external-link"></i></button>
+             </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -314,25 +373,6 @@
       btn.querySelector('.lm-text').textContent = expanded ? 'Learn more' : 'Show less';
     }
 
-    function setDashboardView(view, btn) {
-      if (btn.classList.contains('active')) return;
-      
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      const content = document.getElementById('showcase-content');
-      const img = document.getElementById('dashboard-img');
-      const placeholder = document.getElementById('placeholder-filename');
-      const filename = 'dashboard-' + view + '.png';
-      
-      // Fade out
-      content.classList.add('fade-out');
-      
-      // Wait for fade out to complete, then swap content and fade back in
-      setTimeout(() => {
-        img.src = filename;
-        placeholder.textContent = filename;
-        
         img.style.display = 'block';
         img.nextElementSibling.style.display = 'none';
         
