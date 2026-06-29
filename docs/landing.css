@@ -321,6 +321,26 @@
   text-align: center;
 }
 
+/* Intro paragraph under a section title (e.g. the dashboard section) */
+.section-intro {
+  max-width: 680px;
+  margin: -8px auto 32px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.section-intro em {
+  color: var(--gold-text);
+  font-style: normal;
+}
+
+.section-intro strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 /* ── Live Post Preview ──────────────────────────────────── */
 .preview-card {
   padding: 32px 36px;
