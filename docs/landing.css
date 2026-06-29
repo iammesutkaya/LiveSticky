@@ -25,22 +25,17 @@
 
 .top-nav .nav-link {
   display: inline-block;
-  padding: 8px 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-line);
-  border-radius: var(--radius-full);
+  padding: 8px 12px;
   color: var(--text-primary);
   text-decoration: none;
   font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .top-nav .nav-link:hover {
-  background: var(--bg-card-hover);
   color: var(--accent-gold);
-  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ── Hero ────────────────────────────────────────────────── */
