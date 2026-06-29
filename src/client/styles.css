@@ -836,31 +836,72 @@ body {
    Responsive adjustments
    ========================================================================== */
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .dashboard {
-    padding: 12px;
+    padding: 10px;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
+  /* Shorter banner to reclaim vertical space */
+  .banner-strip {
+    height: 68px;
+    margin: -10px -10px 0;
   }
 
-  .stat-card.uptime {
-    grid-column: 1 / -1;
+  /* Tighter content column */
+  .content {
+    gap: 10px;
+  }
+
+  .content main {
+    gap: 10px;
+  }
+
+  /* Smaller avatar */
+  .avatar {
+    width: 72px;
+    height: 72px;
+    border-width: 3px;
+  }
+
+  .avatar-initial {
+    font-size: 28px;
+  }
+
+  .profile {
+    margin-top: -18px;
+    gap: 10px;
+  }
+
+  .profile-info {
+    padding-bottom: 8px;
   }
 
   .display-name {
     font-size: 16px;
   }
 
-  /* Shrink avatar on narrow screens to give the display name more room */
-  .avatar {
-    width: 80px;
-    height: 80px;
+  /* 3 columns always — avoids the 2+1 wrap that pushes uptime to its own row */
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
 
-  .avatar-initial {
-    font-size: 32px;
+  .stat-card {
+    padding: 10px 6px;
+    gap: 4px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .live-content {
+    gap: 10px;
   }
 
   .platform-btn {
