@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System | LiveSticky</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Design System specific additions */
+    .color-swatch {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      margin-right: 12px;
+      vertical-align: middle;
+      border: 1px solid var(--border-line);
+    }
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    .token-table th, .token-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-line);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .token-table th {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .token-table code {
+      background: var(--bg-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--gold-text);
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .component-list li {
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+
+    <header class="header-left">
+      <h1>LiveSticky Design System</h1>
+      <p class="subtitle">Neutral Amber / v1.0</p>
+    </header>
+
+    <main class="card">
+      <div class="content">
+        <p>
+          One visual language across the Reddit dashboard and the website. The chrome stays neutral and understated so the <strong>streamer's own assets</strong> — avatar, thumbnails, and platform brand colors — are what the eye lands on.
+        </p>
+
+        <hr>
+
+        <h2>Principles</h2>
+        <ol>
+          <li><strong>Neutral ground.</strong> Surfaces are pure dark/light grays with no color tint, so any streamer's brand sits on truly neutral ground.</li>
+          <li><strong>One accent.</strong> Pale gold <code>#f5d474</code> is the only accent. It signals "active" and highlights key numbers — nothing else competes with it.</li>
+          <li><strong>Brand colors stay contained.</strong> Twitch / YouTube / Kick colors appear only inside small badges and logos, never in layout chrome.</li>
+          <li><strong>Flat, not glossy.</strong> No shadows, gradients, or glows. Hierarchy comes from stepping surface lightness, not elevation effects.</li>
+          <li><strong>Gold means active.</strong> Live → gold accents; offline → everything goes muted.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Tokens</h2>
+        
+        <h3>Color</h3>
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Value</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--bg-primary</code></td>
+              <td><span class="color-swatch" style="background: #131313;"></span>#131313</td>
+              <td>Page; the deep ground inside viewer chips</td>
+            </tr>
+            <tr>
+              <td><code>--bg-card</code></td>
+              <td><span class="color-swatch" style="background: #1e1e1e;"></span>#1e1e1e</td>
+              <td>Stream cards, Reddit row, offline card</td>
+            </tr>
+            <tr>
+              <td><code>--bg-surface</code></td>
+              <td><span class="color-swatch" style="background: #282828;"></span>#282828</td>
+              <td>Thumbnails, watch bar, muted avatar, chips</td>
+            </tr>
+            <tr>
+              <td><code>--bg-card-hover</code></td>
+              <td><span class="color-swatch" style="background: #242424;"></span>#242424</td>
+              <td>Hover state of cards/buttons</td>
+            </tr>
+            <tr>
+              <td><code>--text-primary</code></td>
+              <td><span class="color-swatch" style="background: #f5f5f5;"></span>#f5f5f5</td>
+              <td>Titles, names</td>
+            </tr>
+            <tr>
+              <td><code>--text-secondary</code></td>
+              <td><span class="color-swatch" style="background: #aaaaaa;"></span>#aaaaaa</td>
+              <td>Supporting copy</td>
+            </tr>
+            <tr>
+              <td><code>--text-muted</code></td>
+              <td><span class="color-swatch" style="background: #888888;"></span>#888888</td>
+              <td>Meta, labels, footer</td>
+            </tr>
+            <tr>
+              <td><code>--text-faint</code></td>
+              <td><span class="color-swatch" style="background: #555555;"></span>#555555</td>
+              <td>Separators, the "viewers" label</td>
+            </tr>
+            <tr>
+              <td><code>--accent-gold</code></td>
+              <td><span class="color-swatch" style="background: #f5d474;"></span>#f5d474</td>
+              <td>Fill (avatar, Reddit badge, LIVE pill) — dark content on top</td>
+            </tr>
+            <tr>
+              <td><code>--gold-text</code></td>
+              <td><span class="color-swatch" style="background: #f5d474;"></span>#f5d474</td>
+              <td>Gold as <strong>text</strong> on a surface (viewer counts, last-live)</td>
+            </tr>
+            <tr>
+              <td><code>--twitch-color</code></td>
+              <td><span class="color-swatch" style="background: #9147ff;"></span>#9147ff</td>
+              <td>Badge/logo only</td>
+            </tr>
+            <tr>
+              <td><code>--youtube-color</code></td>
+              <td><span class="color-swatch" style="background: #ff0000;"></span>#ff0000</td>
+              <td>Badge/logo only</td>
+            </tr>
+            <tr>
+              <td><code>--kick-color</code></td>
+              <td><span class="color-swatch" style="background: #53fc18;"></span>#53fc18</td>
+              <td>Badge/logo only — uses dark content on top</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <code>--accent-gold</code> is a <strong>fill</strong> (dark text/icon sits on it); <code>--gold-text</code> is the readable-on-surface variant. Never put <code>--gold-text</code> directly on <code>--accent-gold</code>.
+        </p>
+
+        <h3>Type scale</h3>
+        <p>Font: Inter, system-ui fallback. Two weights carry everything: 600 (bold) and 700 (display). Nothing below 11px.</p>
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Size / weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Display name</td><td>17 / 700</td></tr>
+            <tr><td>Section · cinematic card title</td><td>13 / 600</td></tr>
+            <tr><td>Card title · body</td><td>12 / 600</td></tr>
+            <tr><td>Meta · labels · footer · pill text</td><td>11 / 500–800</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Radius</h3>
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Value</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>--radius-sm</code></td><td>5px</td><td>Chips, status pill</td></tr>
+            <tr><td>thumbnail</td><td>7px</td><td>Stream thumbnails</td></tr>
+            <tr><td><code>--radius-md</code></td><td>10px</td><td>Cards, buttons</td></tr>
+            <tr><td><code>--radius-lg</code></td><td>12px</td><td>(reserved / outer containers)</td></tr>
+            <tr><td>corner badge</td><td><code>0 0 8px 0</code></td><td>Platform badge, flush to the thumbnail's top-left corner</td></tr>
+            <tr><td>full</td><td>50%</td><td>Avatar, Reddit badge</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Spacing</h3>
+        <p>Rhythm: <strong>8 · 10 · 12 · 14 · 16</strong>. Card padding 12px; header/offline padding 14–16px; gaps between cards 10px.</p>
+
+        <hr>
+
+        <h2>Components</h2>
+        <ul class="component-list">
+          <li><strong>Avatar</strong> — 44px circle. Gold fill + dark initial when live; <code>--bg-surface</code> + muted initial when offline. A real profile image covers the fill in both.</li>
+          <li><strong>Status pill</strong> — <code>live</code>: gold text, red pulsing dot. <code>offline</code>: <code>--bg-surface</code> bg, muted text + dot.</li>
+          <li><strong>Stream card</strong> — <code>--bg-card</code>, radius 10. Multistream = compact row (112×63 thumb + info). Single = <code>cinematic</code> (full-width 16:9 thumb on top).</li>
+          <li><strong>Platform badge</strong> — brand-color corner badge, <code>border-radius: 0 0 8px 0</code>, flush to the thumbnail's top-left, logo only.</li>
+          <li><strong>Viewer chip</strong> — <code>--bg-primary</code> ground, gold count + <code>--text-faint</code> "viewers" label.</li>
+          <li><strong>Watch / follow button</strong> — <code>--bg-surface</code> (live, as a card's bottom bar) or <code>--bg-card</code> (offline, standalone). Brand-colored logo + label. No border.</li>
+        </ul>
+
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Mesut Kaya. All rights reserved. Official Website: <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a> | Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a>.</p>
+  </footer>
+
+</body>
+</html>
