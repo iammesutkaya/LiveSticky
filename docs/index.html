@@ -68,6 +68,13 @@
 
     <!-- Dashboard Showcase -->
     <section class="showcase">
+      <!-- Showcase Tabs -->
+      <div class="showcase-tabs">
+        <button class="tab-btn active" onclick="setDashboardView('offline', this)">Offline</button>
+        <button class="tab-btn" onclick="setDashboardView('stream', this)">Stream</button>
+        <button class="tab-btn" onclick="setDashboardView('multistream', this)">Multistream</button>
+      </div>
+
       <div class="showcase-container">
         <div class="showcase-header">
           <div class="dots">
@@ -75,10 +82,10 @@
           </div>
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
-        <img src="dashboard-screenshot.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <img id="dashboard-img" src="dashboard-offline.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="showcase-placeholder" style="display: none;">
           <div class="placeholder-icon">📸</div>
-          <p>Drop your screenshot here as <strong>dashboard-screenshot.png</strong></p>
+          <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-offline.png</strong></p>
         </div>
       </div>
     </section>
@@ -280,6 +287,22 @@
     </p>
   </footer>
 
+  <script>
+    function setDashboardView(view, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const img = document.getElementById('dashboard-img');
+      const placeholder = document.getElementById('placeholder-filename');
+      const filename = 'dashboard-' + view + '.png';
+      
+      img.src = filename;
+      placeholder.textContent = filename;
+      
+      img.style.display = 'block';
+      img.nextElementSibling.style.display = 'none';
+    }
+  </script>
 </body>
 
 </html>
