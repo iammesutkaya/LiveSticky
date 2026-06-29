@@ -30,10 +30,10 @@ thumbnails, and platform brand colors — are what the eye lands on.
 
 | Token | Dark | Light | Use |
 |-------|------|-------|-----|
-| `--bg-primary` | `#000000` | `#ffffff` | Page; the deep ground inside viewer chips |
-| `--bg-card` | `#0f0f0f` | `#f6f6f7` | Stream cards, Reddit row, offline card |
-| `--bg-surface` | `#1a1a1a` | `#eaeaec` | Thumbnails, watch bar, muted avatar, chips |
-| `--bg-card-hover` | `#161616` | `#efeff0` | Hover state of cards/buttons |
+| `--bg-primary` | `#0b1416` | `#ffffff` | Page; the deep ground inside viewer chips |
+| `--bg-card` | `#131f23` | `#f6f6f7` | Stream cards, Reddit row, offline card |
+| `--bg-surface` | `#1a282d` | `#eaeaec` | Thumbnails, watch bar, muted avatar, chips |
+| `--bg-card-hover` | `#172328` | `#efeff0` | Hover state of cards/buttons |
 | `--text-primary` | `#ffffff` | `#1a1a1b` | Titles, names |
 | `--text-secondary` | `#a0a0a5` | `#545456` | Supporting copy |
 | `--text-muted` | `#707075` | `#76767a` | Meta, labels, footer |
