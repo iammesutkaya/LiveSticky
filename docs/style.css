@@ -2,35 +2,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Neutral Amber Design System Tokens */
-  --bg-primary: #131313;
-  --bg-card: #1e1e1e;
-  --bg-surface: #282828;
-  --bg-card-hover: #242424;
-  --border-line: #333333;
+  /* Neutral Amber Design System Tokens (Premium) */
+  --bg-primary: #111111; /* Slightly darker to make cards pop */
+  --bg-card: #1c1c1e; /* Smooth dark gray for cards */
+  --bg-surface: #262628;
+  --bg-card-hover: #242426;
+  --border-line: rgba(255, 255, 255, 0.06); /* Subtle inner borders for depth */
   
-  --text-primary: #f5f5f5;
-  --text-secondary: #aaaaaa;
-  --text-muted: #888888;
-  --text-faint: #555555;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a5;
+  --text-muted: #707075;
+  --text-faint: #444448;
   
   --accent-gold: #f5d474;
   --gold-text: #f5d474;
   
-  /* Brand Accents (Only for badges) */
+  /* Brand Accents */
   --twitch-color: #9147ff;
   --youtube-color: #ff0000;
   --kick-color: #53fc18;
   --reddit-color: #ff4500;
   
-  /* Radius */
-  --radius-sm: 5px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-full: 50%;
+  /* Radius - Extended for Premium look */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
   
   /* Transitions */
-  --transition-smooth: all 0.2s ease;
+  --transition-smooth: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Reset and Core Styles */
@@ -43,6 +44,7 @@
 html {
   height: 100%;
   background-color: var(--bg-primary);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -55,11 +57,13 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Container */
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto 40px auto;
   padding: 40px 24px;
@@ -84,10 +88,11 @@ header {
 }
 
 .logo-glow {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--radius-md);
   background: var(--bg-card);
+  border: 1px solid var(--border-line);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,8 +101,8 @@ header {
 
 .logo-glow svg {
   fill: var(--accent-gold);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 }
 
 .logo-glow img.logo-image {
@@ -109,39 +114,43 @@ header {
 
 h1 {
   font-family: 'Inter', sans-serif;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 400;
 }
 
-/* Flat Card */
+/* Premium Card */
 .card {
   background-color: var(--bg-card);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-line);
   padding: 48px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Legal Content Typographical Hierarchy */
 .content h2 {
   font-family: 'Inter', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 600;
   color: var(--text-primary);
   margin-top: 32px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
+  letter-spacing: -0.02em;
 }
 
 .content h2:first-of-type {
@@ -150,7 +159,7 @@ h1 {
 
 .content p {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 1.05rem;
   margin-bottom: 20px;
   line-height: 1.7;
 }
@@ -165,7 +174,7 @@ h1 {
   position: relative;
   padding-left: 24px;
   margin-bottom: 12px;
-  font-size: 0.98rem;
+  font-size: 1rem;
 }
 
 .content li::before {
@@ -173,14 +182,15 @@ h1 {
   position: absolute;
   left: 0;
   color: var(--text-faint);
-  font-size: 1.2rem;
-  top: 0px;
+  font-size: 1.4rem;
+  top: -4px;
+  font-weight: 700;
 }
 
 .content hr {
   border: 0;
   height: 1px;
-  background: var(--bg-surface);
+  background: var(--border-line);
   margin: 32px 0;
 }
 
@@ -205,26 +215,29 @@ h1 {
 
 .portal-btn {
   background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: 32px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-line);
+  padding: 32px;
   text-align: left;
   text-decoration: none;
   color: var(--text-primary);
   transition: var(--transition-smooth);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   position: relative;
   overflow: hidden;
 }
 
 .portal-btn:hover {
   background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
 }
 
 .btn-icon {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
   display: flex;
@@ -235,19 +248,20 @@ h1 {
 
 .portal-btn h3 {
   font-family: 'Inter', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .portal-btn p {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1.5;
 }
 
 /* Nav back button for policy pages */
 .back-nav {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .back-btn {
@@ -259,10 +273,15 @@ h1 {
   font-size: 0.95rem;
   font-weight: 500;
   transition: var(--transition-smooth);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
 }
 
 .back-btn:hover {
   color: var(--text-primary);
+  background: var(--bg-card-hover);
 }
 
 .back-btn svg {
@@ -278,18 +297,31 @@ h1 {
 /* Footer styling */
 footer {
   text-align: center;
-  padding: 32px 24px;
+  padding: 40px 24px;
   color: var(--text-muted);
   font-size: 0.85rem;
-  border-top: 1px solid var(--bg-surface);
+  border-top: 1px solid var(--border-line);
   margin-top: auto;
   background: var(--bg-primary);
+}
+
+footer p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+footer span.sep {
+  color: var(--border-line);
 }
 
 footer a {
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
+  transition: var(--transition-smooth);
 }
 
 footer a:hover {
@@ -304,10 +336,11 @@ footer a:hover {
   
   .card {
     padding: 32px 20px;
+    border-radius: var(--radius-lg);
   }
   
   h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
   
   .portal-grid {
