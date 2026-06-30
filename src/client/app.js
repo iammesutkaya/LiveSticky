@@ -551,7 +551,13 @@ async function init() {
     if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 60000) setUpdateMode('');
   }, 15000);
 
-  const [, statusOk] = await Promise.all([fetchConfig(), fetchStatus()]);
+  // Config must load BEFORE the first status render: updateDashboard() reads
+  // config to decide platform-link visibility and the offline subtext, so a
+  // parallel fetch can render the offline state with empty config (buttons
+  // hidden, generic "Check back soon!") until the next update. Loading config
+  // first makes the first paint correct without needing a manual refresh.
+  await fetchConfig();
+  const statusOk = await fetchStatus();
   if (!statusOk) startPolling();
 
   initRealtime();
