@@ -411,7 +411,7 @@
 .showcase-content {
   opacity: 1;
   transition: opacity 0.2s ease;
-  min-height: 400px;
+  height: 545px;
   display: flex;
   flex-direction: column;
 }
@@ -1135,6 +1135,10 @@
   background: #0e1113 !important;
   padding: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.04);
+  height: 100%;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
   
   /* Inherit dashboard colors scoped strictly to the showcase mockup */
   --bg-primary: #0e1113;
@@ -1641,4 +1645,17 @@
 
 .hidden {
   display: none !important;
+}
+
+.mock-dashboard .content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mock-dashboard main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
