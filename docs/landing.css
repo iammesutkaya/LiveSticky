@@ -1646,6 +1646,15 @@
 
   animation: fadeSlideIn 0.4s ease;
 }
+.mock-dashboard:not(.is-live) .offline-content {
+
+  flex: 1;
+  min-height: 0;
+}
+.mock-dashboard:not(.is-live) .platform-links {
+
+  margin-top: auto;
+}
 .mock-dashboard .offline-message {
 
   display: flex;

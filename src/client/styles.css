@@ -566,6 +566,19 @@ body {
   animation: fadeSlideIn 0.4s ease;
 }
 
+/* Offline layout: stretch the offline content so it fills the fixed-height
+   card, and push the follow buttons to the bottom — instead of pooling the
+   leftover height into one dead gap above the footer. Scoped to the offline
+   state (the live state's .live-content already handles its own fill). */
+.dashboard:not(.is-live) .offline-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.dashboard:not(.is-live) .platform-links {
+  margin-top: auto;
+}
+
 .offline-message {
   display: flex;
   flex-direction: column;
