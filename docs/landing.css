@@ -418,12 +418,36 @@
 }
 
 .placeholder-icon {
-  font-size: 3rem;
-  opacity: 0.5;
+  color: var(--text-muted);
 }
 
-.showcase-placeholder strong {
-  color: var(--gold-text);
+.placeholder-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.showcase-placeholder p {
+  max-width: 280px;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.placeholder-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 20px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gold);
+  color: #111111;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.placeholder-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(245, 212, 116, 0.2);
 }
 
 /* ── Section titles ─────────────────────────────────────── */

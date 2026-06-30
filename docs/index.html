@@ -126,8 +126,9 @@
         <div id="showcase-content" class="showcase-content">
           <img id="dashboard-img" src="dashboard-stream.png" alt="LiveSticky Dashboard" class="showcase-img" onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
           <div class="showcase-placeholder" hidden>
-            <div class="placeholder-icon">📸</div>
-            <p>Drop your screenshot here as <strong id="placeholder-filename">dashboard-stream.png</strong></p>
+            <div class="placeholder-icon"><i data-lucide="monitor-play"></i></div>
+            <p>Install LiveSticky on Reddit to see your live dashboard here.</p>
+            <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer" class="placeholder-link">Install on Reddit</a>
           </div>
         </div>
       </div>
@@ -335,20 +336,20 @@
       
       const content = document.getElementById('showcase-content');
       const img = document.getElementById('dashboard-img');
-      const placeholder = document.getElementById('placeholder-filename');
       const filename = 'dashboard-' + view + '.png';
-      
+
       // Fade out
       content.classList.add('fade-out');
-      
+
       // Wait for fade out to complete, then swap content and fade back in
       setTimeout(() => {
         img.src = filename;
-        placeholder.textContent = filename;
-        
+
+        // Show the image; the onerror handler falls back to the placeholder
+        // if that screenshot isn't available.
         img.hidden = false;
         img.nextElementSibling.hidden = true;
-        
+
         content.classList.remove('fade-out');
       }, 200);
     }
