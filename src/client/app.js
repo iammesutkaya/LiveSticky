@@ -62,10 +62,8 @@ const twitchLink = $('twitch-link');
 const youtubeLink = $('youtube-link');
 const kickLink = $('kick-link');
 
-// Modal
-const aboutModal = $('about-modal');
-const aboutTrigger = $('about-trigger');
-const closeModalBtn = $('close-modal-btn');
+// Modal elements (queried later inside init to ensure DOM readiness)
+let aboutModal, aboutTrigger, closeModalBtn, linkWebsite, linkReddit;
 
 // ---------------------------------------------------------------------------
 // State
@@ -530,23 +528,7 @@ async function handleRefresh() {
   }
 }
 
-// Modal logic
-if (aboutTrigger && aboutModal && closeModalBtn) {
-  aboutTrigger.addEventListener('click', () => {
-    aboutModal.classList.remove('hidden');
-    aboutModal.setAttribute('aria-hidden', 'false');
-  });
-
-  const closeModal = () => {
-    aboutModal.classList.add('hidden');
-    aboutModal.setAttribute('aria-hidden', 'true');
-  };
-
-  closeModalBtn.addEventListener('click', closeModal);
-  aboutModal.addEventListener('click', (e) => {
-    if (e.target === aboutModal) closeModal();
-  });
-}
+// (Modal logic moved to init)
 
 // ---------------------------------------------------------------------------
 // Render logic
@@ -573,6 +555,44 @@ async function init() {
   if (!statusOk) startPolling();
 
   initRealtime();
+
+  // Setup modal logic here to ensure DOM is 100% ready
+  aboutModal = $('about-modal');
+  aboutTrigger = $('about-trigger');
+  closeModalBtn = $('close-modal-btn');
+  linkWebsite = $('link-website');
+  linkReddit = $('link-reddit');
+
+  if (aboutTrigger && aboutModal && closeModalBtn) {
+    aboutTrigger.addEventListener('click', () => {
+      aboutModal.classList.remove('hidden');
+      aboutModal.setAttribute('aria-hidden', 'false');
+    });
+
+    const closeModal = () => {
+      aboutModal.classList.add('hidden');
+      aboutModal.setAttribute('aria-hidden', 'true');
+    };
+
+    closeModalBtn.addEventListener('click', closeModal);
+    aboutModal.addEventListener('click', (e) => {
+      if (e.target === aboutModal) closeModal();
+    });
+  }
+
+  // Handle external links for Devvit Webview
+  if (linkWebsite) {
+    linkWebsite.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo('https://livesticky.com');
+    });
+  }
+  if (linkReddit) {
+    linkReddit.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo('https://www.reddit.com/user/iammesutkaya');
+    });
+  }
 }
 
 init();
