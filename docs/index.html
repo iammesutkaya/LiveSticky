@@ -473,51 +473,42 @@
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
 
-      const content = document.getElementById('showcase-content');
+      const mockStatus = document.getElementById('mock-status');
+      const mockOffline = document.getElementById('mock-offline');
+      const mockLiveList = document.getElementById('mock-live-list');
+      const mockRedditThread = document.getElementById('mock-reddit-thread');
       
-      // Fade out
-      content.classList.add('fade-out');
+      const cardTwitch = document.getElementById('mock-card-twitch');
+      const cardYoutube = document.getElementById('mock-card-youtube');
+      const cardKick = document.getElementById('mock-card-kick');
 
-      setTimeout(() => {
-        const mockStatus = document.getElementById('mock-status');
-        const mockOffline = document.getElementById('mock-offline');
-        const mockLiveList = document.getElementById('mock-live-list');
-        const mockRedditThread = document.getElementById('mock-reddit-thread');
+      if (view === 'stream') {
+        mockStatus.className = 'status-indicator live';
+        mockStatus.querySelector('.status-label').textContent = 'LIVE';
+        mockOffline.classList.add('hidden');
+        mockLiveList.classList.remove('hidden');
+        mockRedditThread.classList.remove('hidden');
         
-        const cardTwitch = document.getElementById('mock-card-twitch');
-        const cardYoutube = document.getElementById('mock-card-youtube');
-        const cardKick = document.getElementById('mock-card-kick');
-
-        if (view === 'stream') {
-          mockStatus.className = 'status-indicator live';
-          mockStatus.querySelector('.status-label').textContent = 'LIVE';
-          mockOffline.classList.add('hidden');
-          mockLiveList.classList.remove('hidden');
-          mockRedditThread.classList.remove('hidden');
-          
-          cardTwitch.classList.remove('hidden');
-          cardYoutube.classList.add('hidden');
-          cardKick.classList.add('hidden');
-        } else if (view === 'multistream') {
-          mockStatus.className = 'status-indicator live';
-          mockStatus.querySelector('.status-label').textContent = 'LIVE';
-          mockOffline.classList.add('hidden');
-          mockLiveList.classList.remove('hidden');
-          mockRedditThread.classList.remove('hidden');
-          
-          cardTwitch.classList.remove('hidden');
-          cardYoutube.classList.remove('hidden');
-          cardKick.classList.remove('hidden');
-        } else if (view === 'offline') {
-          mockStatus.className = 'status-indicator offline';
-          mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
-          mockOffline.classList.remove('hidden');
-          mockLiveList.classList.add('hidden');
-          mockRedditThread.classList.add('hidden');
-        }
-
-        content.classList.remove('fade-out');
-      }, 200);
+        cardTwitch.classList.remove('hidden');
+        cardYoutube.classList.add('hidden');
+        cardKick.classList.add('hidden');
+      } else if (view === 'multistream') {
+        mockStatus.className = 'status-indicator live';
+        mockStatus.querySelector('.status-label').textContent = 'LIVE';
+        mockOffline.classList.add('hidden');
+        mockLiveList.classList.remove('hidden');
+        mockRedditThread.classList.remove('hidden');
+        
+        cardTwitch.classList.remove('hidden');
+        cardYoutube.classList.remove('hidden');
+        cardKick.classList.remove('hidden');
+      } else if (view === 'offline') {
+        mockStatus.className = 'status-indicator offline';
+        mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
+        mockOffline.classList.remove('hidden');
+        mockLiveList.classList.add('hidden');
+        mockRedditThread.classList.add('hidden');
+      }
     }
 
     // Simulate live viewer count updates

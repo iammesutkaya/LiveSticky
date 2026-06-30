@@ -389,14 +389,9 @@
 
 .showcase-content {
   opacity: 1;
-  transition: opacity 0.2s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.showcase-content.fade-out {
-  opacity: 0;
 }
 
 .showcase-img {
