@@ -1179,13 +1179,14 @@
 }
 
 .mock-dashboard .display-name {
+  margin: 0;
   font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .mock-dashboard .header-sub {

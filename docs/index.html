@@ -110,7 +110,7 @@
                 <span class="avatar-initial" style="display: none;">S</span>
               </div>
               <div class="header-info">
-                <h1 class="display-name" style="margin: 0; font-size: 17px; line-height: 1.2;">StickyFox</h1>
+                <h1 class="display-name">StickyFox</h1>
                 <div class="header-sub">Gaming & Coding</div>
               </div>
               <div id="mock-status" class="status-indicator live">
@@ -485,6 +485,7 @@
       if (view === 'stream') {
         mockStatus.className = 'status-indicator live';
         mockStatus.querySelector('.status-label').textContent = 'LIVE';
+        document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
         mockOffline.classList.add('hidden');
         mockLiveList.classList.remove('hidden');
         mockRedditThread.classList.remove('hidden');
@@ -495,6 +496,7 @@
       } else if (view === 'multistream') {
         mockStatus.className = 'status-indicator live';
         mockStatus.querySelector('.status-label').textContent = 'LIVE';
+        document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
         mockOffline.classList.add('hidden');
         mockLiveList.classList.remove('hidden');
         mockRedditThread.classList.remove('hidden');
@@ -505,6 +507,7 @@
       } else if (view === 'offline') {
         mockStatus.className = 'status-indicator offline';
         mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
+        document.querySelector('.mock-dashboard .header-sub').textContent = 'Last live 8h 47m ago';
         mockOffline.classList.remove('hidden');
         mockLiveList.classList.add('hidden');
         mockRedditThread.classList.add('hidden');
