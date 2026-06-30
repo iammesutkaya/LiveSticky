@@ -566,13 +566,26 @@ body {
   animation: fadeSlideIn 0.4s ease;
 }
 
-/* Offline layout: stretch the offline content so it fills the fixed-height
-   card, and push the follow buttons to the bottom — instead of pooling the
-   leftover height into one dead gap above the footer. Scoped to the offline
-   state (the live state's .live-content already handles its own fill). */
+/* Offline layout: the visible box is the inner .offline-message card, not the
+   .offline-content wrapper — so stretching the wrapper alone left the card
+   content-sized with a dead gap below it. Make the wrapper a flex column that
+   fills the leftover height, and let the card flex-fill it with its content
+   centered. Follow buttons sit at the bottom. Scoped to the offline state
+   (the live state's .live-content already handles its own fill). */
+.dashboard:not(.is-live) .content main {
+  gap: 10px;
+}
+
 .dashboard:not(.is-live) .offline-content {
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard:not(.is-live) .offline-message {
+  flex: 1;
+  justify-content: center;
 }
 
 .dashboard:not(.is-live) .platform-links {
