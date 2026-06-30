@@ -12,12 +12,12 @@
     "publish:public": "bash scripts/release.sh --public"
   },
   "dependencies": {
-    "@devvit/public-api": "^0.13.5",
-    "@devvit/web": "^0.13.5",
+    "@devvit/public-api": "^0.13.6",
+    "@devvit/web": "^0.13.6",
     "express": "^4.21.0"
   },
   "devDependencies": {
-    "@devvit/start": "^0.13.5",
+    "@devvit/start": "^0.13.6",
     "@types/express": "^5.0.0",
     "typescript": "5.8.3",
     "vite": "^6.0.0",
