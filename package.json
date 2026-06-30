@@ -4,7 +4,7 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "build": "vite build && node scripts/build-server.mjs",
+    "build": "vite build && node scripts/build-server.mjs && node scripts/sync-demo.cjs",
     "test": "vitest run",
     "upload": "bash scripts/upload.sh",
     "release": "bash scripts/release.sh",
