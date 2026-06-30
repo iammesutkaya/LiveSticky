@@ -115,7 +115,7 @@
       "customAvatarUrl": {
         "type": "string",
         "label": "👑 Custom Avatar Image URL (Optional)",
-        "helpText": "Override your platform profile picture with a direct image URL (e.g., Imgur link). Leave blank to auto-fetch from your primary platform.",
+        "helpText": "Override your platform profile picture with a DIRECT image link from a supported host: Imgur (i.imgur.com/…) or Reddit (i.redd.it/…). Must be a direct link to the image file, not a page. Leave blank to auto-fetch from your primary platform.",
         "placeholder": "https://..."
       },
       "streamerRedditUsername": {
@@ -366,7 +366,10 @@
         "static-cdn.jtvnw.net",
         "yt3.googleusercontent.com",
         "i.ytimg.com",
-        "files.kick.com"
+        "files.kick.com",
+        "i.imgur.com",
+        "imgur.com",
+        "i.redd.it"
       ]
     }
   },

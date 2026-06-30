@@ -564,19 +564,30 @@ async function init() {
   linkReddit = $('link-reddit');
 
   if (aboutTrigger && aboutModal && closeModalBtn) {
-    aboutTrigger.addEventListener('click', () => {
+    // Remember what had focus so we can restore it when the modal closes.
+    let lastFocused = null;
+
+    const openModal = () => {
+      lastFocused = document.activeElement;
       aboutModal.classList.remove('hidden');
       aboutModal.setAttribute('aria-hidden', 'false');
-    });
+      closeModalBtn.focus();
+    };
 
     const closeModal = () => {
       aboutModal.classList.add('hidden');
       aboutModal.setAttribute('aria-hidden', 'true');
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
     };
 
+    aboutTrigger.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
     aboutModal.addEventListener('click', (e) => {
       if (e.target === aboutModal) closeModal();
+    });
+    // Escape closes the modal when it's open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !aboutModal.classList.contains('hidden')) closeModal();
     });
   }
 

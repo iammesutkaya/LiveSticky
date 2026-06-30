@@ -169,6 +169,10 @@ const PROXY_ALLOWED_HOSTS = new Set([
   'yt3.googleusercontent.com',
   'i.ytimg.com',
   'files.kick.com',
+  // Hosts allowed for the optional custom avatar override (see customAvatarUrl).
+  'i.imgur.com',
+  'imgur.com',
+  'i.redd.it',
 ]);
 
 // URL is passed as a base64url path segment to avoid WAF blocks on query

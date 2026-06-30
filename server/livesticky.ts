@@ -1154,6 +1154,8 @@ export const createDashboardPost = async (): Promise<string> => {
     title: dashboardTitle,
     entry: 'default',
     textFallback: { text: dashboardTitle },
+    // Devvit's EntrypointHeight type doesn't accept the bare 'tall' literal, so
+    // the cast is required here (matches the "tall" entrypoint in devvit.json).
     styles: { height: 'tall' as any },
   });
 
