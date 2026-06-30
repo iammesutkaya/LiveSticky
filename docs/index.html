@@ -102,12 +102,6 @@
       </div>
 
       <div class="showcase-container">
-        <div class="showcase-header">
-          <div class="dots">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="showcase-title">LiveSticky Dashboard View</div>
-        </div>
         <div id="showcase-content" class="showcase-content mock-dashboard">
           <div class="content">
             <!-- App Header -->
@@ -496,8 +490,8 @@
         const cardKick = document.getElementById('mock-card-kick');
 
         if (view === 'stream') {
-          mockStatus.className = 'mock-status-indicator live';
-          mockStatus.querySelector('.mock-status-label').textContent = 'LIVE';
+          mockStatus.className = 'status-indicator live';
+          mockStatus.querySelector('.status-label').textContent = 'LIVE';
           mockOffline.classList.add('hidden');
           mockLiveList.classList.remove('hidden');
           mockRedditThread.classList.remove('hidden');
@@ -506,8 +500,8 @@
           cardYoutube.classList.add('hidden');
           cardKick.classList.add('hidden');
         } else if (view === 'multistream') {
-          mockStatus.className = 'mock-status-indicator live';
-          mockStatus.querySelector('.mock-status-label').textContent = 'LIVE';
+          mockStatus.className = 'status-indicator live';
+          mockStatus.querySelector('.status-label').textContent = 'LIVE';
           mockOffline.classList.add('hidden');
           mockLiveList.classList.remove('hidden');
           mockRedditThread.classList.remove('hidden');
@@ -516,8 +510,8 @@
           cardYoutube.classList.remove('hidden');
           cardKick.classList.remove('hidden');
         } else if (view === 'offline') {
-          mockStatus.className = 'mock-status-indicator offline';
-          mockStatus.querySelector('.mock-status-label').textContent = 'OFFLINE';
+          mockStatus.className = 'status-indicator offline';
+          mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
           mockOffline.classList.remove('hidden');
           mockLiveList.classList.add('hidden');
           mockRedditThread.classList.add('hidden');

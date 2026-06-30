@@ -364,12 +364,10 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-  transform: rotateX(2deg) scale(0.98);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .showcase-container:hover {
-  transform: rotateX(0deg) scale(1);
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
   border-color: rgba(255, 255, 255, 0.12);
 }
@@ -1135,7 +1133,6 @@
    ========================================================================== */
 .mock-dashboard {
   background: #0e1113 !important;
-  border-radius: 0 0 12px 12px;
   padding: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.04);
   
