@@ -1131,405 +1131,513 @@
 }
 
 /* ==========================================================================
-   CSS Dashboard Mockup Styles
+   CSS Dashboard Mockup Styles (Mirrors src/client/styles.css)
    ========================================================================== */
 .mock-dashboard {
   background: #0e1113 !important;
   border-radius: 0 0 12px 12px;
   padding: 16px !important;
-  color: #ffffff;
-  display: flex !important;
-  flex-direction: column;
-  text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.04);
+  
+  /* Inherit dashboard colors scoped strictly to the showcase mockup */
+  --bg-primary: #0e1113;
+  --bg-card: #15191c;
+  --bg-surface: #1c2125;
+  --bg-card-hover: #191e21;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a5;
+  --text-muted: #707075;
+  --text-faint: #444448;
+  --accent-gold: #f5d474;
+  --gold-text: #f5d474;
+  --gold-dim: rgba(245, 212, 116, 0.10);
+  --gold-border: rgba(245, 212, 116, 0.30);
+  --twitch-color: #9147ff;
+  --youtube-color: #ff0000;
+  --kick-color: #53fc18;
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-line: rgba(255, 255, 255, 0.06);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 }
 
-.mock-header {
+.mock-dashboard .app-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  padding-bottom: 12px;
-  width: 100%;
 }
 
-.mock-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--accent-gold);
+.mock-dashboard .avatar {
+  position: relative;
   flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-gold);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-.mock-avatar-img {
+.mock-dashboard .avatar-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.mock-header-info {
+.mock-dashboard .avatar-initial {
+  font-size: 18px;
+  font-weight: 800;
+  color: #131313;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.mock-dashboard .header-info {
   flex: 1;
+  min-width: 0;
 }
 
-.mock-display-name {
-  font-size: 14px;
+.mock-dashboard .display-name {
+  font-size: 17px;
   font-weight: 700;
-  color: #ffffff;
-  line-height: 1.2;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.15;
 }
 
-.mock-header-sub {
-  font-size: 11px;
-  color: #707075;
+.mock-dashboard .header-sub {
+  font-size: 12px;
+  color: var(--text-muted);
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.mock-status-indicator {
+.mock-dashboard .status-indicator {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  border: 1px solid transparent;
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 
-.mock-status-indicator.live {
-  background: rgba(255, 69, 0, 0.08);
-  border-color: rgba(255, 69, 0, 0.2);
-  color: #ff4500;
+.mock-dashboard .status-indicator.live {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-text);
 }
 
-.mock-status-indicator.offline {
-  background: rgba(160, 160, 165, 0.08);
-  border-color: rgba(160, 160, 165, 0.2);
-  color: #a0a0a5;
+.mock-dashboard .status-indicator.offline {
+  background: var(--bg-surface);
+  color: var(--text-muted);
 }
 
-.mock-status-dot {
+.mock-dashboard .status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.mock-status-indicator.live .mock-status-dot {
-  background: #ff4500;
-  box-shadow: 0 0 8px #ff4500;
-  animation: mockPulse 1.8s infinite;
+.mock-dashboard .status-indicator.live .status-dot {
+  background: #ef4444;
+  animation: live-blink 1.5s ease-in-out infinite;
 }
 
-.mock-status-indicator.offline .mock-status-dot {
-  background: #a0a0a5;
+.mock-dashboard .status-indicator.offline .status-dot {
+  background: var(--text-muted);
 }
 
-@keyframes mockPulse {
-  0% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.6; }
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
-.mock-main {
-  flex: 1;
+.mock-dashboard .live-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
 }
 
-.mock-offline-content {
-  text-align: center;
-  padding: 32px 16px;
-}
-
-.mock-offline-icon {
-  display: inline-flex;
-  width: 44px;
-  height: 44px;
-  background: #1c2125;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  color: #707075;
-  margin-bottom: 12px;
-}
-
-.mock-offline-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.mock-offline-subtext {
-  font-size: 12px;
-  color: #707075;
-  margin-top: 4px;
-}
-
-.mock-platform-links {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.mock-platform-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  background: #15191c;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: #a0a0a5;
-  cursor: pointer;
-}
-
-.mock-platform-btn:hover {
-  background: #1c2125;
-  color: #ffffff;
-}
-
-.mock-platform-btn.twitch svg { color: var(--twitch-color); }
-.mock-platform-btn.youtube svg { color: var(--youtube-color); }
-
-.mock-live-list {
+.mock-dashboard .platform-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-.mock-stream-card {
-  background: #15191c;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+.mock-dashboard .stream-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  border: 1px solid var(--border-line);
 }
 
-.mock-card-media {
+.mock-dashboard .stream-card-main {
+  display: flex;
+  gap: 13px;
+  padding: 12px;
+}
+
+.mock-dashboard .thumb {
   position: relative;
-  height: 140px;
+  flex-shrink: 0;
+  width: 112px;
+  height: 63px;
+  background: var(--bg-surface);
+  border-radius: 7px;
   overflow: hidden;
+}
+
+.mock-dashboard .platform-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 0 0 8px 0;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.mock-badge-live {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: #ff4500;
-  color: #ffffff;
-  font-size: 9px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.04em;
   z-index: 2;
 }
 
-.mock-card-viewers {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
-  font-size: 10px;
+.mock-dashboard .platform-badge.platform-twitch  { background: var(--twitch-color);  color: #ffffff; }
+.mock-dashboard .platform-badge.platform-youtube { background: var(--youtube-color); color: #ffffff; }
+.mock-dashboard .platform-badge.platform-kick    { background: var(--kick-color);    color: #131313; }
+
+.mock-dashboard .stream-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mock-dashboard .stream-card-title {
+  font-size: 12px;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.mock-dashboard .stream-card-meta {
   display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.mock-dashboard .viewer-chip {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  z-index: 2;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 9px;
 }
 
-.viewers-dot {
-  width: 5px;
-  height: 5px;
-  background: #ff4500;
+.mock-dashboard .viewer-chip .vc-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.mock-dashboard .viewer-chip .vc-label {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.mock-dashboard .meta-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mock-dashboard .meta-sep {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.mock-dashboard .watch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mock-dashboard .watch-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.mock-dashboard .watch-btn .wb-logo {
+  display: flex;
+  align-items: center;
+}
+
+.mock-dashboard .watch-btn.platform-twitch  .wb-logo { color: var(--twitch-color); }
+.mock-dashboard .watch-btn.platform-youtube .wb-logo { color: var(--youtube-color); }
+.mock-dashboard .watch-btn.platform-kick    .wb-logo { color: var(--kick-color); }
+
+.mock-dashboard .reddit-thread {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.mock-dashboard .reddit-thread:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--text-faint);
+}
+
+.mock-dashboard .reddit-badge {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
+  background: var(--accent-gold);
+  color: #131313;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.mock-card-thumbnail-placeholder {
+.mock-dashboard .reddit-thread-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.mock-dashboard .reddit-thread-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.mock-dashboard .reddit-thread-meta {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.mock-dashboard .reddit-thread-chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.mock-dashboard .offline-content {
+  margin-top: 0;
+}
+
+.mock-dashboard .offline-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 1px solid var(--border-line);
+}
+
+.mock-dashboard .offline-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-text);
+  margin-bottom: 2px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.mock-dashboard .offline-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mock-dashboard .offline-subtext {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.mock-dashboard .platform-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mock-dashboard .platform-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mock-dashboard .platform-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.mock-dashboard .platform-btn.twitch  { color: var(--text-primary); }
+.mock-dashboard .platform-btn.twitch  svg { color: var(--twitch-color); }
+.mock-dashboard .platform-btn.youtube svg { color: var(--youtube-color); }
+.mock-dashboard .platform-btn.kick    svg { color: var(--kick-color); }
+
+.mock-dashboard .footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mock-dashboard .footer-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mock-dashboard .update-mode {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-line);
+  flex-shrink: 0;
+}
+
+.mock-dashboard .update-mode.healthy {
+  background: #3fb950;
+  animation: live-blink 2s ease-in-out infinite;
+}
+
+.mock-dashboard .footer-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.mock-dashboard .footer-timestamp {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.mock-dashboard .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mock-dashboard .refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mock-dashboard .refresh-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.mock-dashboard .mock-card-thumbnail-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-.mock-card-thumbnail-placeholder.twitch-bg {
+.mock-dashboard .mock-card-thumbnail-placeholder.twitch-bg {
   background: linear-gradient(135deg, #1b172e 0%, #301f5c 100%);
-  color: var(--twitch-color);
 }
 
-.mock-card-thumbnail-placeholder.youtube-bg {
+.mock-dashboard .mock-card-thumbnail-placeholder.youtube-bg {
   background: linear-gradient(135deg, #2b1717 0%, #5c1f1f 100%);
-  color: var(--youtube-color);
 }
 
-.mock-card-thumbnail-placeholder.kick-bg {
+.mock-dashboard .mock-card-thumbnail-placeholder.kick-bg {
   background: linear-gradient(135deg, #172b17 0%, #1f5c1f 100%);
-  color: var(--kick-color);
 }
 
-.pulse-ring {
+.mock-dashboard .pulse-ring {
   position: absolute;
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid currentColor;
+  border: 1px solid var(--accent-gold);
   opacity: 0.2;
   animation: mockThumbnailPulse 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 
+.mock-dashboard .twitch-bg .pulse-ring { border-color: var(--twitch-color); }
+.mock-dashboard .youtube-bg .pulse-ring { border-color: var(--youtube-color); }
+.mock-dashboard .kick-bg .pulse-ring { border-color: var(--kick-color); }
+
 @keyframes mockThumbnailPulse {
   0% { transform: scale(0.6); opacity: 0.4; }
   100% { transform: scale(1.4); opacity: 0; }
-}
-
-.mock-card-info {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mock-card-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #ffffff;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.mock-card-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #707075;
-}
-
-.mock-watch-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  margin-top: 4px;
-}
-
-.mock-watch-btn.twitch { background: var(--twitch-color); color: #ffffff; }
-.mock-watch-btn.youtube { background: var(--youtube-color); color: #ffffff; }
-.mock-watch-btn.kick { background: var(--kick-color); color: #111111; }
-
-.mock-reddit-thread {
-  background: rgba(255, 69, 0, 0.06);
-  border: 1px solid rgba(255, 69, 0, 0.12);
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  margin-top: 4px;
-}
-
-.mock-reddit-badge {
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 69, 0, 0.12);
-  color: #ff4500;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mock-reddit-text {
-  flex: 1;
-}
-
-.mock-reddit-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.mock-reddit-meta {
-  font-size: 10px;
-  color: #707075;
-}
-
-.mock-chevron {
-  color: #707075;
-}
-
-.mock-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  margin-top: 14px;
-  padding-top: 10px;
-  font-size: 10px;
-  color: #707075;
-}
-
-.mock-footer-left {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.mock-update-indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #53fc18;
-  display: inline-block;
-  box-shadow: 0 0 6px #53fc18;
-}
-
-.mock-footer-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mock-refresh-btn {
-  background: none;
-  border: none;
-  color: #707075;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-family: inherit;
-}
-
-.mock-refresh-btn:hover {
-  color: #ffffff;
 }

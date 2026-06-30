@@ -109,152 +109,170 @@
           <div class="showcase-title">LiveSticky Dashboard View</div>
         </div>
         <div id="showcase-content" class="showcase-content mock-dashboard">
-          <!-- App Header -->
-          <header class="mock-header">
-            <div class="mock-avatar">
-              <img src="icon.png" alt="Sticky the Fox Avatar" class="mock-avatar-img">
-            </div>
-            <div class="mock-header-info">
-              <div class="mock-display-name">StickyFox</div>
-              <div class="mock-header-sub">Gaming & Coding</div>
-            </div>
-            <div id="mock-status" class="mock-status-indicator live">
-              <span class="mock-status-dot"></span>
-              <span class="mock-status-label">LIVE</span>
-            </div>
-          </header>
-
-          <main class="mock-main">
-            <!-- Offline view (hidden by default) -->
-            <div id="mock-offline" class="mock-offline-content hidden">
-              <div class="mock-offline-message">
-                <div class="mock-offline-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </div>
-                <p class="mock-offline-text">StickyFox is offline</p>
-                <p class="mock-offline-subtext">Check back soon for the next stream!</p>
+          <div class="content">
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="avatar">
+                <img class="avatar-img" style="display: block;" src="icon.png" alt="Sticky the Fox Avatar">
+                <span class="avatar-initial" style="display: none;">S</span>
               </div>
-              <div class="mock-platform-links">
-                <div class="mock-platform-btn twitch">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
-                  <span>Twitch VODs</span>
-                </div>
-                <div class="mock-platform-btn youtube">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                  <span>YouTube Channel</span>
-                </div>
+              <div class="header-info">
+                <h1 class="display-name" style="margin: 0; font-size: 17px; line-height: 1.2;">StickyFox</h1>
+                <div class="header-sub">Gaming & Coding</div>
               </div>
-            </div>
-
-            <!-- Live streams list -->
-            <div id="mock-live-list" class="mock-live-list">
-              <!-- Twitch Stream Card -->
-              <div id="mock-card-twitch" class="mock-stream-card twitch">
-                <div class="mock-card-media">
-                  <div class="mock-badge-live">LIVE</div>
-                  <div class="mock-card-viewers">
-                    <span class="viewers-dot"></span>
-                    <span class="viewers-count-twitch">1,420</span> watching
-                  </div>
-                  <div class="mock-card-thumbnail-placeholder twitch-bg">
-                    <div class="pulse-ring"></div>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
-                  </div>
-                </div>
-                <div class="mock-card-info">
-                  <div class="mock-card-title">🚀 Coding a Reddit Dashboard Live! | !project !github</div>
-                  <div class="mock-card-meta">
-                    <span class="mock-card-category">Software & Game Dev</span>
-                    <span class="mock-card-uptime">Uptime: 2h 15m</span>
-                  </div>
-                  <div class="mock-watch-btn twitch">
-                    <span>Watch on Twitch</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </div>
-                </div>
+              <div id="mock-status" class="status-indicator live">
+                <span class="status-dot"></span>
+                <span class="status-label">LIVE</span>
               </div>
+            </header>
 
-              <!-- YouTube Stream Card -->
-              <div id="mock-card-youtube" class="mock-stream-card youtube hidden">
-                <div class="mock-card-media">
-                  <div class="mock-badge-live">LIVE</div>
-                  <div class="mock-card-viewers">
-                    <span class="viewers-dot"></span>
-                    <span class="viewers-count-youtube">850</span> watching
+            <main style="margin-top: 14px;">
+              <!-- Live state -->
+              <div id="mock-live-list" class="live-content">
+                <div class="platform-list">
+                  
+                  <!-- Twitch Card -->
+                  <div id="mock-card-twitch" class="stream-card">
+                    <div class="stream-card-main">
+                      <div class="thumb">
+                        <div class="platform-badge platform-twitch">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+                        </div>
+                        <div class="mock-card-thumbnail-placeholder twitch-bg">
+                          <div class="pulse-ring"></div>
+                        </div>
+                      </div>
+                      <div class="stream-card-info">
+                        <div class="stream-card-title">🚀 Coding a Reddit Dashboard Live! | !project !github</div>
+                        <div class="stream-card-meta">
+                          <div class="viewer-chip">
+                            <span class="viewers-dot"></span>
+                            <span class="vc-num viewers-count-twitch">1,420</span>
+                            <span class="vc-label">watching</span>
+                          </div>
+                          <span class="meta-sep">•</span>
+                          <span class="meta-text">Software & Game Dev</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="watch-btn platform-twitch">
+                      <span class="wb-logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg></span>
+                      <span>Watch on Twitch</span>
+                    </div>
                   </div>
-                  <div class="mock-card-thumbnail-placeholder youtube-bg">
-                    <div class="pulse-ring"></div>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                  </div>
-                </div>
-                <div class="mock-card-info">
-                  <div class="mock-card-title">LiveSticky Launch: Live Q&A & Code Walkthrough</div>
-                  <div class="mock-card-meta">
-                    <span class="mock-card-category">Science & Technology</span>
-                    <span class="mock-card-uptime">Uptime: 45m</span>
-                  </div>
-                  <div class="mock-watch-btn youtube">
-                    <span>Watch on YouTube</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Kick Stream Card -->
-              <div id="mock-card-kick" class="mock-stream-card kick hidden">
-                <div class="mock-card-media">
-                  <div class="mock-badge-live">LIVE</div>
-                  <div class="mock-card-viewers">
-                    <span class="viewers-dot"></span>
-                    <span class="viewers-count-kick">310</span> watching
+                  <!-- YouTube Card -->
+                  <div id="mock-card-youtube" class="stream-card hidden">
+                    <div class="stream-card-main">
+                      <div class="thumb">
+                        <div class="platform-badge platform-youtube">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <div class="mock-card-thumbnail-placeholder youtube-bg">
+                          <div class="pulse-ring"></div>
+                        </div>
+                      </div>
+                      <div class="stream-card-info">
+                        <div class="stream-card-title">LiveSticky Launch: Live Q&A & Code Walkthrough</div>
+                        <div class="stream-card-meta">
+                          <div class="viewer-chip">
+                            <span class="viewers-dot"></span>
+                            <span class="vc-num viewers-count-youtube">850</span>
+                            <span class="vc-label">watching</span>
+                          </div>
+                          <span class="meta-sep">•</span>
+                          <span class="meta-text">Science & Technology</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="watch-btn platform-youtube">
+                      <span class="wb-logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
+                      <span>Watch on YouTube</span>
+                    </div>
                   </div>
-                  <div class="mock-card-thumbnail-placeholder kick-bg">
-                    <div class="pulse-ring"></div>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/></svg>
+
+                  <!-- Kick Card -->
+                  <div id="mock-card-kick" class="stream-card hidden">
+                    <div class="stream-card-main">
+                      <div class="thumb">
+                        <div class="platform-badge platform-kick">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/></svg>
+                        </div>
+                        <div class="mock-card-thumbnail-placeholder kick-bg">
+                          <div class="pulse-ring"></div>
+                        </div>
+                      </div>
+                      <div class="stream-card-info">
+                        <div class="stream-card-title">Late Night Coding Session - Building on Devvit</div>
+                        <div class="stream-card-meta">
+                          <div class="viewer-chip">
+                            <span class="viewers-dot"></span>
+                            <span class="vc-num viewers-count-kick">310</span>
+                            <span class="vc-label">watching</span>
+                          </div>
+                          <span class="meta-sep">•</span>
+                          <span class="meta-text">Coding</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="watch-btn platform-kick">
+                      <span class="wb-logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1.333 0v24h5.338v-6.257l2.67-2.884L12.8 24h6.406l-5.874-12.33L18.666 6h-6.406l-5.589 6.874V0z"/></svg></span>
+                      <span>Watch on Kick</span>
+                    </div>
                   </div>
-                </div>
-                <div class="mock-card-info">
-                  <div class="mock-card-title">Late Night Coding Session - Building on Devvit</div>
-                  <div class="mock-card-meta">
-                    <span class="mock-card-category">Coding</span>
-                    <span class="mock-card-uptime">Uptime: 1h 05m</span>
-                  </div>
-                  <div class="mock-watch-btn kick">
-                    <span>Watch on Kick</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </div>
+
                 </div>
               </div>
-            </div>
 
-            <!-- Join discussion thread banner -->
-            <div id="mock-reddit-thread" class="mock-reddit-thread">
-              <span class="mock-reddit-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12c-.688 0-1.249.561-1.249 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.248 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm-5.466 3.99a.327.327 0 0 0-.232.095.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-              </span>
-              <div class="mock-reddit-text">
-                <div class="mock-reddit-title">Join the live discussion thread</div>
-                <div class="mock-reddit-meta">r/LiveSticky • 42 comments</div>
+              <!-- Offline view -->
+              <div id="mock-offline" class="offline-content hidden">
+                <div class="offline-message">
+                  <div class="offline-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <p class="offline-text">StickyFox is offline</p>
+                  <p class="offline-subtext">Check back soon for the next stream!</p>
+                </div>
+                <div class="platform-links" style="margin-top: 10px;">
+                  <div class="platform-btn twitch">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+                    <span>Twitch</span>
+                  </div>
+                  <div class="platform-btn youtube">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span>YouTube</span>
+                  </div>
+                </div>
               </div>
-              <svg class="mock-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-          </main>
 
-          <!-- Mock Footer -->
-          <footer class="mock-footer">
-            <div class="mock-footer-left">
-              <span class="mock-update-indicator"></span>
-              <span class="mock-footer-text">LiveSticky v1.0.111</span>
-            </div>
-            <div class="mock-footer-right">
-              <span class="mock-last-updated">Last checked: Just now</span>
-              <button class="mock-refresh-btn" type="button">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                <span>Refresh</span>
-              </button>
-            </div>
-          </footer>
+              <!-- Reddit Thread row -->
+              <div id="mock-reddit-thread" class="reddit-thread" style="margin-top: 12px;">
+                <span class="reddit-badge">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12c-.688 0-1.249.561-1.249 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.248 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm-5.466 3.99a.327.327 0 0 0-.232.095.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+                </span>
+                <span class="reddit-thread-text">
+                  <span class="reddit-thread-title">Join the live discussion thread</span>
+                  <span class="reddit-thread-meta">r/LiveSticky • 42 comments</span>
+                </span>
+                <svg class="reddit-thread-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer" style="margin-top: 14px;">
+              <div class="footer-left">
+                <span class="update-mode healthy"></span>
+                <span class="footer-text">LiveSticky v1.0.111</span>
+              </div>
+              <div class="footer-right">
+                <span class="footer-timestamp">Last checked: Just now</span>
+                <button class="refresh-btn" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  <span>Refresh</span>
+                </button>
+              </div>
+            </footer>
+          </div>
         </div>
       </div>
     </section>
