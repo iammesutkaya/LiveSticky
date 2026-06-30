@@ -1403,6 +1403,13 @@
   gap: 10px;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mock-dashboard .platform-list::-webkit-scrollbar {
+
+  display: none;
 }
 .mock-dashboard .stream-card {
 
