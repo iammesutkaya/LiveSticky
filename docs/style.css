@@ -296,6 +296,15 @@ h1 {
 
 /* Footer styling */
 /* ── Footer ─────────────────────────────────────────────── */
+/* Alerts */
+.alert-warning {
+  background: rgba(255, 69, 0, 0.1);
+  border-left: 4px solid #ff4500;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-sm);
+}
+
 .site-footer {
   text-align: left;
   padding: 0;
