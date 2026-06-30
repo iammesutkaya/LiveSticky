@@ -62,6 +62,11 @@ const twitchLink = $('twitch-link');
 const youtubeLink = $('youtube-link');
 const kickLink = $('kick-link');
 
+// Modal
+const aboutModal = $('about-modal');
+const aboutTrigger = $('about-trigger');
+const closeModalBtn = $('close-modal-btn');
+
 // ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
@@ -525,8 +530,26 @@ async function handleRefresh() {
   }
 }
 
+// Modal logic
+if (aboutTrigger && aboutModal && closeModalBtn) {
+  aboutTrigger.addEventListener('click', () => {
+    aboutModal.classList.remove('hidden');
+    aboutModal.setAttribute('aria-hidden', 'false');
+  });
+
+  const closeModal = () => {
+    aboutModal.classList.add('hidden');
+    aboutModal.setAttribute('aria-hidden', 'true');
+  };
+
+  closeModalBtn.addEventListener('click', closeModal);
+  aboutModal.addEventListener('click', (e) => {
+    if (e.target === aboutModal) closeModal();
+  });
+}
+
 // ---------------------------------------------------------------------------
-// Init
+// Render logic
 // ---------------------------------------------------------------------------
 
 async function init() {

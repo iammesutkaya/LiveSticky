@@ -105,7 +105,7 @@
       <footer class="footer">
         <div class="footer-left">
           <span id="update-mode" class="update-mode" aria-hidden="true"></span>
-          <span class="footer-text">LiveSticky</span>
+          <button id="about-trigger" class="footer-text btn-reset">LiveSticky</button>
         </div>
         <div class="footer-right">
           <span id="last-updated" class="footer-timestamp" aria-live="polite"></span>
@@ -118,6 +118,29 @@
           </button>
         </div>
       </footer>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div id="about-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-labelledby="modal-title">
+      <button id="close-modal-btn" class="modal-close" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+      <div class="modal-body">
+        <div class="modal-logo">
+          <!-- Placeholder icon for Sticky the Fox -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--accent-gold)"><path d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0Z"/></svg>
+        </div>
+        <h2 id="modal-title" class="modal-title">LiveSticky</h2>
+        <p class="modal-version">Version 1.0.107</p>
+        <p class="modal-desc">Automatic live posts and a multistream dashboard for your subreddit.</p>
+        <div class="modal-links">
+          <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a>
+          <span class="meta-sep">•</span>
+          <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer">u/iammesutkaya</a>
+        </div>
+      </div>
     </div>
   </div>
 
