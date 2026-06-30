@@ -24,7 +24,7 @@
 
   <!-- Hero & Showcase Split Layout -->
   <div class="landing-container">
-    <button class="mobile-menu-btn" onclick="document.getElementById('topNav').classList.toggle('open')" aria-label="Toggle menu">
+    <button class="mobile-menu-btn" onclick="const n=document.getElementById('topNav');this.setAttribute('aria-expanded', n.classList.toggle('open'))" aria-label="Toggle menu" aria-controls="topNav" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <nav class="top-nav" id="topNav">
@@ -51,7 +51,7 @@
         by u/iammesutkaya
       </a>
       <p class="subtitle">
-        The moment you go live on <span class="inline-brand inline-twitch">Twitch</span>, <span class="inline-brand inline-youtube">YouTube</span>, or <span class="inline-brand inline-kick">Kick</span>, LiveSticky pins an auto-updating post to your subreddit and powers an interactive dashboard that shows every stream you're on — so your community jumps straight to whichever platform they prefer.
+        Go live on <span class="inline-brand inline-twitch">Twitch</span>, <span class="inline-brand inline-youtube">YouTube</span>, or <span class="inline-brand inline-kick">Kick</span> and LiveSticky instantly pins a live post and an interactive dashboard to your subreddit — so your community always knows where to watch.
       </p>
       <ul class="feature-checklist">
         <li>
@@ -63,6 +63,25 @@
           Built natively for the Reddit Developer Platform
         </li>
       </ul>
+
+      <div class="action-group-container">
+
+        <div class="action-group">
+          <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer"
+            class="install-btn">
+          Install on Reddit
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+          </svg>
+        </a>
+        <a href="setup.html" class="install-btn secondary-btn">
+          Setup Guide
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/>
+          </svg>
+        </a>
+      </div>
+      </div>
 
       <div class="hero-badges">
         <a href="https://developers.reddit.com" target="_blank" rel="noopener noreferrer"
@@ -86,34 +105,15 @@
           Open Source
         </a>
       </div>
-
-      <div class="action-group-container">
-
-        <div class="action-group">
-          <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer"
-            class="install-btn">
-          Install on Reddit
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
-          </svg>
-        </a>
-        <a href="setup.html" class="install-btn secondary-btn">
-          Setup Guide
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/>
-          </svg>
-        </a>
-      </div>
-      </div>
     </header>
 
     <!-- Dashboard Showcase -->
     <section class="showcase">
       <!-- Showcase Tabs -->
-      <div class="showcase-tabs">
-        <button class="tab-btn active" onclick="setDashboardView('stream', this)">Stream</button>
-        <button class="tab-btn" onclick="setDashboardView('multistream', this)">Multistream</button>
-        <button class="tab-btn" onclick="setDashboardView('offline', this)">Offline</button>
+      <div class="showcase-tabs" role="tablist" aria-label="Dashboard views">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="setDashboardView('stream', this)">Stream</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('multistream', this)">Multistream</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('offline', this)">Offline</button>
       </div>
 
       <div class="showcase-container">
@@ -136,7 +136,7 @@
     </div> <!-- /hero-split -->
 
     <!-- Interactive Dashboard (flagship) -->
-    <section class="section">
+    <section class="section" id="features">
       <h2 class="section-title"><i data-lucide="monitor-play"></i> The Interactive Live Dashboard</h2>
       <div class="features-grid">
         <div class="feature-item">
@@ -164,7 +164,7 @@
 
     <!-- Core features grid -->
     <section class="section">
-      <h2 id="features" class="section-title"><i data-lucide="layout-grid"></i> Core features</h2>
+      <h2 class="section-title"><i data-lucide="layout-grid"></i> Core features</h2>
       <div class="features-grid core-features-grid">
 
         <div class="feature-card">
@@ -250,8 +250,6 @@
       </div>
     </section>
 
-    </section>
-
   </div>
 
 
@@ -291,6 +289,7 @@
           <span class="footer-col-title">Product</span>
           <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer">Install on Reddit</a>
           <a href="setup.html">Setup Guide</a>
+          <a href="faq.html">FAQ</a>
           <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="design.html">Design System</a>
         </div>
@@ -312,7 +311,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0"></script>
   <script>
     // Render all <i data-lucide="..."> placeholders as inline SVGs.
     if (window.lucide) lucide.createIcons();
@@ -331,9 +330,13 @@
     function setDashboardView(view, btn) {
       if (btn.classList.contains('active')) return;
       
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       btn.classList.add('active');
-      
+      btn.setAttribute('aria-selected', 'true');
+
       const content = document.getElementById('showcase-content');
       const img = document.getElementById('dashboard-img');
       const filename = 'dashboard-' + view + '.png';

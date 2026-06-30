@@ -928,6 +928,21 @@
     justify-content: center;
   }
 
+  /* Keep the checklist readable when the hero centers: left-align the text and
+     top-align the checkmark so wrapped items don't look misaligned. */
+  .feature-checklist {
+    align-self: center;
+    text-align: left;
+  }
+
+  .feature-checklist li {
+    align-items: flex-start;
+  }
+
+  .feature-checklist svg {
+    margin-top: 3px;
+  }
+
   .showcase {
     margin: 16px auto 32px;
   }
