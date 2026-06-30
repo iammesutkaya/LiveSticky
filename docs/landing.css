@@ -2076,3 +2076,50 @@
   background: var(--bg-primary);
   display: flex !important;
 }
+
+/* Placeholder styling for mockup dashboard cards on the landing page */
+.mock-card-thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.mock-card-thumbnail-placeholder.twitch-bg {
+  background: linear-gradient(135deg, #1b172e 0%, #301f5c 100%);
+  color: var(--twitch-color);
+}
+
+.mock-card-thumbnail-placeholder.youtube-bg {
+  background: linear-gradient(135deg, #2b1717 0%, #5c1f1f 100%);
+  color: var(--youtube-color);
+}
+
+.mock-card-thumbnail-placeholder.kick-bg {
+  background: linear-gradient(135deg, #172b17 0%, #1f5c1f 100%);
+  color: var(--kick-color);
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.2;
+  animation: mockThumbnailPulse 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes mockThumbnailPulse {
+  0% { transform: scale(0.6); opacity: 0.4; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* Force 16/9 aspect-ratio on the mock cinematic thumbnail to prevent vertical collapse in the auto-height landing page layout */
+.mock-dashboard .stream-card.cinematic .thumb {
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+}
+
