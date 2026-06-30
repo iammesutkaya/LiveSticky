@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build && node scripts/build-server.mjs && node scripts/sync-demo.cjs",
     "test": "vitest run",
-    "upload": "bash scripts/upload.sh",
+    "upload": "npm run build && bash scripts/upload.sh",
     "release": "bash scripts/release.sh",
     "release:public": "bash scripts/release.sh --public",
     "publish:public": "bash scripts/release.sh --public"

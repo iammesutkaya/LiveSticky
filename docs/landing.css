@@ -1230,9 +1230,11 @@
 
   width: 100%;
   max-width: 600px;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
 }
@@ -1241,18 +1243,19 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  min-height: 0;
 }
 .mock-dashboard .content main {
 
   display: flex;
   flex-direction: column;
-  gap: 14px;
   flex: 1;
+  min-height: 0;
 }
 .mock-dashboard .content footer.footer {
 
-  margin-top: auto;
+  flex-shrink: 0;
 }
 .mock-dashboard .app-header {
 
@@ -1380,6 +1383,8 @@
   flex-direction: column;
   gap: 10px;
   animation: fadeSlideIn 0.4s ease;
+  flex: 1;
+  min-height: 0;
 }
 @keyframes fadeSlideIn {
 
@@ -1395,6 +1400,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
+  min-height: 0;
 }
 .mock-dashboard .stream-card {
 
@@ -1514,6 +1521,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 .mock-dashboard .watch-btn:hover {
 
@@ -1536,16 +1544,28 @@
   display: flex;
   align-items: center;
 }
+.mock-dashboard .stream-card.cinematic {
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
 .mock-dashboard .stream-card.cinematic .stream-card-main {
 
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 0;
+  flex: 1;
+  min-height: 0;
 }
 .mock-dashboard .stream-card.cinematic .thumb {
 
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
   border-radius: 0;
 }
 .mock-dashboard .stream-card.cinematic .platform-badge {
@@ -1555,7 +1575,8 @@
 }
 .mock-dashboard .stream-card.cinematic .stream-card-info {
 
-  padding: 13px 14px 14px;
+  padding: 10px 12px 12px;
+  flex: none;
 }
 .mock-dashboard .stream-card.cinematic .stream-card-title {
 
@@ -1566,13 +1587,14 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 11px 13px;
+  padding: 8px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-line);
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 .mock-dashboard .reddit-thread:hover {
 
@@ -1721,6 +1743,7 @@
   justify-content: space-between;
   padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 .mock-dashboard .footer-left {
 
@@ -1800,10 +1823,6 @@
 
     padding: 10px;
   }
-.mock-dashboard .content, .mock-dashboard .content main, .mock-dashboard .live-content {
-
-    gap: 10px;
-  }
 .mock-dashboard .platform-list {
 
     gap: 8px;
@@ -1838,14 +1857,13 @@
   }
 .mock-dashboard .stream-card.cinematic .stream-card-main {
 
-    display: block;
+    display: flex;
+    flex-direction: column;
     padding: 0;
   }
 .mock-dashboard .stream-card.cinematic .thumb {
 
     width: 100%;
-    max-height: 130px;
-    aspect-ratio: 16 / 9;
     border-radius: 0;
   }
 .mock-dashboard .stream-card.cinematic .stream-card-info {
@@ -2015,6 +2033,9 @@
 }
 .mock-dashboard .footer-left button.footer-text {
 
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
   transition: color 0.2s;
 }
 .mock-dashboard .footer-left button.footer-text:hover {

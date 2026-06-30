@@ -137,9 +137,11 @@ body {
 .dashboard {
   width: 100%;
   max-width: 600px;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
 }
@@ -148,18 +150,19 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  min-height: 0;
 }
 
 .content main {
   display: flex;
   flex-direction: column;
-  gap: 14px;
   flex: 1;
+  min-height: 0;
 }
 
 .content footer.footer {
-  margin-top: auto;
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -294,6 +297,8 @@ body {
   flex-direction: column;
   gap: 10px;
   animation: fadeSlideIn 0.4s ease;
+  flex: 1;
+  min-height: 0;
 }
 
 @keyframes fadeSlideIn {
@@ -305,6 +310,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
+  min-height: 0;
 }
 
 .stream-card {
@@ -426,6 +433,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .watch-btn:hover {
@@ -448,15 +456,27 @@ body {
 }
 
 /* Cinematic single-stream layout: full-width thumbnail on top */
+.stream-card.cinematic {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .stream-card.cinematic .stream-card-main {
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 .stream-card.cinematic .thumb {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
   border-radius: 0;
 }
 
@@ -466,7 +486,8 @@ body {
 }
 
 .stream-card.cinematic .stream-card-info {
-  padding: 13px 14px 14px;
+  padding: 10px 12px 12px;
+  flex: none;
 }
 
 .stream-card.cinematic .stream-card-title {
@@ -481,13 +502,14 @@ body {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 11px 13px;
+  padding: 8px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-line);
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .reddit-thread:hover {
@@ -643,6 +665,7 @@ body {
   justify-content: space-between;
   padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .footer-left {
@@ -725,11 +748,6 @@ body {
     padding: 10px;
   }
 
-  .content,
-  .content main,
-  .live-content {
-    gap: 10px;
-  }
 
   .platform-list {
     gap: 8px;
@@ -764,14 +782,13 @@ body {
   }
   
   .stream-card.cinematic .stream-card-main {
-    display: block;
+    display: flex;
+    flex-direction: column;
     padding: 0;
   }
 
   .stream-card.cinematic .thumb {
     width: 100%;
-    max-height: 130px;
-    aspect-ratio: 16 / 9;
     border-radius: 0;
   }
 
@@ -940,6 +957,9 @@ body {
 }
 
 .footer-left button.footer-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
   transition: color 0.2s;
 }
 
