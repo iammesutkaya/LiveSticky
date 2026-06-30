@@ -159,7 +159,7 @@
   align-items: center;
   gap: 8px 18px;
   justify-content: flex-start;
-  margin-top: 20px;
+  margin: 0;
 }
 
 /* "Built with" credit row — deliberately not button-like, so it can't be
@@ -231,7 +231,7 @@
   gap: 8px;
   list-style: none;
   padding: 0;
-  margin: 16px 0 24px 0;
+  margin: 0;
   color: var(--text-secondary);
   font-size: 0.95rem;
   font-weight: 500;
@@ -250,6 +250,12 @@
 
 .hero .action-group {
   justify-content: flex-start;
+}
+
+.hero-features-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .cta-section .action-group {
