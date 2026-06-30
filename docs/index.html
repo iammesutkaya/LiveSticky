@@ -94,11 +94,19 @@
 
     <!-- Dashboard Showcase -->
     <section class="showcase">
-      <!-- Showcase Tabs -->
-      <div class="showcase-tabs" role="tablist" aria-label="Dashboard views">
-        <button class="tab-btn active" role="tab" aria-selected="true" onclick="setDashboardView('stream', this)">Stream</button>
-        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('multistream', this)">Multistream</button>
-        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('offline', this)">Offline</button>
+      <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views" style="width: 100%;">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="setDashboardView('multistream', this)">
+          <i data-lucide="cast"></i>
+          <span>Multi-Stream</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('stream', this)">
+          <i data-lucide="video"></i>
+          <span>Single-Stream</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="setDashboardView('offline', this)">
+          <i data-lucide="moon"></i>
+          <span>Offline</span>
+        </button>
       </div>
 
       <div class="showcase-container">
@@ -156,7 +164,7 @@
                   </div>
 
                   <!-- YouTube Card -->
-                  <div id="mock-card-youtube" class="stream-card hidden">
+                  <div id="mock-card-youtube" class="stream-card">
                     <div class="stream-card-main">
                       <div class="thumb">
                         <div class="platform-badge platform-youtube">
@@ -186,7 +194,7 @@
                   </div>
 
                   <!-- Kick Card -->
-                  <div id="mock-card-kick" class="stream-card hidden">
+                  <div id="mock-card-kick" class="stream-card">
                     <div class="stream-card-main">
                       <div class="thumb">
                         <div class="platform-badge platform-kick">
