@@ -343,6 +343,7 @@
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
   width: 100%;
   max-width: 480px;
+  height: 512px;
 }
 
 .showcase-container:hover {
@@ -2070,7 +2071,7 @@
   min-height: 0 !important;
   height: 100% !important;
   max-width: 100% !important;
-  padding: 16px !important;
+  padding: 12px !important;
   margin: 0 !important;
   border: 1px solid rgba(255, 255, 255, 0.04);
   background: var(--bg-primary);
@@ -2115,11 +2116,5 @@
 @keyframes mockThumbnailPulse {
   0% { transform: scale(0.6); opacity: 0.4; }
   100% { transform: scale(1.4); opacity: 0; }
-}
-
-/* Force 16/9 aspect-ratio on the mock cinematic thumbnail to prevent vertical collapse in the auto-height landing page layout */
-.mock-dashboard .stream-card.cinematic .thumb {
-  aspect-ratio: 16 / 9 !important;
-  height: auto !important;
 }
 

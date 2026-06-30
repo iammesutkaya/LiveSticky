@@ -119,7 +119,7 @@
               </div>
             </header>
 
-            <main style="margin-top: 14px;">
+            <main>
               <!-- Live state -->
               <div id="mock-live-list" class="live-content">
                 <div class="platform-list">
@@ -215,6 +215,18 @@
                   </div>
 
                 </div>
+
+                <!-- Reddit Thread row -->
+                <div id="mock-reddit-thread" class="reddit-thread">
+                  <span class="reddit-badge">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12c-.688 0-1.249.561-1.249 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.248 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm-5.466 3.99a.327.327 0 0 0-.232.095.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+                  </span>
+                  <span class="reddit-thread-text">
+                    <span class="reddit-thread-title">Join the live discussion thread</span>
+                    <span class="reddit-thread-meta">r/LiveSticky • 42 comments</span>
+                  </span>
+                  <svg class="reddit-thread-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
               </div>
 
               <!-- Offline view -->
@@ -226,33 +238,23 @@
                   <p class="offline-text">StickyFox is offline</p>
                   <p class="offline-subtext">Check back soon for the next stream!</p>
                 </div>
-                <div class="platform-links" style="margin-top: 10px;">
-                  <div class="platform-btn twitch">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
-                    <span>Twitch</span>
-                  </div>
-                  <div class="platform-btn youtube">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    <span>YouTube</span>
-                  </div>
-                </div>
               </div>
 
-              <!-- Reddit Thread row -->
-              <div id="mock-reddit-thread" class="reddit-thread" style="margin-top: 12px;">
-                <span class="reddit-badge">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12c-.688 0-1.249.561-1.249 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.248 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm-5.466 3.99a.327.327 0 0 0-.232.095.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-                </span>
-                <span class="reddit-thread-text">
-                  <span class="reddit-thread-title">Join the live discussion thread</span>
-                  <span class="reddit-thread-meta">r/LiveSticky • 42 comments</span>
-                </span>
-                <svg class="reddit-thread-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+              <!-- Platform links — external streaming destinations, shown only when offline -->
+              <nav id="mock-platform-links" class="platform-links hidden">
+                <div class="platform-btn twitch">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+                  <span>Twitch</span>
+                </div>
+                <div class="platform-btn youtube">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  <span>YouTube</span>
+                </div>
+              </nav>
             </main>
 
             <!-- Footer -->
-            <footer class="footer" style="margin-top: 14px;">
+            <footer class="footer">
               <div class="footer-left">
                 <span class="update-mode healthy"></span>
                 <span class="footer-text">LiveSticky v1.0.130</span>
@@ -477,6 +479,7 @@
       const mockOffline = document.getElementById('mock-offline');
       const mockLiveList = document.getElementById('mock-live-list');
       const mockRedditThread = document.getElementById('mock-reddit-thread');
+      const mockPlatformLinks = document.getElementById('mock-platform-links');
       
       const cardTwitch = document.getElementById('mock-card-twitch');
       const cardYoutube = document.getElementById('mock-card-youtube');
@@ -487,6 +490,7 @@
         mockStatus.querySelector('.status-label').textContent = 'LIVE';
         document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
         mockOffline.classList.add('hidden');
+        mockPlatformLinks.classList.add('hidden');
         mockLiveList.classList.remove('hidden');
         mockRedditThread.classList.remove('hidden');
         
@@ -499,6 +503,7 @@
         mockStatus.querySelector('.status-label').textContent = 'LIVE';
         document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
         mockOffline.classList.add('hidden');
+        mockPlatformLinks.classList.add('hidden');
         mockLiveList.classList.remove('hidden');
         mockRedditThread.classList.remove('hidden');
         
@@ -511,6 +516,7 @@
         mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
         document.querySelector('.mock-dashboard .header-sub').textContent = 'Last live 8h 47m ago';
         mockOffline.classList.remove('hidden');
+        mockPlatformLinks.classList.remove('hidden');
         mockLiveList.classList.add('hidden');
         mockRedditThread.classList.add('hidden');
       }
