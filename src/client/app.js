@@ -265,8 +265,7 @@ function buildCard(p, cinematic) {
       <span class="wb-arrow">${ARROW_SVG}</span>
     </a>`;
 
-  const watch = card.querySelector('.watch-btn');
-  watch.addEventListener('click', (e) => {
+  card.addEventListener('click', (e) => {
     e.preventDefault();
     const url = platformUrl(p.platform);
     if (url) navigateTo(url);

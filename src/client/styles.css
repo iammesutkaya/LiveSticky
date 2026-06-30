@@ -312,19 +312,26 @@ body {
   gap: 10px;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.platform-list::-webkit-scrollbar {
-  display: none;
 }
 
 .stream-card {
   background: var(--bg-card);
   border-radius: var(--radius-md);
   overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.stream-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.stream-card.cinematic {
+  cursor: default;
+}
+
+.stream-card.cinematic:hover {
+  background: var(--bg-card);
 }
 
 /* Top section — compact (row) layout is the multistream default */
@@ -427,6 +434,10 @@ body {
 
 /* Watch CTA bar */
 .watch-btn {
+  display: none;
+}
+
+.stream-card.cinematic .watch-btn {
   display: flex;
   align-items: center;
   justify-content: center;

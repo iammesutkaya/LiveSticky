@@ -1403,19 +1403,26 @@
   gap: 10px;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.mock-dashboard .platform-list::-webkit-scrollbar {
-
-  display: none;
 }
 .mock-dashboard .stream-card {
 
   background: var(--bg-card);
   border-radius: var(--radius-md);
   overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.mock-dashboard .stream-card:hover {
+
+  background: var(--bg-card-hover);
+}
+.mock-dashboard .stream-card.cinematic {
+
+  cursor: default;
+}
+.mock-dashboard .stream-card.cinematic:hover {
+
+  background: var(--bg-card);
 }
 .mock-dashboard .stream-card-main {
 
@@ -1515,6 +1522,10 @@
   color: var(--text-faint);
 }
 .mock-dashboard .watch-btn {
+
+  display: none;
+}
+.mock-dashboard .stream-card.cinematic .watch-btn {
 
   display: flex;
   align-items: center;
