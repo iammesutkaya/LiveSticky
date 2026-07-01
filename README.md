@@ -41,7 +41,12 @@ Full setup instructions, the complete settings/placeholder reference, and copy-p
 
 ## 🌐 Fetch Domains
 
-This app makes HTTP requests to `id.twitch.tv`, `api.twitch.tv`, `youtube.googleapis.com`, `id.kick.com`, and `api.kick.com` (declared in [`devvit.json`](./devvit.json)) to poll live status and fetch stream metadata. No user data is sent to these services - only moderator-configured Client IDs, Client Secrets, and API keys are used for authentication. See the [Configuration Reference](https://livesticky.com/settings.html#fetch-domains) for what each domain is used for.
+This app makes outgoing HTTP requests to the following domains declared in [`devvit.json`](./devvit.json) (required by the Reddit App Review guidelines for transparency):
+
+* **Platform APIs** (status checking and metadata): `id.twitch.tv`, `api.twitch.tv`, `youtube.googleapis.com`, `id.kick.com`, `api.kick.com`
+* **Media CDNs** (proxying streamer avatars and thumbnails): `static-cdn.jtvnw.net`, `yt3.googleusercontent.com`, `i.ytimg.com`, `files.kick.com`, `i.redd.it`
+
+No user data is sent to these services - only moderator-configured credentials are used for API authentication. See the [Configuration Reference](https://livesticky.com/settings.html#fetch-domains) for what each domain is used for.
 
 ---
 
