@@ -1,13 +1,20 @@
 // Immediately apply saved theme preference to avoid FOUC before DOM is ready
 (() => {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  if (savedTheme === 'light') {
-    document.documentElement.classList.add('theme-light');
+  try {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('theme-light');
+    }
+  } catch (e) {
+    console.warn('localStorage not accessible, defaulting to dark theme.');
   }
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-  const currentTheme = localStorage.getItem('theme') || 'dark';
+  let currentTheme = 'dark';
+  try {
+    currentTheme = localStorage.getItem('theme') || 'dark';
+  } catch (e) {}
 
   // 1. Inject Floating Theme Toggle Button globally
   const toggle = document.createElement('button');
@@ -30,7 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
   toggle.addEventListener('click', () => {
     const isLight = document.documentElement.classList.toggle('theme-light');
     const newTheme = isLight ? 'light' : 'dark';
-    localStorage.setItem('theme', newTheme);
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (e) {
+      console.warn('localStorage setItem failed:', e);
+    }
 
     // Sync theme with demo iframe if present
     syncIframeTheme(newTheme);
@@ -52,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Also sync via postMessage when iframe finishes loading
     iframe.addEventListener('load', () => {
-      syncIframeTheme(currentTheme);
+      const activeTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
+      syncIframeTheme(activeTheme);
     });
   }
 
