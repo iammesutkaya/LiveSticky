@@ -4,10 +4,12 @@
 <head>
   <script>
     (function() {
-      const savedTheme = localStorage.getItem("theme") || "dark";
-      if (savedTheme === "light") {
-        document.documentElement.classList.add("theme-light");
-      }
+      try {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
     })();
   </script>
   <meta charset="UTF-8">
@@ -30,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.156">
-  <link rel="stylesheet" href="landing.css?v=1.0.156">
+  <link rel="stylesheet" href="style.css?v=1.0.157">
+  <link rel="stylesheet" href="landing.css?v=1.0.157">
 </head>
 
 <body>
@@ -55,7 +57,7 @@
             <img src="icon.png" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
           </div>
         </div>
-        <span class="badge badge-green badge-pulsate logo-version">v1.0.156</span>
+        <span class="badge badge-green badge-pulsate logo-version">v1.0.157</span>
       </div>
       <h1>LiveSticky</h1>
       <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer" class="creator-link">
@@ -337,7 +339,7 @@
 
       const demoIframe = document.getElementById('demo-iframe');
       if (demoIframe) {
-        const currentTheme = localStorage.getItem('theme') || 'dark';
+        const currentTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
         demoIframe.src = `demo/index.html?mock=${view}&theme=${currentTheme}`;
       }
 
@@ -360,7 +362,7 @@
       }
     });
   </script>
-  <script src="main.js?v=1.0.156"></script>
+  <script src="main.js?v=1.0.157"></script>
 </body>
 
 </html>

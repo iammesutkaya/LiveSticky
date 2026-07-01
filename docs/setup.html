@@ -4,10 +4,12 @@
 <head>
   <script>
     (function() {
-      const savedTheme = localStorage.getItem("theme") || "dark";
-      if (savedTheme === "light") {
-        document.documentElement.classList.add("theme-light");
-      }
+      try {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
     })();
   </script>
   <meta charset="UTF-8">
@@ -29,8 +31,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.156">
-  <link rel="stylesheet" href="landing.css?v=1.0.156">
+  <link rel="stylesheet" href="style.css?v=1.0.157">
+  <link rel="stylesheet" href="landing.css?v=1.0.157">
 </head>
 
 <body>
@@ -279,6 +281,6 @@
     </svg>
   </button>
 
-  <script src="main.js?v=1.0.156"></script>
+  <script src="main.js?v=1.0.157"></script>
 </body>
 </html>
