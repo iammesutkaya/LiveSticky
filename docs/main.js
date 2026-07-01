@@ -137,5 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
+  // 5. Secure Email Link Obfuscation (Prevents static spambot harvesting)
+  document.querySelectorAll('.contact-email').forEach((link) => {
+    const user = link.getAttribute('data-user');
+    const domain = link.getAttribute('data-domain');
+    if (user && domain) {
+      link.setAttribute('href', `mailto:${user}@${domain}`);
+    }
+  });
 });
+
 
