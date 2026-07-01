@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration Reference | LiveSticky</title>
+
+  <meta property="og:title" content="Configuration Reference - LiveSticky">
+  <meta property="og:description" content="Every setting, placeholder, default template, and mod menu action available in LiveSticky.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://livesticky.com/settings.html">
+  <meta property="og:image" content="https://livesticky.com/icon.png">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Configuration Reference specific additions */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    .token-table th, .token-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-line);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .token-table th {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .token-table code {
+      background: var(--bg-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--gold-text);
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .tmpl-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .tmpl-item summary {
+      padding: 16px 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      list-style: none;
+    }
+    .tmpl-item summary::-webkit-details-marker {
+      display: none;
+    }
+    .tmpl-item pre {
+      margin: 0 20px 20px;
+      padding: 16px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+    }
+    .tmpl-item code {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+
+    <header class="header-left">
+      <h1>Configuration Reference</h1>
+      <p class="subtitle">Every setting, placeholder, default template, and mod menu action in LiveSticky.</p>
+    </header>
+
+    <main class="card">
+      <div class="content">
+        <p>
+          All of these live under <strong>Mod Tools</strong> ➔ <strong>Apps</strong> ➔ <strong>live-sticky</strong> ➔ <strong>Settings</strong>. For step-by-step instructions on generating API credentials, see the <a href="setup.html">Setup Guide</a>.
+        </p>
+
+        <h2>Placeholder Reference</h2>
+        <p>Use these placeholders to dynamically insert stream info into your custom titles, bodies, footers, and sidebars:</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Placeholder</th><th>Replaced With</th><th>Example Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>{channel}</code></td><td>Twitch channel name (lowercase)</td><td>streamer</td></tr>
+            <tr><td><code>{display_name}</code></td><td>Twitch display name</td><td>Streamer</td></tr>
+            <tr><td><code>{title}</code></td><td>Current stream title</td><td>First stream back!</td></tr>
+            <tr><td><code>{game}</code></td><td>Category or game name</td><td>Just Chatting</td></tr>
+            <tr><td><code>{viewers}</code></td><td>Current live viewer count</td><td>15,420</td></tr>
+            <tr><td><code>{uptime}</code></td><td>Stream uptime</td><td>2h 15m</td></tr>
+            <tr><td><code>{twitch_url}</code></td><td>Configured Twitch URL</td><td>https://twitch.tv/...</td></tr>
+            <tr><td><code>{youtube_url}</code></td><td>Configured YouTube URL</td><td>https://youtube.com/...</td></tr>
+            <tr><td><code>{kick_url}</code></td><td>Configured Kick URL</td><td>https://kick.com/...</td></tr>
+            <tr><td><code>{date}</code></td><td>Stream date (Highlights post only)</td><td>June 2, 2026</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>Setup</h2>
+        <div class="alert-warning">
+          <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <strong>Per-community settings:</strong> The API credential fields below are entered by each subreddit's moderators and used only for that community. Because Devvit only encrypts app-wide secrets (not per-subreddit settings), these values are visible to the moderators of your subreddit in the settings form. Treat them like any shared moderator credential, and rotate them if your mod team changes.
+          </div>
+        </div>
+        <table class="token-table">
+          <thead>
+            <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Twitch Channel Name</td><td>String</td><td>The Twitch username to monitor (e.g. <code>streamer</code>).</td></tr>
+            <tr><td>Twitch Client ID</td><td>String</td><td>Your Twitch Developer Client ID. Required for Twitch status checks.</td></tr>
+            <tr><td>Twitch Client Secret</td><td>String</td><td>Your Twitch Developer Client Secret. Required for Twitch status checks.</td></tr>
+            <tr><td>YouTube Channel Name / Handle (Optional)</td><td>String</td><td>The handle of your YouTube channel (e.g. <code>@ChannelName</code> or <code>ChannelName</code>).</td></tr>
+            <tr><td>YouTube Data API Key (Optional)</td><td>String</td><td>Your Google Developer API key with YouTube Data API v3 enabled. Required for YouTube status checks.</td></tr>
+            <tr><td>Kick Channel Name (Optional)</td><td>String</td><td>The name of your Kick channel (e.g. <code>ChannelName</code>).</td></tr>
+            <tr><td>Kick API Client ID (Optional)</td><td>String</td><td>Your Kick Developer Client ID. Required for Kick status checks.</td></tr>
+            <tr><td>Kick API Client Secret (Optional)</td><td>String</td><td>Your Kick Developer Client Secret. Required for Kick status checks.</td></tr>
+            <tr><td>Enable Dynamic Post Flair Updates</td><td>Boolean</td><td>Periodically updates the live (or dashboard) post flair with the active game and viewer count (e.g. <code>🔴 LIVE: Just Chatting [15.4K]</code>).</td></tr>
+            <tr><td>Live Post Flair Template ID (Optional)</td><td>String</td><td>The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair).</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Offline Stage</h2>
+        <table class="token-table">
+          <thead>
+            <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Remove Live Post from Feed when Offline</td><td>Boolean</td><td>Mod action: Hides the live post from the community feed when offline (prevents feed flooding while keeping comments/links active).</td></tr>
+            <tr><td>Delete Live Post when Offline</td><td>Boolean</td><td>Completely deletes the live post and all its comments when the stream ends.</td></tr>
+            <tr><td>Offline Grace Period (Minutes)</td><td>Number</td><td>How long (in minutes) to wait before concluding the live post after going offline (defaults to <code>6</code>). Prevents duplicate posts during brief stream crashes.</td></tr>
+            <tr><td>Enable Pinned Offline Post</td><td>Boolean</td><td>Recycles a single permanent pinned post when offline (e.g. <code>😴 {display_name} is Offline. 😴</code>) to prevent new-post notifications, automatically clearing/flushing old comments on each transition so the comment section starts fresh.</td></tr>
+            <tr><td>Enable Sidebar Widget</td><td>Boolean</td><td>Creates and automatically updates a "STREAM STATUS" text widget in your community sidebar reflecting the live/offline state, category, viewers, and uptime in real-time.</td></tr>
+            <tr><td>Offline Post Title (Optional)</td><td>String</td><td>Custom title for the offline post. If empty, the default template is used. Supports placeholder: <code>{display_name}</code>.</td></tr>
+            <tr><td>Offline Post Body (Optional)</td><td>Paragraph</td><td>Custom markdown for the body of the offline post. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, and <code>{youtube_url}</code> as dynamic placeholders.</td></tr>
+            <tr><td>Offline Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the offline post (works with both custom and default templates). Useful for adding Discord/social links or rules.</td></tr>
+            <tr><td>Offline Sidebar Widget Text (Optional)</td><td>Paragraph</td><td>Custom markdown for the sidebar widget when offline. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, and <code>{youtube_url}</code> as placeholders.</td></tr>
+            <tr><td>Offline Sidebar Widget Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the offline sidebar widget (works with both custom and default templates). Useful for adding Discord/social links or rules.</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Live Stage</h2>
+        <table class="token-table">
+          <thead>
+            <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Live Post Title (Optional)</td><td>String</td><td>Custom title for the live post. If empty, the default template is used. Supports placeholders: <code>{display_name}</code>, <code>{title}</code>.</td></tr>
+            <tr><td>Live Post Body (Optional)</td><td>Paragraph</td><td>Custom markdown for the body of the live post. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, <code>{game}</code>, <code>{viewers}</code>, <code>{uptime}</code>, <code>{title}</code>, and <code>{youtube_url}</code> as dynamic placeholders.</td></tr>
+            <tr><td>Live Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the live post (works with both custom and default templates). Useful for adding Discord/social links or rules.</td></tr>
+            <tr><td>Auto-Pinned Comment Text (Optional)</td><td>Paragraph</td><td>Custom multiline markdown to pin at the top of the comment section (supports paragraphs, list formatting, and links).</td></tr>
+            <tr><td>Live Sidebar Widget Text (Optional)</td><td>Paragraph</td><td>Custom markdown for the sidebar widget when the stream is live. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, <code>{game}</code>, <code>{viewers}</code>, <code>{uptime}</code>, <code>{title}</code>, and <code>{youtube_url}</code> as placeholders.</td></tr>
+            <tr><td>Live Sidebar Widget Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the sidebar widget when the stream is live. Perfect for adding Discord links, rules, etc.</td></tr>
+            <tr><td>Suggested Comment Sort</td><td>Select</td><td>The default comment sorting applied to the live post (options: <code>New</code>, <code>Live</code>, <code>Q&amp;A</code>, or <code>None</code> to leave it to the community default). Defaults to <code>New</code>.</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Post-Stream Stage</h2>
+        <table class="token-table">
+          <thead>
+            <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Enable Stream Highlights Post</td><td>Boolean</td><td>Automatically compiles and posts the top Twitch clips generated during the stream when it ends.</td></tr>
+            <tr><td>Highlights Post Flair Template ID (Optional)</td><td>String</td><td>The UUID of the flair template to apply to the stream highlights post.</td></tr>
+            <tr><td>Highlights Post Title (Optional)</td><td>String</td><td>Custom title for the stream highlights post. If empty, the default template is used. Supports placeholders: <code>{display_name}</code>, <code>{date}</code>.</td></tr>
+            <tr><td>Highlights Post Custom Header (Optional)</td><td>Paragraph</td><td>Custom markdown for the header of the stream highlights post. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, <code>{title}</code>, and <code>{date}</code> as dynamic placeholders.</td></tr>
+            <tr><td>Highlights Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used. You can use <code>{channel}</code> as a dynamic placeholder.</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Dashboard (Custom Post)</h2>
+        <table class="token-table">
+          <thead>
+            <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Enable Custom Post Dashboard</td><td>Boolean</td><td>Enables the interactive dashboard custom post. This is an opt-in enhancement - the standard text-post flow continues to work as the default. When enabled, LiveSticky stickies the dashboard (instead of a standard live post) while you're live.</td></tr>
+          </tbody>
+        </table>
+        <p>Once enabled, create the post from <strong>Mod Tools</strong> ➔ the <strong>Create LiveSticky Dashboard</strong> menu item. Running it again replaces the existing dashboard rather than creating a duplicate.</p>
+
+        <h2>Moderator Menu Items</h2>
+        <p>LiveSticky adds these actions under your community's mod menu:</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Menu Item</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Create LiveSticky Dashboard</td><td>Creates (or recreates) the pinned interactive dashboard custom post.</td></tr>
+            <tr><td>Restart LiveSticky</td><td>Clears cached stream state and runs an immediate status check. Use this after changing settings to refresh right away instead of waiting for the next 2-minute poll.</td></tr>
+            <tr><td>Get Default LiveSticky Templates</td><td>Opens this page's copy-paste templates section.</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2 id="default-templates">Default Templates for Copy-Pasting</h2>
+        <p>If you need to restore or tweak the default texts, expand and copy these markdown templates:</p>
+
+        <details class="tmpl-item">
+          <summary>Live Post Title</summary>
+          <pre><code>🚨 {display_name} is LIVE! 🚨 - {title}</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Post Body</summary>
+          <pre><code>* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*Stats are auto-updated in real-time by LiveSticky.*</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Concluding Post Body</summary>
+          <pre><code>### 👋 Stream Ended - Thanks for watching! 👋
+
+**Title:**
+{title}
+
+The stream has concluded. VODs and highlights may be available via the links below.
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*This post is now locked as the stream has ended.*</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Title</summary>
+          <pre><code>😴 {display_name} is offline 😴</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Body</summary>
+          <pre><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Sidebar Widget Text</summary>
+          <pre><code># 🚨 {display_name} is LIVE! 🚨
+
+**Title:**
+{title}
+
+* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Sidebar Widget Text</summary>
+          <pre><code># 😴 {display_name} is offline 😴
+
+Follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Title</summary>
+          <pre><code>🎬 Top Clips from {display_name}'s stream ({date})</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Custom Header</summary>
+          <pre><code>**Title:**
+{title}
+
+Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Footer</summary>
+          <pre><code>---
+*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*</code></pre>
+        </details>
+
+        <hr>
+
+        <h2 id="fetch-domains">Fetch Domains</h2>
+        <p>This app makes HTTP requests to the following external domains (declared in <a href="https://github.com/iammesutkaya/LiveSticky/blob/main/devvit.json" target="_blank" rel="noopener noreferrer"><code>devvit.json</code></a>):</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Domain</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>id.twitch.tv</code></td><td>Twitch OAuth 2.0 token endpoint. Used to obtain a short-lived App Access Token via the Client Credentials flow, which is required to authenticate all Twitch Helix API requests.</td></tr>
+            <tr><td><code>api.twitch.tv</code></td><td>Twitch Helix REST API. Used to poll the live status of the configured channel (<code>/streams</code>), fetch stream metadata (title, game, viewer count), and retrieve top clips (<code>/clips</code>) for the post-stream highlights post.</td></tr>
+            <tr><td><code>youtube.googleapis.com</code></td><td>YouTube Data API v3. Used (when configured) to resolve the channel handle and poll YouTube Live status, title, and viewer count.</td></tr>
+            <tr><td><code>id.kick.com</code></td><td>Kick OAuth 2.0 token endpoint. Used (when configured) to obtain an access token via the Client Credentials flow.</td></tr>
+            <tr><td><code>api.kick.com</code></td><td>Kick public API. Used (when configured) to poll the configured channel's live status and metadata.</td></tr>
+          </tbody>
+        </table>
+        <p>No user data is sent to these external services. Only the moderator-configured Client IDs, Client Secrets, and API keys are used for authentication.</p>
+
+        <hr>
+
+        <h2>A Note on Pinned Posts &amp; Third-Party Clients</h2>
+        <p>Reddit has two pinning systems:</p>
+        <ul>
+          <li><strong>Legacy Sticky</strong> (2 slots max): Sets <code>stickied=true</code> on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.</li>
+          <li><strong>Community Highlights</strong> (6 slots): A newer carousel visible in the official Reddit app. Legacy stickies auto-fill the first 2 carousel slots; slots 3-6 are Highlights-only and do <strong>not</strong> set <code>stickied=true</code>.</li>
+        </ul>
+        <p>LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an <code>ANNOUNCEMENT</code> label - ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.</p>
+        <p><strong>If your subreddit already has 2 legacy-stickied posts</strong> (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but <strong>not</strong> at the top of the classic feed. Third-party Reddit clients that only read the <code>stickied</code> boolean will not surface the post. The solution is to free up a legacy sticky slot.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="icon.png" alt="LiveSticky logo" class="footer-logo">
+        <div>
+          <div class="footer-name">LiveSticky</div>
+          <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit - Twitch, YouTube, and Kick.</p>
+        </div>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <div class="footer-col">
+          <span class="footer-col-title">Product</span>
+          <a href="https://developers.reddit.com/apps/live-sticky" target="_blank" rel="noopener noreferrer">Install on Reddit</a>
+          <a href="setup.html">Setup Guide</a>
+          <a href="settings.html">Configuration Reference</a>
+          <a href="faq.html">FAQ</a>
+          <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="design.html">Design System</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Legal</span>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Connect</span>
+          <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer">u/iammesutkaya</a>
+          <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 LiveSticky. All rights reserved.</span>
+      <span>Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a></span>
+    </div>
+  </footer>
+
+</body>
+</html>

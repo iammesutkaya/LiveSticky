@@ -145,13 +145,13 @@
       "twitchClientId": {
         "type": "string",
         "label": "🟪 Twitch Client ID (Optional)",
-        "helpText": "Your Twitch App Client ID. Register one at https://dev.twitch.tv/console (Guide: https://github.com/iammesutkaya/LiveSticky#readme). Sensitive - only mods of this community can see it.",
+        "helpText": "Your Twitch App Client ID. Register one at https://dev.twitch.tv/console (Guide: https://livesticky.com/setup.html). Sensitive - only mods of this community can see it.",
         "placeholder": "your Twitch app Client ID"
       },
       "twitchClientSecret": {
         "type": "string",
         "label": "🟪 Twitch Client Secret (Optional)",
-        "helpText": "Your Twitch App Client Secret. Sensitive - keep it confidential; only mods of this community can see it. (Guide: https://github.com/iammesutkaya/LiveSticky#readme)",
+        "helpText": "Your Twitch App Client Secret. Sensitive - keep it confidential; only mods of this community can see it. (Guide: https://livesticky.com/setup.html)",
         "placeholder": "your Twitch app Client Secret"
       },
       "youtubeChannel": {

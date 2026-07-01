@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "docs"],
+      "port": 4173
+    },
+    {
+      "name": "harness",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4188", "--directory", "/private/tmp/claude-501/-Users-Mesut-02-Personal-Projects-06-Reddit-01-Apps-live-sticky/048f1deb-83bb-41df-ae7d-124427d6672e/scratchpad"],
+      "port": 4188
+    }
+  ]
+}

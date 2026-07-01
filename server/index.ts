@@ -276,7 +276,7 @@ app.post('/internal/menu/refresh-images', async (_req, res) => {
 
 app.post('/internal/menu/get-templates', async (_req, res) => {
   res.json({
-    navigateTo: 'https://github.com/iammesutkaya/LiveSticky#-default-templates-for-copy-pasting',
+    navigateTo: 'https://livesticky.com/settings.html#default-templates',
   });
 });
 

@@ -4,3 +4,6 @@ node_modules
 .env
 public/*.js
 public/*.js.map
+
+.claude/settings.local.json
+transform.js
