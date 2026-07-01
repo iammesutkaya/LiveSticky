@@ -2,7 +2,7 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky automates stream promotion on Reddit. It monitors your channels (Twitch, YouTube, or Kick) and updates your subreddit community in real-time with an interactive custom post dashboard, automated live threads, VOD archives, and post-stream highlights (Twitch only).
+LiveSticky automates stream promotion on Reddit. Monitor your Twitch, YouTube, or Kick channels and automatically pin an interactive live dashboard that manages real-time updates, concluding VOD archives, and stream highlights (Twitch only).
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
@@ -10,7 +10,7 @@ LiveSticky automates stream promotion on Reddit. It monitors your channels (Twit
 [![Kick Integration](https://img.shields.io/badge/Integration-Kick-53FC18?style=for-the-badge&logo=kick)](https://kick.com)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-LiveSticky handles the entire stream lifecycle automatically: from posting and pinning an interactive live dashboard or standard live post, to updating viewer statistics in real-time, and generating a highlights compilation post when the stream concludes.
+LiveSticky handles the entire stream lifecycle automatically. When you go live on Twitch, YouTube, or Kick, the bot creates and pins a dedicated live thread and interactive dashboard that updates viewer statistics in real-time. Once the stream ends, it transitions the post into an offline VOD archive, locks comments to prevent late spam, and compiles the top clips into a highlights post (Twitch only).
 
 ## ✨ Core Features
 
