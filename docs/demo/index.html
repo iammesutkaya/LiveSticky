@@ -4,6 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LiveSticky Dashboard</title>
+  <script>
+    // Immediately set theme based on query parameter or fallback
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme');
+    if (theme === 'light') {
+      document.documentElement.classList.add('theme-light');
+    } else if (theme === 'dark') {
+      document.documentElement.classList.add('theme-dark');
+    }
+
+    // Also listen for postMessage events for real-time changes
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'theme') {
+        document.documentElement.classList.remove('theme-light', 'theme-dark');
+        if (event.data.theme === 'light') {
+          document.documentElement.classList.add('theme-light');
+        } else if (event.data.theme === 'dark') {
+          document.documentElement.classList.add('theme-dark');
+        }
+      }
+    });
+  </script>
   <script type="module" crossorigin src="./default.js"></script>
   <link rel="stylesheet" crossorigin href="./default.css">
 </head>

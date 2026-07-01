@@ -42,7 +42,7 @@
 /* Light theme - tracks the OS/browser scheme (Reddit's webview doesn't expose
    its in-app toggle). Same structure, light neutrals, darker gold for text. */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not(.theme-dark) {
     --bg-primary: #ffffff;
     --bg-card: #f6f6f7;
     --bg-surface: #eaeaec;
@@ -61,6 +61,46 @@
     --border-subtle: #e6e6e8;
     --border-line: #dcdcde;
   }
+}
+
+:root.theme-light {
+  --bg-primary: #ffffff;
+  --bg-card: #f6f6f7;
+  --bg-surface: #eaeaec;
+  --bg-card-hover: #efeff0;
+
+  --text-primary: #1a1a1b;
+  --text-secondary: #545456;
+  --text-muted: #76767a;
+  --text-faint: #9a9aa0;
+
+  --accent-gold: #f5d474;          /* still a fill with dark content on top */
+  --gold-text: #8a6a12;            /* readable on light surfaces */
+  --gold-dim: rgba(168, 123, 24, 0.12);
+  --gold-border: rgba(168, 123, 24, 0.32);
+
+  --border-subtle: #e6e6e8;
+  --border-line: #dcdcde;
+}
+
+:root.theme-dark {
+  --bg-primary: #0e1113;   /* perfectly match Reddit background */
+  --bg-card: #15191c;      /* stream cards, reddit row */
+  --bg-surface: #1c2125;   /* elevated bits: thumbnails, watch bar */
+  --bg-card-hover: #191e21;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a5;
+  --text-muted: #707075;
+  --text-faint: #444448;
+
+  --accent-gold: #f5d474;
+  --gold-text: #f5d474;
+  --gold-dim: rgba(245, 212, 116, 0.10);
+  --gold-border: rgba(245, 212, 116, 0.30);
+
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-line: rgba(255, 255, 255, 0.06);
 }
 
 * {

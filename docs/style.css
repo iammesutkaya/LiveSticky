@@ -594,3 +594,73 @@ h1 {
   transform: translateY(-1px);
 }
 
+/* Global Light Theme Overrides */
+html.theme-light {
+  --bg-primary: #ffffff;
+  --bg-card: #f6f6f7;
+  --bg-surface: #eaeaec;
+  --bg-card-hover: #efeff0;
+
+  --text-primary: #1a1a1b;
+  --text-secondary: #545456;
+  --text-muted: #76767a;
+  --text-faint: #9a9aa0;
+
+  --accent-gold: #f5d474;
+  --gold-text: #8a6a12;
+  --border-line: #dcdcde;
+}
+
+/* Floating Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 99;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.theme-toggle svg {
+  fill: none;
+  stroke: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(15deg);
+}
+
+/* Hide sun/moon depending on active theme */
+html:not(.theme-light) .theme-toggle .sun-icon {
+  display: block;
+}
+html:not(.theme-light) .theme-toggle .moon-icon {
+  display: none;
+}
+html.theme-light .theme-toggle .sun-icon {
+  display: none;
+}
+html.theme-light .theme-toggle .moon-icon {
+  display: block;
+}
+
+
