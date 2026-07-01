@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatTimeAgo, formatNumber, computeUptime } from '../client/utils.js';
+import { formatTimeAgo, formatNumber } from '../client/utils.js';
 
 describe('formatTimeAgo', () => {
   const now = new Date('2024-01-15T12:00:00Z').getTime();
@@ -96,41 +96,5 @@ describe('formatNumber', () => {
 
   it('falls back for non-numeric string', () => {
     expect(formatNumber('abc')).toBe('abc');
-  });
-});
-
-describe('computeUptime', () => {
-  const now = new Date('2024-01-15T12:00:00Z').getTime();
-
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(now);
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('returns empty string for null', () => {
-    expect(computeUptime(null)).toBe('');
-  });
-
-  it('returns empty string for undefined', () => {
-    expect(computeUptime(undefined)).toBe('');
-  });
-
-  it('returns minutes only for short uptimes', () => {
-    const startedAt = new Date(now - 45 * 60000).toISOString();
-    expect(computeUptime(startedAt)).toBe('45m');
-  });
-
-  it('returns hours and minutes for long uptimes', () => {
-    const startedAt = new Date(now - (2 * 3600000 + 30 * 60000)).toISOString();
-    expect(computeUptime(startedAt)).toBe('2h 30m');
-  });
-
-  it('returns empty string for future timestamps', () => {
-    const startedAt = new Date(now + 60000).toISOString();
-    expect(computeUptime(startedAt)).toBe('');
   });
 });

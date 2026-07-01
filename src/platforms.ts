@@ -505,61 +505,12 @@ async function fetchTwitchStatus(
 // ---------------------------------------------------------------------------
 
 /**
- * Polls status across configured platforms in order of priority: Twitch > YouTube > Kick
- */
-export async function checkStreamStatus(
-  context: PlatformContext
-): Promise<UnifiedStreamInfo | null> {
-  const [
-    twitchChannel,
-    twitchClientId,
-    twitchClientSecret,
-    youtubeChannel,
-    youtubeApiKey,
-    kickChannel,
-    kickClientId,
-    kickClientSecret,
-  ] = await Promise.all([
-    context.settings.get('twitchChannel') as Promise<string | undefined>,
-    context.settings.get('twitchClientId') as Promise<string | undefined>,
-    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
-    context.settings.get('youtubeChannel') as Promise<string | undefined>,
-    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
-    context.settings.get('kickChannel') as Promise<string | undefined>,
-    context.settings.get('kickClientId') as Promise<string | undefined>,
-    context.settings.get('kickClientSecret') as Promise<string | undefined>,
-  ]);
-
-  if (twitchChannel && twitchClientId && twitchClientSecret) {
-    const twitchStatus = await fetchTwitchStatus(
-      twitchChannel, twitchClientId, twitchClientSecret, context.redis
-    );
-    if (twitchStatus) return twitchStatus;
-  }
-
-  if (youtubeChannel && youtubeApiKey) {
-    const youtubeStatus = await fetchYouTubeStatus(youtubeChannel, youtubeApiKey, context.redis);
-    if (youtubeStatus) return youtubeStatus;
-  }
-
-  if (kickChannel && kickClientId && kickClientSecret) {
-    const kickStatus = await fetchKickStatus(
-      kickChannel, kickClientId, kickClientSecret, context.redis
-    );
-    if (kickStatus) return kickStatus;
-  }
-
-  return null;
-}
-
-/**
  * Polls EVERY configured platform in parallel and returns all that are
  * currently live, ordered Twitch > YouTube > Kick.
  *
- * Unlike checkStreamStatus (which short-circuits at the first live platform to
- * conserve API quota), this is used by the multistream dashboard, which needs
- * the full set of simultaneously-live platforms so viewers can choose which one
- * to watch.
+ * This is used by the multistream dashboard, which needs the full set of
+ * simultaneously-live platforms so viewers can choose which one to watch
+ * (rather than short-circuiting at the first live platform).
  *
  * NOTE: when a YouTube channel is configured this calls the YouTube Data API on
  * every check (~100 quota units), even if another platform is already live - 
@@ -648,7 +599,7 @@ const IMAGE_TTL = 43200; // 12 hours
 /**
  * Fetches and caches avatar + banner URLs for the active platform.
  * Skips the API call if the cached avatar key is still alive in Redis.
- * Priority mirrors checkStreamStatus: Twitch > YouTube > Kick.
+ * Priority: Twitch > YouTube > Kick.
  */
 export async function refreshChannelImages(context: PlatformContext): Promise<void> {
   const cached = await context.redis.get('dashboard_avatar_url');

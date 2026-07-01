@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   formatLivePostBody,
   formatOfflinePostBody,
@@ -7,6 +7,7 @@ import {
   removeYoutubeLink,
   removeTwitchLink,
   removeKickLink,
+  computeUptime,
 } from '../formatters.js';
 import type { UnifiedStreamInfo } from '../platforms.js';
 
@@ -150,5 +151,45 @@ describe('removeKickLink', () => {
     const result = removeKickLink(text);
     expect(result).not.toContain('{kick_url}');
     expect(result).toContain('Other');
+  });
+});
+
+describe('computeUptime', () => {
+  const now = new Date('2024-01-15T12:00:00Z').getTime();
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('returns empty string for null', () => {
+    expect(computeUptime(null)).toBe('');
+  });
+
+  it('returns empty string for undefined', () => {
+    expect(computeUptime(undefined)).toBe('');
+  });
+
+  it('returns empty string for an invalid date', () => {
+    expect(computeUptime('not-a-date')).toBe('');
+  });
+
+  it('returns minutes only for short uptimes', () => {
+    const startedAt = new Date(now - 45 * 60000).toISOString();
+    expect(computeUptime(startedAt)).toBe('45m');
+  });
+
+  it('returns hours and minutes for long uptimes', () => {
+    const startedAt = new Date(now - (2 * 3600000 + 30 * 60000)).toISOString();
+    expect(computeUptime(startedAt)).toBe('2h 30m');
+  });
+
+  it('returns empty string for future timestamps', () => {
+    const startedAt = new Date(now + 60000).toISOString();
+    expect(computeUptime(startedAt)).toBe('');
   });
 });

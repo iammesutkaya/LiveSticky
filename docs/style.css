@@ -205,6 +205,15 @@ h1 {
   color: var(--text-primary);
 }
 
+/* Reference tables (design tokens, settings reference) - the parent .card
+   clips overflow, so make wide tables scroll horizontally on their own rather
+   than getting cut off on narrow screens. */
+.token-table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Landing Portal Buttons Grid */
 .portal-grid {
   display: grid;

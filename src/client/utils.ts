@@ -40,18 +40,3 @@ export function formatNumber(numStr: string | number | null | undefined): string
   if (num >= 1_000) return `${(num / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
   return num.toString();
 }
-
-/**
- * Compute a human-readable uptime string from a started-at ISO timestamp.
- * Returns '' if startedAt is falsy.
- */
-export function computeUptime(startedAt: string | null | undefined): string {
-  if (!startedAt) return '';
-  const startTime = new Date(startedAt).getTime();
-  if (isNaN(startTime)) return '';
-  const elapsedMs = Date.now() - startTime;
-  if (elapsedMs < 0) return '';
-  const hours = Math.floor(elapsedMs / 3600000);
-  const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-}
