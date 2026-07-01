@@ -350,6 +350,10 @@
   transition: color 0.25s ease;
 }
 
+.mobile-label {
+  display: none;
+}
+
 .showcase-tabs .tab-btn:hover {
   color: var(--text-primary);
   background: transparent !important;
@@ -1007,6 +1011,10 @@
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .hero .action-group {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1057,6 +1065,18 @@
 
   .portal-grid {
     grid-template-columns: 1fr;
+  }
+
+  .desktop-label {
+    display: none;
+  }
+
+  .mobile-label {
+    display: inline;
+  }
+
+  .showcase-tabs .tab-btn {
+    padding: 8px 12px;
   }
 }
 

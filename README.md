@@ -56,4 +56,3 @@ No user data is sent to these services. Only moderator-configured API credential
 * **Twitch:** Follow the live channel at [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
 
 *Created with ❤️ for the community.*
-

@@ -141,9 +141,15 @@
       <section class="showcase">
         <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views" style="width: 100%;">
           <button class="tab-btn active" role="tab" aria-selected="true"
-            onclick="setDashboardView('multistream', this)">Multi-Stream</button>
+            onclick="setDashboardView('multistream', this)">
+            <span class="desktop-label">Multi-Stream</span>
+            <span class="mobile-label">Multi</span>
+          </button>
           <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardView('stream', this)">Single-Stream</button>
+            onclick="setDashboardView('stream', this)">
+            <span class="desktop-label">Single-Stream</span>
+            <span class="mobile-label">Single</span>
+          </button>
           <button class="tab-btn" role="tab" aria-selected="false"
             onclick="setDashboardView('offline', this)">Offline</button>
         </div>
