@@ -342,11 +342,11 @@ h1 {
 }
 
 .alert-warning strong {
-  color: var(--accent-gold);
+  color: var(--gold-text);
 }
 
 .alert-icon {
-  color: var(--accent-gold);
+  color: var(--gold-text);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -585,7 +585,7 @@ h1 {
 .back-to-top:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent-gold);
-  color: var(--accent-gold);
+  color: var(--gold-text);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
@@ -644,7 +644,7 @@ html.theme-light {
 .theme-toggle:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent-gold);
-  color: var(--accent-gold);
+  color: var(--gold-text);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
@@ -713,7 +713,7 @@ html.theme-light .theme-toggle .moon-icon {
     font-weight: 600 !important;
     font-size: 0.75rem !important;
     text-transform: uppercase !important;
-    color: var(--accent-gold) !important;
+    color: var(--gold-text) !important;
     margin-bottom: 4px !important;
   }
 }

@@ -51,7 +51,7 @@
 }
 
 .top-nav .nav-link:hover {
-  color: var(--accent-gold);
+  color: var(--gold-text);
 }
 
 /* ── Hero ────────────────────────────────────────────────── */
@@ -360,7 +360,7 @@
 }
 
 .showcase-tabs .tab-btn.active {
-  color: var(--accent-gold);
+  color: var(--gold-text);
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -684,7 +684,7 @@
 
 /* Subtle micro-interaction: the icon eases to gold and lifts on card hover */
 .feature-card:hover .feature-icon {
-  color: var(--accent-gold);
+  color: var(--gold-text);
   transform: translateY(-2px) scale(1.06);
 }
 
@@ -759,7 +759,7 @@
   height: 22px;
   vertical-align: -3px;
   margin-right: 8px;
-  color: var(--accent-gold);
+  color: var(--gold-text);
   stroke-width: 2;
 }
 
@@ -807,7 +807,7 @@
 }
 
 .feature-item:hover .feature-icon {
-  color: var(--accent-gold);
+  color: var(--gold-text);
   transform: translateY(-2px) scale(1.06);
 }
 
@@ -912,7 +912,7 @@
 
 .faq-item[open] .faq-icon {
   transform: rotate(180deg);
-  color: var(--accent-gold);
+  color: var(--gold-text);
 }
 
 .faq-content {
