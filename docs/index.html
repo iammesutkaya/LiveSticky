@@ -308,75 +308,11 @@
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
 
-      const mockStatus = document.getElementById('mock-status');
-      const mockOffline = document.getElementById('mock-offline');
-      const mockLiveList = document.getElementById('mock-live-list');
-      const mockRedditThread = document.getElementById('mock-reddit-thread');
-      const mockPlatformLinks = document.getElementById('mock-platform-links');
-      
-      const cardTwitch = document.getElementById('mock-card-twitch');
-      const cardYoutube = document.getElementById('mock-card-youtube');
-      const cardKick = document.getElementById('mock-card-kick');
-
-      if (view === 'stream') {
-        mockStatus.className = 'status-indicator live';
-        mockStatus.querySelector('.status-label').textContent = 'LIVE';
-        document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
-        mockOffline.classList.add('hidden');
-        mockPlatformLinks.classList.add('hidden');
-        mockLiveList.classList.remove('hidden');
-        mockRedditThread.classList.remove('hidden');
-        
-        cardTwitch.classList.remove('hidden');
-        cardYoutube.classList.add('hidden');
-        cardKick.classList.add('hidden');
-        cardTwitch.classList.add('cinematic');
-      } else if (view === 'multistream') {
-        mockStatus.className = 'status-indicator live';
-        mockStatus.querySelector('.status-label').textContent = 'LIVE';
-        document.querySelector('.mock-dashboard .header-sub').textContent = 'Gaming & Coding';
-        mockOffline.classList.add('hidden');
-        mockPlatformLinks.classList.add('hidden');
-        mockLiveList.classList.remove('hidden');
-        mockRedditThread.classList.remove('hidden');
-        
-        cardTwitch.classList.remove('hidden');
-        cardYoutube.classList.remove('hidden');
-        cardKick.classList.remove('hidden');
-        cardTwitch.classList.remove('cinematic');
-      } else if (view === 'offline') {
-        mockStatus.className = 'status-indicator offline';
-        mockStatus.querySelector('.status-label').textContent = 'OFFLINE';
-        document.querySelector('.mock-dashboard .header-sub').textContent = 'Last live 8h 47m ago';
-        mockOffline.classList.remove('hidden');
-        mockPlatformLinks.classList.remove('hidden');
-        mockLiveList.classList.add('hidden');
-        mockRedditThread.classList.add('hidden');
+      const demoIframe = document.getElementById('demo-iframe');
+      if (demoIframe) {
+        demoIframe.src = `demo/index.html?mock=${view}`;
       }
     }
-
-    // Simulate live viewer count updates
-    setInterval(() => {
-      const twitchViewerSpan = document.querySelector('.viewers-count-twitch');
-      const youtubeViewerSpan = document.querySelector('.viewers-count-youtube');
-      const kickViewerSpan = document.querySelector('.viewers-count-kick');
-
-      if (twitchViewerSpan && !twitchViewerSpan.closest('.hidden')) {
-        let count = parseInt(twitchViewerSpan.textContent.replace(/,/g, ''), 10);
-        count += Math.floor(Math.random() * 21) - 10; // +/- 10
-        twitchViewerSpan.textContent = count.toLocaleString();
-      }
-      if (youtubeViewerSpan && !youtubeViewerSpan.closest('.hidden')) {
-        let count = parseInt(youtubeViewerSpan.textContent.replace(/,/g, ''), 10);
-        count += Math.floor(Math.random() * 11) - 5; // +/- 5
-        youtubeViewerSpan.textContent = count.toLocaleString();
-      }
-      if (kickViewerSpan && !kickViewerSpan.closest('.hidden')) {
-        let count = parseInt(kickViewerSpan.textContent.replace(/,/g, ''), 10);
-        count += Math.floor(Math.random() * 7) - 3; // +/- 3
-        kickViewerSpan.textContent = count.toLocaleString();
-      }
-    }, 4000);
   </script>
 </body>
 
