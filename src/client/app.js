@@ -81,6 +81,75 @@ let config = {
 // Reddit discussion post URL for the live-thread row.
 let redditThreadUrl = null;
 
+// ---------------------------------------------------------------------------
+// Mock Mode Configuration
+// ---------------------------------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const mockMode = urlParams.get('mock');
+const isMockMode = mockMode !== null;
+
+const MOCK_CONFIG = {
+  twitchChannel: 'stickyfox',
+  twitchUrl: 'https://twitch.tv/stickyfox',
+  youtubeUrl: 'https://youtube.com/c/stickyfox',
+  kickUrl: 'https://kick.com/stickyfox',
+};
+
+const MOCK_STATUS = {
+  multistream: {
+    isLive: true,
+    displayName: "StickyFox",
+    avatarUrl: "icon.png",
+    lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
+    postComments: 42,
+    postScore: 156,
+    livePostId: "t3_123456",
+    twitchLive: true,
+    twitchTitle: "🚀 Coding a Reddit Dashboard Live! | !project !github",
+    twitchViewers: 1414,
+    twitchGame: "Software & Game Dev",
+    twitchUptime: "3h 15m",
+    youtubeLive: true,
+    youtubeTitle: "LiveSticky Launch: Live Q&A & Code Walkthrough",
+    youtubeViewers: 850,
+    youtubeGame: "Science & Technology",
+    youtubeUptime: "1h 45m",
+    kickLive: true,
+    kickTitle: "Late Night Coding Session - Building on Devvit",
+    kickViewers: 310,
+    kickGame: "Coding",
+    kickUptime: "45m"
+  },
+  stream: {
+    isLive: true,
+    displayName: "StickyFox",
+    avatarUrl: "icon.png",
+    lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
+    postComments: 42,
+    postScore: 156,
+    livePostId: "t3_123456",
+    twitchLive: true,
+    twitchTitle: "🚀 Coding a Reddit Dashboard Live! | !project !github",
+    twitchViewers: 1414,
+    twitchGame: "Software & Game Dev",
+    twitchUptime: "3h 15m",
+    youtubeLive: false,
+    kickLive: false
+  },
+  offline: {
+    isLive: false,
+    displayName: "StickyFox",
+    avatarUrl: "icon.png",
+    lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
+    postComments: 42,
+    postScore: 156,
+    livePostId: "t3_123456",
+    twitchLive: false,
+    youtubeLive: false,
+    kickLive: false
+  }
+};
+
 // Timestamp of the last successful data update, for the relative footer label.
 let lastFetchTime = null;
 
@@ -245,8 +314,9 @@ function buildCard(p, cinematic) {
 
   card.innerHTML = `
     <div class="stream-card-main">
-      <div class="thumb">
+      <div class="thumb platform-${p.platform}">
         <img alt="" class="thumb-img" style="display:none">
+        <div class="pulse-ring"></div>
         <span class="platform-badge platform-${p.platform}">${logo}</span>
       </div>
       <div class="stream-card-info">
@@ -376,21 +446,29 @@ function updateDashboard(data) {
 
   if (avatarImgEl && data.avatarUrl && data.avatarUrl !== loadedAvatarUrl) {
     loadedAvatarUrl = data.avatarUrl;
-    fetchProxiedImage(data.avatarUrl).then((blobUrl) => {
-      if (blobUrl) {
-        if (avatarBlobUrl) URL.revokeObjectURL(avatarBlobUrl);
-        avatarBlobUrl = blobUrl;
-        avatarImgEl.onload = () => {
-          avatarImgEl.style.display = 'block';
-          if (avatarInitialEl) avatarInitialEl.style.display = 'none';
-        };
-        avatarImgEl.src = blobUrl;
-      } else {
-        avatarImgEl.style.display = 'none';
-        if (avatarInitialEl) avatarInitialEl.style.display = '';
-        loadedAvatarUrl = null;
-      }
-    });
+    if (isMockMode) {
+      avatarImgEl.onload = () => {
+        avatarImgEl.style.display = 'block';
+        if (avatarInitialEl) avatarInitialEl.style.display = 'none';
+      };
+      avatarImgEl.src = data.avatarUrl;
+    } else {
+      fetchProxiedImage(data.avatarUrl).then((blobUrl) => {
+        if (blobUrl) {
+          if (avatarBlobUrl) URL.revokeObjectURL(avatarBlobUrl);
+          avatarBlobUrl = blobUrl;
+          avatarImgEl.onload = () => {
+            avatarImgEl.style.display = 'block';
+            if (avatarInitialEl) avatarInitialEl.style.display = 'none';
+          };
+          avatarImgEl.src = blobUrl;
+        } else {
+          avatarImgEl.style.display = 'none';
+          if (avatarInitialEl) avatarInitialEl.style.display = '';
+          loadedAvatarUrl = null;
+        }
+      });
+    }
   }
 
   dashboard.classList.toggle('is-live', isNowLive);
@@ -518,7 +596,13 @@ async function handleRefresh() {
   refreshBtn.classList.add('spinning');
   refreshBtn.disabled = true;
   try {
-    await fetchStatus();
+    if (isMockMode) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const mockState = MOCK_STATUS[mockMode] || MOCK_STATUS.multistream;
+      updateDashboard(mockState);
+    } else {
+      await fetchStatus();
+    }
   } finally {
     setTimeout(() => {
       refreshBtn.classList.remove('spinning');
@@ -555,11 +639,33 @@ async function init() {
   // parallel fetch can render the offline state with empty config (buttons
   // hidden, generic "Check back soon!") until the next update. Loading config
   // first makes the first paint correct without needing a manual refresh.
-  await fetchConfig();
-  const statusOk = await fetchStatus();
-  if (!statusOk) startPolling();
+  if (isMockMode) {
+    config = MOCK_CONFIG;
+    updatePlatformLinks();
+    const mockState = MOCK_STATUS[mockMode] || MOCK_STATUS.multistream;
+    updateDashboard(mockState);
 
-  initRealtime();
+    // Periodically fluctuate mock viewers slightly to simulate live updates
+    setInterval(() => {
+      if (currentState.twitchLive) {
+        currentState.twitchViewers = Math.max(10, currentState.twitchViewers + Math.floor(Math.random() * 21) - 10);
+        updateCard({ platform: 'twitch', viewers: currentState.twitchViewers, game: currentState.twitchGame, uptime: currentState.twitchUptime, title: currentState.twitchTitle });
+      }
+      if (currentState.youtubeLive) {
+        currentState.youtubeViewers = Math.max(10, currentState.youtubeViewers + Math.floor(Math.random() * 11) - 5);
+        updateCard({ platform: 'youtube', viewers: currentState.youtubeViewers, game: currentState.youtubeGame, uptime: currentState.youtubeUptime, title: currentState.youtubeTitle });
+      }
+      if (currentState.kickLive) {
+        currentState.kickViewers = Math.max(10, currentState.kickViewers + Math.floor(Math.random() * 7) - 3);
+        updateCard({ platform: 'kick', viewers: currentState.kickViewers, game: currentState.kickGame, uptime: currentState.kickUptime, title: currentState.kickTitle });
+      }
+    }, 4000);
+  } else {
+    await fetchConfig();
+    const statusOk = await fetchStatus();
+    if (!statusOk) startPolling();
+    initRealtime();
+  }
 
   // Setup modal logic here to ensure DOM is 100% ready
   aboutModal = $('about-modal');
