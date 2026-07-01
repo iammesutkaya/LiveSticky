@@ -30,8 +30,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.155">
-  <link rel="stylesheet" href="landing.css?v=1.0.155">
+  <link rel="stylesheet" href="style.css?v=1.0.156">
+  <link rel="stylesheet" href="landing.css?v=1.0.156">
 </head>
 
 <body>
@@ -55,7 +55,7 @@
             <img src="icon.png" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
           </div>
         </div>
-        <span class="badge badge-green badge-pulsate logo-version">v1.0.155</span>
+        <span class="badge badge-green badge-pulsate logo-version">v1.0.156</span>
       </div>
       <h1>LiveSticky</h1>
       <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer" class="creator-link">
@@ -337,7 +337,8 @@
 
       const demoIframe = document.getElementById('demo-iframe');
       if (demoIframe) {
-        demoIframe.src = `demo/index.html?mock=${view}`;
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        demoIframe.src = `demo/index.html?mock=${view}&theme=${currentTheme}`;
       }
 
       updateTabIndicator(btn);
@@ -359,7 +360,7 @@
       }
     });
   </script>
-  <script src="main.js?v=1.0.155"></script>
+  <script src="main.js?v=1.0.156"></script>
 </body>
 
 </html>
