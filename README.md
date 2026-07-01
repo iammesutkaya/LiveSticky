@@ -45,12 +45,6 @@ This app makes HTTP requests to `id.twitch.tv`, `api.twitch.tv`, `youtube.google
 
 ---
 
-## 🗺️ Roadmap
-
-See the [ROADMAP.md](./ROADMAP.md) file for our upcoming features, integrations, and future enhancements!
-
----
-
 ## 👨‍💻 Author & Credits
 
 * **Developer:** Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya)
