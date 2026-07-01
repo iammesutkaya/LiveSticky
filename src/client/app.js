@@ -104,21 +104,32 @@ const MOCK_STATUS = {
     postComments: 42,
     postScore: 156,
     livePostId: "t3_123456",
-    twitchLive: true,
-    twitchTitle: "🚀 Coding a Reddit Dashboard Live! | !project !github",
-    twitchViewers: 1414,
-    twitchGame: "Software & Game Dev",
-    twitchUptime: "3h 15m",
-    youtubeLive: true,
-    youtubeTitle: "LiveSticky Launch: Live Q&A & Code Walkthrough",
-    youtubeViewers: 850,
-    youtubeGame: "Science & Technology",
-    youtubeUptime: "1h 45m",
-    kickLive: true,
-    kickTitle: "Late Night Coding Session - Building on Devvit",
-    kickViewers: 310,
-    kickGame: "Coding",
-    kickUptime: "45m"
+    platforms: [
+      {
+        platform: "twitch",
+        title: "🚀 Coding a Reddit Dashboard Live! | !project !github",
+        viewers: 1414,
+        game: "Software & Game Dev",
+        uptime: "3h 15m",
+        thumbnail: ""
+      },
+      {
+        platform: "youtube",
+        title: "LiveSticky Launch: Live Q&A & Code Walkthrough",
+        viewers: 850,
+        game: "Science & Technology",
+        uptime: "1h 45m",
+        thumbnail: ""
+      },
+      {
+        platform: "kick",
+        title: "Late Night Coding Session - Building on Devvit",
+        viewers: 310,
+        game: "Coding",
+        uptime: "45m",
+        thumbnail: ""
+      }
+    ]
   },
   stream: {
     isLive: true,
@@ -128,13 +139,16 @@ const MOCK_STATUS = {
     postComments: 42,
     postScore: 156,
     livePostId: "t3_123456",
-    twitchLive: true,
-    twitchTitle: "🚀 Coding a Reddit Dashboard Live! | !project !github",
-    twitchViewers: 1414,
-    twitchGame: "Software & Game Dev",
-    twitchUptime: "3h 15m",
-    youtubeLive: false,
-    kickLive: false
+    platforms: [
+      {
+        platform: "twitch",
+        title: "🚀 Coding a Reddit Dashboard Live! | !project !github",
+        viewers: 1414,
+        game: "Software & Game Dev",
+        uptime: "3h 15m",
+        thumbnail: ""
+      }
+    ]
   },
   offline: {
     isLive: false,
@@ -144,9 +158,7 @@ const MOCK_STATUS = {
     postComments: 42,
     postScore: 156,
     livePostId: "t3_123456",
-    twitchLive: false,
-    youtubeLive: false,
-    kickLive: false
+    platforms: []
   }
 };
 
@@ -647,18 +659,16 @@ async function init() {
 
     // Periodically fluctuate mock viewers slightly to simulate live updates
     setInterval(() => {
-      if (currentState.twitchLive) {
-        currentState.twitchViewers = Math.max(10, currentState.twitchViewers + Math.floor(Math.random() * 21) - 10);
-        updateCard({ platform: 'twitch', viewers: currentState.twitchViewers, game: currentState.twitchGame, uptime: currentState.twitchUptime, title: currentState.twitchTitle });
-      }
-      if (currentState.youtubeLive) {
-        currentState.youtubeViewers = Math.max(10, currentState.youtubeViewers + Math.floor(Math.random() * 11) - 5);
-        updateCard({ platform: 'youtube', viewers: currentState.youtubeViewers, game: currentState.youtubeGame, uptime: currentState.youtubeUptime, title: currentState.youtubeTitle });
-      }
-      if (currentState.kickLive) {
-        currentState.kickViewers = Math.max(10, currentState.kickViewers + Math.floor(Math.random() * 7) - 3);
-        updateCard({ platform: 'kick', viewers: currentState.kickViewers, game: currentState.kickGame, uptime: currentState.kickUptime, title: currentState.kickTitle });
-      }
+      if (!currentState || !Array.isArray(currentState.platforms)) return;
+      currentState.platforms.forEach((p) => {
+        let delta = 0;
+        if (p.platform === 'twitch') delta = Math.floor(Math.random() * 21) - 10;
+        else if (p.platform === 'youtube') delta = Math.floor(Math.random() * 11) - 5;
+        else if (p.platform === 'kick') delta = Math.floor(Math.random() * 7) - 3;
+        
+        p.viewers = Math.max(10, Number(p.viewers) + delta);
+        updateCard(p);
+      });
     }, 4000);
   } else {
     await fetchConfig();
