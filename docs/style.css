@@ -39,6 +39,11 @@
   --kick-color: #53fc18;
   --reddit-color: #ff4500;
   
+  /* Success / Copied Notification */
+  --copied-color: #53fc18;
+  --copied-bg: rgba(83, 252, 24, 0.15);
+  --copied-border: rgba(83, 252, 24, 0.3);
+  
   /* Radius - Extended for Premium look */
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -542,9 +547,9 @@ h1 {
 }
 
 .copy-btn.copied {
-  background: rgba(83, 252, 24, 0.15);
-  color: var(--kick-color);
-  border-color: rgba(83, 252, 24, 0.3);
+  background: var(--copied-bg);
+  color: var(--copied-color);
+  border-color: var(--copied-border);
   opacity: 1 !important;
 }
 
@@ -603,12 +608,17 @@ html.theme-light {
 
   --text-primary: #1a1a1b;
   --text-secondary: #545456;
-  --text-muted: #76767a;
+  --text-muted: #68686c; /* Accessibility compliant contrast */
   --text-faint: #9a9aa0;
 
   --accent-gold: #f5d474;
   --gold-text: #8a6a12;
   --border-line: #dcdcde;
+
+  /* Success / Copied Notification (Accessibility compliant) */
+  --copied-color: #1a7f37;
+  --copied-bg: rgba(26, 127, 55, 0.08);
+  --copied-border: rgba(26, 127, 55, 0.2);
 }
 
 /* Floating Theme Toggle Button */
