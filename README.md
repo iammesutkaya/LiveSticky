@@ -2,7 +2,7 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky monitors your Twitch stream and updates your community by pinning a post, updating your sidebar, and sharing highlights when the stream ends.
+LiveSticky automates stream promotion on Reddit. It monitors your channels (Twitch, YouTube, or Kick) and updates your subreddit community in real-time with an interactive custom post dashboard, automated live threads, VOD archives, and post-stream highlights.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
@@ -10,34 +10,34 @@ LiveSticky monitors your Twitch stream and updates your community by pinning a p
 [![Kick Integration](https://img.shields.io/badge/Integration-Kick-53FC18?style=for-the-badge&logo=kick)](https://kick.com)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends. It can also pin an interactive **dashboard** - a live-updating custom post showing your current status, viewer count, category, uptime, and platform links.
+LiveSticky handles the entire stream lifecycle automatically: from posting and pinning an interactive live dashboard or standard live post, to updating viewer statistics in real-time, and generating a highlights compilation post when the stream concludes.
 
 ## ✨ Core Features
 
 | | Feature | Description |
 | :---: | :--- | :--- |
-| 🔴 | **Automatic Live Posts** | Periodically polls your Twitch stream (every 2 minutes) and creates a pinned live post when you go live. |
-| ⚡ | **Real-Time Statistics** | Keeps the live post body up-to-date in real-time with current uptime, game/category, and live viewer count. |
-| 🛡️ | **Stream Crash Protection (6-Min Grace Period)** | Prevents duplicate post spam if your stream crashes briefly, OBS restarts, or Twitch has a quick hiccup. LiveSticky waits 6 minutes before concluding the post so you can reconnect seamlessly. |
-| 📺 | **Multi-Platform Promotion** | Optionally promotes your YouTube and Kick channels alongside Twitch. If configured, links to all platforms are displayed side-by-side in both live and concluding posts. |
+| 📊 | **Interactive Live Dashboard** | An optional, premium custom post (webview) pinned to your subreddit that auto-updates with your stream state, viewer count, category, uptime, and clickable platform links. Created via the **Create LiveSticky Dashboard** mod menu item. |
+| 🔴 | **Automatic Live Posts** | Polls your configured channel (every 2 minutes) and automatically creates/pins a dedicated discussion thread when you go live. |
+| ⚡ | **Real-Time Statistics** | Keeps the live post body up to date with live uptime, game/category, and active viewer counts. |
+| 🛡️ | **Stream Crash Protection (6-Min Grace Period)** | Prevents duplicate thread spam if your stream crashes briefly, OBS restarts, or the platform connection drops. LiveSticky waits 6 minutes before concluding the thread so you can reconnect seamlessly. |
+| 📺 | **Multi-Platform Promotion** | Promotes your YouTube and Kick channels alongside Twitch. If configured, links to all active platforms are shown side-by-side. |
 | 🏷️ | **Custom Post Flairing** | Automatically flairs the live post (e.g., "🔴 Live Now") using your community's custom post flair templates. |
-| 📌 | **Pinned Moderator Comments** | Auto-posts a customizable, pinned moderator comment at the top of the discussion section, where you can promote your Discord & social media, or list community rules. |
-| 🏁 | **Concluding VOD Archives** | When the stream goes offline for more than 6 minutes, LiveSticky edits the live post to a clean "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it. |
-| 💬 | **Auto-Suggested Comment Sort** | Automatically sets the suggested comment sort of the live post to "New" so the comment section behaves like a real-time stream chat. |
-| 🎥 | **Stream Highlights Post** | Queries Twitch Helix Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post. |
-| 🚀 | **Speed & Rate-Limit Protection** | Uses built-in caching to ensure status checks are fast, lightweight, and never get rate-limited by Twitch's API. |
-| 📊 | **Interactive Live Dashboard** | An optional pinned custom post (webview) that auto-updates with the live/offline state, viewer count, category, uptime, and clickable platform links. Create it from the **Create LiveSticky Dashboard** mod menu item. |
-| 🛠️ | **One-Click Moderator Reset** | Restart the status checker or clear the cache instantly using a custom mod tools shortcut directly on your community. |
+| 📌 | **Pinned Moderator Comments** | Automatically posts a customizable, pinned moderator comment at the top of the thread to promote your Discord, socials, or highlight rules. |
+| 🏁 | **Concluding VOD Archives** | When the stream concludes (offline for more than 6 minutes), LiveSticky transitions the live post into an "Offline / Thanks for watching!" archive state, highlights VOD links, locks the post to prevent late spam, and unpins it. |
+| 💬 | **Auto-Suggested Comment Sort** | Sets the suggested comment sort of the live thread to "New" so the discussion section behaves like a real-time stream chat. |
+| 🎥 | **Stream Highlights Post** | Queries the Twitch Clips API upon stream conclusion to automatically compile the top 5 clips generated during that stream and submit them as a standalone highlights post. |
+| 🚀 | **Rate-Limit Protection** | Utilizes built-in caching via Redis to ensure status checks are lightweight, fast, and never get rate-limited by platform APIs. |
+| 🛠️ | **One-Click Moderator Actions** | Clear the cache or restart the status checker instantly using custom moderator actions built directly into the subreddit context menu. |
 
 ---
 
 ## 📚 Documentation
 
-Full setup instructions, the complete settings/placeholder reference, and copy-paste default templates now live on the website instead of this README:
+Full setup instructions, configuration reference, and copy-paste templates live on the website:
 
-* **[Setup Guide](https://livesticky.com/setup.html)** - install the app and generate your Twitch, YouTube, and Kick API credentials.
-* **[Configuration Reference](https://livesticky.com/settings.html)** - every setting, placeholder, default template, and mod menu action.
-* **[FAQ](https://livesticky.com/faq.html)** - common questions about pricing, multistreaming, and crash protection.
+* **[Setup Guide](https://livesticky.com/setup.html)** - Install the app and generate your Twitch, YouTube, and Kick API credentials.
+* **[Configuration Reference](https://livesticky.com/settings.html)** - Every setting, placeholder, template, and mod menu action.
+* **[FAQ](https://livesticky.com/faq.html)** - Answers regarding pricing, multistreaming, and crash protection.
 
 ## 🌐 Fetch Domains
 
@@ -46,7 +46,7 @@ This app makes outgoing HTTP requests to the following domains declared in [`dev
 * **Platform APIs** (status checking and metadata): `id.twitch.tv`, `api.twitch.tv`, `youtube.googleapis.com`, `id.kick.com`, `api.kick.com`
 * **Media CDNs** (proxying streamer avatars and thumbnails): `static-cdn.jtvnw.net`, `yt3.googleusercontent.com`, `i.ytimg.com`, `files.kick.com`, `i.redd.it`
 
-No user data is sent to these services - only moderator-configured credentials are used for API authentication. See the [Configuration Reference](https://livesticky.com/settings.html#fetch-domains) for what each domain is used for.
+No user data is sent to these services. Only moderator-configured API credentials are used for authentication. See the [Configuration Reference](https://livesticky.com/settings.html#fetch-domains) for what each domain is used for.
 
 ---
 
@@ -56,3 +56,4 @@ No user data is sent to these services - only moderator-configured credentials a
 * **Twitch:** Follow the live channel at [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
 
 *Created with ❤️ for the community.*
+
