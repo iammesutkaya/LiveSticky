@@ -298,16 +298,28 @@ h1 {
 /* ── Footer ─────────────────────────────────────────────── */
 /* Alerts */
 .alert-warning {
-  background: rgba(245, 212, 116, 0.05);
+  display: flex;
+  gap: 12px;
+  background: rgba(245, 212, 116, 0.04);
+  border: 1px solid rgba(245, 212, 116, 0.12);
   border-left: 4px solid var(--accent-gold);
-  padding: 1rem;
+  padding: 1.2rem;
   margin-bottom: 1.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  align-items: flex-start;
 }
 
 .alert-warning strong {
   color: var(--accent-gold);
+}
+
+.alert-icon {
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .site-footer {

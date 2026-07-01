@@ -875,13 +875,17 @@
   font-size: 0.95rem;
   line-height: 1.6;
   opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: translateY(-8px);
+  overflow: hidden;
 }
 
 .faq-item[open] .faq-content {
-  opacity: 1;
-  transform: translateY(0);
+  animation: slideFaq 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideFaq {
+  from { max-height: 0; opacity: 0; transform: translateY(-8px); }
+  to { max-height: 500px; opacity: 1; transform: translateY(0); }
 }
 
 .faq-content p {
