@@ -327,6 +327,9 @@
   border-bottom: none !important;
   padding-bottom: 0 !important;
   margin-bottom: 24px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
 }
 
 .showcase-tabs .tab-btn {
