@@ -352,6 +352,7 @@
 
 .showcase-tabs .tab-btn:hover {
   color: var(--text-primary);
+  background: transparent !important;
 }
 
 .showcase-tabs .tab-btn.active {
