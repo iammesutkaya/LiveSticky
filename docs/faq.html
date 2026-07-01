@@ -15,8 +15,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.146">
-  <link rel="stylesheet" href="landing.css?v=1.0.146">
+  <link rel="stylesheet" href="style.css?v=1.0.147">
+  <link rel="stylesheet" href="landing.css?v=1.0.147">
 </head>
 
 <body>
@@ -39,30 +39,65 @@
     <section class="section unboxed-section pt-0">
       <div class="faq-grid">
         <details class="faq-item">
-          <summary>Is LiveSticky really free? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <summary>Does this require a server running 24/7 or paid hosting? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
           <div class="faq-content">
-            <p>Yes. LiveSticky is 100% free and open-source. Because it runs on the Reddit Developer Platform, Reddit handles all the hosting and infrastructure automatically.</p>
-          </div>
-        </details>
-        
-        <details class="faq-item">
-          <summary>Do I need coding experience or a server? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
-          <div class="faq-content">
-            <p>Not at all! You don't need a server, and you don't need to touch any code. You just click "Install" on the Reddit Developer Portal, enter your Twitch/YouTube/Kick usernames in your Mod Tools, and you're done.</p>
+            <p>No hosting or server is needed! Because LiveSticky is built on the Reddit Developer Platform (Devvit), Reddit runs the bot entirely on their own serverless infrastructure for free. You do not have to pay for hosting, manage a VPS, or worry about bot uptime.</p>
           </div>
         </details>
 
         <details class="faq-item">
-          <summary>What if I stream to multiple platforms at the same time? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <summary>Can I use this for multiple streamers in my subreddit, or is it only for one channel? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
           <div class="faq-content">
-            <p>LiveSticky handles multistreaming perfectly. The dashboard will automatically update to show every platform you are currently live on, displaying them side-by-side so your viewers can choose their preferred player.</p>
+            <p>LiveSticky is designed to monitor a primary channel configuration (perfect for creator-specific subreddits like <code>r/streamername</code>). If you stream on multiple platforms (Twitch, YouTube, Kick) at the same time, the custom dashboard will show them all side-by-side. However, it monitors one central channel identity configured in your subreddit Mod Tools.</p>
           </div>
         </details>
 
         <details class="faq-item">
-          <summary>Will this spam my subreddit if my stream disconnects? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <summary>How does the bot handle stream disconnects or OBS crashes? Will it spam the feed? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
           <div class="faq-content">
-            <p>No. LiveSticky has a built-in 6-minute grace period. If your OBS crashes or your internet blips, the post stays live. It only converts into an offline VOD archive after you've been offline for 6 straight minutes.</p>
+            <p>No, it won't spam. LiveSticky features an integrated 6-minute grace period. If your internet blips or OBS crashes, the bot waits. The live post is only unpinned or switched to offline mode after you have been offline for 6 consecutive minutes. It will never create a new post for short disconnects.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>We use scheduled pinned posts (like daily threads). Will LiveSticky override them? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>Reddit only allows 2 legacy sticky slots. If both slots are already occupied by other announcements, LiveSticky is smart enough to pin itself to Reddit's "Community Highlights" carousel (which supports up to 6 slots) so it won't conflict with or unpin your daily discussion threads.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Do I have to share my private Twitch Stream Key or credentials? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>Never. LiveSticky only reads public API data to check if your stream is live. You only need to register a standard Developer Client ID and Client Secret on the platform console, which is stored securely in Reddit's encrypted app settings. The bot does not have access to your streaming software or streaming keys.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How fast does the bot detect that I went live or offline? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>The scheduler runs a status check every 2 minutes. Typically, the live post is created and pinned within 2 minutes of clicking "Start Streaming" in OBS. When you go offline, the bot waits out the 6-minute grace period before archiving/unpinning the post.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can users watch the stream directly inside Reddit? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>Yes! The custom post dashboard features a "Watch Stream" button that opens the live Twitch, YouTube, or Kick player directly inside an iframe overlay within the official Reddit app and web client, letting users watch and chat without leaving your community.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Will I hit YouTube API quota limits using this? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>No. We optimized YouTube API requests to use minimal quota units. The bot caches stream state in Redis and avoids redundant polling, meaning a standard, free Google Developer API key is more than enough to monitor your stream status safely.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can we customize the title and content of the post? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>Yes. The configuration settings in your Mod Tools support dynamic placeholders. You can customize the title and body with variables like <code>{display_name}</code> (your name), <code>{title}</code> (stream title), <code>{game}</code> (stream category), and <code>{viewers}</code> (current viewer count).</p>
           </div>
         </details>
       </div>
