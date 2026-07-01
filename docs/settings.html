@@ -19,7 +19,7 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.153">
+  <link rel="stylesheet" href="style.css?v=1.0.154">
   <style>
     /* Configuration Reference specific additions */
     .token-table {
@@ -63,9 +63,12 @@
     .tmpl-item summary::-webkit-details-marker {
       display: none;
     }
-    .tmpl-item pre {
+    .tmpl-item .code-container {
       margin: 0 20px 20px;
-      padding: 16px;
+    }
+    .tmpl-item pre {
+      margin: 0;
+      padding: 16px 64px 16px 16px;
       background: var(--bg-surface);
       border-radius: var(--radius-sm);
       overflow-x: auto;
@@ -409,6 +412,6 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
     </svg>
   </button>
 
-  <script src="main.js?v=1.0.153"></script>
+  <script src="main.js?v=1.0.154"></script>
 </body>
 </html>
