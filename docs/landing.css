@@ -384,6 +384,19 @@ html.theme-light .inline-youtube { background: #cc0000; }
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Light theme overrides for showcase tabs segment control */
+html.theme-light .showcase-tabs {
+  background: var(--bg-card) !important;
+  border-color: var(--border-line) !important;
+}
+
+html.theme-light .showcase-tabs .tab-indicator {
+  background: var(--bg-primary) !important;
+  border-color: var(--border-line) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+
 .showcase-container {
   background: var(--bg-card);
   border: 1px solid var(--border-line);
