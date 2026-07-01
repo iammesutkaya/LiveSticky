@@ -31,8 +31,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.158">
-  <link rel="stylesheet" href="landing.css?v=1.0.158">
+  <link rel="stylesheet" href="style.css?v=1.0.159">
+  <link rel="stylesheet" href="landing.css?v=1.0.159">
 </head>
 
 <body>
@@ -116,6 +116,13 @@
             <p>Yes. The configuration settings in your Mod Tools support dynamic placeholders. You can customize the title and body with variables like <code>{display_name}</code> (your name), <code>{title}</code> (stream title), <code>{game}</code> (stream category), and <code>{viewers}</code> (current viewer count).</p>
           </div>
         </details>
+
+        <details class="faq-item">
+          <summary>Does the highlights post feature work for YouTube and Kick streams? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+          <div class="faq-content">
+            <p>No, the automated post-stream highlights post is exclusive to **Twitch** channels. LiveSticky queries Twitch's public Clips API upon stream conclusion to automatically compile the top clips generated during that stream. Since YouTube and Kick do not offer equivalent open Clips APIs that allow querying clip logs generated during a specific live window programmatically, highlights posts are skipped for these platforms.</p>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -158,6 +165,6 @@
     </div>
   </footer>
 
-  <script src="main.js?v=1.0.158"></script>
+  <script src="main.js?v=1.0.159"></script>
 </body>
 </html>
