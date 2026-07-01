@@ -16,8 +16,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="landing.css">
+  <link rel="stylesheet" href="style.css?v=1.0.139">
+  <link rel="stylesheet" href="landing.css?v=1.0.139">
 </head>
 
 <body>
@@ -298,10 +298,29 @@
       btn.querySelector('.lm-text').textContent = expanded ? 'Learn more' : 'Show less';
     }
 
+    function updateTabIndicator(btn) {
+      const tabs = btn.parentElement;
+      let indicator = tabs.querySelector('.tab-indicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'tab-indicator';
+        tabs.appendChild(indicator);
+      }
+      const btnRect = btn.getBoundingClientRect();
+      const tabsRect = tabs.getBoundingClientRect();
+      
+      const left = btnRect.left - tabsRect.left;
+      const width = btnRect.width;
+      
+      indicator.style.transform = `translateX(${left}px)`;
+      indicator.style.width = `${width}px`;
+    }
+
     function setDashboardView(view, btn) {
       if (btn.classList.contains('active')) return;
       
-      document.querySelectorAll('.tab-btn').forEach(b => {
+      const tabs = btn.parentElement;
+      tabs.querySelectorAll('.tab-btn').forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-selected', 'false');
       });
@@ -312,7 +331,25 @@
       if (demoIframe) {
         demoIframe.src = `demo/index.html?mock=${view}`;
       }
+
+      updateTabIndicator(btn);
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const activeBtn = document.querySelector('.showcase-tabs .tab-btn.active');
+      if (activeBtn) {
+        setTimeout(() => {
+          updateTabIndicator(activeBtn);
+        }, 100);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      const activeBtn = document.querySelector('.showcase-tabs .tab-btn.active');
+      if (activeBtn) {
+        updateTabIndicator(activeBtn);
+      }
+    });
   </script>
 </body>
 

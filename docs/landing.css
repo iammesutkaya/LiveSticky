@@ -324,6 +324,7 @@
 }
 
 .showcase-tabs {
+  position: relative; /* for absolute positioned indicator child */
   border-bottom: none !important;
   padding: 5px !important;
   margin-bottom: 24px;
@@ -337,6 +338,8 @@
 }
 
 .showcase-tabs .tab-btn {
+  position: relative;
+  z-index: 1; /* sit above indicator */
   font-size: 0.88rem;
   padding: 8px 16px;
   font-weight: 600;
@@ -344,18 +347,28 @@
   border: 1px solid transparent;
   color: var(--text-muted);
   border-radius: 20px;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 0.25s ease;
 }
 
 .showcase-tabs .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .showcase-tabs .tab-btn.active {
-  background: rgba(255, 255, 255, 0.08);
   color: var(--accent-gold);
-  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.showcase-tabs .tab-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  z-index: 0;
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
