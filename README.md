@@ -2,7 +2,7 @@
 
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
 
-LiveSticky automates stream promotion on Reddit. Monitor your Twitch, YouTube, or Kick channels and automatically pin an interactive live dashboard that manages real-time updates, concluding VOD archives, and stream highlights (Twitch only).
+LiveSticky automates stream promotion on Reddit. Monitor Twitch, YouTube, or Kick to automatically create and pin live threads or interactive dashboards in your subreddit.
 
 [![Devvit Platform](https://img.shields.io/badge/Platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com)
 [![Twitch Integration](https://img.shields.io/badge/Integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch)](https://dev.twitch.tv)
