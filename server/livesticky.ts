@@ -1,5 +1,5 @@
 /**
- * LiveSticky core logic — Devvit Web server.
+ * LiveSticky core logic - Devvit Web server.
  *
  * This module contains the stream-status checking, post management, sidebar
  * widget, highlights, and dashboard logic. It was migrated from the former
@@ -49,7 +49,7 @@ const computeUptime = (startedAt?: string): string => {
 
 /**
  * Shape persisted to Redis (`dashboard_live_platforms`) and returned to the
- * dashboard webview — one entry per simultaneously-live platform.
+ * dashboard webview - one entry per simultaneously-live platform.
  */
 interface DashboardPlatform {
   platform: 'twitch' | 'youtube' | 'kick';
@@ -315,7 +315,7 @@ const postStreamHighlights = async (
  *
  * Reddit's sticky system caps at 2 legacy slots; Community Highlights supports
  * up to 6 slots. Legacy stickies auto-sync into Highlights slots 1-2, but
- * Highlights-only slots 3-6 do NOT set `stickied=true` — that's why third-
+ * Highlights-only slots 3-6 do NOT set `stickied=true` - that's why third-
  * party clients that only read the `stickied` boolean may see nothing.
  */
 const pinPostWithFallback = async (postId: string): Promise<void> => {
@@ -344,7 +344,7 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
     return;
   }
 
-  // 3. Legacy slot was not granted — explicitly add to Community Highlights.
+  // 3. Legacy slot was not granted - explicitly add to Community Highlights.
   console.log(
     `[pin] Post ${postId} did not get a legacy sticky slot. ` +
       `Adding to Community Highlights as ANNOUNCEMENT (visible in official app).`
@@ -394,7 +394,7 @@ const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<vo
     const post = await reddit.getPostById(postId as `t3_${string}`);
     isStickied = post.stickied;
   } catch {
-    // Post may have been deleted — caller handles missing-post logic separately.
+    // Post may have been deleted - caller handles missing-post logic separately.
     return;
   }
 
@@ -409,7 +409,7 @@ const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<vo
 
   if (!isStickied && !isHighlighted) {
     console.warn(
-      `[verify] ${label} post ${postId} is neither legacy-stickied nor in Community Highlights — re-pinning.`
+      `[verify] ${label} post ${postId} is neither legacy-stickied nor in Community Highlights - re-pinning.`
     );
     await pinPostWithFallback(postId);
   }
@@ -577,7 +577,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
   // Poll every configured platform so the dashboard can show all simultaneous
   // streams. The first entry (highest priority that's live) is the "primary"
-  // stream that drives the Reddit live post, flair, sidebar, and highlights —
+  // stream that drives the Reddit live post, flair, sidebar, and highlights - 
   // all of which remain single-stream concepts.
   const liveStreams = await checkAllStreamStatuses({
     settings,
@@ -748,7 +748,7 @@ export const runStatusCheck = async (): Promise<void> => {
           } catch (e) {
             console.error('Failed to update live post stats:', e);
           }
-          // Re-verify that the live post is still pinned — throttled to every 10 minutes.
+          // Re-verify that the live post is still pinned - throttled to every 10 minutes.
           const PIN_VERIFY_INTERVAL_MS = 10 * 60 * 1000;
           const lastPinVerified = await redis.get('last_pin_verified');
           const shouldVerifyPin =
@@ -1069,7 +1069,7 @@ export const runStatusCheck = async (): Promise<void> => {
     // Reddit live-post engagement (comments + score) for the "Join the live
     // thread" row. Fetched once here (not per dashboard poll) and cached so the
     // /api/stream-status endpoint can serve it cheaply. Only the live post is
-    // relevant — there's nothing to show once the stream concludes.
+    // relevant - there's nothing to show once the stream concludes.
     let postComments = 0;
     let postScore = 0;
     if (isLive && cachedLivePostId) {

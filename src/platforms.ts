@@ -31,7 +31,7 @@ export interface PlatformContext {
 }
 
 // ---------------------------------------------------------------------------
-// YouTube response shapes (partial — only the fields we use)
+// YouTube response shapes (partial - only the fields we use)
 // ---------------------------------------------------------------------------
 
 interface YouTubeChannelContentItem {
@@ -119,7 +119,7 @@ async function resolveYouTubeChannelId(
     console.error('YouTube forHandle resolution failed, falling back to search:', err);
   }
 
-  // Fallback: search.list (100 quota units) — only when forHandle didn't match
+  // Fallback: search.list (100 quota units) - only when forHandle didn't match
   // (e.g. the setting holds a display name rather than an exact @handle).
   try {
     console.log(`forHandle did not resolve ${handle}. Falling back to Search API (100 units)...`);
@@ -201,7 +201,7 @@ async function fetchYouTubeStatus(
   if (!uploadsPlaylist) return null;
 
   try {
-    // 1 unit: the most recent uploads — a live stream sits at the top.
+    // 1 unit: the most recent uploads - a live stream sits at the top.
     const plUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=5&playlistId=${uploadsPlaylist}`;
     const plRes = await fetch(plUrl, { headers: { 'x-goog-api-key': apiKey } });
     if (!plRes.ok) {
@@ -370,7 +370,7 @@ async function fetchKickStatus(
 }
 
 // ---------------------------------------------------------------------------
-// Twitch — shared token management (exported so livesticky.ts can reuse it)
+// Twitch - shared token management (exported so livesticky.ts can reuse it)
 // ---------------------------------------------------------------------------
 
 interface TwitchTokenResponse {
@@ -562,7 +562,7 @@ export async function checkStreamStatus(
  * to watch.
  *
  * NOTE: when a YouTube channel is configured this calls the YouTube Data API on
- * every check (~100 quota units), even if another platform is already live —
+ * every check (~100 quota units), even if another platform is already live - 
  * that's the cost of knowing whether YouTube is *also* live for multistreaming.
  */
 export async function checkAllStreamStatuses(
@@ -622,7 +622,7 @@ export async function checkAllStreamStatuses(
 }
 
 // ---------------------------------------------------------------------------
-// Channel image refresh — avatar + offline banner, cached 12 hours in Redis
+// Channel image refresh - avatar + offline banner, cached 12 hours in Redis
 // ---------------------------------------------------------------------------
 
 interface TwitchUsersResponse {

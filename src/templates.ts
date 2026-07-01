@@ -2,24 +2,24 @@
  * Default templates for LiveSticky posts and sidebar widgets.
  *
  * Available placeholders:
- *   {channel}       — Twitch channel name (lowercase)
- *   {display_name}  — Twitch display name
- *   {title}         — Stream title
- *   {game}          — Category / game name
- *   {viewers}       — Current viewer count
- *   {uptime}        — Stream uptime (e.g. "1h 23m")
- *   {twitch_url}    — Twitch URL (lines containing this are auto-removed if not configured)
- *   {youtube_url}   — YouTube URL (lines containing this are auto-removed if not configured)
- *   {kick_url}      — Kick URL (lines containing this are auto-removed if not configured)
+ *   {channel} - Twitch channel name (lowercase)
+ *   {display_name} - Twitch display name
+ *   {title} - Stream title
+ *   {game} - Category / game name
+ *   {viewers} - Current viewer count
+ *   {uptime} - Stream uptime (e.g. "1h 23m")
+ *   {twitch_url} - Twitch URL (lines containing this are auto-removed if not configured)
+ *   {youtube_url} - YouTube URL (lines containing this are auto-removed if not configured)
+ *   {kick_url} - Kick URL (lines containing this are auto-removed if not configured)
  *
  * Highlights post only:
- *   {date}          — Stream date (e.g. "May 28, 2026")
+ *   {date} - Stream date (e.g. "May 28, 2026")
  */
 
 // ---------------------------------------------------------------------------
 // Live post (submitted & pinned when stream goes live)
 // ---------------------------------------------------------------------------
-export const DEFAULT_LIVE_POST_TITLE = '🚨 {display_name} is LIVE! 🚨 — {title}';
+export const DEFAULT_LIVE_POST_TITLE = '🚨 {display_name} is LIVE! 🚨 - {title}';
 
 export const DEFAULT_LIVE_POST_BODY = `\
 * **Category/Game:** {game}
@@ -38,7 +38,7 @@ export const DEFAULT_LIVE_POST_BODY = `\
 // Concluding post body (live post is updated with this when the stream ends)
 // ---------------------------------------------------------------------------
 export const DEFAULT_CONCLUDING_POST_BODY = `\
-### 👋 Stream Ended — Thanks for watching! 👋
+### 👋 Stream Ended - Thanks for watching! 👋
 
 **Title:**
 {title}

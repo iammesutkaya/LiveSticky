@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Design System | LiveSticky</title>
 
-  <meta property="og:title" content="Design System — LiveSticky">
+  <meta property="og:title" content="Design System - LiveSticky">
   <meta property="og:description" content="The visual language and component system behind LiveSticky.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://livesticky.com/design.html">
@@ -100,7 +100,7 @@
     <main class="card">
       <div class="content">
         <p>
-          One visual language across the Reddit dashboard and the website. The chrome stays neutral and understated so the <strong>streamer's own assets</strong> — avatar, thumbnails, and platform brand colors — are what the eye lands on.
+          One visual language across the Reddit dashboard and the website. The chrome stays neutral and understated so the <strong>streamer's own assets</strong> - avatar, thumbnails, and platform brand colors - are what the eye lands on.
         </p>
 
         <hr>
@@ -108,7 +108,7 @@
         <h2>Principles</h2>
         <ol>
           <li><strong>Neutral ground.</strong> Surfaces are pure dark/light grays with no color tint, so any streamer's brand sits on truly neutral ground.</li>
-          <li><strong>One accent.</strong> Pale gold <code>#f5d474</code> is the only accent. It signals "active" and highlights key numbers — nothing else competes with it.</li>
+          <li><strong>One accent.</strong> Pale gold <code>#f5d474</code> is the only accent. It signals "active" and highlights key numbers - nothing else competes with it.</li>
           <li><strong>Brand colors stay contained.</strong> Twitch / YouTube / Kick colors appear only inside small badges and logos, never in layout chrome.</li>
           <li><strong>Flat, not glossy.</strong> No shadows, gradients, or glows. Hierarchy comes from stepping surface lightness, not elevation effects.</li>
           <li><strong>Gold means active.</strong> Live → gold accents; offline → everything goes muted.</li>
@@ -171,7 +171,7 @@
             <tr>
               <td><code>--accent-gold</code></td>
               <td><span class="color-swatch swatch-accent-gold"></span>#f5d474</td>
-              <td>Fill (avatar, Reddit badge, LIVE pill) — dark content on top</td>
+              <td>Fill (avatar, Reddit badge, LIVE pill) - dark content on top</td>
             </tr>
             <tr>
               <td><code>--gold-text</code></td>
@@ -191,7 +191,7 @@
             <tr>
               <td><code>--kick-color</code></td>
               <td><span class="color-swatch swatch-kick-color"></span>#53fc18</td>
-              <td>Badge/logo only — uses dark content on top</td>
+              <td>Badge/logo only - uses dark content on top</td>
             </tr>
           </tbody>
         </table>
@@ -243,21 +243,21 @@
 
         <h2>Components</h2>
         <ul class="component-list">
-          <li><strong>Avatar</strong> — 44px circle. Gold fill + dark initial when live; <code>--bg-surface</code> + muted initial when offline. A real profile image covers the fill in both.</li>
-          <li><strong>Status pill</strong> — <code>live</code>: gold text, red pulsing dot. <code>offline</code>: <code>--bg-surface</code> bg, muted text + dot.</li>
-          <li><strong>Stream card</strong> — <code>--bg-card</code>, radius 10. Multistream = compact row (112×63 thumb + info). Single = <code>cinematic</code> (full-width 16:9 thumb on top).</li>
-          <li><strong>Platform badge</strong> — brand-color corner badge, <code>border-radius: 0 0 8px 0</code>, flush to the thumbnail's top-left, logo only.</li>
-          <li><strong>Viewer chip</strong> — <code>--bg-primary</code> ground, gold count + <code>--text-faint</code> "viewers" label.</li>
-          <li><strong>Watch / follow button</strong> — <code>--bg-surface</code> (live, as a card's bottom bar) or <code>--bg-card</code> (offline, standalone). Brand-colored logo + label. No border.</li>
-          <li><strong>Reddit thread row</strong> — <code>--bg-card</code> + <code>--border-line</code>, gold circular badge with the Snoo, title plus <code>comments · upvotes</code> meta, and a chevron.</li>
-          <li><strong>Footer</strong> — health dot + "LiveSticky" on the left; timestamp + Refresh button on the right.</li>
+          <li><strong>Avatar</strong> - 44px circle. Gold fill + dark initial when live; <code>--bg-surface</code> + muted initial when offline. A real profile image covers the fill in both.</li>
+          <li><strong>Status pill</strong> - <code>live</code>: gold text, red pulsing dot. <code>offline</code>: <code>--bg-surface</code> bg, muted text + dot.</li>
+          <li><strong>Stream card</strong> - <code>--bg-card</code>, radius 10. Multistream = compact row (112×63 thumb + info). Single = <code>cinematic</code> (full-width 16:9 thumb on top).</li>
+          <li><strong>Platform badge</strong> - brand-color corner badge, <code>border-radius: 0 0 8px 0</code>, flush to the thumbnail's top-left, logo only.</li>
+          <li><strong>Viewer chip</strong> - <code>--bg-primary</code> ground, gold count + <code>--text-faint</code> "viewers" label.</li>
+          <li><strong>Watch / follow button</strong> - <code>--bg-surface</code> (live, as a card's bottom bar) or <code>--bg-card</code> (offline, standalone). Brand-colored logo + label. No border.</li>
+          <li><strong>Reddit thread row</strong> - <code>--bg-card</code> + <code>--border-line</code>, gold circular badge with the Snoo, title plus <code>comments · upvotes</code> meta, and a chevron.</li>
+          <li><strong>Footer</strong> - health dot + "LiveSticky" on the left; timestamp + Refresh button on the right.</li>
         </ul>
 
         <hr>
 
         <h2>Iconography</h2>
         <p>
-          The product UI uses <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer">Lucide</a> — outline
+          The product UI uses <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer">Lucide</a> - outline
           icons with a consistent 1.75px stroke that share the dashboard's own SVG language. Emoji are reserved for the
           README; the website and app render real icons.
         </p>
@@ -271,7 +271,7 @@
           <span class="icon-chip"><i data-lucide="message-circle"></i></span>
         </div>
         <p>
-          Icons sit in <code>--text-secondary</code> and ease to <code>--accent-gold</code> with a slight lift on hover —
+          Icons sit in <code>--text-secondary</code> and ease to <code>--accent-gold</code> with a slight lift on hover - 
           the one moment of motion in an otherwise flat system. Platform marks (Twitch, YouTube, Kick, Reddit) keep their
           official brand SVGs, since Lucide has no brand logos.
         </p>
@@ -286,7 +286,7 @@
         <img src="icon.png" alt="LiveSticky logo" class="footer-logo">
         <div>
           <div class="footer-name">LiveSticky</div>
-          <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit — Twitch, YouTube, and Kick.</p>
+          <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit - Twitch, YouTube, and Kick.</p>
         </div>
       </div>
       <nav class="footer-links" aria-label="Footer">

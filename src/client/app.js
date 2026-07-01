@@ -1,5 +1,5 @@
 /**
- * LiveSticky Dashboard — Client App
+ * LiveSticky Dashboard - Client App
  *
  * Fetches stream status and config from the Devvit server endpoints, then
  * subscribes to Realtime updates for instant live stat changes.
@@ -165,14 +165,14 @@ const MOCK_STATUS = {
 // Timestamp of the last successful data update, for the relative footer label.
 let lastFetchTime = null;
 
-// Avatar proxying — track the loaded CDN url + its blob URL so repeated ticks
+// Avatar proxying - track the loaded CDN url + its blob URL so repeated ticks
 // don't re-fetch a stable image.
 let loadedAvatarUrl = null;
 let avatarBlobUrl = null;
 
 // Thumbnail blobs cached by CDN url so re-renders don't refetch (and to avoid
 // flicker). Devvit's webview CSP blocks direct <img src> from CDN hosts, and
-// plain <img src> requests don't carry Devvit's injected auth header — so every
+// plain <img src> requests don't carry Devvit's injected auth header - so every
 // image is fetched through the same-origin /api/image proxy and shown as a blob.
 const thumbBlobCache = new Map();
 
@@ -186,7 +186,7 @@ let lastListSignature = '';
 
 /**
  * Routes a CDN image URL through the same-origin /api/image proxy. The URL is
- * base64url-encoded as a path segment — Devvit's WAF blocks query params that
+ * base64url-encoded as a path segment - Devvit's WAF blocks query params that
  * look like full URLs (e.g. ?url=https://...).
  */
 function proxyImgUrl(url) {
@@ -212,7 +212,7 @@ async function fetchProxiedImage(cdnUrl) {
   }
 }
 
-/** Cached proxy fetch for thumbnails — one blob per distinct CDN url. */
+/** Cached proxy fetch for thumbnails - one blob per distinct CDN url. */
 async function getThumbBlob(cdnUrl) {
   if (thumbBlobCache.has(cdnUrl)) return thumbBlobCache.get(cdnUrl);
   const blob = await fetchProxiedImage(cdnUrl);
@@ -379,7 +379,7 @@ function updateCard(p) {
   const watch = card.querySelector('.watch-btn');
   if (url) watch.href = url;
 
-  // Thumbnail — Twitch URLs carry {width}x{height} placeholders.
+  // Thumbnail - Twitch URLs carry {width}x{height} placeholders.
   const img = card.querySelector('.thumb-img');
   const cdnSrc = (p.thumbnail || '').replace('{width}', '480').replace('{height}', '270');
   if (!cdnSrc) {
@@ -498,7 +498,7 @@ function updateDashboard(data) {
 
   const platforms = platformsFromData(data);
 
-  // Header subtitle — live: how/where they're streaming; offline: last-live time
+  // Header subtitle - live: how/where they're streaming; offline: last-live time
   if (headerSubEl) {
     if (isNowLive && platforms.length > 1) {
       headerSubEl.textContent = `Live on ${platforms.length} platforms`;
@@ -573,7 +573,7 @@ async function initRealtime() {
         if (msg && msg.type === 'status-update') updateDashboard(msg.data);
       },
       onConnect: () => {
-        console.log('[LiveSticky] Realtime connected — stopping poll fallback');
+        console.log('[LiveSticky] Realtime connected - stopping poll fallback');
         stopPolling();
       },
       onDisconnect: () => {

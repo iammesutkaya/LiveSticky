@@ -50,7 +50,7 @@ The newer Community Highlights carousel (`AddPostToHighlights` endpoint) support
 
 The 2-minute cron (`runStatusCheck`) calls `verifyAndRepinIfNeeded()` each tick to detect if a post lost its slot and re-pins it automatically.
 
-**Why third-party clients may still not show the post:** If both legacy slots are occupied by other mods' pinned posts, LiveSticky will secure a Community Highlights slot but `stickied` stays `false`. Third-party clients will not show it at the top of the feed — only the official Reddit app will show it in the carousel.
+**Why third-party clients may still not show the post:** If both legacy slots are occupied by other mods' pinned posts, LiveSticky will secure a Community Highlights slot but `stickied` stays `false`. Third-party clients will not show it at the top of the feed - only the official Reddit app will show it in the carousel.
 
 ## 🔒 Fetch Domains
 

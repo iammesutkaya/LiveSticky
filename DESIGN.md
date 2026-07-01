@@ -1,8 +1,8 @@
 # LiveSticky Design System
 
 One visual language across the Reddit dashboard and the website. The chrome
-stays neutral and understated so the **streamer's own assets** — avatar,
-thumbnails, and platform brand colors — are what the eye lands on.
+stays neutral and understated so the **streamer's own assets** - avatar,
+thumbnails, and platform brand colors - are what the eye lands on.
 
 > Source of truth. The dashboard implements these tokens in
 > [`src/client/styles.css`](src/client/styles.css). The website should reuse the
@@ -15,7 +15,7 @@ thumbnails, and platform brand colors — are what the eye lands on.
 1. **Neutral ground.** Surfaces are pure dark/light grays with no color tint, so
    any streamer's brand sits on truly neutral ground.
 2. **One accent.** Pale gold `#f5d474` is the only accent. It signals "active"
-   and highlights key numbers — nothing else competes with it.
+   and highlights key numbers - nothing else competes with it.
 3. **Brand colors stay contained.** Twitch / YouTube / Kick colors appear only
    inside small badges and logos, never in layout chrome.
 4. **Flat, not glossy.** No shadows, gradients, or glows. Hierarchy comes from
@@ -38,16 +38,16 @@ thumbnails, and platform brand colors — are what the eye lands on.
 | `--text-secondary` | `#a0a0a5` | `#545456` | Supporting copy |
 | `--text-muted` | `#707075` | `#76767a` | Meta, labels, footer |
 | `--text-faint` | `#444448` | `#9a9aa0` | Separators, the "viewers" label |
-| `--accent-gold` | `#f5d474` | `#f5d474` | Fill (avatar, Reddit badge, LIVE pill) — dark content on top |
+| `--accent-gold` | `#f5d474` | `#f5d474` | Fill (avatar, Reddit badge, LIVE pill) - dark content on top |
 | `--gold-text` | `#f5d474` | `#8a6a12` | Gold as **text** on a surface (viewer counts, last-live) |
 | `--twitch-color` | `#9147ff` | `#9147ff` | Badge/logo only |
 | `--youtube-color` | `#ff0000` | `#ff0000` | Badge/logo only |
-| `--kick-color` | `#53fc18` | `#53fc18` | Badge/logo only — uses dark `#131313` content on top |
+| `--kick-color` | `#53fc18` | `#53fc18` | Badge/logo only - uses dark `#131313` content on top |
 | live dot | `#ef4444` | `#ef4444` | The pulsing dot in the LIVE pill |
 | health dot | `#3fb950` | `#3fb950` | Footer "up to date" indicator |
 
 `--accent-gold` is a **fill** (dark text/icon sits on it); `--gold-text` is the
-readable-on-surface variant — in light mode it darkens so gold numbers stay
+readable-on-surface variant - in light mode it darkens so gold numbers stay
 legible. Never put `--gold-text` directly on `--accent-gold`.
 
 ### Type scale
@@ -83,34 +83,34 @@ Rhythm: **8 · 10 · 12 · 14 · 16**. Card padding 12px; header/offline padding
 
 ## Components
 
-- **Avatar** — 44px circle. Gold fill + dark initial when live; `--bg-surface`
+- **Avatar** - 44px circle. Gold fill + dark initial when live; `--bg-surface`
   and muted initial when offline. A real profile image covers the fill in both.
-- **Status pill** — `live`: `--gold-dim` bg, `--gold-border`, `--gold-text`,
+- **Status pill** - `live`: `--gold-dim` bg, `--gold-border`, `--gold-text`,
   red pulsing dot. `offline`: `--bg-surface` bg, muted text + dot.
-- **Stream card** — `--bg-card`, radius 10. Multistream = compact row
+- **Stream card** - `--bg-card`, radius 10. Multistream = compact row
   (112×63 thumb + info). Single = `cinematic` (full-width 16:9 thumb on top).
-- **Platform badge** — brand-color corner badge, `border-radius: 0 0 8px 0`,
+- **Platform badge** - brand-color corner badge, `border-radius: 0 0 8px 0`,
   flush to the thumbnail's top-left, logo only.
-- **Viewer chip** — `--bg-primary` ground, `--gold-text` count + `--text-faint`
+- **Viewer chip** - `--bg-primary` ground, `--gold-text` count + `--text-faint`
   "viewers" label.
-- **Meta row** — viewer chip, then per-platform category and uptime in muted
+- **Meta row** - viewer chip, then per-platform category and uptime in muted
   text separated by a faint `·`.
-- **Watch / follow button** — `--bg-surface` (live, as a card's bottom bar) or
+- **Watch / follow button** - `--bg-surface` (live, as a card's bottom bar) or
   `--bg-card` (offline, standalone). Brand-colored logo + label. No border.
-- **Reddit thread row** — `--bg-card` + `--border-line`, gold circular badge
+- **Reddit thread row** - `--bg-card` + `--border-line`, gold circular badge
   with the Snoo, title + `comments · upvotes` meta, chevron.
-- **Footer** — health dot + "LiveSticky" left; timestamp + Refresh button right.
+- **Footer** - health dot + "LiveSticky" left; timestamp + Refresh button right.
 
 ---
 
 ## Iconography
 
-The product UI (dashboard + website) uses **[Lucide](https://lucide.dev)** —
+The product UI (dashboard + website) uses **[Lucide](https://lucide.dev)** - 
 outline icons with a consistent ~1.75px stroke that share the dashboard's own
 SVG language (moon, chevrons, refresh). Emoji are reserved for the README only.
 
 - Icons sit in `--text-secondary` and ease to `--accent-gold` with a slight lift
-  on hover — the one moment of motion in an otherwise flat system.
+  on hover - the one moment of motion in an otherwise flat system.
 - Platform marks (Twitch, YouTube, Kick, Reddit) keep their **official brand
   SVGs**, since Lucide has no brand logos.
 - On the static website, Lucide loads via CDN (`unpkg.com/lucide`) and renders
@@ -124,8 +124,8 @@ Every state is built from the tokens and components above.
 
 | State | Header | Body |
 | --- | --- | --- |
-| **Loading** | — | Gold pulse + "Connecting…" |
-| **Error** | — | Gold pulse + message + "Retrying…" hint |
+| **Loading** | - | Gold pulse + "Connecting…" |
+| **Error** | - | Gold pulse + message + "Retrying…" hint |
 | **Live (single)** | Avatar gold · name · "Live on `<platform>`" · LIVE pill | One cinematic card + Reddit row |
 | **Live (multi)** | Avatar gold · name · "Live on N platforms" · LIVE pill | One card per platform + Reddit row |
 | **Offline** | Avatar muted · name · "Last live Xh ago" · OFFLINE pill | Moon icon + "`<name>` is offline" + follow buttons |

@@ -203,7 +203,7 @@ app.get('/api/image/:encoded', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Scheduler — runs every 2 minutes (declared in devvit.json scheduler.tasks)
+// Scheduler - runs every 2 minutes (declared in devvit.json scheduler.tasks)
 // ---------------------------------------------------------------------------
 
 app.post('/internal/scheduler/check-status', async (_req, res) => {
@@ -217,7 +217,7 @@ app.post('/internal/scheduler/check-status', async (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Triggers — run an immediate check on install/upgrade so state is seeded
+// Triggers - run an immediate check on install/upgrade so state is seeded
 // ---------------------------------------------------------------------------
 
 const onInstallOrUpgrade = async (_req: express.Request, res: express.Response) => {

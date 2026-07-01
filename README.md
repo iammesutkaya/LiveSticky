@@ -10,7 +10,7 @@ LiveSticky monitors your Twitch stream and updates your community by pinning a p
 [![Kick Integration](https://img.shields.io/badge/Integration-Kick-53FC18?style=for-the-badge&logo=kick)](https://kick.com)
 [![Redis Cached](https://img.shields.io/badge/Database-Redis%20Cache-D82C20?style=for-the-badge&logo=redis)](https://redis.io)
 
-It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends. It can also pin an interactive **dashboard** — a live-updating custom post showing your current status, viewer count, category, uptime, and platform links.
+It handles the entire stream lifecycle automatically: from flairing and pinning a new live post when you go live, to updating viewer stats in real-time, and sharing a highlights post with a VOD archive when the stream ends. It can also pin an interactive **dashboard** - a live-updating custom post showing your current status, viewer count, category, uptime, and platform links.
 
 ## ✨ Core Features
 
@@ -55,7 +55,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 ### 🛠️ Setup
 
 > [!IMPORTANT]
-> The API credential fields below are **per-community settings** — each subreddit's moderators enter their own keys, and they are only used for that community. Because Devvit only encrypts *app-wide* secrets (not per-subreddit settings), these values are **visible to the moderators of your subreddit** in the settings form. Treat them like any shared moderator credential, and rotate them if your mod team changes.
+> The API credential fields below are **per-community settings** - each subreddit's moderators enter their own keys, and they are only used for that community. Because Devvit only encrypts *app-wide* secrets (not per-subreddit settings), these values are **visible to the moderators of your subreddit** in the settings form. Treat them like any shared moderator credential, and rotate them if your mod team changes.
 
 | Setting Name | Type | Description |
 | :--- | :--- | :--- |
@@ -111,7 +111,7 @@ You can use these placeholders to dynamically insert stream info into your custo
 
 | Setting Name | Type | Description |
 | :--- | :--- | :--- |
-| **Enable Custom Post Dashboard** | `Boolean` | Enables the interactive dashboard custom post. This is an opt-in enhancement — the standard text-post flow continues to work as the default. When enabled, LiveSticky stickies the dashboard (instead of a standard live post) while you're live. |
+| **Enable Custom Post Dashboard** | `Boolean` | Enables the interactive dashboard custom post. This is an opt-in enhancement - the standard text-post flow continues to work as the default. When enabled, LiveSticky stickies the dashboard (instead of a standard live post) while you're live. |
 
 Once enabled, create the post from **Mod Tools** ➔ the **Create LiveSticky Dashboard** menu item. Running it again replaces the existing dashboard rather than creating a duplicate.
 
@@ -134,7 +134,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 **Default Live Post Title:**
 
 ```text
-🚨 {display_name} is LIVE! 🚨 — {title}
+🚨 {display_name} is LIVE! 🚨 - {title}
 ```
 
 **Default Live Post Body:**
@@ -156,7 +156,7 @@ If you need to restore or tweak the default texts, you can copy these markdown t
 #### 2. Default Concluding Post Body
 
 ```markdown
-### 👋 Stream Ended — Thanks for watching! 👋
+### 👋 Stream Ended - Thanks for watching! 👋
 
 **Title:**
 {title}
@@ -263,7 +263,7 @@ To configure LiveSticky, you need a **Twitch Client ID** and **Twitch Client Sec
    * Click **New Secret** to generate a secret. Copy the **Client Secret** and paste it into the LiveSticky settings.
 
 > [!IMPORTANT]
-> Never share your Client Secret publicly. It is stored as a per-subreddit setting, which means it is **not** masked or encrypted the way app-wide secrets are — the moderators of your community can see it in the settings form. Regular subreddit visitors cannot. If you'd rather not share a secret with your mod team, register a dedicated Twitch application just for this bot and rotate the secret if needed.
+> Never share your Client Secret publicly. It is stored as a per-subreddit setting, which means it is **not** masked or encrypted the way app-wide secrets are - the moderators of your community can see it in the settings form. Regular subreddit visitors cannot. If you'd rather not share a secret with your mod team, register a dedicated Twitch application just for this bot and rotate the secret if needed.
 
 ## 🔑 How to Get YouTube Credentials
 
@@ -312,7 +312,7 @@ Reddit has two pinning systems:
 - **Legacy Sticky** (2 slots max): Sets `stickied=true` on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.
 - **Community Highlights** (6 slots): A newer carousel visible in the official Reddit app. Legacy stickies auto-fill the first 2 carousel slots; slots 3–6 are Highlights-only and do **not** set `stickied=true`.
 
-LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an `ANNOUNCEMENT` label — ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.
+LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an `ANNOUNCEMENT` label - ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.
 
 **If your subreddit already has 2 legacy-stickied posts** (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but **not** at the top of the classic feed. Third-party Reddit clients that only read the `stickied` boolean will not surface the post. The solution is to free up a legacy sticky slot.
 

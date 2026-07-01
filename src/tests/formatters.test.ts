@@ -29,7 +29,7 @@ describe('formatLivePostBody', () => {
       'https://twitch.tv/coolstreamer',
       undefined,
       undefined,
-      '{game} — {viewers} — {uptime} — {twitch_url}'
+      '{game} - {viewers} - {uptime} - {twitch_url}'
     );
     expect(result).toContain('Minecraft');
     expect(result).toContain('5,420');

@@ -1,11 +1,11 @@
 /* ==========================================================================
-   LiveSticky Dashboard — Neutral dark theme with a single pale-gold accent.
+   LiveSticky Dashboard - Neutral dark theme with a single pale-gold accent.
    The chrome stays understated so the streamer's own thumbnails, avatar, and
    platform brand colors are what the eye lands on.
    ========================================================================== */
 
 :root {
-  /* Neutral surfaces — no color tint, so any streamer's brand assets sit on a
+  /* Neutral surfaces - no color tint, so any streamer's brand assets sit on a
      truly neutral ground. */
   --bg-primary: #0e1113;   /* perfectly match Reddit background */
   --bg-card: #15191c;      /* stream cards, reddit row */
@@ -24,7 +24,7 @@
   --gold-dim: rgba(245, 212, 116, 0.10);
   --gold-border: rgba(245, 212, 116, 0.30);
 
-  /* Platform brand colors — only ever used inside contained badges/logos. */
+  /* Platform brand colors - only ever used inside contained badges/logos. */
   --twitch-color: #9147ff;
   --youtube-color: #ff0000;
   --kick-color: #53fc18;
@@ -39,7 +39,7 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Light theme — tracks the OS/browser scheme (Reddit's webview doesn't expose
+/* Light theme - tracks the OS/browser scheme (Reddit's webview doesn't expose
    its in-app toggle). Same structure, light neutrals, darker gold for text. */
 @media (prefers-color-scheme: light) {
   :root {
@@ -80,7 +80,7 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Multistream can stack 3 cards — let the webview scroll vertically rather
+  /* Multistream can stack 3 cards - let the webview scroll vertically rather
      than clipping. */
   overflow-x: hidden;
   overflow-y: auto;
@@ -289,7 +289,7 @@ body {
 }
 
 /* ==========================================================================
-   Live content — platform cards
+   Live content - platform cards
    ========================================================================== */
 
 .live-content {
@@ -334,7 +334,7 @@ body {
   background: var(--bg-card);
 }
 
-/* Top section — compact (row) layout is the multistream default */
+/* Top section - compact (row) layout is the multistream default */
 .stream-card-main {
   display: flex;
   gap: 13px;
@@ -439,7 +439,7 @@ body {
   overflow: hidden;
 }
 
-/* Viewer count chip — the gold number on a deep ground */
+/* Viewer count chip - the gold number on a deep ground */
 .viewer-chip {
   display: inline-flex;
   align-items: center;
@@ -627,7 +627,7 @@ body {
 }
 
 /* Offline layout: the visible box is the inner .offline-message card, not the
-   .offline-content wrapper — so stretching the wrapper alone left the card
+   .offline-content wrapper - so stretching the wrapper alone left the card
    content-sized with a dead gap below it. Make the wrapper a flex column that
    fills the leftover height, and let the card flex-fill it with its content
    centered. Follow buttons sit at the bottom. Scoped to the offline state
@@ -663,7 +663,7 @@ body {
   text-align: center;
 }
 
-/* Outline moon in a neutral circle — matches the SVG/badge icon language
+/* Outline moon in a neutral circle - matches the SVG/badge icon language
    rather than a system emoji. */
 .offline-icon {
   width: 40px;
@@ -696,7 +696,7 @@ body {
 }
 
 /* ==========================================================================
-   Platform links (offline only) — neutral cards with brand logos
+   Platform links (offline only) - neutral cards with brand logos
    ========================================================================== */
 
 .platform-links {
@@ -894,7 +894,7 @@ body {
   }
 }
 
-/* Compact slot (Community Highlights) — keep it from overflowing a short frame */
+/* Compact slot (Community Highlights) - keep it from overflowing a short frame */
 @media (max-height: 320px) {
   .dashboard {
     padding: 10px;
