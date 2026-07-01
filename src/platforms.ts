@@ -573,16 +573,15 @@ export async function checkAllStreamStatuses(
 }
 
 // ---------------------------------------------------------------------------
-// Channel image refresh - avatar + offline banner, cached 12 hours in Redis
+// Channel avatar refresh - cached 12 hours in Redis
 // ---------------------------------------------------------------------------
 
 interface TwitchUsersResponse {
-  data?: Array<{ profile_image_url?: string; offline_image_url?: string }>;
+  data?: Array<{ profile_image_url?: string }>;
 }
 
 interface YouTubeChannelItem {
   snippet?: { thumbnails?: { high?: { url?: string }; medium?: { url?: string } } };
-  brandingSettings?: { image?: { bannerExternalUrl?: string } };
 }
 
 interface YouTubeChannelsResponse {
@@ -590,14 +589,13 @@ interface YouTubeChannelsResponse {
 }
 
 interface KickChannelImagesResponse {
-  user?: { profile_pic?: string; banner_image?: string };
-  banner_image?: string;
+  user?: { profile_pic?: string };
 }
 
 const IMAGE_TTL = 43200; // 12 hours
 
 /**
- * Fetches and caches avatar + banner URLs for the active platform.
+ * Fetches and caches the avatar URL for the active platform.
  * Skips the API call if the cached avatar key is still alive in Redis.
  * Priority: Twitch > YouTube > Kick.
  */
@@ -625,7 +623,6 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
   ]);
 
   let avatarUrl = customAvatarUrl?.trim() ?? '';
-  let bannerUrl = '';
 
   const fetchOrder = primaryPlatform === 'YouTube' ? ['youtube', 'twitch', 'kick']
     : primaryPlatform === 'Kick' ? ['kick', 'twitch', 'youtube']
@@ -645,7 +642,6 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
               const data = await res.json() as TwitchUsersResponse;
               const user = data.data?.[0];
               avatarUrl = user?.profile_image_url ?? '';
-              bannerUrl = user?.offline_image_url ?? '';
             }
           }
         } catch (err) {
@@ -657,7 +653,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
           const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
           if (channelId) {
             const res = await fetch(
-              `https://youtube.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
+              `https://youtube.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}`,
               { headers: { 'x-goog-api-key': youtubeApiKey } }
             );
             if (res.ok) {
@@ -666,7 +662,6 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
               avatarUrl = item?.snippet?.thumbnails?.high?.url
                 ?? item?.snippet?.thumbnails?.medium?.url
                 ?? '';
-              bannerUrl = item?.brandingSettings?.image?.bannerExternalUrl ?? '';
             }
           }
         } catch (err) {
@@ -704,7 +699,6 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
             if (res.ok) {
               const data = await res.json() as KickChannelImagesResponse;
               avatarUrl = data.user?.profile_pic ?? '';
-              bannerUrl = data.user?.banner_image ?? data.banner_image ?? '';
             }
           }
         } catch (err) {
@@ -722,9 +716,5 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
   await Promise.all([
     context.redis.set('dashboard_avatar_url', avatarUrl),
     context.redis.expire('dashboard_avatar_url', avatarTtl),
-    ...(bannerUrl ? [
-      context.redis.set('dashboard_banner_url', bannerUrl),
-      context.redis.expire('dashboard_banner_url', IMAGE_TTL),
-    ] : []),
   ]);
 }

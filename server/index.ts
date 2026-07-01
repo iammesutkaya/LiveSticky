@@ -37,7 +37,6 @@ app.get('/api/stream-status', async (_req, res) => {
       legacyTitle,
       lastLiveAt,
       avatarUrl,
-      bannerUrl,
       postComments,
       postScore,
     ] = await Promise.all([
@@ -56,7 +55,6 @@ app.get('/api/stream-status', async (_req, res) => {
       redis.get('twitch_stream_title'),
       redis.get('last_live_at'),
       redis.get('dashboard_avatar_url'),
-      redis.get('dashboard_banner_url'),
       redis.get('dashboard_post_comments'),
       redis.get('dashboard_post_score'),
     ]);
@@ -126,7 +124,6 @@ app.get('/api/stream-status', async (_req, res) => {
       postScore: postScore ? parseInt(postScore, 10) : 0,
       lastLiveAt: lastLiveAt || null,
       avatarUrl: (avatarUrl && avatarUrl.length > 0) ? avatarUrl : null,
-      bannerUrl: (bannerUrl && bannerUrl.length > 0) ? bannerUrl : null,
     });
   } catch (error) {
     console.error('Error fetching stream status:', error);
@@ -258,11 +255,8 @@ app.post('/internal/menu/restart', async (_req, res) => {
 
 app.post('/internal/menu/refresh-images', async (_req, res) => {
   try {
-    // Clear the image cache so the next status check re-fetches from the platform API.
-    await Promise.all([
-      redis.del('dashboard_avatar_url'),
-      redis.del('dashboard_banner_url'),
-    ]);
+    // Clear the avatar cache so the next status check re-fetches from the platform API.
+    await redis.del('dashboard_avatar_url');
     await runStatusCheck();
     res.json({ showToast: '✅ Profile images refreshed!' });
   } catch (error) {

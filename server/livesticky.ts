@@ -1035,7 +1035,7 @@ export const runStatusCheck = async (): Promise<void> => {
     console.error('Failed to sync dashboard config:', dashSyncError);
   }
 
-  // Refresh channel images (avatar + banner) once every 12 hours via Redis TTL.
+  // Refresh the channel avatar once every 12 hours via Redis TTL.
   try {
     await refreshChannelImages({ settings, redis });
   } catch (imgErr) {
@@ -1045,10 +1045,9 @@ export const runStatusCheck = async (): Promise<void> => {
   // Push the latest state to the dashboard Realtime channel so clients update
   // immediately without waiting for the next 30-second poll.
   try {
-    const [cachedLivePostId, cachedAvatarUrl, cachedBannerUrl, cachedLastLiveAt] = await Promise.all([
+    const [cachedLivePostId, cachedAvatarUrl, cachedLastLiveAt] = await Promise.all([
       redis.get('live_post_id'),
       redis.get('dashboard_avatar_url'),
-      redis.get('dashboard_banner_url'),
       redis.get('last_live_at'),
     ]);
     const realtimeDisplayName =
@@ -1108,7 +1107,6 @@ export const runStatusCheck = async (): Promise<void> => {
         postScore,
         lastLiveAt: cachedLastLiveAt ?? null,
         avatarUrl: (cachedAvatarUrl && cachedAvatarUrl.length > 0) ? cachedAvatarUrl : null,
-        bannerUrl: (cachedBannerUrl && cachedBannerUrl.length > 0) ? cachedBannerUrl : null,
       },
     });
   } catch (realtimeErr) {
