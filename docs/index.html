@@ -3,6 +3,12 @@
 
 <head>
   <meta charset="UTF-8">
+  <style>
+    /* Prevent Flash of Unstyled Content (FOUC) */
+    html, body { background-color: #0e1113; }
+    .logo-image { width: 64px; height: 64px; }
+    .footer-logo { width: 40px; height: 40px; }
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LiveSticky - Live Reddit Posts + Multistream Dashboard for Twitch, YouTube & Kick</title>
   <meta name="description"
@@ -16,8 +22,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.150">
-  <link rel="stylesheet" href="landing.css?v=1.0.150">
+  <link rel="stylesheet" href="style.css?v=1.0.151">
+  <link rel="stylesheet" href="landing.css?v=1.0.151">
 </head>
 
 <body>
@@ -38,10 +44,10 @@
       <div class="logo-group">
         <div class="logo-container">
           <div class="logo-glow">
-            <img src="icon.png" alt="LiveSticky Logo" class="logo-image">
+            <img src="icon.png" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
           </div>
         </div>
-        <span class="badge badge-green badge-pulsate logo-version">v1.0.150</span>
+        <span class="badge badge-green badge-pulsate logo-version">v1.0.151</span>
       </div>
       <h1>LiveSticky</h1>
       <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer" class="creator-link">
@@ -246,7 +252,7 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <img src="icon.png" alt="LiveSticky logo" class="footer-logo">
+        <img src="icon.png" alt="LiveSticky logo" class="footer-logo" width="40" height="40">
         <div>
           <div class="footer-name">LiveSticky</div>
           <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit - Twitch, YouTube, and Kick.</p>
