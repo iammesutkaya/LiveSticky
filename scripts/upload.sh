@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # -------------------------------------------------------
-# upload.sh — Upload to Devvit, auto-update version badge
+# upload.sh — Upload to Devvit, auto-update website version tags
 # Usage: ./scripts/upload.sh [--version X.Y.Z]
 # -------------------------------------------------------
 
@@ -55,22 +55,30 @@ else
 fi
 
 if [ -z "$VERSION" ]; then
-  echo "⚠️  Could not detect version — index.html not updated."
+  echo "⚠️  Could not detect version — website tags not updated."
   exit 0
 fi
 
 echo ""
-echo "📝 Detected version: $VERSION — updating docs/index.html..."
+echo "📝 Detected version: $VERSION — updating website version tags..."
 
-# Replace the version badge in index.html (handles any vX.X.XX pattern)
+# One app version drives everything the site exposes: the visible version
+# badge (index.html) and every stylesheet cache-buster (all pages), so
+# returning visitors always get fresh CSS after a release.
 sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g" docs/index.html
 rm -f docs/index.html.bak
 
-echo "✅ docs/index.html updated to v${VERSION}"
+for page in docs/*.html; do
+  # Rewrite existing ".css?v=X.Y.Z" busters and add one to any bare ".css" link.
+  sed -i.bak -E "s|(\.css)(\?v=[0-9]+\.[0-9]+\.[0-9]+)?\"|\1?v=${VERSION}\"|g" "$page"
+  rm -f "${page}.bak"
+done
+
+echo "✅ Website version tags updated to v${VERSION}"
 
 # Commit and push
-git add docs/index.html
-git commit -m "chore: bump website version badge to v${VERSION} (dev upload)"
+git add docs/*.html
+git commit -m "chore: bump website version to v${VERSION} (dev upload)"
 env -u GITHUB_TOKEN git push
 
-echo "🎉 Done! Website badge → v${VERSION}"
+echo "🎉 Done! Website → v${VERSION}"
