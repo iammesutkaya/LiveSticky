@@ -111,6 +111,10 @@
 .inline-youtube { background: var(--youtube-color); }
 .inline-kick { background: var(--kick-color); color: #111111; }
 
+html.theme-light .inline-twitch { background: #772ce8; }
+html.theme-light .inline-youtube { background: #cc0000; }
+
+
 .logo-group {
   display: flex;
   flex-direction: column;
