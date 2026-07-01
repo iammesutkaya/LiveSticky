@@ -38,7 +38,6 @@ Full setup instructions, the complete settings/placeholder reference, and copy-p
 * **[Setup Guide](https://livesticky.com/setup.html)** - install the app and generate your Twitch, YouTube, and Kick API credentials.
 * **[Configuration Reference](https://livesticky.com/settings.html)** - every setting, placeholder, default template, and mod menu action.
 * **[FAQ](https://livesticky.com/faq.html)** - common questions about pricing, multistreaming, and crash protection.
-* **[Design System](https://livesticky.com/design.html)** - the visual language behind the dashboard UI.
 
 ## 🌐 Fetch Domains
 
