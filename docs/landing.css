@@ -207,6 +207,11 @@ html.theme-light .inline-youtube { background: #cc0000; }
   font-weight: 500;
 }
 
+.merged-features {
+  gap: 8px;
+}
+
+
 .feature-checklist li {
   display: flex;
 }
