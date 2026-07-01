@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("theme-light");
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) */
@@ -19,7 +27,7 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.154">
+  <link rel="stylesheet" href="style.css?v=1.0.155">
   <style>
     /* Design System specific additions */
     .color-swatch {
@@ -322,5 +330,6 @@
     </div>
   </footer>
 
+  <script src="main.js?v=1.0.155"></script>
 </body>
 </html>

@@ -2,6 +2,14 @@
 <html lang="en">
 
 <head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("theme-light");
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) */
@@ -22,8 +30,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.154">
-  <link rel="stylesheet" href="landing.css?v=1.0.154">
+  <link rel="stylesheet" href="style.css?v=1.0.155">
+  <link rel="stylesheet" href="landing.css?v=1.0.155">
 </head>
 
 <body>
@@ -47,7 +55,7 @@
             <img src="icon.png" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
           </div>
         </div>
-        <span class="badge badge-green badge-pulsate logo-version">v1.0.154</span>
+        <span class="badge badge-green badge-pulsate logo-version">v1.0.155</span>
       </div>
       <h1>LiveSticky</h1>
       <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer" class="creator-link">
@@ -351,6 +359,7 @@
       }
     });
   </script>
+  <script src="main.js?v=1.0.155"></script>
 </body>
 
 </html>
