@@ -28,6 +28,8 @@
   --twitch-color: #9147ff;
   --youtube-color: #ff0000;
   --kick-color: #53fc18;
+  --reddit-color: #ff4500;
+
 
   --border-subtle: rgba(255, 255, 255, 0.04);
   --border-line: rgba(255, 255, 255, 0.06);
@@ -621,8 +623,8 @@ body {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--accent-gold);
-  color: #131313;
+  background: var(--reddit-color);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
