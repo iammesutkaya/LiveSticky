@@ -622,6 +622,9 @@ body {
 .reddit-badge {
   width: 26px;
   height: 26px;
+  border-radius: 50%;
+  background: var(--reddit-color);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
