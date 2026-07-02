@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <style>
+    /* Prevent Flash of Unstyled Content (FOUC) */
+    html, body { background-color: #0e1113; }
+    .logo-image { width: 64px; height: 64px; }
+    .footer-logo { width: 40px; height: 40px; }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Templates & Placeholders | LiveSticky</title>
+
+  <meta property="og:title" content="Templates & Placeholders - LiveSticky">
+  <meta property="og:description" content="Copy-paste default templates and see all available dynamic placeholders for LiveSticky.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://livesticky.com/templates.html">
+  <meta property="og:image" content="https://livesticky.com/icon.png">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css?v=1.0.185">
+  <style>
+    /* Templates & Placeholders specific additions */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    .token-table th, .token-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-line);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .token-table th {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .token-table code {
+      background: var(--bg-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--gold-text);
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .tmpl-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .tmpl-item summary {
+      padding: 16px 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tmpl-item summary::-webkit-details-marker {
+      display: none;
+    }
+    .tmpl-item summary::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid var(--text-muted);
+      border-bottom: 2px solid var(--text-muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      margin-right: 4px;
+    }
+    .tmpl-item[open] summary::after {
+      transform: rotate(-135deg);
+    }
+    .tmpl-item .code-container {
+      margin: 0 20px 20px;
+      position: relative;
+    }
+    .tmpl-item pre {
+      margin: 0;
+      padding: 16px 64px 16px 16px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+    }
+    .tmpl-item code {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+
+    <header class="header-left">
+      <h1>Templates &amp; Placeholders</h1>
+      <p class="subtitle">Customize your LiveSticky post titles, bodies, and widgets with dynamic variables.</p>
+    </header>
+
+    <main class="card">
+      <div class="content">
+        <h2>Placeholder Reference</h2>
+        <p>Use these placeholders to dynamically insert stream info into your custom titles, bodies, footers, and sidebars:</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Placeholder</th><th>Replaced With</th><th>Example Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>{channel}</code></td><td>Twitch channel name (lowercase)</td><td>streamer</td></tr>
+            <tr><td><code>{display_name}</code></td><td>Twitch display name</td><td>Streamer</td></tr>
+            <tr><td><code>{title}</code></td><td>Current stream title</td><td>First stream back!</td></tr>
+            <tr><td><code>{game}</code></td><td>Category or game name</td><td>Just Chatting</td></tr>
+            <tr><td><code>{viewers}</code></td><td>Current live viewer count</td><td>15,420</td></tr>
+            <tr><td><code>{uptime}</code></td><td>Stream uptime</td><td>2h 15m</td></tr>
+            <tr><td><code>{twitch_url}</code></td><td>Configured Twitch URL</td><td>https://twitch.tv/...</td></tr>
+            <tr><td><code>{youtube_url}</code></td><td>Configured YouTube URL</td><td>https://youtube.com/...</td></tr>
+            <tr><td><code>{kick_url}</code></td><td>Configured Kick URL</td><td>https://kick.com/...</td></tr>
+            <tr><td><code>{date}</code></td><td>Stream date (Highlights post only)</td><td>June 2, 2026</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>Default Templates for Copy-Pasting</h2>
+        <p>If you need to restore or tweak the default texts, expand and copy these markdown templates:</p>
+
+        <details class="tmpl-item">
+          <summary>Live Post Title</summary>
+          <div class="code-container">
+            <pre><code>🚨 {display_name} is LIVE! 🚨 - {title}</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Post Body</summary>
+          <div class="code-container">
+            <pre><code>* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*Stats are auto-updated in real-time by LiveSticky.*</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Concluding Post Body</summary>
+          <div class="code-container">
+            <pre><code>### 👋 Stream Ended - Thanks for watching! 👋
+
+**Title:**
+{title}
+
+The stream has concluded. VODs and highlights may be available via the links below.
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*This post is now locked as the stream has ended.*</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Title</summary>
+          <div class="code-container">
+            <pre><code>😴 {display_name} is offline 😴</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Body</summary>
+          <div class="code-container">
+            <pre><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 🚨 {display_name} is LIVE! 🚨
+
+**Title:**
+{title}
+
+* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 😴 {display_name} is offline 😴
+
+Follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Title</summary>
+          <div class="code-container">
+            <pre><code>🎬 Top Clips from {display_name}'s stream ({date})</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Custom Header</summary>
+          <div class="code-container">
+            <pre><code>**Title:**
+{title}
+
+Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Footer</summary>
+          <div class="code-container">
+            <pre><code>---
+*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*</code></pre>
+          </div>
+        </details>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="icon.png" alt="LiveSticky logo" class="footer-logo" width="40" height="40">
+        <div>
+          <div class="footer-name">LiveSticky</div>
+          <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit - Twitch, YouTube, and Kick.</p>
+        </div>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <div class="footer-col">
+          <span class="footer-col-title">Documentation</span>
+          <a href="setup.html">Setup Guide</a>
+          <a href="mod-tools.html">Moderator Guide</a>
+          <a href="templates.html">Templates &amp; Placeholders</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Reference</span>
+          <a href="settings.html">Configuration Reference</a>
+          <a href="technical.html">Technical Info</a>
+          <a href="faq.html">FAQ</a>
+          <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Legal</span>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="impressum.html">Impressum</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Connect</span>
+          <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer">u/iammesutkaya</a>
+          <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>
+          <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 LiveSticky. All rights reserved.</span>
+      <span>Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a></span>
+    </div>
+  </footer>
+
+  <!-- Floating Back-to-Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+    </svg>
+  </button>
+
+  <script src="main.js?v=1.0.185"></script>
+</body>
+</html>

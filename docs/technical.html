@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <style>
+    /* Prevent Flash of Unstyled Content (FOUC) */
+    html, body { background-color: #0e1113; }
+    .logo-image { width: 64px; height: 64px; }
+    .footer-logo { width: 40px; height: 40px; }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Info | LiveSticky</title>
+
+  <meta property="og:title" content="Technical Info - LiveSticky">
+  <meta property="og:description" content="Declared network domains, security warning, and app architecture data for LiveSticky.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://livesticky.com/technical.html">
+  <meta property="og:image" content="https://livesticky.com/icon.png">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css?v=1.0.185">
+  <style>
+    /* Technical Info specific additions */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    .token-table th, .token-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-line);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .token-table th {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .token-table code {
+      background: var(--bg-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--gold-text);
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+
+    <header class="header-left">
+      <h1>Technical Specifications</h1>
+      <p class="subtitle">API domains, environment details, and security policies of LiveSticky.</p>
+    </header>
+
+    <main class="card">
+      <div class="content">
+        <h2>Fetch Domains</h2>
+        <p>LiveSticky makes outbound HTTP requests to the following external domains (all declared and locked inside the Devvit security configuration <a href="https://github.com/iammesutkaya/LiveSticky/blob/main/devvit.json" target="_blank" rel="noopener noreferrer"><code>devvit.json</code></a>):</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Domain</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>id.twitch.tv</code></td><td>Twitch OAuth 2.0 token endpoint. Used to obtain short-lived App Access Tokens via Client Credentials flows.</td></tr>
+            <tr><td><code>api.twitch.tv</code></td><td>Twitch Helix REST API. Used to poll Twitch live status (<code>/streams</code>), metadata, and clips (<code>/clips</code>).</td></tr>
+            <tr><td><code>youtube.googleapis.com</code></td><td>YouTube Data API v3. Used to resolve channel handles and poll live streams.</td></tr>
+            <tr><td><code>id.kick.com</code></td><td>Kick OAuth 2.0 token endpoint. Used to obtain short-lived Kick access tokens.</td></tr>
+            <tr><td><code>api.kick.com</code></td><td>Kick public API. Used to poll Kick channel stream status and game categories.</td></tr>
+            <tr><td><code>static-cdn.jtvnw.net</code></td><td>Twitch static image CDN. Used to fetch Twitch channel profile avatars and offline banners.</td></tr>
+            <tr><td><code>yt3.googleusercontent.com</code></td><td>YouTube user image CDN. Used to fetch YouTube channel profile avatars.</td></tr>
+            <tr><td><code>i.ytimg.com</code></td><td>YouTube image CDN. Used to fetch YouTube stream thumbnails.</td></tr>
+            <tr><td><code>files.kick.com</code></td><td>Kick files CDN. Used to fetch Kick channel profile avatars and stream thumbnails.</td></tr>
+            <tr><td><code>i.redd.it</code></td><td>Reddit static image CDN. Used to load images uploaded directly to Reddit.</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>Subreddit-level API Secrets Storage</h2>
+        <div class="alert-warning" style="margin: 20px 0;">
+          <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div style="line-height: 1.5;">
+            <strong>Mod Tools Setting Visibility:</strong> Under Reddit's Developer Platform (Devvit), secrets that are customized on a per-subreddit basis (like your Client Secret or YouTube API Key) are saved within your community's App Settings. These settings are visible to all moderators of your subreddit who have permission to manage apps. Treat these developer credentials as shared team credentials, and rotate them if your moderator team changes.
+          </div>
+        </div>
+
+        <hr>
+
+        <h2>Privacy Policy Summary</h2>
+        <p>No personal user data (Reddit profiles, IP addresses, voting histories, browser configurations) is ever sent, logged, or transferred to any external platform APIs. The bot only reads public channel statuses, stream categories, viewer counts, and clips to compile public feeds.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="icon.png" alt="LiveSticky logo" class="footer-logo" width="40" height="40">
+        <div>
+          <div class="footer-name">LiveSticky</div>
+          <p class="footer-tag">Automatic live posts and a multistream dashboard for your subreddit - Twitch, YouTube, and Kick.</p>
+        </div>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <div class="footer-col">
+          <span class="footer-col-title">Documentation</span>
+          <a href="setup.html">Setup Guide</a>
+          <a href="mod-tools.html">Moderator Guide</a>
+          <a href="templates.html">Templates &amp; Placeholders</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Reference</span>
+          <a href="settings.html">Configuration Reference</a>
+          <a href="technical.html">Technical Info</a>
+          <a href="faq.html">FAQ</a>
+          <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Legal</span>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="impressum.html">Impressum</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Connect</span>
+          <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer">u/iammesutkaya</a>
+          <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>
+          <a href="https://livesticky.com" target="_blank" rel="noopener noreferrer">livesticky.com</a>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 LiveSticky. All rights reserved.</span>
+      <span>Built for the <a href="https://developers.reddit.com/" target="_blank" rel="noopener noreferrer">Reddit Developer Platform</a></span>
+    </div>
+  </footer>
+
+  <!-- Floating Back-to-Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+    </svg>
+  </button>
+
+  <script src="main.js?v=1.0.185"></script>
+</body>
+</html>
