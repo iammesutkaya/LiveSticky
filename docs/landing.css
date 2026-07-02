@@ -1099,13 +1099,6 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 
 /* Utility overrides for inner pages */
-.page-narrow {
-  max-width: 800px;
-  padding-top: 60px;
-}
-.mt-2 {
-  margin-top: 8px;
-}
 .pt-0 {
   padding-top: 0 !important;
 }

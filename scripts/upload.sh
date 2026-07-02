@@ -76,8 +76,10 @@ done
 
 echo "✅ Website version tags updated to v${VERSION}"
 
-# Commit and push
-git add docs/*.html
+# Commit and push. Stage the whole website folder, not just the HTML pages:
+# the pages depend on style.css/landing.css/main.js, and leaving those
+# unstaged deploys new HTML against stale assets.
+git add docs
 git commit -m "chore: bump website version to v${VERSION} (dev upload)"
 env -u GITHUB_TOKEN git push
 
