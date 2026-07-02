@@ -54,6 +54,120 @@
   color: var(--gold-text);
 }
 
+/* ── Docs dropdown ──────────────────────────────────────── */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s ease;
+}
+
+.nav-dropdown-toggle:hover,
+.nav-dropdown-toggle.active {
+  color: var(--gold-text);
+}
+
+.nav-caret {
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown.open .nav-caret {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 230px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 120;
+}
+
+.nav-dropdown.open .nav-dropdown-menu {
+  display: flex;
+}
+
+.nav-dropdown-item {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-dropdown-item:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.nav-dropdown-item.active {
+  color: var(--gold-text);
+}
+
+/* ── Doc-page nav bar (shared header on setup/faq/etc.) ─── */
+.doc-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.doc-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.doc-nav-brand img {
+  border-radius: 7px;
+}
+
+.doc-nav-brand:hover {
+  color: var(--gold-text);
+}
+
+/* Reset the hero-specific offsets when .top-nav is reused inside .doc-nav */
+.doc-nav .top-nav {
+  align-self: auto;
+  margin: 0;
+}
+
+.doc-nav .mobile-menu-btn {
+  position: static;
+}
+
 /* ── Hero ────────────────────────────────────────────────── */
 .hero-split {
   display: flex;
@@ -1061,6 +1175,42 @@ html.theme-light .showcase-tabs .tab-indicator {
   .top-nav .nav-link {
     width: 100%;
     padding: 12px 16px;
+    text-align: left;
+  }
+
+  .nav-dropdown-item {
+    text-align: left;
+  }
+
+  /* Doc-page nav: drop the panel just under the compact bar, not at hero offset */
+  .doc-nav .top-nav {
+    top: calc(100% + 8px);
+    right: 0;
+  }
+
+  /* Docs dropdown expands inline (accordion) within the mobile nav panel */
+  .nav-dropdown {
+    width: 100%;
+  }
+
+  .nav-dropdown-toggle {
+    width: 100%;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .nav-dropdown-menu {
+    position: static;
+    display: none;
+    min-width: 0;
+    padding: 0 0 4px 12px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .nav-dropdown.open .nav-dropdown-menu {
+    display: flex;
   }
 
   .landing-container {

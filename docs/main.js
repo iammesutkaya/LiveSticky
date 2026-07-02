@@ -159,7 +159,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 7. Scroll to top on every page load (prevents stale scroll from bfcache)
+  // 7. Top navigation: mobile menu toggle, Docs dropdown, active-link state
+  const navToggleBtn = document.querySelector('.mobile-menu-btn');
+  const topNav = document.getElementById('topNav');
+  if (navToggleBtn && topNav) {
+    navToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = topNav.classList.toggle('open');
+      navToggleBtn.setAttribute('aria-expanded', String(open));
+    });
+  }
+
+  const navDropdowns = document.querySelectorAll('.nav-dropdown');
+  const closeDropdowns = () => {
+    navDropdowns.forEach((dd) => {
+      dd.classList.remove('open');
+      const t = dd.querySelector('.nav-dropdown-toggle');
+      if (t) t.setAttribute('aria-expanded', 'false');
+    });
+  };
+  navDropdowns.forEach((dd) => {
+    const toggleEl = dd.querySelector('.nav-dropdown-toggle');
+    if (!toggleEl) return;
+    toggleEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dd.classList.contains('open');
+      closeDropdowns();
+      if (!isOpen) {
+        dd.classList.add('open');
+        toggleEl.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+  // Close open dropdowns on outside click or Escape
+  document.addEventListener('click', closeDropdowns);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDropdowns();
+  });
+
+  // Highlight the current page in the top nav (and its parent Docs toggle)
+  document.querySelectorAll('.top-nav a').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('#')) return;
+    const linkPage = href.split('?')[0].split('#')[0];
+    if (linkPage && linkPage === currentPage) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+      if (link.classList.contains('nav-dropdown-item')) {
+        const parent = link.closest('.nav-dropdown');
+        const parentToggle = parent && parent.querySelector('.nav-dropdown-toggle');
+        if (parentToggle) parentToggle.classList.add('active');
+      }
+    }
+  });
+
+  // 8. Scroll to top on every page load (prevents stale scroll from bfcache)
   window.scrollTo(0, 0);
 });
 

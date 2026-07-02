@@ -56,8 +56,7 @@
 
   <!-- Hero & Showcase Split Layout -->
   <div class="landing-container">
-    <button class="mobile-menu-btn"
-      onclick="const n=document.getElementById('topNav');this.setAttribute('aria-expanded', n.classList.toggle('open'))"
+    <button class="mobile-menu-btn" type="button"
       aria-label="Toggle menu" aria-controls="topNav" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -67,8 +66,20 @@
     </button>
     <nav class="top-nav" id="topNav">
       <a href="#features" class="nav-link">Features</a>
-      <a href="setup.html" class="nav-link">Setup Guide</a>
-      <a href="faq.html" class="nav-link">FAQ</a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+          Docs
+          <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="nav-dropdown-menu" role="menu">
+          <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
+          <a href="mod-tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+          <a href="templates.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+          <a href="technical.html" class="nav-dropdown-item" role="menuitem">Technical Info</a>
+          <a href="settings.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="faq.html" class="nav-dropdown-item" role="menuitem">FAQ</a>
+        </div>
+      </div>
       <a href="https://github.com/iammesutkaya/LiveSticky" target="_blank" rel="noopener noreferrer"
         class="nav-link">GitHub</a>
     </nav>
