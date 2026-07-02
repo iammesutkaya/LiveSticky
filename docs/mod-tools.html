@@ -30,46 +30,19 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" href="style.css?v=1.0.194">
-   <link rel="stylesheet" href="landing.css?v=1.0.194">
-   <style>
-    /* Moderator Guide specific additions */
-    .token-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 24px;
-    }
-    .token-table th, .token-table td {
-      text-align: left;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border-line);
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-    .token-table th {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .token-table code {
-      background: var(--bg-surface);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: var(--gold-text);
-      font-family: monospace;
-      font-size: 0.9em;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css?v=1.0.195">
+  <link rel="stylesheet" href="landing.css?v=1.0.195">
 </head>
 <body>
 
-   <div class="page-container">
+  <div class="page-container">
     <div class="back-nav">
-<a href="index.html" class="back-btn">
-         <svg width="16" height="16" viewBox="0 0 24 24">
-           <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-         </svg>
-         Back to Home
-       </a>
+      <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Home
+      </a>
     </div>
 
     <header class="header-left">
@@ -109,23 +82,23 @@
 
         <h2>How to Access Mod Tools</h2>
         <p>To run any of the actions above, ensure you are logged in with moderator permissions on your subreddit:</p>
-        <ol class="steps-list" style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; padding: 0; list-style: none;">
-          <li style="display: flex; gap: 12px; align-items: flex-start;">
-            <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); color: var(--gold-text); font-weight: 700; font-size: 13px; flex-shrink: 0;">1</span>
-            <div style="color: var(--text-secondary); line-height: 1.5;">
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
               Navigate to your subreddit's home feed (e.g. <code>r/yourcommunity</code>) in the official Reddit mobile app or desktop browser.
             </div>
           </li>
-          <li style="display: flex; gap: 12px; align-items: flex-start;">
-            <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); color: var(--gold-text); font-weight: 700; font-size: 13px; flex-shrink: 0;">2</span>
-            <div style="color: var(--text-secondary); line-height: 1.5;">
-              Click the **Mod Tools** shield icon or the overflow menu (three dots button <code>...</code>) near the top of the feed page.
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              Click the <strong>Mod Tools</strong> shield icon or the overflow menu (three dots button <code>...</code>) near the top of the feed page.
             </div>
           </li>
-          <li style="display: flex; gap: 12px; align-items: flex-start;">
-            <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); color: var(--gold-text); font-weight: 700; font-size: 13px; flex-shrink: 0;">3</span>
-            <div style="color: var(--text-secondary); line-height: 1.5;">
-              Scroll to the **Apps** or **Mod Commands** submenu, and click your desired action. The app will immediately trigger the action and show a confirmation toast notification.
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              Scroll to the <strong>Apps</strong> or <strong>Mod Commands</strong> submenu, and click your desired action. The app will immediately trigger the action and show a confirmation toast notification.
             </div>
           </li>
         </ol>
@@ -148,12 +121,12 @@
           <a href="setup.html">Setup Guide</a>
           <a href="mod-tools.html">Mod Menu &amp; Tools</a>
           <a href="templates.html">Variables &amp; Templates</a>
-          <a href="technical.html">Technical Infos</a>
+          <a href="technical.html">Technical Info</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
           <a href="faq.html">FAQ</a>
-          <a href="settings.html">Settings explained</a>
+          <a href="settings.html">Configuration Reference</a>
           <a href="https://github.com/iammesutkaya/LiveSticky/issues" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>
         </div>
@@ -182,6 +155,6 @@
     </svg>
   </button>
 
-  <script src="main.js?v=1.0.194"></script>
+  <script src="main.js?v=1.0.195"></script>
 </body>
 </html>

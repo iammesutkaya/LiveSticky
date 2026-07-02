@@ -32,14 +32,14 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="icon.png">
-  <link rel="stylesheet" href="style.css?v=1.0.194">
-  <link rel="stylesheet" href="landing.css?v=1.0.194">
+  <link rel="stylesheet" href="style.css?v=1.0.195">
+  <link rel="stylesheet" href="landing.css?v=1.0.195">
 
 </head>
 
 <body>
-  <div class="landing-container page-narrow">
-    
+  <div class="page-container">
+
     <div class="back-nav">
       <a href="index.html" class="back-btn">
         <svg width="16" height="16" viewBox="0 0 24 24">
@@ -49,10 +49,10 @@
       </a>
     </div>
 
-    <div class="header-left">
+    <header class="header-left">
       <h1>Frequently Asked Questions</h1>
-      <p class="subtitle mt-2">Everything you need to know about LiveSticky.</p>
-    </div>
+      <p class="subtitle">Everything you need to know about LiveSticky.</p>
+    </header>
 
     <section class="section unboxed-section pt-0">
       <div class="content article-content">
@@ -123,7 +123,8 @@
         <details class="faq-item">
           <summary>Does the highlights post feature work for YouTube and Kick streams? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
           <div class="faq-content">
-            <p>No, the automated post-stream highlights post is exclusive to **Twitch** channels. LiveSticky queries Twitch's public Clips API upon stream conclusion to automatically compile the top clips generated during that stream. Since YouTube and Kick do not offer equivalent open Clips APIs that allow querying clip logs generated during a specific live window programmatically, highlights posts are skipped for these platforms.</p>
+            <p>No, the automated post-stream highlights post is exclusive to <strong>Twitch</strong> channels. LiveSticky queries Twitch's public Clips API upon stream conclusion to automatically compile the top clips generated during that stream. Since YouTube and Kick do not offer equivalent open Clips APIs that allow querying clip logs generated during a specific live window programmatically, highlights posts are skipped for these platforms.</p>
+          </div>
         </details>
 
         <details class="faq-item">
@@ -163,12 +164,12 @@
           <a href="setup.html">Setup Guide</a>
           <a href="mod-tools.html">Mod Menu &amp; Tools</a>
           <a href="templates.html">Variables &amp; Templates</a>
-          <a href="technical.html">Technical Infos</a>
+          <a href="technical.html">Technical Info</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
           <a href="faq.html">FAQ</a>
-          <a href="settings.html">Settings explained</a>
+          <a href="settings.html">Configuration Reference</a>
           <a href="https://github.com/iammesutkaya/LiveSticky/issues" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>
         </div>
@@ -190,6 +191,13 @@
     </div>
   </footer>
 
-  <script src="main.js?v=1.0.194"></script>
+  <!-- Floating Back-to-Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+    </svg>
+  </button>
+
+  <script src="main.js?v=1.0.195"></script>
 </body>
 </html>
