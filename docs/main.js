@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Highlight the current page in the top nav (and its parent Docs toggle)
   document.querySelectorAll('.top-nav a').forEach((link) => {
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('#')) return;
+    if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto')) return;
     const linkPage = href.split('?')[0].split('#')[0];
     if (linkPage && linkPage === currentPage) {
       link.classList.add('active');
