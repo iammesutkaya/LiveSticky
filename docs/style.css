@@ -516,14 +516,8 @@ h1 {
 
 .footer-links {
   display: flex;
-  gap: 36px;
+  gap: 56px;
   flex-wrap: wrap;
-}
-
-.footer-col a svg.ext-icon {
-  width: 8px;
-  height: 8px;
-  opacity: 0.45;
 }
 
 .footer-col {
