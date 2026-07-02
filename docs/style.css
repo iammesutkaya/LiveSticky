@@ -91,7 +91,19 @@ body {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+/* Unified inner-page container – 800px readable width, consistent spacing */
+.page-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px 24px 64px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 /* Header styling */
@@ -458,6 +470,11 @@ h1 {
   color: var(--text-primary);
 }
 
+.footer-col a.active {
+  color: var(--gold-text);
+  text-decoration: underline;
+}
+
 .footer-bottom {
   max-width: 1200px;
   margin: 0 auto;
@@ -502,24 +519,34 @@ h1 {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .container {
-    padding: 24px 16px;
-  }
-  
-  .card {
-    padding: 32px 20px;
-    border-radius: var(--radius-lg);
-  }
-  
-  h1 {
-    font-size: 2.2rem;
-  }
-  
-  .portal-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-}
+   .container {
+     padding: 24px 16px;
+   }
+   
+   .page-container {
+     padding: 24px 16px 32px;
+   }
+   
+   .card {
+     padding: 32px 20px;
+     border-radius: var(--radius-lg);
+   }
+   
+   h1 {
+     font-size: 2.2rem;
+   }
+   
+   .portal-grid {
+     grid-template-columns: 1fr;
+     gap: 16px;
+   }
+ }
+
+ @media (max-width: 600px) {
+   .page-container {
+     padding: 24px 16px 32px;
+   }
+ }
 
 /* ==========================================================================
    UX Additions (Copy-to-Clipboard & Back-to-Top Button)

@@ -146,6 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
       link.setAttribute('href', `mailto:${user}@${domain}`);
     }
   });
-});
 
+  // 6. Footer Active Link Highlighting
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.footer-col a').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (href && !href.startsWith('http') && !href.startsWith('mailto') && !href.startsWith('#')) {
+      const linkPage = href.split('?')[0].split('#')[0];
+      if (linkPage === currentPage) {
+        link.classList.add('active');
+      }
+    }
+  });
+
+  // 7. Scroll to top on every page load (prevents stale scroll from bfcache)
+  window.scrollTo(0, 0);
+});
 
