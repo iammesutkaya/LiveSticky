@@ -101,6 +101,7 @@
   flex-direction: column;
   gap: 2px;
   z-index: 120;
+  text-align: left;
 }
 
 .nav-dropdown.open .nav-dropdown-menu {
