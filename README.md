@@ -39,17 +39,29 @@ LiveSticky handles the entire stream lifecycle automatically. When you go live o
 Full setup instructions, configuration reference, and copy-paste templates live on the website:
 
 * **[Setup Guide](https://livesticky.com/setup.html)** - Install the app and generate your Twitch, YouTube, and Kick API credentials.
+* **[Mod Menu & Tools](https://livesticky.com/mod-tools.html)** - Moderator actions, commands, and subreddit controls.
+* **[Variables & Templates](https://livesticky.com/templates.html)** - Dynamic placeholders and copy-paste post templates.
 * **[Configuration Reference](https://livesticky.com/settings.html)** - Every setting, placeholder, template, and mod menu action.
-* **[FAQ](https://livesticky.com/faq.html)** - Answers regarding pricing, multistreaming, and crash protection.
+* **[FAQ](https://livesticky.com/faq.html)** - Answers regarding common questions, multistreaming, and crash protection.
 
-## 🌐 Fetch Domains
+## 🔌 External APIs
 
-This app makes outgoing HTTP requests to the following domains declared in [`devvit.json`](./devvit.json) (required by the Reddit App Review guidelines for transparency):
+LiveSticky makes outbound HTTP requests to the following external domains (all declared and locked inside [`devvit.json`](./devvit.json)):
 
-* **Platform APIs** (status checking and metadata): `id.twitch.tv`, `api.twitch.tv`, `youtube.googleapis.com`, `id.kick.com`, `api.kick.com`
-* **Media CDNs** (proxying streamer avatars and thumbnails): `static-cdn.jtvnw.net`, `yt3.googleusercontent.com`, `i.ytimg.com`, `files.kick.com`, `i.redd.it`
+| Domain | Purpose |
+| --- | --- |
+| `id.twitch.tv` | Twitch OAuth 2.0 token endpoint. |
+| `api.twitch.tv` | Twitch Helix REST API (live status, metadata, clips). |
+| `youtube.googleapis.com` | YouTube Data API v3 (channel resolution, live stream polling). |
+| `id.kick.com` | Kick OAuth 2.0 token endpoint. |
+| `api.kick.com` | Kick public API (stream status, game categories). |
+| `static-cdn.jtvnw.net` | Twitch image CDN (avatars, banners). |
+| `yt3.googleusercontent.com` | YouTube image CDN (channel avatars). |
+| `i.ytimg.com` | YouTube image CDN (stream thumbnails). |
+| `files.kick.com` | Kick file CDN (avatars, thumbnails). |
+| `i.redd.it` | Reddit image CDN (uploaded images). |
 
-No user data is sent to these services. Only moderator-configured API credentials are used for authentication. See the [Configuration Reference](https://livesticky.com/settings.html#fetch-domains) for what each domain is used for.
+No user data is sent to these services. Only moderator-configured API credentials are used for authentication. See the [External APIs](https://livesticky.com/external-apis.html) page for full details.
 
 ---
 
