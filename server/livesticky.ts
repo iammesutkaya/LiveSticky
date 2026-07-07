@@ -587,14 +587,14 @@ export const runStatusCheck = async (): Promise<void> => {
       const hasCooldown = await redis.get(cooldownKey);
       if (!hasCooldown) {
         try {
+          await redis.set(cooldownKey, 'true');
+          await redis.expire(cooldownKey, 86400); // 24 hours
           await reddit.modMail.createConversation({
             subredditName: subreddit.name,
             subject: `⚠️ LiveSticky API Alert: ${platform}`,
             body: `Hello,\n\nLiveSticky encountered an error while trying to check your ${platform} stream status:\n\n> **${msg}**\n\nThis usually happens when API credentials expire or a free quota is exceeded. Please check your LiveSticky settings.\n\n*(This alert is rate-limited to once per 24 hours per platform.)*`,
             isAuthorHidden: true,
           });
-          await redis.set(cooldownKey, 'true');
-          await redis.expire(cooldownKey, 86400); // 24 hours
           console.log(`Sent ModMail alert for ${platform}`);
         } catch (err) {
           console.error(`Failed to send ModMail alert for ${platform}:`, err);
@@ -665,23 +665,23 @@ export const runStatusCheck = async (): Promise<void> => {
         }
       }
 
+      if (stickyOfflinePost) {
+        await redis.del('is_offline_post_pinned');
+        const offlinePostId = await redis.get('offline_post_id');
+        if (offlinePostId) {
+          try {
+            const offlinePost = await reddit.getPostById(offlinePostId as `t3_${string}`);
+            await offlinePost.unsticky();
+            console.log(`Successfully unstickied offline post: ${offlinePostId}`);
+          } catch (unstickyError) {
+            console.error('Failed to unsticky offline post:', unstickyError);
+          }
+        }
+      }
+
       if (enableLivePost) {
         console.log('Stream went live! Posting and pinning standard live post...');
         try {
-          if (stickyOfflinePost) {
-            await redis.del('is_offline_post_pinned');
-            const offlinePostId = await redis.get('offline_post_id');
-            if (offlinePostId) {
-              try {
-                const offlinePost = await reddit.getPostById(offlinePostId as `t3_${string}`);
-                await offlinePost.unsticky();
-                console.log(`Successfully unstickied offline post: ${offlinePostId}`);
-              } catch (unstickyError) {
-                console.error('Failed to unsticky offline post:', unstickyError);
-              }
-            }
-          }
-
           const post = await reddit.submitPost({
             title: postTitle,
             subredditName: subreddit.name,
@@ -728,9 +728,14 @@ export const runStatusCheck = async (): Promise<void> => {
 
           await redis.set('live_post_id', post.id);
           console.log(`Successfully posted and pinned: ${post.id}`);
-        } catch (e) {
-          console.error('Failed to post stream status to Reddit, resetting lock:', e);
-          await redis.del('is_live_pinned');
+        } catch (e: any) {
+          console.error('Failed to post stream status to Reddit:', e);
+          if (e && e.message && e.message.includes('400')) {
+             console.error('Reddit API returned 400 Bad Request. Discarding lock recovery to prevent infinite loop. Please check your settings for oversized text.');
+          } else {
+             console.log('Resetting lock...');
+             await redis.del('is_live_pinned');
+          }
         }
       }
     } else {
@@ -739,40 +744,23 @@ export const runStatusCheck = async (): Promise<void> => {
         const postId = await redis.get('live_post_id');
         if (postId) {
           try {
-            const post = await reddit.getPostById(postId as `t3_${string}`);
-            await post.edit({ text: postBody });
-            console.log(`Successfully updated live post stats for: ${postId}`);
+            const cachedBodyKey = `live_post_body_${postId}`;
+            const cachedBody = await redis.get(cachedBodyKey);
+            
+            if (cachedBody !== postBody) {
+              const post = await reddit.getPostById(postId as `t3_${string}`);
+              await post.edit({ text: postBody });
+              await redis.set(cachedBodyKey, postBody);
+              console.log(`Successfully updated live post stats for: ${postId}`);
+            } else {
+              console.log(`Live post body unchanged, skipping edit for: ${postId}`);
+            }
+            
             if (enableDynamicFlair) {
               await updateDynamicPostFlair(postId, subreddit.name, streamInfo, liveFlairId);
             }
           } catch (e) {
             console.error('Failed to update live post stats:', e);
-          }
-          // Re-verify that the live post is still pinned - throttled to every 10 minutes.
-          const PIN_VERIFY_INTERVAL_MS = 10 * 60 * 1000;
-          const lastPinVerified = await redis.get('last_pin_verified');
-          const shouldVerifyPin =
-            !lastPinVerified ||
-            Date.now() - parseInt(lastPinVerified, 10) > PIN_VERIFY_INTERVAL_MS;
-
-          if (shouldVerifyPin) {
-            await redis.set('last_pin_verified', Date.now().toString());
-            try {
-              await verifyAndRepinIfNeeded(postId, 'live');
-            } catch (verifyErr) {
-              console.error('Failed to verify/re-pin live post:', verifyErr);
-            }
-
-            if (enableDashboard) {
-              const dashPostId = await redis.get('dashboard_post_id');
-              if (dashPostId) {
-                try {
-                  await verifyAndRepinIfNeeded(dashPostId, 'dashboard');
-                } catch (verifyErr) {
-                  console.error('Failed to verify/re-pin dashboard post:', verifyErr);
-                }
-              }
-            }
           }
         } else {
           console.error('Lock is held but no live_post_id found! Resetting lock so post can be created...');
@@ -809,6 +797,15 @@ export const runStatusCheck = async (): Promise<void> => {
         redis.set('dashboard_viewers', viewerCount),
         redis.set('dashboard_thumbnail', thumbnail),
         redis.set('dashboard_live_platforms', livePlatformsJson),
+        // 7 days TTL (604800 seconds)
+        redis.expire('dashboard_platform', 604800),
+        redis.expire('dashboard_display_name', 604800),
+        redis.expire('dashboard_title', 604800),
+        redis.expire('dashboard_started_at', 604800),
+        redis.expire('dashboard_game', 604800),
+        redis.expire('dashboard_viewers', 604800),
+        redis.expire('dashboard_thumbnail', 604800),
+        redis.expire('dashboard_live_platforms', 604800),
       ]);
     } catch (dashError) {
       console.error('Failed to write dashboard Redis keys:', dashError);

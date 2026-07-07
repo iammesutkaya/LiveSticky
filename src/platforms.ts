@@ -78,15 +78,23 @@ async function resolveYouTubeChannelId(
 
   let handle = trimmed;
   if (trimmed.includes('youtube.com/')) {
-    const parts = trimmed.split('/');
-    const lastPart = parts[parts.length - 1];
-    if (lastPart && lastPart.startsWith('@')) {
-      handle = lastPart;
+    // Remove trailing slash if any to avoid empty last parts
+    const cleanUrl = trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
+    const parts = cleanUrl.split('/');
+    
+    // Check if any part starts with '@'
+    const handlePart = parts.find(p => p.startsWith('@'));
+    if (handlePart) {
+      handle = handlePart;
     } else {
       const channelIdx = parts.indexOf('channel');
       if (channelIdx !== -1 && channelIdx + 1 < parts.length) {
         const potentialId = parts[channelIdx + 1];
         if (potentialId) return potentialId;
+      } else {
+        // Fallback to the last part if it's not a channel URL
+        const lastPart = parts[parts.length - 1];
+        if (lastPart) handle = lastPart;
       }
     }
   }
@@ -240,7 +248,8 @@ async function fetchYouTubeStatus(
       liveItem.snippet?.thumbnails?.medium?.url ??
       '';
     const userName = liveItem.snippet?.channelTitle || channel;
-    const viewers = details?.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
+    const parsedViewers = details?.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
+    const viewers = Number.isNaN(parsedViewers) ? 0 : parsedViewers;
     const startedAt = details?.actualStartTime || new Date().toISOString();
 
     return {
@@ -344,8 +353,8 @@ async function fetchKickStatus(
     if (isLive && channelData.livestream) {
       const stream = channelData.livestream;
       const title = stream.title || 'Kick Livestream';
-      const viewers =
-        stream.viewers !== undefined ? parseInt(String(stream.viewers), 10) : 0;
+      const parsedViewers = stream.viewers !== undefined ? parseInt(String(stream.viewers), 10) : 0;
+      const viewers = Number.isNaN(parsedViewers) ? 0 : parsedViewers;
       const startedAt = stream.created_at || new Date().toISOString();
       const gameName = stream.category?.name || 'Kick Stream';
       const thumbnail = stream.thumbnail?.url || '';
