@@ -1458,14 +1458,10 @@ html.theme-light .showcase-tabs .tab-indicator {
     grid-row: 2;
   }
   
-  .about-grid .about-links {
+  .about-grid .feature-checklist {
     grid-row: 3;
     margin-top: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: auto;
-    justify-self: center;
+    justify-self: start;
   }
 }
 
