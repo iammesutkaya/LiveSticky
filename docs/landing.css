@@ -1386,6 +1386,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 
+
 /* About Page Custom Layout */
 .about-grid {
   display: grid;
@@ -1397,7 +1398,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 .about-sidebar {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* changed to flex-start so list aligns left with the avatar */
 }
 
 .about-avatar {
@@ -1405,23 +1406,63 @@ html.theme-light .showcase-tabs .tab-indicator {
   width: 150px;
   height: 150px;
   object-fit: cover;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   border: 2px solid var(--border-subtle);
+  align-self: center;
 }
 
 .about-links {
-  list-style: none;
+  list-style: none !important;
   padding: 0;
   margin: 0;
   width: 100%;
 }
 
+.about-links li::before {
+  display: none !important;
+}
+
 .about-link-item {
-  margin-bottom: 16px;
-  display: flex;
+  margin-bottom: 8px;
+}
+
+.about-link-text {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-left: -12px; /* Pull it slightly left so icons align with avatar */
+}
+
+.about-link-text:hover {
+  color: var(--gold-text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.about-link-text svg {
+  fill: var(--text-secondary);
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.about-link-text .lucide-link {
+  fill: none;
+  stroke: var(--text-secondary);
+}
+
+.about-link-text:hover svg {
+  fill: var(--gold-text);
+}
+
+.about-link-text:hover .lucide-link {
+  fill: none;
+  stroke: var(--gold-text);
 }
 
 @media (max-width: 768px) {
@@ -1437,6 +1478,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   .about-grid .about-avatar {
     grid-row: 1;
     margin-bottom: 24px;
+    justify-self: center;
   }
   
   .about-grid .about-main {
@@ -1448,6 +1490,8 @@ html.theme-light .showcase-tabs .tab-indicator {
     margin-top: 32px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    width: auto;
+    justify-self: center;
   }
 }
