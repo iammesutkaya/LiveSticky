@@ -1398,71 +1398,117 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 
 
-/* About Page Custom Layout */
+/* About Page Premium Layout */
 .about-grid {
   display: grid;
-  grid-template-columns: 170px 1fr;
-  gap: 48px;
-  align-items: stretch;
+  grid-template-columns: 180px 1fr;
+  gap: 64px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ambient Aurora Glow */
+.about-grid.card::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 80%;
+  height: 160%;
+  background: radial-gradient(circle, rgba(145, 71, 255, 0.15) 0%, rgba(245, 212, 116, 0.08) 40%, transparent 70%);
+  filter: blur(60px);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: pulse-aurora 8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-aurora {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+  100% { transform: scale(1.1) translate(30px, 20px); opacity: 1; }
 }
 
 .about-sidebar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(138, 43, 226, 0.02) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px; /* perfectly nests inside 28px outer card radius with 4px gap */
-  padding: 40px 32px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  margin: -44px 0 -44px -44px; /* Pulls into the 48px card padding, leaving a 4px gap */
+  gap: 32px;
 }
 
-.about-sidebar .feature-checklist {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-self: center;
+/* Animated Dynamic Avatar */
+.avatar-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  padding: 3px; /* Space for the animated border */
+  background: linear-gradient(135deg, var(--twitch-color), var(--accent-gold), var(--reddit-color));
+  background-size: 200% 200%;
+  animation: spin-gradient 4s linear infinite;
+  box-shadow: 0 8px 32px rgba(145, 71, 255, 0.2);
 }
 
-.about-sidebar .feature-checklist li {
-  width: 100%;
-}
-
-.about-sidebar .feature-link {
-  width: 100%;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-}
-
-.about-sidebar .feature-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: rgba(255, 255, 255, 0.1);
+@keyframes spin-gradient {
+  0% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+  100% { background-position: 200% 50%; filter: hue-rotate(360deg); }
 }
 
 .about-avatar {
   border-radius: 50%;
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 24px rgba(138, 43, 226, 0.15), 0 4px 12px rgba(0,0,0,0.3);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  align-self: center;
+  border: 4px solid var(--bg-card); /* inner mask */
+  background-color: var(--bg-card);
+  position: relative;
+  z-index: 2;
 }
+
+/* Bento Box Social Widgets */
+.bento-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.bento-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  color: var(--text-muted);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.bento-link svg {
+  width: 28px;
+  height: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bento-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.reddit-hover:hover { border-color: rgba(255, 69, 0, 0.4); box-shadow: 0 8px 24px rgba(255, 69, 0, 0.2); }
+.reddit-hover:hover svg { color: #ff4500; transform: scale(1.15); }
+
+.twitch-hover:hover { border-color: rgba(145, 71, 255, 0.4); box-shadow: 0 8px 24px rgba(145, 71, 255, 0.2); }
+.twitch-hover:hover svg { color: #9147ff; transform: scale(1.15); }
+
+.github-hover:hover { border-color: rgba(255, 255, 255, 0.4); box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15); }
+.github-hover:hover svg { color: #ffffff; transform: scale(1.15); }
+
+.link-hover:hover { border-color: rgba(245, 212, 116, 0.4); box-shadow: 0 8px 24px rgba(245, 212, 116, 0.2); }
+.link-hover:hover svg { color: var(--accent-gold); transform: scale(1.15); }
 
 .about-links {
   list-style: none !important;
@@ -1478,37 +1524,53 @@ html.theme-light .showcase-tabs .tab-indicator {
 .about-link-item {
   margin-bottom: 8px;
 }
+/* Typography */
+.designer-subtitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.gradient-username {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--twitch-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .intro-text {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: #fff;
   line-height: 1.6;
   margin-bottom: 24px;
+  font-weight: 400;
 }
 
 @media (max-width: 768px) {
   .about-grid {
     grid-template-columns: 1fr;
-    justify-items: center;
+    gap: 40px;
   }
   
+  .about-grid.card::before {
+    display: none; /* Hide aurora on mobile to keep it clean */
+  }
+
   .about-sidebar {
-    display: contents; /* Flattens sidebar so children can be reordered in the grid */
+    width: 100%;
   }
   
-  .about-grid .about-avatar {
-    grid-row: 1;
-    margin-bottom: 24px;
-    justify-self: start;
+  .avatar-container {
+    width: 140px;
+    height: 140px;
   }
   
-  .about-grid .about-main {
-    grid-row: 2;
-  }
-  
-  .about-grid .feature-checklist {
-    grid-row: 3;
-    margin-top: 32px;
-    justify-self: start;
+  .bento-links {
+    max-width: 320px;
   }
 }
 
