@@ -696,14 +696,14 @@ html.theme-light .showcase-tabs .tab-indicator {
   color: var(--text-primary);
 }
 
-.article-content a {
+.article-content a:not(.feature-link) {
   color: var(--gold-text);
   text-decoration: none;
   font-weight: 500;
   transition: var(--transition-smooth);
 }
 
-.article-content a:hover {
+.article-content a:not(.feature-link):hover {
   color: var(--text-primary);
 }
 
@@ -1467,4 +1467,18 @@ html.theme-light .showcase-tabs .tab-indicator {
     width: auto;
     justify-self: center;
   }
+}
+
+/* Override article-content defaults for feature-checklist */
+.article-content ul.feature-checklist {
+  padding-left: 0;
+  list-style: none;
+}
+
+.article-content ul.feature-checklist li {
+  margin-bottom: 0;
+}
+
+.article-content ul.feature-checklist li::before {
+  display: none !important;
 }
