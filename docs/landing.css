@@ -1414,10 +1414,10 @@ html.theme-light .showcase-tabs .tab-indicator {
   position: absolute;
   top: -30%;
   left: -20%;
-  width: 100%;
-  height: 180%;
-  background: radial-gradient(circle, rgba(145, 71, 255, 0.25) 0%, rgba(245, 212, 116, 0.15) 50%, transparent 80%);
-  filter: blur(70px);
+  width: 80%;
+  height: 160%;
+  background: radial-gradient(circle, rgba(145, 71, 255, 0.15) 0%, rgba(245, 212, 116, 0.08) 40%, transparent 70%);
+  filter: blur(60px);
   z-index: -1;
   pointer-events: none;
   border-radius: 50%;
@@ -1425,8 +1425,8 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 @keyframes pulse-aurora {
-  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
-  100% { transform: scale(1.15) translate(40px, 30px); opacity: 1; }
+  0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+  100% { transform: scale(1.1) translate(30px, 20px); opacity: 1; }
 }
 
 .about-sidebar {
