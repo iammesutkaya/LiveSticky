@@ -98,7 +98,7 @@ const MOCK_CONFIG = {
 const MOCK_STATUS = {
   multistream: {
     isLive: true,
-    displayName: "StickyFox",
+    displayName: "Sticky",
     avatarUrl: "icon.png",
     lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
     postComments: 42,
@@ -133,7 +133,7 @@ const MOCK_STATUS = {
   },
   stream: {
     isLive: true,
-    displayName: "StickyFox",
+    displayName: "Sticky",
     avatarUrl: "icon.png",
     lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
     postComments: 42,
@@ -152,7 +152,7 @@ const MOCK_STATUS = {
   },
   offline: {
     isLive: false,
-    displayName: "StickyFox",
+    displayName: "Sticky",
     avatarUrl: "icon.png",
     lastLiveAt: new Date(Date.now() - 31620000).toISOString(),
     postComments: 42,
