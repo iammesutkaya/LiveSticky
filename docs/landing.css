@@ -1522,12 +1522,12 @@ html.theme-light .showcase-tabs .tab-indicator {
   }
 
   .about-sidebar {
-    width: 100%;
+    display: contents;
   }
   
   .about-grid .about-avatar {
     grid-row: 1;
-    margin-bottom: 24px;
+    margin-bottom: 0;
     justify-self: center;
   }
   
@@ -1535,9 +1535,9 @@ html.theme-light .showcase-tabs .tab-indicator {
     grid-row: 2;
   }
   
-  .about-grid .feature-checklist {
+  .about-sidebar .feature-checklist {
     grid-row: 3;
-    margin-top: 32px;
+    margin-top: 0;
     justify-self: stretch;
   }
 }
