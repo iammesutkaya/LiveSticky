@@ -828,24 +828,14 @@ export const runStatusCheck = async (): Promise<void> => {
       if (elapsedMinutes >= gracePeriodMin) {
         console.log('Grace period expired! Concluding post and unpinning...');
 
-        // Record when the stream actually went offline (first offline detection)
-        // so the dashboard can show "Last live X ago".
-        await redis.set('last_live_at', new Date(firstOfflineTime).toISOString());
-
-        await redis.del('is_live_pinned');
-        await redis.del('offline_since');
         const postId = await redis.get('live_post_id');
-        await redis.del('live_post_id');
-
         const broadcasterId = await redis.get('twitch_broadcaster_id');
         const startedAt = await redis.get('twitch_started_at');
         const streamTitle = (await redis.get('twitch_stream_title')) || 'Recent Stream';
         const cachedDisplayName = await redis.get('twitch_display_name');
         const displayName = cachedDisplayName || defaultChannel;
 
-        await redis.del('twitch_broadcaster_id');
-        await redis.del('twitch_started_at');
-        await redis.del('twitch_stream_title');
+        let cleanupSafe = true;
 
         if (enableDynamicFlair) {
           if (enableDashboard) {
@@ -909,8 +899,12 @@ export const runStatusCheck = async (): Promise<void> => {
                 console.error('Failed to lock concluding post:', lockError);
               }
             }
-          } catch (e) {
+          } catch (e: any) {
             console.error('Failed to conclude/unsticky/delete/remove post:', e);
+            // If the post is simply not found, we can safely cleanup. Otherwise, we might want to retry.
+            if (e && e.message && !e.message.toLowerCase().includes('not found')) {
+               cleanupSafe = false;
+            }
           }
         }
 
@@ -943,7 +937,22 @@ export const runStatusCheck = async (): Promise<void> => {
         }
 
         if (!enableDashboard && stickyOfflinePost) {
-          await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
+          try {
+            await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
+          } catch (err) {
+            console.error('Failed to ensure sticky offline post:', err);
+          }
+        }
+
+        if (cleanupSafe) {
+          // Record when the stream actually went offline (first offline detection)
+          await redis.set('last_live_at', new Date(firstOfflineTime).toISOString());
+          await redis.del('is_live_pinned');
+          await redis.del('offline_since');
+          await redis.del('live_post_id');
+          await redis.del('twitch_broadcaster_id');
+          await redis.del('twitch_started_at');
+          await redis.del('twitch_stream_title');
         }
       }
     }
