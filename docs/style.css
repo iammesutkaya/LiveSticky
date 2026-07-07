@@ -638,14 +638,10 @@ h1 {
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  opacity: 0;
+  opacity: 1;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(4px);
   z-index: 10;
-}
-
-.code-container:hover .copy-btn {
-  opacity: 1;
 }
 
 .copy-btn:hover {
