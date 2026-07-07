@@ -215,14 +215,14 @@ h1 {
   margin: 32px 0;
 }
 
-.content a {
+.content a:not(.feature-link) {
   color: var(--gold-text);
   text-decoration: none;
   font-weight: 500;
   transition: var(--transition-smooth);
 }
 
-.content a:hover {
+.content a:not(.feature-link):hover {
   color: var(--text-primary);
 }
 
