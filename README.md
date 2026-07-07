@@ -1,8 +1,8 @@
 # LiveSticky - Reddit Bot
 
-🌍 **Website:** [livesticky.com](https://livesticky.com)
-
 ![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
+
+🌍 **Website:** [livesticky.com](https://livesticky.com)
 
 LiveSticky automates stream promotion on Reddit. It monitors Twitch, YouTube and Kick and automatically creates a pinned, interactive dashboard and live thread in your subreddit.
 
