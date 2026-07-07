@@ -20,12 +20,12 @@
     .footer-logo { width: 40px; height: 40px; }
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Variables &amp; Templates | LiveSticky</title>
+  <title>External APIs | LiveSticky</title>
 
-  <meta property="og:title" content="Variables &amp; Templates - LiveSticky">
-  <meta property="og:description" content="Copy-paste default templates and see all available customization variables for LiveSticky.">
+  <meta property="og:title" content="External APIs - LiveSticky">
+  <meta property="og:description" content="Declared network domains, security warning, and app architecture data for LiveSticky.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://livesticky.com/templates.html">
+  <meta property="og:url" content="https://livesticky.com/external-apis.html">
   <meta property="og:image" content="https://livesticky.com/icon.png">
   <meta name="twitter:card" content="summary">
 
@@ -56,10 +56,10 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
-            <a href="mod-tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
-            <a href="templates.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
-            <a href="settings.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
-          <a href="external-apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
+            <a href="tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+            <a href="customization.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+            <a href="configuration.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
           </div>
         </div>
         <div class="nav-dropdown">
@@ -88,157 +88,33 @@
     </header>
 
     <header class="header-left">
-      <h1>Variables &amp; Templates</h1>
-      <p class="subtitle">Customize your LiveSticky post titles, bodies, and widgets with dynamic variables.</p>
+      <h1>External APIs</h1>
+      <p class="subtitle">API domains, environment details, and security policies of LiveSticky.</p>
     </header>
 
     <main class="card">
       <div class="content">
-        <h2>Variable Reference</h2>
-        <p>Use these variables to dynamically insert stream info into your custom titles, bodies, footers, and sidebars:</p>
+        <p>LiveSticky makes outbound HTTP requests to the following external domains (all declared and locked inside the Devvit security configuration <a href="https://github.com/iammesutkaya/LiveSticky/blob/main/devvit.json" target="_blank" rel="noopener noreferrer"><code>devvit.json</code></a>):</p>
         <table class="token-table">
           <thead>
-            <tr><th>Variable</th><th>Replaced With</th><th>Example Value</th></tr>
+            <tr><th>Domain</th><th>Purpose</th></tr>
           </thead>
           <tbody>
-            <tr><td><code>{channel}</code></td><td>Twitch channel name (lowercase)</td><td>streamer</td></tr>
-            <tr><td><code>{display_name}</code></td><td>Twitch display name</td><td>Streamer</td></tr>
-            <tr><td><code>{title}</code></td><td>Current stream title</td><td>First stream back!</td></tr>
-            <tr><td><code>{game}</code></td><td>Category or game name</td><td>Just Chatting</td></tr>
-            <tr><td><code>{viewers}</code></td><td>Current live viewer count</td><td>15,420</td></tr>
-            <tr><td><code>{uptime}</code></td><td>Stream uptime</td><td>2h 15m</td></tr>
-            <tr><td><code>{twitch_url}</code></td><td>Configured Twitch URL</td><td>https://twitch.tv/...</td></tr>
-            <tr><td><code>{youtube_url}</code></td><td>Configured YouTube URL</td><td>https://youtube.com/...</td></tr>
-            <tr><td><code>{kick_url}</code></td><td>Configured Kick URL</td><td>https://kick.com/...</td></tr>
-            <tr><td><code>{date}</code></td><td>Stream date (Highlights post only)</td><td>June 2, 2026</td></tr>
+            <tr><td><code>id.twitch.tv</code></td><td>Twitch OAuth 2.0 token endpoint. Used to obtain short-lived App Access Tokens via Client Credentials flows.</td></tr>
+            <tr><td><code>api.twitch.tv</code></td><td>Twitch Helix REST API. Used to poll Twitch live status (<code>/streams</code>), metadata, and clips (<code>/clips</code>).</td></tr>
+            <tr><td><code>youtube.googleapis.com</code></td><td>YouTube Data API v3. Used to resolve channel handles and poll live streams.</td></tr>
+            <tr><td><code>id.kick.com</code></td><td>Kick OAuth 2.0 token endpoint. Used to obtain short-lived Kick access tokens.</td></tr>
+            <tr><td><code>api.kick.com</code></td><td>Kick public API. Used to poll Kick channel stream status and game categories.</td></tr>
+            <tr><td><code>static-cdn.jtvnw.net</code></td><td>Twitch static image CDN. Used to fetch Twitch channel profile avatars and offline banners.</td></tr>
+            <tr><td><code>yt3.googleusercontent.com</code></td><td>YouTube user image CDN. Used to fetch YouTube channel profile avatars.</td></tr>
+            <tr><td><code>i.ytimg.com</code></td><td>YouTube image CDN. Used to fetch YouTube stream thumbnails.</td></tr>
+            <tr><td><code>files.kick.com</code></td><td>Kick files CDN. Used to fetch Kick channel profile avatars and stream thumbnails.</td></tr>
+            <tr><td><code>i.redd.it</code></td><td>Reddit static image CDN. Used to load images uploaded directly to Reddit.</td></tr>
           </tbody>
         </table>
 
-        <hr>
+        <p style="margin-top:24px"><a href="privacy.html">View our full Privacy Policy</a></p>
 
-        <h2>Default Templates for Copy-Pasting</h2>
-        <p>If you need to restore or tweak the default texts, expand and copy these markdown templates:</p>
-
-        <details class="tmpl-item">
-          <summary>Live Post Title</summary>
-          <div class="code-container">
-            <pre><code>🚨 {display_name} is LIVE! 🚨 - {title}</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Live Post Body</summary>
-          <div class="code-container">
-            <pre><code>* **Category/Game:** {game}
-* **Current Viewers:** {viewers}
-* **Uptime:** live for {uptime}
-
----
-**Watch the stream on:**
-
-🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
-
----
-*Stats are auto-updated in real-time by LiveSticky.*</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Concluding Post Body</summary>
-          <div class="code-container">
-            <pre><code>### 👋 Stream Ended - Thanks for watching! 👋
-
-**Title:**
-{title}
-
-The stream has concluded. VODs and highlights may be available via the links below.
-
----
-**Watch the VODs on:**
-
-🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
-
----
-*This post is now locked as the stream has ended.*</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Offline Post Title</summary>
-          <div class="code-container">
-            <pre><code>😴 {display_name} is offline 😴</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Offline Post Body</summary>
-          <div class="code-container">
-            <pre><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
-
----
-**Watch the VODs on:**
-
-🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Live Sidebar Widget Text</summary>
-          <div class="code-container">
-            <pre><code># 🚨 {display_name} is LIVE! 🚨
-
-**Title:**
-{title}
-
-* **Category/Game:** {game}
-* **Current Viewers:** {viewers}
-* **Uptime:** live for {uptime}
-
----
-**Watch the stream on:**
-
-🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Offline Sidebar Widget Text</summary>
-          <div class="code-container">
-            <pre><code># 😴 {display_name} is offline 😴
-
-Follow the channels below to get notified when {display_name} goes live!
-
----
-**Watch the VODs on:**
-
-🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Highlights Post Title</summary>
-          <div class="code-container">
-            <pre><code>🎬 Top Clips from {display_name}'s stream ({date})</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Highlights Post Custom Header</summary>
-          <div class="code-container">
-            <pre><code>**Title:**
-{title}
-
-Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
-          </div>
-        </details>
-
-        <details class="tmpl-item">
-          <summary>Highlights Post Footer</summary>
-          <div class="code-container">
-            <pre><code>---
-*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*</code></pre>
-          </div>
-        </details>
       </div>
     </main>
   </div>
@@ -256,10 +132,10 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
         <div class="footer-col">
           <span class="footer-col-title">Setup</span>
           <a href="setup.html">Setup Guide</a>
-          <a href="mod-tools.html">Mod Menu &amp; Tools</a>
-          <a href="templates.html">Variables &amp; Templates</a>
-          <a href="settings.html">Configuration Reference</a>
-          <a href="external-apis.html">External APIs</a>
+          <a href="tools.html">Mod Menu &amp; Tools</a>
+          <a href="customization.html">Variables &amp; Templates</a>
+          <a href="configuration.html">Configuration Reference</a>
+          <a href="apis.html">External APIs</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
@@ -271,7 +147,7 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
           <span class="footer-col-title">Legal</span>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms of Service</a>
-          <a href="impressum.html">Impressum</a>
+          <a href="legal.html">Impressum</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">About</span>

@@ -268,7 +268,7 @@ app.post('/internal/menu/refresh-images', async (_req, res) => {
 
 app.post('/internal/menu/get-templates', async (_req, res) => {
   res.json({
-    navigateTo: 'https://livesticky.com/templates.html',
+    navigateTo: 'https://livesticky.com/customization.html',
   });
 });
 

@@ -20,12 +20,12 @@
     .footer-logo { width: 40px; height: 40px; }
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Impressum | LiveSticky</title>
+  <title>Variables &amp; Templates | LiveSticky</title>
 
-  <meta property="og:title" content="Impressum - LiveSticky">
-  <meta property="og:description" content="Legal Disclosure (Impressum) for LiveSticky.">
+  <meta property="og:title" content="Variables &amp; Templates - LiveSticky">
+  <meta property="og:description" content="Copy-paste default templates and see all available customization variables for LiveSticky.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://livesticky.com/impressum.html">
+  <meta property="og:url" content="https://livesticky.com/templates.html">
   <meta property="og:image" content="https://livesticky.com/icon.png">
   <meta name="twitter:card" content="summary">
 
@@ -56,10 +56,10 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
-            <a href="mod-tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
-            <a href="templates.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
-            <a href="settings.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
-          <a href="external-apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
+            <a href="tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+            <a href="customization.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+            <a href="configuration.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
           </div>
         </div>
         <div class="nav-dropdown">
@@ -88,60 +88,157 @@
     </header>
 
     <header class="header-left">
-      <h1>Impressum</h1>
-      <p class="subtitle">Legal Disclosure / Imprint</p>
+      <h1>Variables &amp; Templates</h1>
+      <p class="subtitle">Customize your LiveSticky post titles, bodies, and widgets with dynamic variables.</p>
     </header>
 
     <main class="card">
       <div class="content">
-        <p>
-          The following legal disclosure applies to the website <strong>livesticky.com</strong>, all services provided under the <strong>LiveSticky</strong> app on Reddit, and associated social media presences.
-        </p>
+        <h2>Variable Reference</h2>
+        <p>Use these variables to dynamically insert stream info into your custom titles, bodies, footers, and sidebars:</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Variable</th><th>Replaced With</th><th>Example Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>{channel}</code></td><td>Twitch channel name (lowercase)</td><td>streamer</td></tr>
+            <tr><td><code>{display_name}</code></td><td>Twitch display name</td><td>Streamer</td></tr>
+            <tr><td><code>{title}</code></td><td>Current stream title</td><td>First stream back!</td></tr>
+            <tr><td><code>{game}</code></td><td>Category or game name</td><td>Just Chatting</td></tr>
+            <tr><td><code>{viewers}</code></td><td>Current live viewer count</td><td>15,420</td></tr>
+            <tr><td><code>{uptime}</code></td><td>Stream uptime</td><td>2h 15m</td></tr>
+            <tr><td><code>{twitch_url}</code></td><td>Configured Twitch URL</td><td>https://twitch.tv/...</td></tr>
+            <tr><td><code>{youtube_url}</code></td><td>Configured YouTube URL</td><td>https://youtube.com/...</td></tr>
+            <tr><td><code>{kick_url}</code></td><td>Configured Kick URL</td><td>https://kick.com/...</td></tr>
+            <tr><td><code>{date}</code></td><td>Stream date (Highlights post only)</td><td>June 2, 2026</td></tr>
+          </tbody>
+        </table>
 
         <hr>
 
-        <h2>Information according to § 5 TMG</h2>
-        <p>
-          <strong>Owner / Operator:</strong><br>
-          mesutkaya.de - Mesut Kaya<br>
-          c/o Online-Impressum #4561<br>
-          Europaring 90<br>
-          53757 Sankt Augustin<br>
-          Germany
-        </p>
+        <h2>Default Templates for Copy-Pasting</h2>
+        <p>If you need to restore or tweak the default texts, expand and copy these markdown templates:</p>
 
-        <h2>Contact Information</h2>
-        <p>
-          <strong>E-Mail:</strong> <a href="mailto:impressum@mesutkaya.de">impressum@mesutkaya.de</a><br>
-          <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer">Reddit</a>
-          <a href="https://www.twitch.tv/iammesutkaya" target="_blank" rel="noopener noreferrer">Twitch</a>
-          <a href="https://links.mesutkaya.com" target="_blank" rel="noopener noreferrer">links.mesutkaya.com</a>
-        </p>
+        <details class="tmpl-item">
+          <summary>Live Post Title</summary>
+          <div class="code-container">
+            <pre><code>🚨 {display_name} is LIVE! 🚨 - {title}</code></pre>
+          </div>
+        </details>
 
-        <h2>Supervisory Authority</h2>
-        <p>
-          Landesanstalt für Kommunikation Baden-Württemberg (LFK)<br>
-          Germany
-        </p>
+        <details class="tmpl-item">
+          <summary>Live Post Body</summary>
+          <div class="code-container">
+            <pre><code>* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
 
-        <h2>Mailing &amp; Package Guidelines</h2>
-        <p>
-          Please format any physical packages or official correspondence exactly as shown below:
-        </p>
-        <pre><code>mesutkaya.de - Mesut Kaya
-c/o Online-Impressum #4561
-Europaring 90
-53757 Sankt Augustin
-Germany</code></pre>
-        <p>
-          <strong>Important:</strong> The <code>c/o Online-Impressum #4561</code> line must be fully visible on the address label, otherwise the correspondence cannot be assigned or delivered. A pre-announcement email must be sent to <a href="mailto:Paket@online-impressum.de">Paket@online-impressum.de</a>.
-        </p>
+---
+**Watch the stream on:**
 
-        <h2>Dispute Resolution</h2>
-        <p>
-          The European Commission provides a platform for online dispute resolution (ODR): <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>.<br>
-          We are neither willing nor obligated to participate in dispute resolution proceedings before a consumer arbitration board.
-        </p>
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*Stats are auto-updated in real-time by LiveSticky.*</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Concluding Post Body</summary>
+          <div class="code-container">
+            <pre><code>### 👋 Stream Ended - Thanks for watching! 👋
+
+**Title:**
+{title}
+
+The stream has concluded. VODs and highlights may be available via the links below.
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**
+
+---
+*This post is now locked as the stream has ended.*</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Title</summary>
+          <div class="code-container">
+            <pre><code>😴 {display_name} is offline 😴</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Body</summary>
+          <div class="code-container">
+            <pre><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 🚨 {display_name} is LIVE! 🚨
+
+**Title:**
+{title}
+
+* **Category/Game:** {game}
+* **Current Viewers:** {viewers}
+* **Uptime:** live for {uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 😴 {display_name} is offline 😴
+
+Follow the channels below to get notified when {display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Title</summary>
+          <div class="code-container">
+            <pre><code>🎬 Top Clips from {display_name}'s stream ({date})</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Custom Header</summary>
+          <div class="code-container">
+            <pre><code>**Title:**
+{title}
+
+Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Footer</summary>
+          <div class="code-container">
+            <pre><code>---
+*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*</code></pre>
+          </div>
+        </details>
       </div>
     </main>
   </div>
@@ -159,10 +256,10 @@ Germany</code></pre>
         <div class="footer-col">
           <span class="footer-col-title">Setup</span>
           <a href="setup.html">Setup Guide</a>
-          <a href="mod-tools.html">Mod Menu &amp; Tools</a>
-          <a href="templates.html">Variables &amp; Templates</a>
-          <a href="settings.html">Configuration Reference</a>
-          <a href="external-apis.html">External APIs</a>
+          <a href="tools.html">Mod Menu &amp; Tools</a>
+          <a href="customization.html">Variables &amp; Templates</a>
+          <a href="configuration.html">Configuration Reference</a>
+          <a href="apis.html">External APIs</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
@@ -174,7 +271,7 @@ Germany</code></pre>
           <span class="footer-col-title">Legal</span>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms of Service</a>
-          <a href="impressum.html">Impressum</a>
+          <a href="legal.html">Impressum</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">About</span>

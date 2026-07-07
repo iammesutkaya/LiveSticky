@@ -56,10 +56,10 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
-            <a href="mod-tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
-            <a href="templates.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
-            <a href="settings.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
-          <a href="external-apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
+            <a href="tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+            <a href="customization.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+            <a href="configuration.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
           </div>
         </div>
         <div class="nav-dropdown">
@@ -98,7 +98,7 @@
           All of these settings live under <strong>Mod Tools</strong> ➔ <strong>Apps</strong> ➔ <strong>live-sticky</strong> ➔ <strong>Settings</strong>. For step-by-step instructions on generating API credentials, see the <a href="setup.html">Setup Guide</a>.
         </p>
         <p style="margin-top: -8px; margin-bottom: 24px; color: var(--text-secondary);">
-          Looking for post layout variables or default copy-paste text templates? Visit the <a href="templates.html">Templates &amp; Placeholders</a> page. Looking for moderator commands? Check out the <a href="mod-tools.html">Moderator Guide</a>.
+          Looking for post layout variables or default copy-paste text templates? Visit the <a href="customization.html">Templates &amp; Placeholders</a> page. Looking for moderator commands? Check out the <a href="tools.html">Moderator Guide</a>.
         </p>
 
         <h2>Setup</h2>
@@ -123,6 +123,9 @@
             <tr><td>Kick API Client Secret (Optional)</td><td>String</td><td>Your Kick Developer Client Secret. Required for Kick status checks.</td></tr>
             <tr><td>Enable Dynamic Post Flair Updates</td><td>Boolean</td><td>Periodically updates the live (or dashboard) post flair with the active game and viewer count (e.g. <code>🔴 LIVE: Just Chatting [15.4K]</code>).</td></tr>
             <tr><td>Live Post Flair Template ID (Optional)</td><td>String</td><td>The UUID of the flair template to apply to the post (found in Community Mod Tools ➔ Post Flair).</td></tr>
+            <tr><td>Primary Platform</td><td>Select</td><td>This platform will always appear at the top of the multistream dashboard (Options: Twitch, YouTube, Kick).</td></tr>
+            <tr><td>Custom Avatar Image URL (Optional)</td><td>String</td><td>Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Leave blank to auto-fetch from your primary platform.</td></tr>
+            <tr><td>Streamer Reddit Username (Optional)</td><td>String</td><td>The exact Reddit username of the streamer (without the u/). Used for dynamic User Flair updates.</td></tr>
           </tbody>
         </table>
 
@@ -142,6 +145,8 @@
             <tr><td>Offline Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the offline post (works with both custom and default templates). Useful for adding Discord/social links or rules.</td></tr>
             <tr><td>Offline Sidebar Widget Text (Optional)</td><td>Paragraph</td><td>Custom markdown for the sidebar widget when offline. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, and <code>{youtube_url}</code> as placeholders.</td></tr>
             <tr><td>Offline Sidebar Widget Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the offline sidebar widget (works with both custom and default templates). Useful for adding Discord/social links or rules.</td></tr>
+            <tr><td>Offline User Flair Text (Optional)</td><td>String</td><td>The User Flair text applied to the Streamer when they go offline. Leave blank to clear their flair completely.</td></tr>
+            <tr><td>Offline Flair Text (Optional)</td><td>String</td><td>Text to set as the post flair when the stream goes offline. Defaults to '⚫ OFFLINE' if left empty.</td></tr>
           </tbody>
         </table>
 
@@ -158,6 +163,8 @@
             <tr><td>Live Sidebar Widget Text (Optional)</td><td>Paragraph</td><td>Custom markdown for the sidebar widget when the stream is live. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, <code>{game}</code>, <code>{viewers}</code>, <code>{uptime}</code>, <code>{title}</code>, and <code>{youtube_url}</code> as placeholders.</td></tr>
             <tr><td>Live Sidebar Widget Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the sidebar widget when the stream is live. Perfect for adding Discord links, rules, etc.</td></tr>
             <tr><td>Suggested Comment Sort</td><td>Select</td><td>The default comment sorting applied to the live post (options: <code>New</code>, <code>Live</code>, <code>Q&amp;A</code>, or <code>None</code> to leave it to the community default). Defaults to <code>New</code>.</td></tr>
+            <tr><td>Enable Live Text Post</td><td>Boolean</td><td>If enabled, automatically creates and pins a standard text post when the stream goes live. Defaults to true.</td></tr>
+            <tr><td>Live User Flair Text (Optional)</td><td>String</td><td>The User Flair text applied to the Streamer when they go live.</td></tr>
           </tbody>
         </table>
 
@@ -172,6 +179,8 @@
             <tr><td>Highlights Post Title (Optional)</td><td>String</td><td>Custom title for the stream highlights post. If empty, the default template is used. Supports placeholders: <code>{display_name}</code>, <code>{date}</code>.</td></tr>
             <tr><td>Highlights Post Custom Header (Optional)</td><td>Paragraph</td><td>Custom markdown for the header of the stream highlights post. If empty, the default template is used. You can use <code>{channel}</code>, <code>{display_name}</code>, <code>{title}</code>, and <code>{date}</code> as dynamic placeholders.</td></tr>
             <tr><td>Highlights Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used. You can use <code>{channel}</code> as a dynamic placeholder.</td></tr>
+            <tr><td>Concluding Post Body (Optional)</td><td>Paragraph</td><td>Custom markdown for the live post body after the stream ends. If empty, the default template is used.</td></tr>
+            <tr><td>Concluding Post Custom Footer (Optional)</td><td>Paragraph</td><td>Custom markdown to append at the bottom of the concluding post.</td></tr>
           </tbody>
         </table>
 
@@ -182,12 +191,13 @@
           </thead>
           <tbody>
             <tr><td>Enable Custom Post Dashboard</td><td>Boolean</td><td>Enables the interactive dashboard custom post. This is an opt-in enhancement - the standard text-post flow continues to work as the default. When enabled, LiveSticky stickies the dashboard (instead of a standard live post) while you're live.</td></tr>
+            <tr><td>Dashboard Post Title (Optional)</td><td>String</td><td>Custom title for the persistent dashboard post. If empty, the default is used.</td></tr>
           </tbody>
         </table>
         <p>Once enabled, create the post from <strong>Mod Tools</strong> ➔ the <strong>Create LiveSticky Dashboard</strong> menu item. Running it again replaces the existing dashboard rather than creating a duplicate.</p>
 
         <h2>Moderator Menu Items</h2>
-        <p>LiveSticky adds custom moderator actions directly inside your community mod tools. For a complete list of commands and instructions on how to use them, see the <a href="mod-tools.html">Moderator Guide</a>.</p>
+        <p>LiveSticky adds custom moderator actions directly inside your community mod tools. For a complete list of commands and instructions on how to use them, see the <a href="tools.html">Moderator Guide</a>.</p>
       </div>
     </main>
   </div>
@@ -205,10 +215,10 @@
         <div class="footer-col">
           <span class="footer-col-title">Setup</span>
           <a href="setup.html">Setup Guide</a>
-          <a href="mod-tools.html">Mod Menu &amp; Tools</a>
-          <a href="templates.html">Variables &amp; Templates</a>
-          <a href="settings.html">Configuration Reference</a>
-          <a href="external-apis.html">External APIs</a>
+          <a href="tools.html">Mod Menu &amp; Tools</a>
+          <a href="customization.html">Variables &amp; Templates</a>
+          <a href="configuration.html">Configuration Reference</a>
+          <a href="apis.html">External APIs</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
@@ -220,7 +230,7 @@
           <span class="footer-col-title">Legal</span>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms of Service</a>
-          <a href="impressum.html">Impressum</a>
+          <a href="legal.html">Impressum</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">About</span>

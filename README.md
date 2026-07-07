@@ -39,9 +39,9 @@ LiveSticky handles the entire stream lifecycle automatically. When you go live o
 Full setup instructions, configuration reference, and copy-paste templates live on the website:
 
 * **[Setup Guide](https://livesticky.com/setup.html)** - Install the app and generate your Twitch, YouTube, and Kick API credentials.
-* **[Mod Menu & Tools](https://livesticky.com/mod-tools.html)** - Moderator actions, commands, and subreddit controls.
-* **[Variables & Templates](https://livesticky.com/templates.html)** - Dynamic placeholders and copy-paste post templates.
-* **[Configuration Reference](https://livesticky.com/settings.html)** - Every setting, placeholder, template, and mod menu action.
+* **[Mod Menu & Tools](https://livesticky.com/tools.html)** - Moderator actions, commands, and subreddit controls.
+* **[Variables & Templates](https://livesticky.com/customization.html)** - Dynamic placeholders and copy-paste post templates.
+* **[Configuration Reference](https://livesticky.com/configuration.html)** - Every setting, placeholder, template, and mod menu action.
 * **[FAQ](https://livesticky.com/faq.html)** - Answers regarding common questions, multistreaming, and crash protection.
 
 ## 🔌 External APIs
@@ -61,7 +61,7 @@ LiveSticky makes outbound HTTP requests to the following external domains (all d
 | `files.kick.com` | Kick file CDN (avatars, thumbnails). |
 | `i.redd.it` | Reddit image CDN (uploaded images). |
 
-No user data is sent to these services. Only moderator-configured API credentials are used for authentication. See the [External APIs](https://livesticky.com/external-apis.html) page for full details.
+No user data is sent to these services. Only moderator-configured API credentials are used for authentication. See the [External APIs](https://livesticky.com/apis.html) page for full details.
 
 ---
 

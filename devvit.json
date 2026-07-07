@@ -78,6 +78,36 @@
         "defaultValue": false,
         "helpText": "Creates and automatically updates a \"Stream Status\" text widget in your community sidebar."
       },
+      "enableDynamicFlair": {
+        "type": "boolean",
+        "label": "🔧 Enable Dynamic Post Flair Updates",
+        "defaultValue": false,
+        "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K])."
+      },
+      "removeOfflinePost": {
+        "type": "boolean",
+        "label": "😴 Remove Live Post from Feed when Offline",
+        "defaultValue": false,
+        "helpText": "Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed."
+      },
+      "deleteOfflinePost": {
+        "type": "boolean",
+        "label": "😴 Delete Live Post when Offline",
+        "defaultValue": false,
+        "helpText": "Completely deletes the live post and all its comments when the stream ends."
+      },
+      "stickyOfflinePost": {
+        "type": "boolean",
+        "label": "😴 Enable Pinned Offline Post",
+        "defaultValue": true,
+        "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation."
+      },
+      "enableHighlightsPost": {
+        "type": "boolean",
+        "label": "🎬 Enable Stream Highlights Post",
+        "defaultValue": false,
+        "helpText": "Automatically posts a compilation of top Twitch clips generated during the stream when it ends."
+      },
       "suggestedSort": {
         "type": "select",
         "label": "💬 Suggested Comment Sort",
@@ -105,9 +135,18 @@
         "type": "select",
         "label": "👑 Primary Platform",
         "options": [
-          { "label": "Twitch", "value": "Twitch" },
-          { "label": "YouTube", "value": "YouTube" },
-          { "label": "Kick", "value": "Kick" }
+          {
+            "label": "Twitch",
+            "value": "Twitch"
+          },
+          {
+            "label": "YouTube",
+            "value": "YouTube"
+          },
+          {
+            "label": "Kick",
+            "value": "Kick"
+          }
         ],
         "defaultValue": "Twitch",
         "helpText": "This platform will always appear at the top of the multistream dashboard."
@@ -123,18 +162,6 @@
         "label": "👤 Streamer Reddit Username (Optional)",
         "helpText": "The exact Reddit username of the streamer (without the u/). Used for User Flair updates.",
         "placeholder": "iammesutkaya"
-      },
-      "liveUserFlairText": {
-        "type": "string",
-        "label": "👤 Live User Flair Text (Optional)",
-        "helpText": "The User Flair text applied to the Streamer when they go live.",
-        "defaultValue": "🔴 LIVE NOW"
-      },
-      "offlineUserFlairText": {
-        "type": "string",
-        "label": "👤 Offline User Flair Text (Optional)",
-        "helpText": "The User Flair text applied to the Streamer when they go offline. Leave blank to clear their flair completely.",
-        "defaultValue": " "
       },
       "twitchChannel": {
         "type": "string",
@@ -195,6 +222,12 @@
         "helpText": "Custom title for the persistent dashboard post. If empty, the default is used.",
         "defaultValue": "LiveSticky Dashboard"
       },
+      "liveUserFlairText": {
+        "type": "string",
+        "label": "👤 Live User Flair Text (Optional)",
+        "helpText": "The User Flair text applied to the Streamer when they go live.",
+        "defaultValue": "🔴 LIVE NOW"
+      },
       "livePostTitle": {
         "type": "string",
         "label": "🔴 Live Post Title (Optional)",
@@ -231,12 +264,6 @@
         "helpText": "Text to automatically post and pin as a mod comment inside the live post (e.g. Discord link).",
         "placeholder": "Optional - pinned mod comment (Discord link, rules…)"
       },
-      "enableDynamicFlair": {
-        "type": "boolean",
-        "label": "🔧 Enable Dynamic Post Flair Updates",
-        "defaultValue": false,
-        "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K])."
-      },
       "liveFlairId": {
         "type": "string",
         "label": "🔧 Live Post Flair Template ID (Optional)",
@@ -249,23 +276,11 @@
         "defaultValue": 6,
         "helpText": "How long (in minutes) to wait before concluding the live post after going offline. Prevents duplicate posts during brief stream crashes."
       },
-      "removeOfflinePost": {
-        "type": "boolean",
-        "label": "😴 Remove Live Post from Feed when Offline",
-        "defaultValue": false,
-        "helpText": "Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed."
-      },
-      "deleteOfflinePost": {
-        "type": "boolean",
-        "label": "😴 Delete Live Post when Offline",
-        "defaultValue": false,
-        "helpText": "Completely deletes the live post and all its comments when the stream ends."
-      },
-      "stickyOfflinePost": {
-        "type": "boolean",
-        "label": "😴 Enable Pinned Offline Post",
-        "defaultValue": true,
-        "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation."
+      "offlineUserFlairText": {
+        "type": "string",
+        "label": "👤 Offline User Flair Text (Optional)",
+        "helpText": "The User Flair text applied to the Streamer when they go offline. Leave blank to clear their flair completely.",
+        "defaultValue": " "
       },
       "offlineFlairText": {
         "type": "string",
@@ -315,12 +330,6 @@
         "helpText": "Custom markdown to append at the bottom of the concluding post.",
         "placeholder": "Optional - appended below the concluding post"
       },
-      "enableHighlightsPost": {
-        "type": "boolean",
-        "label": "🎬 Enable Stream Highlights Post",
-        "defaultValue": false,
-        "helpText": "Automatically posts a compilation of top Twitch clips generated during the stream when it ends."
-      },
       "highlightsFlairId": {
         "type": "string",
         "label": "🎬 Highlights Post Flair Template ID (Optional)",
@@ -344,6 +353,12 @@
         "label": "🎬 Highlights Post Custom Footer (Markdown) (Optional)",
         "helpText": "Custom markdown to append at the bottom of the stream highlights post. If empty, the default template is used.",
         "defaultValue": "---\n*Watch VODs and catch the next stream live on [twitch.tv/{channel}](https://twitch.tv/{channel})!*"
+      },
+      "modNotes": {
+        "type": "paragraph",
+        "label": "📝 Internal Moderator Notes",
+        "helpText": "Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes. LiveSticky ignores this field.",
+        "placeholder": "e.g. \"Twitch API keys belong to u/ModName\""
       }
     }
   },

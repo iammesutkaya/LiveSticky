@@ -20,12 +20,12 @@
     .footer-logo { width: 40px; height: 40px; }
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>External APIs | LiveSticky</title>
+  <title>Mod Menu &amp; Tools | LiveSticky</title>
 
-  <meta property="og:title" content="External APIs - LiveSticky">
-  <meta property="og:description" content="Declared network domains, security warning, and app architecture data for LiveSticky.">
+  <meta property="og:title" content="Moderator Guide - LiveSticky">
+  <meta property="og:description" content="How to run moderator commands and custom post dashboards for LiveSticky in your subreddit.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://livesticky.com/external-apis.html">
+  <meta property="og:url" content="https://livesticky.com/mod-tools.html">
   <meta property="og:image" content="https://livesticky.com/icon.png">
   <meta name="twitter:card" content="summary">
 
@@ -56,10 +56,10 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
-            <a href="mod-tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
-            <a href="templates.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
-            <a href="settings.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
-          <a href="external-apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
+            <a href="tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+            <a href="customization.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+            <a href="configuration.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
           </div>
         </div>
         <div class="nav-dropdown">
@@ -88,33 +88,62 @@
     </header>
 
     <header class="header-left">
-      <h1>External APIs</h1>
-      <p class="subtitle">API domains, environment details, and security policies of LiveSticky.</p>
+      <h1>Mod Menu &amp; Tools</h1>
+      <p class="subtitle">How to manage LiveSticky directly from your subreddit using built-in mod commands.</p>
     </header>
 
     <main class="card">
       <div class="content">
-        <p>LiveSticky makes outbound HTTP requests to the following external domains (all declared and locked inside the Devvit security configuration <a href="https://github.com/iammesutkaya/LiveSticky/blob/main/devvit.json" target="_blank" rel="noopener noreferrer"><code>devvit.json</code></a>):</p>
+        <h2>Moderator Menu Items</h2>
+        <p>LiveSticky registers custom moderator commands that you can run directly from your community's Mod Menu feed:</p>
         <table class="token-table">
           <thead>
-            <tr><th>Domain</th><th>Purpose</th></tr>
+            <tr><th>Menu Item</th><th>Description &amp; Action</th></tr>
           </thead>
           <tbody>
-            <tr><td><code>id.twitch.tv</code></td><td>Twitch OAuth 2.0 token endpoint. Used to obtain short-lived App Access Tokens via Client Credentials flows.</td></tr>
-            <tr><td><code>api.twitch.tv</code></td><td>Twitch Helix REST API. Used to poll Twitch live status (<code>/streams</code>), metadata, and clips (<code>/clips</code>).</td></tr>
-            <tr><td><code>youtube.googleapis.com</code></td><td>YouTube Data API v3. Used to resolve channel handles and poll live streams.</td></tr>
-            <tr><td><code>id.kick.com</code></td><td>Kick OAuth 2.0 token endpoint. Used to obtain short-lived Kick access tokens.</td></tr>
-            <tr><td><code>api.kick.com</code></td><td>Kick public API. Used to poll Kick channel stream status and game categories.</td></tr>
-            <tr><td><code>static-cdn.jtvnw.net</code></td><td>Twitch static image CDN. Used to fetch Twitch channel profile avatars and offline banners.</td></tr>
-            <tr><td><code>yt3.googleusercontent.com</code></td><td>YouTube user image CDN. Used to fetch YouTube channel profile avatars.</td></tr>
-            <tr><td><code>i.ytimg.com</code></td><td>YouTube image CDN. Used to fetch YouTube stream thumbnails.</td></tr>
-            <tr><td><code>files.kick.com</code></td><td>Kick files CDN. Used to fetch Kick channel profile avatars and stream thumbnails.</td></tr>
-            <tr><td><code>i.redd.it</code></td><td>Reddit static image CDN. Used to load images uploaded directly to Reddit.</td></tr>
+            <tr>
+              <td><code>Create LiveSticky Dashboard</code></td>
+              <td>Creates (or replaces) the pinned interactive dashboard custom post. If you've updated your stream cards or channels, run this to force-refresh the dashboard container.</td>
+            </tr>
+            <tr>
+              <td><code>Restart LiveSticky</code></td>
+              <td>Flushes cached stream status values from Redis and forces an immediate check. Ideal for validating new Client IDs or API keys immediately without waiting for the next 2-minute poll.</td>
+            </tr>
+            <tr>
+              <td><code>Refresh Profile Images</code></td>
+              <td>Clears cached avatar image URLs and stream banners. If you or the creator updated their Twitch or YouTube channel profile picture, run this to sync it to the dashboard immediately.</td>
+            </tr>
+            <tr>
+              <td><code>Get Default LiveSticky Templates</code></td>
+              <td>Opens the <a href="customization.html">Templates &amp; Placeholders</a> reference page directly from the app so you can copy and tweak default post texts.</td>
+            </tr>
           </tbody>
         </table>
 
-        <p style="margin-top:24px"><a href="privacy.html">View our full Privacy Policy</a></p>
+        <hr>
 
+        <h2>How to Access Mod Tools</h2>
+        <p>To run any of the actions above, ensure you are logged in with moderator permissions on your subreddit:</p>
+        <ol class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              Navigate to your subreddit's home feed (e.g. <code>r/yourcommunity</code>) in the official Reddit mobile app or desktop browser.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              Click the <strong>Mod Tools</strong> shield icon or the overflow menu (three dots button <code>...</code>) near the top of the feed page.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              Scroll to the <strong>Apps</strong> or <strong>Mod Commands</strong> submenu, and click your desired action. The app will immediately trigger the action and show a confirmation toast notification.
+            </div>
+          </li>
+        </ol>
       </div>
     </main>
   </div>
@@ -132,10 +161,10 @@
         <div class="footer-col">
           <span class="footer-col-title">Setup</span>
           <a href="setup.html">Setup Guide</a>
-          <a href="mod-tools.html">Mod Menu &amp; Tools</a>
-          <a href="templates.html">Variables &amp; Templates</a>
-          <a href="settings.html">Configuration Reference</a>
-          <a href="external-apis.html">External APIs</a>
+          <a href="tools.html">Mod Menu &amp; Tools</a>
+          <a href="customization.html">Variables &amp; Templates</a>
+          <a href="configuration.html">Configuration Reference</a>
+          <a href="apis.html">External APIs</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
@@ -147,7 +176,7 @@
           <span class="footer-col-title">Legal</span>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms of Service</a>
-          <a href="impressum.html">Impressum</a>
+          <a href="legal.html">Impressum</a>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">About</span>
