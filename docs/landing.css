@@ -1468,3 +1468,21 @@ html.theme-light .showcase-tabs .tab-indicator {
     justify-self: center;
   }
 }
+
+.about-link-style {
+  gap: 16px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--gold-text);
+}
+
+.about-link-style:hover {
+  color: var(--gold-text); /* Keep it gold on hover, just the icon changes */
+}
+
+.about-link-style .icon-container {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
