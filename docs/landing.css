@@ -1401,15 +1401,24 @@ html.theme-light .showcase-tabs .tab-indicator {
 /* About Page Custom Layout */
 .about-grid {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 32px;
+  grid-template-columns: 250px 1fr;
+  gap: 48px;
   align-items: stretch;
 }
 
 .about-sidebar {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* changed to flex-start so list aligns left with the avatar */
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.005) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  padding: 40px 32px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .about-sidebar .feature-checklist {
