@@ -1403,13 +1403,17 @@ html.theme-light .showcase-tabs .tab-indicator {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 32px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .about-sidebar {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* changed to flex-start so list aligns left with the avatar */
+}
+
+.about-sidebar .feature-checklist {
+  margin-top: auto;
 }
 
 .about-avatar {
