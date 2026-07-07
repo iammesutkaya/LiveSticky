@@ -1401,7 +1401,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 /* About Page Custom Layout */
 .about-grid {
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 170px 1fr;
   gap: 48px;
   align-items: stretch;
 }
