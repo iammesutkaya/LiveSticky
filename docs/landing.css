@@ -1420,7 +1420,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   border: 2px solid var(--border-subtle);
-  align-self: center;
+  align-self: flex-start;
 }
 
 .about-links {
@@ -1451,7 +1451,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   .about-grid .about-avatar {
     grid-row: 1;
     margin-bottom: 24px;
-    justify-self: center;
+    justify-self: start;
   }
   
   .about-grid .about-main {
