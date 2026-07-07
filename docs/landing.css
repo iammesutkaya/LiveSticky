@@ -1473,6 +1473,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 .article-content ul.feature-checklist li {
   margin-bottom: 0;
+  padding-left: 0;
 }
 
 .article-content ul.feature-checklist li::before {
