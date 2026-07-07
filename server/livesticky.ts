@@ -610,8 +610,22 @@ export const runStatusCheck = async (): Promise<void> => {
 
   const isCurrentlyPinned = await redis.get('is_live_pinned');
 
+  enum StreamState {
+    LIVE = 'LIVE',
+    GRACE_PERIOD = 'GRACE_PERIOD',
+    OFFLINE = 'OFFLINE',
+  }
+
+  let currentState = StreamState.OFFLINE;
   if (isLive && streamInfo) {
-    const postBody = formatLivePostBody(
+    currentState = StreamState.LIVE;
+  } else if (isCurrentlyPinned) {
+    currentState = StreamState.GRACE_PERIOD;
+  }
+
+  switch (currentState) {
+    case StreamState.LIVE: {
+      const postBody = formatLivePostBody(
       streamInfo,
       defaultChannel,
       twitchUrl,
@@ -813,7 +827,9 @@ export const runStatusCheck = async (): Promise<void> => {
     } catch (dashError) {
       console.error('Failed to write dashboard Redis keys:', dashError);
     }
-  } else if (!isLive && isCurrentlyPinned) {
+  }
+  break;
+  case StreamState.GRACE_PERIOD: {
     const offlineSince = await redis.get('offline_since');
     const gracePeriodMin =
       offlineGracePeriod !== undefined && offlineGracePeriod >= 0 ? offlineGracePeriod : 6;
@@ -959,7 +975,9 @@ export const runStatusCheck = async (): Promise<void> => {
         }
       }
     }
-  } else if (!isLive && !isCurrentlyPinned) {
+  }
+  break;
+  case StreamState.OFFLINE: {
     if (!enableDashboard && stickyOfflinePost) {
       const isOfflinePostPinned = await redis.get('is_offline_post_pinned');
       if (!isOfflinePostPinned) {
@@ -967,6 +985,29 @@ export const runStatusCheck = async (): Promise<void> => {
         await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
       }
     }
+
+    // Garbage Collection for offline > 7 days
+    const lastLiveAtStr = await redis.get('last_live_at');
+    if (lastLiveAtStr) {
+      const msOffline = Date.now() - new Date(lastLiveAtStr).getTime();
+      const daysOffline = msOffline / (1000 * 60 * 60 * 24);
+      if (daysOffline > 7) {
+        console.log(`Stream offline for ${daysOffline.toFixed(1)} days. Running Redis Garbage Collection...`);
+        const keysToWipe = [
+          'last_live_at', 'live_post_id', 'offline_post_id', 'dashboard_post_id',
+          'twitch_broadcaster_id', 'twitch_started_at', 'twitch_stream_title',
+          'twitch_display_name', 'last_pin_verified', 'is_live_pinned',
+          'offline_since', 'dashboard_platform', 'dashboard_live_platforms',
+          'dashboard_display_name', 'dashboard_started_at', 'dashboard_title',
+          'dashboard_game', 'dashboard_viewers', 'dashboard_thumbnail',
+          'dashboard_post_comments', 'dashboard_post_score', 'dashboard_avatar_url'
+        ];
+        await Promise.all(keysToWipe.map((k) => redis.del(k)));
+        console.log('Garbage Collection complete.');
+      }
+    }
+  }
+  break;
   }
 
   // Sidebar widget
