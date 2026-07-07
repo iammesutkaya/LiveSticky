@@ -774,6 +774,9 @@ export const runStatusCheck = async (): Promise<void> => {
               }
             }
           }
+        } else {
+          console.error('Lock is held but no live_post_id found! Resetting lock so post can be created...');
+          await redis.del('is_live_pinned');
         }
       }
 
