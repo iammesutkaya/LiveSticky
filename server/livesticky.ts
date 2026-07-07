@@ -184,8 +184,9 @@ const ensureStickyOfflinePost = async (
   if (!offlinePostExists) {
     try {
       const subreddit = await reddit.getCurrentSubreddit();
+      const safeTitle = offlinePostTitle.length > 300 ? offlinePostTitle.slice(0, 297) + '...' : offlinePostTitle;
       const offlinePost = await reddit.submitPost({
-        title: offlinePostTitle,
+        title: safeTitle,
         subredditName: subreddit.name,
         text: concludingBody,
       });
@@ -276,8 +277,9 @@ const postStreamHighlights = async (
     body += templateFooter.replace(/{channel}/g, channelName);
 
     const subreddit = await reddit.getCurrentSubreddit();
+    const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
     const highlightsPost = await reddit.submitPost({
-      title: postTitle,
+      title: safeTitle,
       subredditName: subreddit.name,
       text: body,
     });
@@ -682,8 +684,9 @@ export const runStatusCheck = async (): Promise<void> => {
       if (enableLivePost) {
         console.log('Stream went live! Posting and pinning standard live post...');
         try {
+          const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
           const post = await reddit.submitPost({
-            title: postTitle,
+            title: safeTitle,
             subredditName: subreddit.name,
             text: postBody,
           });

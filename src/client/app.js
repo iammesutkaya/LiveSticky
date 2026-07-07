@@ -11,6 +11,13 @@
 import { connectRealtime, navigateTo } from '@devvit/web/client';
 import { formatTimeAgo, formatNumber } from './utils.js';
 
+let isNavigating = false;
+function safeNavigateTo(url) {
+  if (isNavigating) return;
+  isNavigating = true;
+  navigateTo(url);
+  setTimeout(() => { isNavigating = false; }, 1000);
+}
 // ---------------------------------------------------------------------------
 // Platform metadata
 // ---------------------------------------------------------------------------
@@ -350,7 +357,7 @@ function buildCard(p, cinematic) {
   card.addEventListener('click', (e) => {
     e.preventDefault();
     const url = platformUrl(p.platform);
-    if (url) navigateTo(url);
+    if (url) safeNavigateTo(url);
   });
 
   return card;
@@ -557,7 +564,7 @@ function setupPlatformLink(el, url) {
   el.href = url;
   el.addEventListener('click', (e) => {
     e.preventDefault();
-    navigateTo(url);
+    safeNavigateTo(url);
   });
 }
 
@@ -636,7 +643,7 @@ async function init() {
   if (redditThreadEl) {
     redditThreadEl.addEventListener('click', (e) => {
       e.preventDefault();
-      if (redditThreadUrl) navigateTo(redditThreadUrl);
+      if (redditThreadUrl) safeNavigateTo(redditThreadUrl);
     });
   }
 
@@ -716,13 +723,13 @@ async function init() {
   if (linkWebsite) {
     linkWebsite.addEventListener('click', (e) => {
       e.preventDefault();
-      navigateTo('https://livesticky.com');
+      safeNavigateTo('https://livesticky.com');
     });
   }
   if (linkReddit) {
     linkReddit.addEventListener('click', (e) => {
       e.preventDefault();
-      navigateTo('https://www.reddit.com/user/iammesutkaya');
+      safeNavigateTo('https://www.reddit.com/user/iammesutkaya');
     });
   }
 }

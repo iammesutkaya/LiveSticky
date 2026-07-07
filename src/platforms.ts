@@ -30,6 +30,19 @@ export interface PlatformContext {
   onError?: (platform: string, msg: string) => Promise<void>;
 }
 
+export function sanitizeHandle(input: string, platformUrl: string): string {
+  let clean = input.trim().toLowerCase();
+  // Strip trailing slashes
+  while (clean.endsWith('/')) {
+    clean = clean.slice(0, -1);
+  }
+  if (clean.includes(platformUrl)) {
+    const parts = clean.split(platformUrl)[1]?.split('/');
+    if (parts && parts[0]) return parts[0];
+  }
+  return clean;
+}
+
 // ---------------------------------------------------------------------------
 // YouTube response shapes (partial - only the fields we use)
 // ---------------------------------------------------------------------------
@@ -294,7 +307,7 @@ async function fetchKickStatus(
   redis: RedisClient,
   onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<UnifiedStreamInfo | null> {
-  const channelSlug = channel.trim().toLowerCase();
+  const channelSlug = sanitizeHandle(channel, 'kick.com/');
   let accessToken = await redis.get('kick_access_token');
 
   if (!accessToken) {
@@ -465,7 +478,7 @@ async function fetchTwitchStatus(
   redis: RedisClient,
   onError?: (platform: string, msg: string) => Promise<void>
 ): Promise<UnifiedStreamInfo | null> {
-  const channelName = channel.trim().toLowerCase();
+  const channelName = sanitizeHandle(channel, 'twitch.tv/');
   try {
     const token = await getOrRefreshTwitchToken(clientId, clientSecret, redis, onError);
     if (!token) return null;
