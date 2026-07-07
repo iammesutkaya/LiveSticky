@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <style>
+    /* Prevent Flash of Unstyled Content (FOUC) */
+    html, body { background-color: #0e1113; }
+    html.theme-light, html.theme-light body { background-color: #ffffff; }
+    .logo-image { width: 64px; height: 64px; }
+    .footer-logo { width: 40px; height: 40px; }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me | LiveSticky</title>
+  <meta name="description" content="About the creator of LiveSticky.">
+  
+  <meta property="og:title" content="About Me - LiveSticky">
+  <meta property="og:description" content="About the creator of LiveSticky.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://livesticky.com/about.html">
+  <meta property="og:image" content="https://livesticky.com/icon.png">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css?v=1.0.212">
+  <link rel="stylesheet" href="landing.css?v=1.0.212">
+
+</head>
+
+<body>
+  <div class="page-container">
+
+    <header class="doc-nav">
+      <a href="index.html" class="doc-nav-brand">
+        <img src="icon.png" alt="" width="28" height="28">
+        <span>LiveSticky</span>
+      </a>
+      <button class="mobile-menu-btn" type="button" aria-label="Toggle menu" aria-controls="topNav" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <nav class="top-nav" id="topNav">
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+            Setup
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="setup.html" class="nav-dropdown-item" role="menuitem">Setup Guide</a>
+            <a href="tools.html" class="nav-dropdown-item" role="menuitem">Mod Menu &amp; Tools</a>
+            <a href="customization.html" class="nav-dropdown-item" role="menuitem">Variables &amp; Templates</a>
+            <a href="configuration.html" class="nav-dropdown-item" role="menuitem">Configuration Reference</a>
+          <a href="apis.html" class="nav-dropdown-item" role="menuitem">External APIs</a>
+          </div>
+        </div>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+            Support
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="faq.html" class="nav-dropdown-item" role="menuitem">FAQ</a>
+            <a href="#" class="nav-dropdown-item contact-email" role="menuitem" data-user="support" data-domain="livesticky.com">Contact Support</a>
+            <a href="https://github.com/iammesutkaya/LiveSticky/issues" target="_blank" rel="noopener noreferrer" class="nav-dropdown-item" role="menuitem">Report Bug via GitHub</a>
+          </div>
+        </div>
+        <a href="about.html" class="nav-link">About me</a>
+      </nav>
+    </header>
+
+    <header class="header-left">
+      <h1>About Me</h1>
+      <p class="subtitle">Creator of LiveSticky and a passionate builder.</p>
+    </header>
+
+    <section class="section unboxed-section pt-0">
+      <div class="content article-content">
+        <p>Hi, I'm <strong>Mesut Kaya</strong>. I build tools and integrations for creators and communities.</p>
+        
+        <h2>Connect With Me</h2>
+        <ul class="steps-list" style="list-style: none; padding-left: 0;">
+          <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gold-text)"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+            <a href="https://github.com/iammesutkaya" target="_blank" rel="noopener noreferrer" style="font-size: 1.1rem; color: var(--gold-text); text-decoration: none; font-weight: 600;">GitHub</a>
+          </li>
+          <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gold-text)"><path d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm5.01 16.59h-2.1v-3.09c0-.75-.27-1.26-.96-1.26-.51 0-.81.36-.93.69-.06.12-.06.33-.06.51v3.15H8.79s.03-8.49 0-9.36h2.1v1.32c.27-.42.78-1.02 1.86-1.02 1.35 0 2.37.9 2.37 2.82v6.24h-.01zM6.66 6.36c-.72 0-1.17.48-1.17 1.11 0 .6.42 1.11 1.14 1.11h.03c.75 0 1.17-.48 1.17-1.11-.03-.63-.45-1.11-1.17-1.11zM5.61 16.59h2.1V7.23h-2.1v9.36z"/></svg>
+            <a href="https://links.mesutkaya.com" target="_blank" rel="noopener noreferrer" style="font-size: 1.1rem; color: var(--gold-text); text-decoration: none; font-weight: 600;">Personal Links (links.mesutkaya.com)</a>
+          </li>
+          <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gold-text)"><path d="M22 2H2v20l4-4h16V2zm-2 14H6.83L4 18.83V4h16v12zM15 7h-2v4h2V7zm-4 0H9v4h2V7z"/></svg>
+            <a href="https://www.twitch.tv/iammesutkaya" target="_blank" rel="noopener noreferrer" style="font-size: 1.1rem; color: var(--gold-text); text-decoration: none; font-weight: 600;">Twitch (iammesutkaya)</a>
+          </li>
+          <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gold-text)"><path d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.75-1.64-6.07-1.72l1.08-5.03 3.4.73c.04 1.07.9 1.93 1.98 1.93 1.1 0 2-.9 2-2s-.9-2-2-2c-.75 0-1.4.4-1.74 1l-3.86-.83c-.1-.02-.2 0-.28.05-.08.06-.13.14-.15.23L11.83 8.5c-2.35.07-4.48.7-6.14 1.7C5.13 9.47 4.22 9 3.25 9c-1.65 0-3 1.35-3 3 0 1.26.78 2.33 1.88 2.8-.04.22-.06.45-.06.68 0 3.73 4.48 6.75 10 6.75s10-3.02 10-6.75c0-.23-.02-.46-.06-.68C23.22 13.83 24 12.76 24 11.5zM7.5 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm9 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+            <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer" style="font-size: 1.1rem; color: var(--gold-text); text-decoration: none; font-weight: 600;">Reddit (u/iammesutkaya)</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
