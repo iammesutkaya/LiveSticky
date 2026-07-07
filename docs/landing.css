@@ -1416,9 +1416,10 @@ html.theme-light .showcase-tabs .tab-indicator {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-xl);
+  border-radius: 24px; /* perfectly nests inside 28px outer card radius with 4px gap */
   padding: 40px 32px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  margin: -44px 0 -44px -44px; /* Pulls into the 48px card padding, leaving a 4px gap */
 }
 
 .about-sidebar .feature-checklist {
