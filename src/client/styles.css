@@ -1094,3 +1094,8 @@ body {
 .footer-left button.footer-text:hover {
   color: var(--text-primary);
 }
+
+
+.squircle {
+  border-radius: 22.5%;
+}
