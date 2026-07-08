@@ -189,7 +189,7 @@
 .hero .logo-glow {
   width: 144px;
   height: 144px;
-  border-radius: var(--radius-xl);
+  border-radius: 22.5%;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
   background: var(--bg-card);
   border: 1px solid var(--border-line);
