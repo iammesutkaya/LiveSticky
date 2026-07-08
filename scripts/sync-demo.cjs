@@ -148,6 +148,16 @@ function run() {
       fs.copyFileSync(srcProfilePic, destProfilePic);
       console.log('[sync-demo] Copied sticky-profile-pic.png to docs/demo/ successfully.');
     }
+
+    const mockImages = ['twitch-stream.png', 'youtube-stream.png', 'kick-stream.png'];
+    for (const img of mockImages) {
+      const srcImg = path.join(__dirname, '../docs/', img);
+      const destImg = path.join(docsDemoPath, img);
+      if (fs.existsSync(srcImg)) {
+        fs.copyFileSync(srcImg, destImg);
+        console.log(`[sync-demo] Copied ${img} to docs/demo/ successfully.`);
+      }
+    }
   }
 }
 
