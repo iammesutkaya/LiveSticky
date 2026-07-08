@@ -389,10 +389,12 @@ function updateCard(p) {
 
   // Thumbnail - Twitch URLs carry {width}x{height} placeholders.
   const img = card.querySelector('.thumb-img');
+  const pulse = card.querySelector('.pulse-ring');
   const cdnSrc = (p.thumbnail || '').replace('{width}', '480').replace('{height}', '270');
   if (!cdnSrc) {
     img.style.display = 'none';
     img.dataset.src = '';
+    if (pulse) pulse.style.display = '';
     return;
   }
   if (img.dataset.src === cdnSrc) return; // already loaded/loading this exact url
@@ -400,10 +402,14 @@ function updateCard(p) {
   getThumbBlob(cdnSrc).then((blobUrl) => {
     if (img.dataset.src !== cdnSrc) return; // url changed while fetching
     if (blobUrl) {
-      img.onload = () => { img.style.display = 'block'; };
+      img.onload = () => { 
+        img.style.display = 'block'; 
+        if (pulse) pulse.style.display = 'none';
+      };
       img.src = blobUrl;
     } else {
       img.style.display = 'none';
+      if (pulse) pulse.style.display = '';
     }
   });
 }
