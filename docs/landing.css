@@ -361,7 +361,7 @@ html.theme-light .inline-youtube { background: #cc0000; }
 }
 
 .github-hover:hover svg {
-  color: #ffffff;
+  color: var(--text-primary);
   transform: scale(1.1);
 }
 
