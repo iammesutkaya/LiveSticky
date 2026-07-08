@@ -142,6 +142,13 @@ function run() {
       console.log('[sync-demo] Copied icon.png to docs/demo/icon.png successfully.');
     }
 
+    const srcFavicon = path.join(__dirname, '../docs/favicon-squircle.png');
+    const destFavicon = path.join(docsDemoPath, 'favicon-squircle.png');
+    if (fs.existsSync(srcFavicon)) {
+      fs.copyFileSync(srcFavicon, destFavicon);
+      console.log('[sync-demo] Copied favicon-squircle.png to docs/demo/ successfully.');
+    }
+
     const srcProfilePic = path.join(__dirname, '../docs/sticky-profile-pic.png');
     const destProfilePic = path.join(docsDemoPath, 'sticky-profile-pic.png');
     if (fs.existsSync(srcProfilePic)) {
