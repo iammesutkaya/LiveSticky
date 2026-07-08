@@ -198,8 +198,6 @@
   -webkit-mask-size: 100% 100%;
   mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M 100,0 C 20,0 0,20 0,100 C 0,180 20,200 100,200 C 180,200 200,180 200,100 C 200,20 180,0 100,0 Z"/></svg>');
   mask-size: 100% 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border-line);
 }
 
 .hero h1 {
