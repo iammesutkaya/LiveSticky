@@ -207,6 +207,7 @@ function proxyImgUrl(url) {
  * headers) and return a local blob URL, or null on failure.
  */
 async function fetchProxiedImage(cdnUrl) {
+  if (isMockMode) return cdnUrl;
   const proxyUrl = proxyImgUrl(cdnUrl);
   if (!proxyUrl) return null;
   try {
