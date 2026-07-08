@@ -141,6 +141,13 @@ function run() {
       fs.copyFileSync(srcIcon, destIcon);
       console.log('[sync-demo] Copied icon.png to docs/demo/icon.png successfully.');
     }
+
+    const srcProfilePic = path.join(__dirname, '../docs/sticky-profile-pic.png');
+    const destProfilePic = path.join(docsDemoPath, 'sticky-profile-pic.png');
+    if (fs.existsSync(srcProfilePic)) {
+      fs.copyFileSync(srcProfilePic, destProfilePic);
+      console.log('[sync-demo] Copied sticky-profile-pic.png to docs/demo/ successfully.');
+    }
   }
 }
 
