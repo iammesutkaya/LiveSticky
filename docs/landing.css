@@ -1457,7 +1457,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 .about-sidebar .feature-link {
   width: 100%;
   padding: 10px 16px;
-  background: var(--bg-surface);
+  background: transparent;
   border: 1px solid var(--border-line);
   border-radius: 12px;
   justify-content: center;
@@ -1466,7 +1466,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .about-sidebar .feature-link:hover {
-  background: var(--bg-card-hover);
+  background: var(--bg-surface);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: var(--border-line);
