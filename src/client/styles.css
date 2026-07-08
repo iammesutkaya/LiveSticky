@@ -431,6 +431,7 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  transform: scale(1.01);
 }
 
 /* Brand corner badge anchored flush to the thumbnail's top-left */
