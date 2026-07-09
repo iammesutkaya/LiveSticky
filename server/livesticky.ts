@@ -956,7 +956,7 @@ export const runStatusCheck = async (): Promise<void> => {
           }
         }
 
-        if (!enableDashboard && stickyOfflinePost) {
+        if (stickyOfflinePost) {
           try {
             await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
           } catch (err) {
@@ -979,7 +979,7 @@ export const runStatusCheck = async (): Promise<void> => {
   }
   break;
   case StreamState.OFFLINE: {
-    if (!enableDashboard && stickyOfflinePost) {
+    if (stickyOfflinePost) {
       const isOfflinePostPinned = await redis.get('is_offline_post_pinned');
       if (!isOfflinePostPinned) {
         console.log('Offline post is not marked as pinned in Redis. Ensuring sticky offline post is active...');
