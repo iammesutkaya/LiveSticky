@@ -23,6 +23,7 @@
   --bg-card: #15191c;    /* Reddit elevated surface */
   --bg-surface: #1c2125; /* Reddit higher surface */
   --bg-card-hover: #191e21;
+  --hover-overlay: color-mix(in srgb, var(--text-primary) 8%, transparent);
   --border-line: rgba(255, 255, 255, 0.06); /* Subtle inner borders for depth */
   
   --text-primary: #ffffff;
@@ -715,6 +716,7 @@ html.theme-light {
   --bg-card: #f6f6f7;
   --bg-surface: #eaeaec;
   --bg-card-hover: #efeff0;
+  --hover-overlay: rgba(255, 255, 255, 0.7);
 
   --text-primary: #1a1a1b;
   --text-secondary: #545456;
