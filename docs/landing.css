@@ -1562,3 +1562,26 @@ html.theme-light .showcase-tabs .tab-indicator {
 .article-content ul.feature-checklist li::before {
   display: none !important;
 }
+
+/* Helper classes to replace inline styles */
+.gold-link {
+  color: var(--gold-text);
+  text-decoration: none;
+}
+.gold-link:hover {
+  text-decoration: underline;
+}
+
+.faq-footer-note {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.faq-list {
+  margin: 10px 0 10px 20px;
+  list-style-type: disc;
+}
+.faq-list li {
+  margin-bottom: 6px;
+}

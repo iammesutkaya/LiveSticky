@@ -234,7 +234,6 @@ h1 {
 .token-table {
   display: block;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 24px;
@@ -646,6 +645,7 @@ h1 {
   cursor: pointer;
   opacity: 1;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   z-index: 10;
 }

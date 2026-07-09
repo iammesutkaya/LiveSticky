@@ -170,17 +170,17 @@
           <summary>How does LiveSticky handle pinned post slots (Legacy Sticky vs. Community Highlights)? <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
           <div class="faq-content">
             <p>Reddit has two pinning systems:</p>
-            <ul style="margin: 10px 0 10px 20px; list-style-type: disc;">
-              <li style="margin-bottom: 6px;"><strong>Legacy Sticky</strong> (2 slots max): Sets <code>stickied=true</code> on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.</li>
+            <ul class="faq-list">
+              <li><strong>Legacy Sticky</strong> (2 slots max): Sets <code>stickied=true</code> on a post. This is what traditional Reddit clients, old.reddit.com, and third-party apps read to show a post at the top of the feed.</li>
               <li><strong>Community Highlights</strong> (6 slots): A newer carousel visible in the official Reddit app. Legacy stickies auto-fill the first 2 carousel slots; slots 3-6 are Highlights-only and do not set <code>stickied=true</code>.</li>
             </ul>
             <p>LiveSticky tries the legacy sticky first. If both legacy slots are already occupied by other pinned posts, it falls back to adding the post to Community Highlights with an <code>ANNOUNCEMENT</code> label - ensuring the post is visible in the official Reddit app's carousel even when legacy slots are full.</p>
-            <p style="margin-top: 10px;"><strong>If your subreddit already has 2 legacy-stickied posts</strong> (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but <strong>not</strong> at the top of the classic feed. Third-party Reddit clients that only read the <code>stickied</code> boolean will not surface the post. The solution is to free up a legacy sticky slot.</p>
+            <p class="faq-note"><strong>If your subreddit already has 2 legacy-stickied posts</strong> (common in large communities where mods pin announcements permanently), LiveSticky's post will appear in the Highlights carousel but <strong>not</strong> at the top of the classic feed. Third-party Reddit clients that only read the <code>stickied</code> boolean will not surface the post. The solution is to free up a legacy sticky slot.</p>
           </div>
         </details>
       </div>
 
-      <div class="faq-footer-note" style="margin-top: 48px; text-align: center; color: var(--text-secondary);">
+      <div class="faq-footer-note">
         <p>Have a question or feedback not covered here? Reach out to us at <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>.</p>
       </div>
     </div>
