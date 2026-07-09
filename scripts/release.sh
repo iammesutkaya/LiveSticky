@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "🚀 Publishing to Devvit..."
-OUTPUT=$(npx devvit publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr)
+OUTPUT=$(npx devvit@0.13.7 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr)
 
 # Determine the version: use explicit if provided, otherwise extract from output
 if [ -n "$EXPLICIT_VERSION" ]; then

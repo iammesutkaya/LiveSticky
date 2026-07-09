@@ -386,7 +386,7 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
  * in Community Highlights). If neither is true, re-pins via pinPostWithFallback.
  * Called from the 2-minute cron to catch slots that slipped.
  */
-const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<void> => {
+export const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<void> => {
   const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
 
   let isStickied = false;
@@ -625,6 +625,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
   switch (currentState) {
     case StreamState.LIVE: {
+      if (!streamInfo) break;
       const postBody = formatLivePostBody(
       streamInfo,
       defaultChannel,
