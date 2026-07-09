@@ -214,7 +214,7 @@
       "placeholderReference": {
         "type": "paragraph",
         "label": "ℹ️ Available Placeholders (for reference)",
-        "defaultValue": "{channel} - Twitch channel login name (e.g. streamer)\n{display_name} - Channel display name (e.g. Streamer)\n{title} - Stream title\n{game} - Game or category being streamed (live only)\n{viewers} - Current viewer count (live only)\n{uptime} - How long the stream has been live (live only)\n{date} - Date the stream ended (post-stream only)\n{twitch_url} - Twitch channel URL\n{youtube_url} - YouTube channel URL\n{kick_url} - Kick channel URL"
+        "defaultValue": "Please refer to https://livesticky.com/customization.html for a full list of available placeholders."
       },
       "dashboardPostTitle": {
         "type": "string",
