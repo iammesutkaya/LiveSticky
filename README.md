@@ -1,6 +1,6 @@
 # LiveSticky - Reddit Bot
 
-![LiveSticky Logo](https://livesticky.com/icon.png?v=2)
+<img src="https://livesticky.com/icon.png?v=2" alt="LiveSticky Logo" width="160" height="160">
 
 🌍 **Website:** [livesticky.com](https://livesticky.com)
 
