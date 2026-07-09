@@ -23,23 +23,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "🚀 Publishing to Devvit..."
-OUTPUT=$(npx devvit@0.13.7 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr)
-
-# Determine the version: use explicit if provided, otherwise extract from output
-if [ -n "$EXPLICIT_VERSION" ]; then
-  VERSION="$EXPLICIT_VERSION"
-else
-  VERSION=$(echo "$OUTPUT" | sed -n 's/.*Automatically bumped app version to: \([^[:space:]]\{1,\}\).*/\1/p')
+if [ -z "$EXPLICIT_VERSION" ]; then
+  echo "❌ Error: You must provide an explicit version for release (e.g., --version 1.0.239)"
+  echo "This ensures the webview dashboard and website tags all match the published version exactly."
+  exit 1
 fi
 
-if [ -z "$VERSION" ]; then
-  echo "⚠️  Could not detect version — website tags not updated."
-  exit 0
-fi
+VERSION="$EXPLICIT_VERSION"
 
-echo ""
-echo "📝 Detected version: $VERSION — updating website version tags..."
+echo "📝 Updating webview and website version tags to v${VERSION}..."
+
+# Update webview client source HTML
+sed -i.bak -E "s|Version [0-9]+\.[0-9]+\.[0-9]+|Version ${VERSION}|g" src/client/index.html
+rm -f src/client/index.html.bak
 
 # One app version drives everything the site exposes: the visible version
 # badge (index.html) and every stylesheet cache-buster (all pages), so
@@ -53,13 +49,16 @@ for page in docs/*.html; do
   rm -f "${page}.bak"
 done
 
-echo "✅ Website version tags updated to v${VERSION}"
+echo "✅ Rebuilding webview client with new version..."
+npm run build
 
-# Commit and push. Stage the whole website folder, not just the HTML pages:
-# the pages depend on style.css/landing.css/main.js, and leaving those
-# unstaged deploys new HTML against stale assets.
-git add docs
-git commit -m "chore: bump website version to v${VERSION}"
+echo "🚀 Publishing to Devvit..."
+# Devvit output will still print the version, but we already applied it
+npx devvit@0.13.7 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr
+
+# Commit and push. Stage the whole website folder and the client html:
+git add docs src/client/index.html
+git commit -m "chore: bump app and website version to v${VERSION}"
 env -u GITHUB_TOKEN git push
 
-echo "🎉 Done! Website → v${VERSION}"
+echo "🎉 Done! Webview + Website + Devvit → v${VERSION}"
