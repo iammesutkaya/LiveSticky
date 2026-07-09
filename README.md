@@ -1,6 +1,6 @@
 # LiveSticky - Reddit Bot
 
-![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
+![LiveSticky Logo](https://livesticky.com/icon.png?v=2)
 
 🌍 **Website:** [livesticky.com](https://livesticky.com)
 
