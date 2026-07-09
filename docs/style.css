@@ -26,6 +26,17 @@
   --hover-overlay: color-mix(in srgb, var(--text-primary) 8%, transparent);
   --border-line: rgba(255, 255, 255, 0.06); /* Subtle inner borders for depth */
   
+  /* Shared Audit Tokens */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 4px 12px var(--shadow-color);
+  --shadow-md: 0 8px 24px var(--shadow-color);
+  --shadow-lg: 0 12px 36px var(--shadow-color);
+  
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-subtle: rgba(255, 255, 255, 0.04);
+  
+  --text-inverse: #111111;
   --text-primary: #ffffff;
   --text-secondary: #a0a0a5;
   --text-muted: #707075;
@@ -160,7 +171,7 @@ h1 {
   padding: 48px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 /* Legal Content Typographical Hierarchy */
@@ -366,7 +377,7 @@ h1 {
 
 .portal-btn:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--glass-border);
   transform: translateY(-2px);
 }
 
@@ -461,7 +472,7 @@ h1 {
   padding: 0;
   position: relative;
   /* Cinematic top glowing edge */
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--glass-border-subtle);
 }
 
 .site-footer::before {
@@ -635,8 +646,8 @@ h1 {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   color: var(--text-secondary);
   padding: 5px 10px;
   border-radius: 6px;
@@ -652,9 +663,9 @@ h1 {
 }
 
 .copy-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--glass-border);
   color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--glass-border);
 }
 
 .copy-btn.copied {
@@ -679,7 +690,7 @@ h1 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
   opacity: 0;
   visibility: hidden;
   transform: translateY(8px);
@@ -698,7 +709,7 @@ h1 {
   border-color: var(--accent-gold);
   color: var(--gold-text);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-sm);
 }
 
 .back-to-top svg {
@@ -717,6 +728,13 @@ html.theme-light {
   --bg-surface: #eaeaec;
   --bg-card-hover: #efeff0;
   --hover-overlay: rgba(255, 255, 255, 0.7);
+
+  /* Shared Audit Tokens (Light Mode Overrides) */
+  --shadow-color: rgba(0, 0, 0, 0.12);
+  --glass-bg: rgba(0, 0, 0, 0.02);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-subtle: rgba(0, 0, 0, 0.04);
+  --text-inverse: #ffffff;
 
   --text-primary: #1a1a1b;
   --text-secondary: #545456;
@@ -748,7 +766,7 @@ html.theme-light {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 99;
 }
@@ -758,7 +776,7 @@ html.theme-light {
   border-color: var(--accent-gold);
   color: var(--gold-text);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-toggle svg {
@@ -810,7 +828,7 @@ html.theme-light .theme-toggle .moon-icon {
   body .token-table td {
     display: block !important;
     padding: 8px 0 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 1px solid var(--glass-border-subtle) !important;
     text-align: left !important;
     white-space: normal !important;
     width: 100% !important;

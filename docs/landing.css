@@ -96,7 +96,7 @@
   border: 1px solid var(--border-line);
   border-radius: 10px;
   padding: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
   display: none;
   flex-direction: column;
   gap: 2px;
@@ -187,7 +187,7 @@
 }
 
 .hero .logo-container {
-  filter: drop-shadow(0 12px 36px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(var(--shadow-lg));
 }
 
 .hero .logo-glow {
@@ -405,7 +405,7 @@ html.theme-light .inline-youtube { background: #cc0000; }
 
 .secondary-btn:hover {
   background: var(--bg-card-hover);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .secondary-btn svg {
@@ -471,8 +471,8 @@ html.theme-light .inline-youtube { background: #cc0000; }
   width: 100%;
   max-width: 480px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border) !important;
   border-radius: 30px;
   gap: 4px;
 }
@@ -511,13 +511,13 @@ html.theme-light .inline-youtube { background: #cc0000; }
   top: 5px;
   bottom: 5px;
   left: 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-subtle);
   border-radius: 20px;
   z-index: 0;
   transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s cubic-bezier(0.25, 1, 0.5, 1);
   pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Light theme overrides for showcase tabs segment control */
@@ -538,7 +538,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   border: 1px solid var(--border-line);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
   width: 100%;
   max-width: 480px;
@@ -805,14 +805,14 @@ html.theme-light .showcase-tabs .tab-indicator {
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .feature-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--glass-border);
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .feature-icon {
@@ -1028,7 +1028,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 .faq-item:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--glass-border);
 }
 
 .faq-item summary {
@@ -1181,7 +1181,7 @@ html.theme-light .showcase-tabs .tab-indicator {
     border: 1px solid var(--border-line);
     border-radius: 8px;
     padding: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow-md);
     z-index: 100;
   }
 
@@ -1356,7 +1356,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   max-width: 100% !important;
   padding: 12px !important;
   margin: 0 !important;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-subtle);
   background: var(--bg-primary);
   display: flex !important;
 }
@@ -1468,7 +1468,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 .about-sidebar .feature-link:hover {
   background: var(--hover-overlay);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   border-color: var(--border-line);
 }
 
@@ -1478,8 +1478,8 @@ html.theme-light .showcase-tabs .tab-indicator {
   height: 150px;
   object-fit: cover;
   margin-bottom: 32px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--glass-border);
   align-self: center;
 }
 
@@ -1584,4 +1584,44 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 .faq-list li {
   margin-bottom: 6px;
+}
+
+/* Utility Classes */
+.mt-24 {
+  margin-top: 24px;
+}
+.intro-note {
+  margin-top: -8px;
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+/* Error Page (404) */
+.error-header {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+.error-title {
+  font-size: 6rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.error-subtitle {
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+.error-section {
+  text-align: center;
+  margin-bottom: 120px;
+}
+.error-description {
+  margin-bottom: 40px;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.error-action {
+  display: inline-block;
 }
