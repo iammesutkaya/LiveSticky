@@ -118,7 +118,7 @@ const MOCK_STATUS = {
         viewers: 1414,
         game: "Software & Game Dev",
         uptime: "3h 15m",
-        thumbnail: "twitch-stream.png"
+        thumbnail: "twitch-stream.png?v=3"
       },
       {
         platform: "youtube",
@@ -126,7 +126,7 @@ const MOCK_STATUS = {
         viewers: 850,
         game: "Science & Technology",
         uptime: "1h 45m",
-        thumbnail: "youtube-stream.png"
+        thumbnail: "youtube-stream.png?v=3"
       },
       {
         platform: "kick",
@@ -134,7 +134,7 @@ const MOCK_STATUS = {
         viewers: 310,
         game: "Coding",
         uptime: "45m",
-        thumbnail: "kick-stream.png"
+        thumbnail: "kick-stream.png?v=3"
       }
     ]
   },
@@ -153,7 +153,7 @@ const MOCK_STATUS = {
         viewers: 1414,
         game: "Software & Game Dev",
         uptime: "3h 15m",
-        thumbnail: "twitch-stream.png"
+        thumbnail: "twitch-stream.png?v=3"
       }
     ]
   },
