@@ -243,17 +243,17 @@
         "helpText": "Required for Kick.",
         "placeholder": "your Kick Client Secret"
       },
-      "dashboardPostTitle": {
-        "type": "string",
-        "label": "📺 Dashboard Post Title",
-        "helpText": "Title for the dashboard post.",
-        "defaultValue": "LiveSticky Dashboard"
-      },
       "templatesReference": {
         "type": "string",
         "label": "📖 Templates & Placeholders Reference",
         "helpText": "Copy and paste templates for the text fields below from the LiveSticky website.",
         "defaultValue": "https://livesticky.com/customization"
+      },
+      "dashboardPostTitle": {
+        "type": "string",
+        "label": "📺 Dashboard Post Title",
+        "helpText": "Title for the dashboard post.",
+        "defaultValue": "LiveSticky Dashboard"
       },
       "offlinePostTitle": {
         "type": "string",
