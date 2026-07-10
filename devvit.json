@@ -163,12 +163,6 @@
         "label": "💊 Highlights Post Flair Template ID",
         "helpText": "The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
       },
-      "setupReference": {
-        "type": "string",
-        "label": "📖 Platform API Setup Guide",
-        "helpText": "Follow our step-by-step guide to generate the API credentials for the platforms below.",
-        "defaultValue": "https://livesticky.com/setup"
-      },
       "primaryPlatform": {
         "type": "select",
         "label": "👑 Primary Platform",
@@ -194,6 +188,12 @@
         "label": "👑 Avatar Image URL",
         "helpText": "Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Upload an image to Reddit, then copy its direct link. Leave blank to auto-fetch from your primary platform.",
         "placeholder": "https://..."
+      },
+      "setupReference": {
+        "type": "string",
+        "label": "📖 Platform API Setup Guide",
+        "helpText": "Follow our step-by-step guide to generate the API credentials for the platforms below.",
+        "defaultValue": "https://livesticky.com/setup"
       },
       "twitchChannel": {
         "type": "string",
