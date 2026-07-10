@@ -695,8 +695,9 @@ async function init() {
   aboutModal = $('about-modal');
   aboutTrigger = $('about-trigger');
   closeModalBtn = $('close-modal-btn');
-  linkWebsite = $('link-website');
-  linkReddit = $('link-reddit');
+  const linkWebsite = $('link-website');
+  const linkReddit = $('link-reddit');
+  const linkVersion = $('link-version');
 
   if (aboutTrigger && aboutModal && closeModalBtn) {
     // Remember what had focus so we can restore it when the modal closes.
@@ -736,7 +737,13 @@ async function init() {
   if (linkReddit) {
     linkReddit.addEventListener('click', (e) => {
       e.preventDefault();
-      safeNavigateTo('https://www.reddit.com/user/iammesutkaya');
+      safeNavigateTo('https://livesticky.com/about.html');
+    });
+  }
+  if (linkVersion) {
+    linkVersion.addEventListener('click', (e) => {
+      e.preventDefault();
+      safeNavigateTo('https://developers.reddit.com/apps/live-sticky');
     });
   }
 }

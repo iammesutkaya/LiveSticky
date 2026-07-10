@@ -1051,6 +1051,12 @@ body {
   margin-bottom: 16px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  text-decoration: none;
+  display: block;
+}
+
+.modal-version:hover {
+  text-decoration: underline;
 }
 
 .modal-desc {
