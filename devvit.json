@@ -217,7 +217,7 @@
         "type": "string",
         "label": "🟥 YouTube Channel Name / Handle",
         "helpText": "YouTube channel to monitor.",
-        "placeholder": "@ChannelName"
+        "placeholder": "ChannelName"
       },
       "youtubeApiKey": {
         "type": "string",
