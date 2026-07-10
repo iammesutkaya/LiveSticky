@@ -192,7 +192,7 @@
       "setupReference": {
         "type": "string",
         "label": "📖 Platform API Setup Guide",
-        "helpText": "Follow the step-by-step guide to generate API credentials for the platforms below.",
+        "helpText": "Follow the step-by-step guide to generate API credentials for the platforms below: https://livesticky.com/setup",
         "defaultValue": "https://livesticky.com/setup"
       },
       "twitchChannel": {
@@ -246,7 +246,7 @@
       "templatesReference": {
         "type": "string",
         "label": "📖 Templates & Placeholders Reference",
-        "helpText": "Copy and paste templates for the text fields below from the LiveSticky website.",
+        "helpText": "Copy and paste templates for the text fields below from the LiveSticky website: https://livesticky.com/customization",
         "defaultValue": "https://livesticky.com/customization"
       },
       "dashboardPostTitle": {
