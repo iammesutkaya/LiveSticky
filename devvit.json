@@ -156,7 +156,7 @@
       "liveFlairId": {
         "type": "string",
         "label": "💊 Live Post Flair Template ID",
-        "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair)"
+        "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
       },
       "highlightsFlairId": {
         "type": "string",
@@ -199,19 +199,19 @@
         "type": "string",
         "label": "🟪 Twitch Channel Name",
         "helpText": "Twitch channel to monitor.",
-        "placeholder": "streamer"
+        "placeholder": "ChannelName"
       },
       "twitchClientId": {
         "type": "string",
         "label": "🟪 Twitch Client ID",
         "helpText": "Required for Twitch.",
-        "placeholder": "your Twitch app Client ID"
+        "placeholder": "your Twitch Client ID"
       },
       "twitchClientSecret": {
         "type": "string",
         "label": "🟪 Twitch Client Secret",
         "helpText": "Required for Twitch.",
-        "placeholder": "your Twitch app Client Secret"
+        "placeholder": "your Twitch Client Secret"
       },
       "youtubeChannel": {
         "type": "string",
@@ -223,7 +223,7 @@
         "type": "string",
         "label": "🟥 YouTube API Key",
         "helpText": "Required for YouTube.",
-        "placeholder": "your YouTube Data API v3 key"
+        "placeholder": "your YouTube API key"
       },
       "kickChannel": {
         "type": "string",
@@ -328,7 +328,7 @@
       "highlightsHeader": {
         "type": "paragraph",
         "label": "🎬 Highlights Post Header Text",
-        "helpText": "Header for the highlights post."
+        "helpText": "Header for the stream highlights post."
       },
       "highlightsFooter": {
         "type": "paragraph",
