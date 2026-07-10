@@ -122,13 +122,22 @@ export const replaceTemplateVariables = (text: string, vars: TemplateVariables, 
       .replace(/{stream_title}/g, vars.streamTitle || '')
       .replace(/{stream_game}/g, vars.streamGame || '')
       .replace(/{stream_viewers}/g, vars.streamViewers || '')
-      .replace(/{stream_uptime}/g, vars.streamUptime || '');
+      .replace(/{stream_uptime}/g, vars.streamUptime || '')
+      // Backward-compatible fallback aliases for old template settings
+      .replace(/{display_name}/g, vars.streamDisplayName || '')
+      .replace(/{title}/g, vars.streamTitle || '')
+      .replace(/{game}/g, vars.streamGame || '')
+      .replace(/{viewers}/g, vars.streamViewers || '')
+      .replace(/{uptime}/g, vars.streamUptime || '');
   } else {
     // Offline fallback aliases
     result = result
       .replace(/{stream_handle}/g, vars.streamHandle || '')
       .replace(/{stream_display_name}/g, vars.streamDisplayName || '')
-      .replace(/{stream_title}/g, vars.streamTitle || '');
+      .replace(/{stream_title}/g, vars.streamTitle || '')
+      // Backward-compatible fallback aliases for old template settings
+      .replace(/{display_name}/g, vars.streamDisplayName || '')
+      .replace(/{title}/g, vars.streamTitle || '');
   }
 
   if (vars.dateStr) {
@@ -148,11 +157,11 @@ export const formatLivePostBody = (
   customBody?: string,
   footer?: string
 ): string => {
-  const content = customBody || DEFAULT_LIVE_POST_BODY;
+  const content = customBody?.trim() || DEFAULT_LIVE_POST_BODY;
   let result = replaceTemplateVariables(content, vars, true);
 
-  if (footer) {
-    result += `\n\n${replaceTemplateVariables(footer, vars, true)}`;
+  if (footer?.trim()) {
+    result += `\n\n${replaceTemplateVariables(footer.trim(), vars, true)}`;
   }
   return result;
 };
@@ -163,11 +172,11 @@ export const formatOfflinePostBody = (
   footer?: string,
   defaultTemplate: string = DEFAULT_OFFLINE_POST_BODY
 ): string => {
-  const content = customBody || defaultTemplate;
+  const content = customBody?.trim() || defaultTemplate;
   let result = replaceTemplateVariables(content, vars, false);
 
-  if (footer) {
-    result += `\n\n${replaceTemplateVariables(footer, vars, false)}`;
+  if (footer?.trim()) {
+    result += `\n\n${replaceTemplateVariables(footer.trim(), vars, false)}`;
   }
   return result;
 };

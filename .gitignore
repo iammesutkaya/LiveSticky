@@ -2,6 +2,9 @@ node_modules
 .DS_Store
 
 .env
+.env.local
+devvit.secret.yaml
+*.log
 public/*.js
 public/*.js.map
 

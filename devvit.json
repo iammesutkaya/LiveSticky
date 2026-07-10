@@ -258,82 +258,92 @@
       "offlinePostTitle": {
         "type": "string",
         "label": "😴 Offline Post Title",
-        "helpText": "Title for the offline post."
+        "helpText": "Title for the offline post. If empty, the default template is used.",
+        "defaultValue": "😴 {stream_display_name} is offline 😴"
       },
       "offlinePostBody": {
         "type": "paragraph",
         "label": "😴 Offline Post Body",
-        "helpText": "Body for the offline post."
+        "helpText": "Body for the offline post. If empty, the default template is used.",
+        "defaultValue": "The stream is currently offline. Check back soon or follow the channels below to get notified when {stream_display_name} goes live!\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
       },
       "offlinePostFooter": {
         "type": "paragraph",
         "label": "😴 Offline Post Footer Text",
-        "helpText": "Appended to the bottom of the offline post."
+        "helpText": "Optional. Appended to the bottom of the offline post."
       },
       "offlineSidebarText": {
         "type": "paragraph",
         "label": "😴 Offline Sidebar Widget Text",
-        "helpText": "Body for the offline sidebar widget."
+        "helpText": "Body for the offline sidebar widget. If empty, the default template is used.",
+        "defaultValue": "# 😴 {stream_display_name} is offline 😴\n\nFollow the channels below to get notified when {stream_display_name} goes live!\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
       },
       "offlineSidebarFooter": {
         "type": "paragraph",
         "label": "😴 Offline Sidebar Widget Footer Text",
-        "helpText": "Appended to the bottom of the offline sidebar widget."
+        "helpText": "Optional. Appended to the bottom of the offline sidebar widget."
       },
       "livePostTitle": {
         "type": "string",
         "label": "🔴 Live Post Title",
-        "helpText": "Title for the live post."
+        "helpText": "Title for the live post. If empty, the default template is used.",
+        "defaultValue": "🚨 {stream_display_name} is LIVE! 🚨 - {stream_title}"
       },
       "livePostBody": {
         "type": "paragraph",
         "label": "🔴 Live Post Body",
-        "helpText": "Body for the live post."
+        "helpText": "Body for the live post. If empty, the default template is used.",
+        "defaultValue": "* **Category/Game:** {stream_game}\n* **Current Viewers:** {stream_viewers}\n* **Uptime:** live for {stream_uptime}\n\n---\n**Watch the stream on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**\n\n---\n*Stats are auto-updated in real-time by LiveSticky.*"
       },
       "livePostFooter": {
         "type": "paragraph",
         "label": "🔴 Live Post Footer Text",
-        "helpText": "Appended to the bottom of the live post."
+        "helpText": "Optional. Appended to the bottom of the live post."
       },
       "liveCommentText": {
         "type": "paragraph",
         "label": "🔴 Auto-Pinned Comment Text",
-        "helpText": "Automatically posts and pins a mod comment inside the live post."
+        "helpText": "Optional. Automatically posts and pins a mod comment inside the live post."
       },
       "liveSidebarText": {
         "type": "paragraph",
         "label": "🔴 Live Sidebar Widget Text",
-        "helpText": "Body for the live sidebar widget."
+        "helpText": "Body for the live sidebar widget. If empty, the default template is used.",
+        "defaultValue": "# 🚨 {stream_display_name} is LIVE! 🚨\n\n**Title:**\n{stream_title}\n\n* **Category/Game:** {stream_game}\n* **Current Viewers:** {stream_viewers}\n* **Uptime:** live for {stream_uptime}\n\n---\n**Watch the stream on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
       },
       "liveSidebarFooter": {
         "type": "paragraph",
         "label": "🔴 Live Sidebar Widget Footer Text",
-        "helpText": "Appended to the bottom of the live sidebar widget."
+        "helpText": "Optional. Appended to the bottom of the live sidebar widget."
       },
       "concludingPostBody": {
         "type": "paragraph",
         "label": "🎬 Concluding Post Body",
-        "helpText": "Body for the concluding post."
+        "helpText": "Body for the concluding post. If empty, the default template is used.",
+        "defaultValue": "### 👋 Stream Ended - Thanks for watching! 👋\n\n**Title:**\n{stream_title}\n\nThe stream has concluded. VODs and highlights may be available via the links below.\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**\n\n---\n*This post is now locked as the stream has ended.*"
       },
       "concludingPostFooter": {
         "type": "paragraph",
         "label": "🎬 Concluding Post Footer Text",
-        "helpText": "Appended to the bottom of the concluding post."
+        "helpText": "Optional. Appended to the bottom of the concluding post."
       },
       "highlightsPostTitle": {
         "type": "string",
         "label": "🎬 Highlights Post Title",
-        "helpText": "Title for the stream highlights post."
+        "helpText": "Title for the stream highlights post. If empty, the default template is used.",
+        "defaultValue": "🎬 Top Clips from {stream_display_name}'s stream ({date})"
       },
       "highlightsHeader": {
         "type": "paragraph",
         "label": "🎬 Highlights Post Header Text",
-        "helpText": "Header for the stream highlights post."
+        "helpText": "Header for the stream highlights post. If empty, the default template is used.",
+        "defaultValue": "**Title:**\n{stream_title}\n\nHere are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky."
       },
       "highlightsFooter": {
         "type": "paragraph",
         "label": "🎬 Highlights Post Footer Text",
-        "helpText": "Appended to the bottom of the stream highlights post."
+        "helpText": "Appended to the bottom of the stream highlights post. If empty, the default template is used.",
+        "defaultValue": "---\n*Watch VODs and catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*"
       },
       "modNotes": {
         "type": "paragraph",

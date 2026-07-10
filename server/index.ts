@@ -3,8 +3,7 @@ import { createServer, getServerPort } from '@devvit/web/server';
 import { redis } from '@devvit/web/server';
 import {
   runStatusCheck,
-  createDashboardPost,
-  restartLiveSticky,
+  refreshLiveSticky,
 } from './livesticky.js';
 import { buildYouTubeUrl } from '../src/formatters.js';
 
@@ -230,46 +229,15 @@ app.post('/internal/triggers/on-app-upgrade', onInstallOrUpgrade);
 // ---------------------------------------------------------------------------
 // Menu items (declared in devvit.json menu.items)
 // ---------------------------------------------------------------------------
-
-app.post('/internal/menu/create-dashboard', async (_req, res) => {
+app.post('/internal/menu/refresh', async (_req, res) => {
   try {
-    const message = await createDashboardPost();
+    const message = await refreshLiveSticky();
     res.json({ showToast: message });
   } catch (error) {
-    console.error('Failed to create dashboard post:', error);
+    console.error('Failed to refresh LiveSticky:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    res.json({ showToast: `❌ Dashboard failed: ${message.slice(0, 80)}` });
+    res.json({ showToast: `❌ Refresh failed: ${message.slice(0, 80)}` });
   }
-});
-
-app.post('/internal/menu/restart', async (_req, res) => {
-  try {
-    const message = await restartLiveSticky();
-    res.json({ showToast: message });
-  } catch (error) {
-    console.error('Failed to restart LiveSticky:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    res.json({ showToast: `❌ Restart failed: ${message.slice(0, 80)}` });
-  }
-});
-
-app.post('/internal/menu/refresh-images', async (_req, res) => {
-  try {
-    // Clear the avatar cache so the next status check re-fetches from the platform API.
-    await redis.del('dashboard_avatar_url');
-    await runStatusCheck();
-    res.json({ showToast: '✅ Profile images refreshed!' });
-  } catch (error) {
-    console.error('Failed to refresh profile images:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    res.json({ showToast: `❌ Image refresh failed: ${message.slice(0, 80)}` });
-  }
-});
-
-app.post('/internal/menu/get-templates', async (_req, res) => {
-  res.json({
-    navigateTo: 'https://livesticky.com/customization.html',
-  });
 });
 
 // ---------------------------------------------------------------------------

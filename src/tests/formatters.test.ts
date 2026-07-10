@@ -8,29 +8,26 @@ import {
   removeTwitchLink,
   removeKickLink,
   computeUptime,
+  type TemplateVariables,
 } from '../formatters.js';
-import type { UnifiedStreamInfo } from '../platforms.js';
 
-const mockStream: UnifiedStreamInfo = {
-  isLive: true,
-  platform: 'twitch',
-  user_name: 'CoolStreamer',
-  title: 'Epic Gaming Session',
-  game_name: 'Minecraft',
-  viewer_count: 5420,
-  started_at: new Date(Date.now() - 90 * 60000).toISOString(),
-  thumbnail_url: 'https://example.com/thumb.jpg',
+const mockVars: TemplateVariables = {
+  twitchChannel: 'coolstreamer',
+  twitchUrl: 'https://twitch.tv/coolstreamer',
+  streamHandle: 'coolstreamer',
+  streamDisplayName: 'CoolStreamer',
+  streamTitle: 'Epic Gaming Session',
+  streamGame: 'Minecraft',
+  streamViewers: '5,420',
+  streamUptime: '1h 30m',
+  dateStr: 'May 28, 2026',
 };
 
 describe('formatLivePostBody', () => {
   it('replaces all placeholders for a Twitch stream', () => {
     const result = formatLivePostBody(
-      mockStream,
-      'coolstreamer',
-      'https://twitch.tv/coolstreamer',
-      undefined,
-      undefined,
-      '{game} - {viewers} - {uptime} - {twitch_url}'
+      mockVars,
+      '{stream_game} - {stream_viewers} - {stream_uptime} - {twitch_url}'
     );
     expect(result).toContain('Minecraft');
     expect(result).toContain('5,420');
@@ -39,11 +36,15 @@ describe('formatLivePostBody', () => {
 
   it('replaces display_name placeholder from stream info', () => {
     const result = formatLivePostBody(
-      mockStream,
-      'coolstreamer',
-      undefined,
-      undefined,
-      undefined,
+      mockVars,
+      '{stream_display_name} is live playing {stream_game}'
+    );
+    expect(result).toContain('CoolStreamer is live playing Minecraft');
+  });
+
+  it('replaces display_name placeholder using backward-compatible fallback alias', () => {
+    const result = formatLivePostBody(
+      mockVars,
       '{display_name} is live playing {game}'
     );
     expect(result).toContain('CoolStreamer is live playing Minecraft');
@@ -51,36 +52,33 @@ describe('formatLivePostBody', () => {
 
   it('strips Twitch link when twitchUrl is omitted (uses {twitch_url} placeholder)', () => {
     const template = '**[Watch on Twitch]({twitch_url})**';
-    const result = formatLivePostBody(mockStream, 'coolstreamer', undefined, undefined, undefined, template);
+    const varsWithoutTwitch = { ...mockVars, twitchUrl: undefined };
+    const result = formatLivePostBody(varsWithoutTwitch, template);
     expect(result).not.toContain('{twitch_url}');
     expect(result.trim()).toBe('');
   });
 
   it('appends footer when provided', () => {
-    const result = formatLivePostBody(mockStream, 'coolstreamer', undefined, undefined, undefined, undefined, 'My footer');
+    const result = formatLivePostBody(mockVars, 'body', 'My footer');
     expect(result).toContain('My footer');
-  });
-
-  it('uses display_name placeholder correctly', () => {
-    const result = formatLivePostBody(mockStream, 'coolstreamer', undefined, undefined, undefined, '{display_name} is live!');
-    expect(result).toContain('CoolStreamer is live!');
   });
 });
 
 describe('formatOfflinePostBody', () => {
   it('replaces channel placeholder', () => {
-    const result = formatOfflinePostBody('coolstreamer', undefined, undefined, undefined, '{channel} is offline');
+    const result = formatOfflinePostBody(mockVars, '{twitch_channel} is offline');
     expect(result).toBe('coolstreamer is offline');
   });
 
   it('strips YouTube link when youtubeUrl is omitted', () => {
     const template = '**[Watch on YouTube]({youtube_url})**';
-    const result = formatOfflinePostBody('coolstreamer', undefined, undefined, undefined, template);
+    const varsWithoutYoutube = { ...mockVars, youtubeUrl: undefined };
+    const result = formatOfflinePostBody(varsWithoutYoutube, template);
     expect(result).not.toContain('youtube');
   });
 
   it('appends footer', () => {
-    const result = formatOfflinePostBody('coolstreamer', undefined, undefined, undefined, 'body', 'footer text');
+    const result = formatOfflinePostBody(mockVars, 'body', 'footer text');
     expect(result).toContain('\n\nfooter text');
   });
 });
@@ -138,9 +136,9 @@ describe('removeYoutubeLink', () => {
 
 describe('removeTwitchLink', () => {
   it('removes a Twitch link line', () => {
-    const text = 'Watch here:\n• **[Twitch](https://twitch.tv/{channel})**\nOther';
+    const text = 'Watch here:\n• **[Twitch](https://twitch.tv/{twitch_channel})**\nOther';
     const result = removeTwitchLink(text);
-    expect(result).not.toContain('twitch.tv/{channel}');
+    expect(result).not.toContain('twitch.tv/{twitch_channel}');
     expect(result).toContain('Other');
   });
 });

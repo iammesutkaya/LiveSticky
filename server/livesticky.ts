@@ -76,15 +76,15 @@ const formatSidebarWidgetText = (
   offlineFooter?: string
 ): string => {
   if (isLive) {
-    const content = customLiveText || DEFAULT_LIVE_SIDEBAR;
+    const content = customLiveText?.trim() || DEFAULT_LIVE_SIDEBAR;
     let result = replaceTemplateVariables(content, vars, true);
-    if (liveFooter) result += `\n\n${replaceTemplateVariables(liveFooter, vars, true)}`;
+    if (liveFooter?.trim()) result += `\n\n${replaceTemplateVariables(liveFooter.trim(), vars, true)}`;
     return result;
   }
 
-  const content = customOfflineText || DEFAULT_OFFLINE_SIDEBAR;
+  const content = customOfflineText?.trim() || DEFAULT_OFFLINE_SIDEBAR;
   let result = replaceTemplateVariables(content, vars, false);
-  if (offlineFooter) result += `\n\n${replaceTemplateVariables(offlineFooter, vars, false)}`;
+  if (offlineFooter?.trim()) result += `\n\n${replaceTemplateVariables(offlineFooter.trim(), vars, false)}`;
   return result;
 };
 
@@ -103,7 +103,7 @@ const ensureStickyOfflinePost = async (
     preloadedOfflineBody,
     preloadedOfflineFooter
   );
-  const templateTitle = preloadedOfflineTitle || DEFAULT_OFFLINE_POST_TITLE;
+  const templateTitle = preloadedOfflineTitle?.trim() || DEFAULT_OFFLINE_POST_TITLE;
   const offlinePostTitle = replaceTemplateVariables(templateTitle, vars, false);
   const offlinePostId = await redis.get('offline_post_id');
   let offlinePostExists = false;
@@ -196,10 +196,10 @@ const postStreamHighlights = async (
 
     console.log(`Found ${clips.length} clips. Posting top ${topClips.length} clips to Reddit...`);
 
-    const templateTitle = customTitle || DEFAULT_HIGHLIGHTS_POST_TITLE;
+    const templateTitle = customTitle?.trim() || DEFAULT_HIGHLIGHTS_POST_TITLE;
     const postTitle = replaceTemplateVariables(templateTitle, vars, false);
 
-    const templateHeader = customHeader || DEFAULT_HIGHLIGHTS_POST_HEADER;
+    const templateHeader = customHeader?.trim() || DEFAULT_HIGHLIGHTS_POST_HEADER;
     const header = replaceTemplateVariables(templateHeader, vars, false);
 
     let body = header;
@@ -212,7 +212,7 @@ const postStreamHighlights = async (
       body += `   * **Clipped by:** ${creator}\n\n`;
     });
 
-    const templateFooter = customFooter || DEFAULT_HIGHLIGHTS_POST_FOOTER;
+    const templateFooter = customFooter?.trim() || DEFAULT_HIGHLIGHTS_POST_FOOTER;
     body += replaceTemplateVariables(templateFooter, vars, false);
 
     const subreddit = await reddit.getCurrentSubreddit();
@@ -612,7 +612,7 @@ export const runStatusCheck = async (): Promise<void> => {
         livePostBody,
         livePostFooter
       );
-      const templateTitle = livePostTitle || DEFAULT_LIVE_POST_TITLE;
+      const templateTitle = livePostTitle?.trim() || DEFAULT_LIVE_POST_TITLE;
       const postTitle = replaceTemplateVariables(templateTitle, currentVars, true);
 
     const offlineSince = await redis.get('offline_since');
