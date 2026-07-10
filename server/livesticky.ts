@@ -16,11 +16,7 @@ import {
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, type UnifiedStreamInfo } from '../src/platforms.js';
 import {
-  removeYoutubeLink,
-  removeTwitchLink,
-  removeKickLink,
   buildYouTubeUrl,
-  buildKickUrl,
   buildKickUrl,
   formatLivePostBody,
   formatOfflinePostBody,
@@ -28,7 +24,6 @@ import {
   type TemplateVariables
 } from '../src/formatters.js';
 import {
-  DEFAULT_CONCLUDING_POST_BODY,
   DEFAULT_LIVE_SIDEBAR,
   DEFAULT_OFFLINE_SIDEBAR,
   DEFAULT_HIGHLIGHTS_POST_HEADER,
@@ -628,7 +623,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
     if (!isCurrentlyPinned) {
       await redis.set('is_live_pinned', 'true');
-      await redis.set('twitch_display_name', currentVars.streamDisplayName);
+      await redis.set('twitch_display_name', currentVars.streamDisplayName || '');
 
       if (streamInfo.platform === 'twitch') {
         if (streamInfo.user_id) await redis.set('twitch_broadcaster_id', streamInfo.user_id);
@@ -787,7 +782,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const livePlatformsJson = JSON.stringify(liveStreams.map(toDashboardPlatform));
       await Promise.all([
         redis.set('dashboard_platform', streamInfo.platform),
-        redis.set('dashboard_display_name', currentVars.streamDisplayName),
+        redis.set('dashboard_display_name', currentVars.streamDisplayName || ''),
         redis.set('dashboard_title', streamInfo.title || ''),
         redis.set('dashboard_started_at', streamInfo.started_at || new Date().toISOString()),
         redis.set('dashboard_game', gameName),
@@ -829,7 +824,6 @@ export const runStatusCheck = async (): Promise<void> => {
         const postId = await redis.get('live_post_id');
         const broadcasterId = await redis.get('twitch_broadcaster_id');
         const startedAt = await redis.get('twitch_started_at');
-        const streamTitle = (await redis.get('twitch_stream_title')) || 'Recent Stream';
 
         let cleanupSafe = true;
 
@@ -950,7 +944,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const isOfflinePostPinned = await redis.get('is_offline_post_pinned');
       if (!isOfflinePostPinned) {
         console.log('Offline post is not marked as pinned in Redis. Ensuring sticky offline post is active...');
-        await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
+        await ensureStickyOfflinePost(currentVars, offlinePostBody, offlinePostFooter, offlinePostTitle);
       }
     }
 
