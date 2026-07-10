@@ -163,6 +163,12 @@
         "label": "💊 Highlights Post Flair Template ID",
         "helpText": "The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
       },
+      "setupReference": {
+        "type": "string",
+        "label": "📖 Platform API Setup Guide",
+        "helpText": "Follow our step-by-step guide to generate the API credentials for the platforms below.",
+        "defaultValue": "https://livesticky.com/setup"
+      },
       "primaryPlatform": {
         "type": "select",
         "label": "👑 Primary Platform",
@@ -198,13 +204,12 @@
       "twitchClientId": {
         "type": "string",
         "label": "🟪 Twitch Client ID",
-        "helpText": "Register at https://dev.twitch.tv/console (Guide: https://livesticky.com/setup).",
+        "helpText": "Register at https://dev.twitch.tv/console.",
         "placeholder": "your Twitch app Client ID"
       },
       "twitchClientSecret": {
         "type": "string",
         "label": "🟪 Twitch Client Secret",
-        "helpText": "(Guide: https://livesticky.com/setup)",
         "placeholder": "your Twitch app Client Secret"
       },
       "youtubeChannel": {
