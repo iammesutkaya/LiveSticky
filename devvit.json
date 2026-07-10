@@ -29,32 +29,11 @@
   "menu": {
     "items": [
       {
-        "label": "Create LiveSticky Dashboard",
-        "description": "Creates a persistent custom post dashboard that auto-updates with live stream stats and platform links.",
+        "label": "Refresh LiveSticky",
+        "description": "Clears cached data, re-fetches profile images, updates the dashboard, and runs an immediate status check.",
         "location": "subreddit",
         "forUserType": "moderator",
-        "endpoint": "/internal/menu/create-dashboard"
-      },
-      {
-        "label": "Restart LiveSticky",
-        "description": "Clears cached stream status and runs an immediate status check.",
-        "location": "subreddit",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/restart"
-      },
-      {
-        "label": "Refresh Profile Images",
-        "description": "Clears the cached avatar and banner URLs and re-fetches them from the platform API immediately.",
-        "location": "subreddit",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/refresh-images"
-      },
-      {
-        "label": "Get Default LiveSticky Templates",
-        "description": "Opens the GitHub page with copy-pasteable templates for your settings.",
-        "location": "subreddit",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/get-templates"
+        "endpoint": "/internal/menu/refresh"
       }
     ]
   },
@@ -84,5 +63,278 @@
   },
   "dev": {
     "subreddit": "live_sticky_dev"
+  },
+  "settings": {
+    "subreddit": {
+      "enableDashboard": {
+        "type": "boolean",
+        "label": "⚙️ Custom Post Dashboard",
+        "defaultValue": false,
+        "helpText": "Powers a persistent interactive dashboard post."
+      },
+      "updateSidebarWidget": {
+        "type": "boolean",
+        "label": "⚙️ Sidebar Widget",
+        "defaultValue": false,
+        "helpText": "Creates and automatically updates a \"Stream Status\" text widget in your community sidebar."
+      },
+      "suggestedSort": {
+        "type": "select",
+        "label": "⚙️ Suggested Comment Sort",
+        "options": [
+          {
+            "label": "New (Recommended)",
+            "value": "NEW"
+          },
+          {
+            "label": "Live",
+            "value": "LIVE"
+          },
+          {
+            "label": "Q&A",
+            "value": "QA"
+          },
+          {
+            "label": "None (Community default)",
+            "value": "BLANK"
+          }
+        ],
+        "defaultValue": "NEW"
+      },
+      "stickyOfflinePost": {
+        "type": "boolean",
+        "label": "⚙️ Offline Post",
+        "defaultValue": true,
+        "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation."
+      },
+      "enableLivePost": {
+        "type": "boolean",
+        "label": "⚙️ Live Post",
+        "defaultValue": true,
+        "helpText": "Automatically creates and pins a standard text post when the stream goes live."
+      },
+      "removeOfflinePost": {
+        "type": "boolean",
+        "label": "⚙️ Hide Live Post from Feed when Offline",
+        "defaultValue": false,
+        "helpText": "Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed."
+      },
+      "deleteOfflinePost": {
+        "type": "boolean",
+        "label": "⚙️ Delete Live Post when Offline",
+        "defaultValue": false,
+        "helpText": "Deletes the live post and all its comments when the stream ends."
+      },
+      "offlineGracePeriod": {
+        "type": "number",
+        "label": "⚙️ Disconnect Grace Period (Minutes)",
+        "defaultValue": 6,
+        "helpText": "Minutes to wait before concluding the live post (prevents duplicates during crashes)."
+      },
+      "enableHighlightsPost": {
+        "type": "boolean",
+        "label": "⚙️ Stream Highlights Post",
+        "defaultValue": false,
+        "helpText": "Automatically posts a compilation of top Twitch clips generated during the stream when it ends."
+      },
+      "enableDynamicFlair": {
+        "type": "boolean",
+        "label": "💊 Dynamic Post Flair Updates",
+        "defaultValue": false,
+        "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K])."
+      },
+      "offlineUserFlairText": {
+        "type": "string",
+        "label": "💊 Offline User Flair Text",
+        "helpText": "Assigned to the streamer's user flair when offline."
+      },
+      "liveUserFlairText": {
+        "type": "string",
+        "label": "💊 Live User Flair Text",
+        "helpText": "Assigned to the streamer's user flair when live."
+      },
+      "liveFlairId": {
+        "type": "string",
+        "label": "💊 Live Post Flair Template ID",
+        "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair)"
+      },
+      "highlightsFlairId": {
+        "type": "string",
+        "label": "💊 Highlights Post Flair Template ID",
+        "helpText": "The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
+      },
+      "primaryPlatform": {
+        "type": "select",
+        "label": "👑 Primary Platform",
+        "options": [
+          {
+            "label": "Twitch",
+            "value": "Twitch"
+          },
+          {
+            "label": "YouTube",
+            "value": "YouTube"
+          },
+          {
+            "label": "Kick",
+            "value": "Kick"
+          }
+        ],
+        "defaultValue": "Twitch",
+        "helpText": "This platform will always appear at the top of the multistream dashboard."
+      },
+      "customAvatarUrl": {
+        "type": "string",
+        "label": "👑 Avatar Image URL",
+        "helpText": "Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Upload an image to Reddit, then copy its direct link. Leave blank to auto-fetch from your primary platform.",
+        "placeholder": "https://..."
+      },
+      "twitchChannel": {
+        "type": "string",
+        "label": "🟪 Twitch Channel Name",
+        "helpText": "Twitch channel to monitor.",
+        "placeholder": "streamer"
+      },
+      "twitchClientId": {
+        "type": "string",
+        "label": "🟪 Twitch Client ID",
+        "helpText": "Register at https://dev.twitch.tv/console (Guide: https://livesticky.com/setup).",
+        "placeholder": "your Twitch app Client ID"
+      },
+      "twitchClientSecret": {
+        "type": "string",
+        "label": "🟪 Twitch Client Secret",
+        "helpText": "(Guide: https://livesticky.com/setup)",
+        "placeholder": "your Twitch app Client Secret"
+      },
+      "youtubeChannel": {
+        "type": "string",
+        "label": "🟥 YouTube Channel Name / Handle",
+        "helpText": "YouTube channel to monitor.",
+        "placeholder": "@ChannelName"
+      },
+      "youtubeApiKey": {
+        "type": "string",
+        "label": "🟥 YouTube Data API Key",
+        "helpText": "Google Developer API Key with YouTube Data API v3 enabled. Required for YouTube.",
+        "placeholder": "your YouTube Data API v3 key"
+      },
+      "kickChannel": {
+        "type": "string",
+        "label": "🟩 Kick Channel Name",
+        "helpText": "Kick channel to monitor.",
+        "placeholder": "ChannelName"
+      },
+      "kickClientId": {
+        "type": "string",
+        "label": "🟩 Kick API Client ID",
+        "helpText": "Required for Kick.",
+        "placeholder": "your Kick Client ID"
+      },
+      "kickClientSecret": {
+        "type": "string",
+        "label": "🟩 Kick API Client Secret",
+        "helpText": "Required for Kick.",
+        "placeholder": "your Kick Client Secret"
+      },
+      "dashboardPostTitle": {
+        "type": "string",
+        "label": "📺 Dashboard Post Title",
+        "helpText": "Title for the dashboard post.",
+        "defaultValue": "LiveSticky Dashboard"
+      },
+      "templatesReference": {
+        "type": "string",
+        "label": "📖 Templates & Placeholders Reference",
+        "helpText": "Copy and paste templates for the text fields below from our website.",
+        "defaultValue": "https://livesticky.com/customization"
+      },
+      "offlinePostTitle": {
+        "type": "string",
+        "label": "😴 Offline Post Title",
+        "helpText": "Title for the offline post."
+      },
+      "offlinePostBody": {
+        "type": "paragraph",
+        "label": "😴 Offline Post Body",
+        "helpText": "Body for the offline post."
+      },
+      "offlinePostFooter": {
+        "type": "paragraph",
+        "label": "😴 Offline Post Footer Text",
+        "helpText": "Appended to the bottom of the offline post."
+      },
+      "offlineSidebarText": {
+        "type": "paragraph",
+        "label": "😴 Offline Sidebar Widget Text",
+        "helpText": "Body for the offline sidebar widget."
+      },
+      "offlineSidebarFooter": {
+        "type": "paragraph",
+        "label": "😴 Offline Sidebar Widget Footer Text",
+        "helpText": "Appended to the bottom of the offline sidebar widget."
+      },
+      "livePostTitle": {
+        "type": "string",
+        "label": "🔴 Live Post Title",
+        "helpText": "Title for the live post."
+      },
+      "livePostBody": {
+        "type": "paragraph",
+        "label": "🔴 Live Post Body",
+        "helpText": "Body for the live post."
+      },
+      "livePostFooter": {
+        "type": "paragraph",
+        "label": "🔴 Live Post Footer Text",
+        "helpText": "Appended to the bottom of the live post."
+      },
+      "liveCommentText": {
+        "type": "paragraph",
+        "label": "🔴 Auto-Pinned Comment Text",
+        "helpText": "Automatically posts and pins a mod comment inside the live post."
+      },
+      "liveSidebarText": {
+        "type": "paragraph",
+        "label": "🔴 Live Sidebar Widget Text",
+        "helpText": "Body for the live sidebar widget."
+      },
+      "liveSidebarFooter": {
+        "type": "paragraph",
+        "label": "🔴 Live Sidebar Widget Footer Text",
+        "helpText": "Appended to the bottom of the live sidebar widget."
+      },
+      "concludingPostBody": {
+        "type": "paragraph",
+        "label": "🎬 Concluding Post Body",
+        "helpText": "Body for the concluding post."
+      },
+      "concludingPostFooter": {
+        "type": "paragraph",
+        "label": "🎬 Concluding Post Footer Text",
+        "helpText": "Appended to the bottom of the concluding post."
+      },
+      "highlightsPostTitle": {
+        "type": "string",
+        "label": "🎬 Highlights Post Title",
+        "helpText": "Title for the stream highlights post."
+      },
+      "highlightsHeader": {
+        "type": "paragraph",
+        "label": "🎬 Highlights Post Header Text",
+        "helpText": "Header for the highlights post."
+      },
+      "highlightsFooter": {
+        "type": "paragraph",
+        "label": "🎬 Highlights Post Footer Text",
+        "helpText": "Appended to the bottom of the stream highlights post."
+      },
+      "modNotes": {
+        "type": "paragraph",
+        "label": "📝 Internal Moderator Notes",
+        "helpText": "Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes. LiveSticky ignores this field.",
+        "placeholder": "e.g. \"Twitch API keys belong to u/ModName\""
+      }
+    }
   }
 }
