@@ -43,7 +43,7 @@ rm -f src/client/index.html.bak
 sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g" docs/index.html
 rm -f docs/index.html.bak
 
-for page in docs/*.html; do
+for page in docs/*.html docs/demo/*.html; do
   # Rewrite existing ".css?v=X.Y.Z" busters and add one to any bare ".css" link.
   sed -i.bak -E "s|(\.css)(\?v=[0-9]+\.[0-9]+\.[0-9]+)?\"|\1?v=${VERSION}\"|g" "$page"
   rm -f "${page}.bak"
