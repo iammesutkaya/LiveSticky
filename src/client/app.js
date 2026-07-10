@@ -737,7 +737,7 @@ async function init() {
   if (linkReddit) {
     linkReddit.addEventListener('click', (e) => {
       e.preventDefault();
-      safeNavigateTo('https://livesticky.com/about.html');
+      safeNavigateTo('https://livesticky.com/about');
     });
   }
   if (linkVersion) {
