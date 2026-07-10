@@ -220,7 +220,7 @@
       },
       "youtubeApiKey": {
         "type": "string",
-        "label": "🟥 YouTube Data API Key",
+        "label": "🟥 YouTube API Key",
         "helpText": "Google Developer API Key with YouTube Data API v3 enabled. Required for YouTube.",
         "placeholder": "your YouTube Data API v3 key"
       },
@@ -232,13 +232,13 @@
       },
       "kickClientId": {
         "type": "string",
-        "label": "🟩 Kick API Client ID",
+        "label": "🟩 Kick Client ID",
         "helpText": "Required for Kick.",
         "placeholder": "your Kick Client ID"
       },
       "kickClientSecret": {
         "type": "string",
-        "label": "🟩 Kick API Client Secret",
+        "label": "🟩 Kick Client Secret",
         "helpText": "Required for Kick.",
         "placeholder": "your Kick Client Secret"
       },
