@@ -168,9 +168,7 @@ const postStreamHighlights = async (
   token: string,
   broadcasterId: string,
   startedAt: string,
-  streamTitle: string,
-  channelName: string,
-  displayName: string,
+  vars: TemplateVariables,
   customHeader?: string,
   customFooter?: string,
   flairTemplateId?: string,
@@ -203,23 +201,11 @@ const postStreamHighlights = async (
 
     console.log(`Found ${clips.length} clips. Posting top ${topClips.length} clips to Reddit...`);
 
-    const dateStr = new Date(startedAt).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-
     const templateTitle = customTitle || DEFAULT_HIGHLIGHTS_POST_TITLE;
-    const postTitle = templateTitle
-      .replace(/{display_name}/g, displayName)
-      .replace(/{date}/g, dateStr);
+    const postTitle = replaceTemplateVariables(templateTitle, vars, false);
 
     const templateHeader = customHeader || DEFAULT_HIGHLIGHTS_POST_HEADER;
-    const header = templateHeader
-      .replace(/{display_name}/g, displayName)
-      .replace(/{title}/g, streamTitle)
-      .replace(/{date}/g, dateStr)
-      .replace(/{channel}/g, channelName);
+    const header = replaceTemplateVariables(templateHeader, vars, false);
 
     let body = header;
     topClips.forEach((clip: any, index: number) => {
@@ -232,7 +218,7 @@ const postStreamHighlights = async (
     });
 
     const templateFooter = customFooter || DEFAULT_HIGHLIGHTS_POST_FOOTER;
-    body += templateFooter.replace(/{channel}/g, channelName);
+    body += replaceTemplateVariables(templateFooter, vars, false);
 
     const subreddit = await reddit.getCurrentSubreddit();
     const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
@@ -581,7 +567,7 @@ export const runStatusCheck = async (): Promise<void> => {
     currentState = StreamState.GRACE_PERIOD;
   }
 
-  const buildTemplateVars = async (stream: UnifiedStreamInfo | null, dateStr?: string): Promise<TemplateVariables> => {
+  const buildTemplateVars = async (stream: UnifiedStreamInfo | null): Promise<TemplateVariables> => {
     let streamDisplayName = '';
     if (stream) {
       streamDisplayName = stream.user_name || defaultChannel;
@@ -597,6 +583,12 @@ export const runStatusCheck = async (): Promise<void> => {
       const diffMins = Math.floor((diffMs % 3600000) / 60000);
       streamUptime = diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
     }
+
+    const dateStr = new Date().toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
 
     return {
       twitchChannel: twitchChannel as string,
@@ -919,9 +911,7 @@ export const runStatusCheck = async (): Promise<void> => {
                 twitchToken,
                 broadcasterId,
                 startedAt,
-                streamTitle,
-                twitchChannel || '',
-                currentVars.streamDisplayName,
+                currentVars,
                 highlightsHeader,
                 highlightsFooter,
                 highlightsFlairId,
