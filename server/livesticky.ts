@@ -454,7 +454,7 @@ export const runStatusCheck = async (): Promise<void> => {
     highlightsFooter,
     highlightsFlairId,
     offlineGracePeriod,
-    suggestedSort,
+    suggestedSortRaw,
     enableDashboard,
     enableLivePostRaw,
     enableDynamicFlair,
@@ -489,7 +489,7 @@ export const runStatusCheck = async (): Promise<void> => {
     get('highlightsFooter'),
     get('highlightsFlairId'),
     get<number>('offlineGracePeriod'),
-    get('suggestedSort'),
+    get<unknown>('suggestedSort'),
     get<boolean>('enableDashboard'),
     get<boolean>('enableLivePost'),
     get<boolean>('enableDynamicFlair'),
@@ -500,6 +500,10 @@ export const runStatusCheck = async (): Promise<void> => {
     get('liveUserFlairText'),
     get('offlineUserFlairText'),
   ]);
+  const suggestedSort = Array.isArray(suggestedSortRaw)
+    ? (suggestedSortRaw[0] as string | undefined)
+    : (suggestedSortRaw as string | undefined);
+
   const enableLivePost = enableLivePostRaw ?? true;
 
   const twitchUrl = twitchChannel ? `https://twitch.tv/${twitchChannel.trim()}` : undefined;
@@ -1173,12 +1177,7 @@ export const refreshLiveSticky = async (): Promise<string> => {
   await redis.del('dashboard_avatar_url');
 
   await Promise.all([
-    redis.del('is_live_pinned'),
-    redis.del('live_post_id'),
-    redis.del('offline_since'),
-    redis.del('offline_post_id'),
     redis.del('twitch_display_name'),
-    redis.del('is_offline_post_pinned'),
     redis.del('dashboard_platform'),
     redis.del('dashboard_display_name'),
     redis.del('dashboard_title'),

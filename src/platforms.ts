@@ -550,7 +550,7 @@ export async function checkAllStreamStatuses(
     kickChannel,
     kickClientId,
     kickClientSecret,
-    primaryPlatform,
+    primaryPlatformRaw,
   ] = await Promise.all([
     context.settings.get('twitchChannel') as Promise<string | undefined>,
     context.settings.get('twitchClientId') as Promise<string | undefined>,
@@ -560,8 +560,12 @@ export async function checkAllStreamStatuses(
     context.settings.get('kickChannel') as Promise<string | undefined>,
     context.settings.get('kickClientId') as Promise<string | undefined>,
     context.settings.get('kickClientSecret') as Promise<string | undefined>,
-    context.settings.get('primaryPlatform') as Promise<string | undefined>,
+    context.settings.get('primaryPlatform') as Promise<unknown>,
   ]);
+
+  const primaryPlatform = Array.isArray(primaryPlatformRaw)
+    ? (primaryPlatformRaw[0] as string | undefined)
+    : (primaryPlatformRaw as string | undefined);
 
   // Build the checks in priority order so the resulting array stays
   // Twitch > YouTube > Kick after the nulls are filtered out.
@@ -630,7 +634,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
     youtubeChannel, youtubeApiKey,
     kickChannel, kickClientId, kickClientSecret,
     customAvatarUrl,
-    primaryPlatform,
+    primaryPlatformRaw,
   ] = await Promise.all([
     context.settings.get('twitchChannel') as Promise<string | undefined>,
     context.settings.get('twitchClientId') as Promise<string | undefined>,
@@ -641,8 +645,12 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
     context.settings.get('kickClientId') as Promise<string | undefined>,
     context.settings.get('kickClientSecret') as Promise<string | undefined>,
     context.settings.get('customAvatarUrl') as Promise<string | undefined>,
-    context.settings.get('primaryPlatform') as Promise<string | undefined>,
+    context.settings.get('primaryPlatform') as Promise<unknown>,
   ]);
+
+  const primaryPlatform = Array.isArray(primaryPlatformRaw)
+    ? (primaryPlatformRaw[0] as string | undefined)
+    : (primaryPlatformRaw as string | undefined);
 
   let avatarUrl = customAvatarUrl?.trim() ?? '';
 
