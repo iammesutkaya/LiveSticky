@@ -114,68 +114,60 @@
           <strong>Note:</strong> Lines containing exactly <code>{twitch_url}</code>, <code>{youtube_url}</code>, or <code>{kick_url}</code> will be <strong>automatically removed</strong> by LiveSticky if the corresponding channel is not configured in your settings. This lets you copy-paste the templates below without worrying about dead links.
         </p>
 
-        <!-- Dashboard Post Title -->
-        <div class="template-section">
-          <h3>📺 Dashboard Post Title</h3>
-          <div class="code-header">
-            <span>Title</span>
-            <button class="copy-btn" data-clipboard-target="#dashboard-post-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
-          </div>
-          <pre id="dashboard-post-title"><code>LiveSticky Dashboard</code></pre>
-        </div>
+        <h2>Default Templates for Copy-Pasting</h2>
+        <p>If you need to restore or tweak the default texts, expand and copy these markdown templates:</p>
 
-        <!-- Offline Post -->
-        <div class="template-section">
-          <h3>😴 Offline Post</h3>
-          
-          <div class="code-header">
-            <span>Title</span>
-            <button class="copy-btn" data-clipboard-target="#offline-post-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
+        <details class="tmpl-item">
+          <summary>Dashboard Post Title</summary>
+          <div class="code-container">
+            <pre><code>LiveSticky Dashboard</code></pre>
           </div>
-          <pre id="offline-post-title"><code>😴 {stream_display_name} is offline 😴</code></pre>
+        </details>
 
-          <div class="code-header">
-            <span>Body</span>
-            <button class="copy-btn" data-clipboard-target="#offline-post-body">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
+        <details class="tmpl-item">
+          <summary>Offline Post Title</summary>
+          <div class="code-container">
+            <pre><code>😴 {stream_display_name} is offline 😴</code></pre>
           </div>
-          <pre id="offline-post-body"><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {stream_display_name} goes live!
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Offline Post Body</summary>
+          <div class="code-container">
+            <pre><code>The stream is currently offline. Check back soon or follow the channels below to get notified when {stream_display_name} goes live!
 
 ---
 **Watch the VODs on:**
 
 🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
-        </div>
-
-        <!-- Live Post -->
-        <div class="template-section">
-          <h3>🔴 Live Post</h3>
-          
-          <div class="code-header">
-            <span>Title</span>
-            <button class="copy-btn" data-clipboard-target="#live-post-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
           </div>
-          <pre id="live-post-title"><code>🚨 {stream_display_name} is LIVE! 🚨 - {stream_title}</code></pre>
+        </details>
 
-          <div class="code-header">
-            <span>Body</span>
-            <button class="copy-btn" data-clipboard-target="#live-post-body">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
+        <details class="tmpl-item">
+          <summary>Offline Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 😴 {stream_display_name} is offline 😴
+
+Follow the channels below to get notified when {stream_display_name} goes live!
+
+---
+**Watch the VODs on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
           </div>
-          <pre id="live-post-body"><code>* **Category/Game:** {stream_game}
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Post Title</summary>
+          <div class="code-container">
+            <pre><code>🚨 {stream_display_name} is LIVE! 🚨 - {stream_title}</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Post Body</summary>
+          <div class="code-container">
+            <pre><code>* **Category/Game:** {stream_game}
 * **Current Viewers:** {stream_viewers}
 * **Uptime:** live for {stream_uptime}
 
@@ -186,19 +178,32 @@
 
 ---
 *Stats are auto-updated in real-time by LiveSticky.*</code></pre>
-        </div>
-
-        <div class="template-section">
-          <h3>🎬 Concluding Post Body</h3>
-
-          <div class="code-header">
-            <span>Body</span>
-            <button class="copy-btn" data-clipboard-target="#concluding-post-body">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
           </div>
-          <pre id="concluding-post-body"><code>### 👋 Stream Ended - Thanks for watching! 👋
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Live Sidebar Widget Text</summary>
+          <div class="code-container">
+            <pre><code># 🚨 {stream_display_name} is LIVE! 🚨
+
+**Title:**
+{stream_title}
+
+* **Category/Game:** {stream_game}
+* **Current Viewers:** {stream_viewers}
+* **Uptime:** live for {stream_uptime}
+
+---
+**Watch the stream on:**
+
+🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Concluding Post Body</summary>
+          <div class="code-container">
+            <pre><code>### 👋 Stream Ended - Thanks for watching! 👋
 
 **Title:**
 {stream_title}
@@ -212,43 +217,33 @@ The stream has concluded. VODs and highlights may be available via the links bel
 
 ---
 *This post is now locked as the stream has ended.*</code></pre>
-        </div>
-
-        <!-- Highlights Post -->
-        <div class="template-section">
-          <h3>🎬 Highlights Post</h3>
-          
-          <div class="code-header">
-            <span>Title</span>
-            <button class="copy-btn" data-clipboard-target="#highlights-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
           </div>
-          <pre id="highlights-title"><code>🎬 Top Clips from {stream_display_name}'s stream ({date})</code></pre>
+        </details>
 
-          <div class="code-header">
-            <span>Header</span>
-            <button class="copy-btn" data-clipboard-target="#highlights-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
+        <details class="tmpl-item">
+          <summary>Highlights Post Title</summary>
+          <div class="code-container">
+            <pre><code>🎬 Top Clips from {stream_display_name}'s stream ({date})</code></pre>
           </div>
-          <pre id="highlights-header"><code>**Title:**
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Header Text</summary>
+          <div class="code-container">
+            <pre><code>**Title:**
 {stream_title}
 
 Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
-
-          <div class="code-header">
-            <span>Footer</span>
-            <button class="copy-btn" data-clipboard-target="#highlights-footer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy
-            </button>
           </div>
-          <pre id="highlights-footer"><code>---
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Highlights Post Footer Text</summary>
+          <div class="code-container">
+            <pre><code>---
 *Watch VODs and catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*</code></pre>
-        </div>
+          </div>
+        </details>
       </div>
     </main>
   </div>
