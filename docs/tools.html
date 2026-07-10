@@ -30,8 +30,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.0.267">
-  <link rel="stylesheet" href="landing.css?v=1.0.267">
+  <link rel="stylesheet" href="style.css?v=1.0.268">
+  <link rel="stylesheet" href="landing.css?v=1.0.268">
 </head>
 <body>
 
@@ -92,20 +92,8 @@
           </thead>
           <tbody>
             <tr>
-              <td><code>Create LiveSticky Dashboard</code></td>
-              <td>Creates (or replaces) the pinned interactive dashboard custom post. If you've updated your stream cards or channels, run this to force-refresh the dashboard container.</td>
-            </tr>
-            <tr>
-              <td><code>Restart LiveSticky</code></td>
-              <td>Flushes cached stream status values from Redis and forces an immediate check. Ideal for validating new Client IDs or API keys immediately without waiting for the next 2-minute poll.</td>
-            </tr>
-            <tr>
-              <td><code>Refresh Profile Images</code></td>
-              <td>Clears cached avatar image URLs and stream banners. If you or the creator updated their Twitch or YouTube channel profile picture, run this to sync it to the dashboard immediately.</td>
-            </tr>
-            <tr>
-              <td><code>Get Default LiveSticky Templates</code></td>
-              <td>Opens the <a href="customization.html">Templates &amp; Placeholders</a> reference page directly from the app so you can copy and tweak default post texts.</td>
+              <td><code>Refresh LiveSticky</code></td>
+              <td>Clears cached data, re-fetches profile images, updates the dashboard, and runs an immediate status check. Ideal for validating new settings or force-syncing channel changes immediately.</td>
             </tr>
           </tbody>
         </table>
@@ -185,6 +173,6 @@
     </svg>
   </button>
 
-  <script src="main.js?v=1.0.267"></script>
+  <script src="main.js?v=1.0.268"></script>
 </body>
 </html>
