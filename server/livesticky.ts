@@ -21,8 +21,11 @@ import {
   removeKickLink,
   buildYouTubeUrl,
   buildKickUrl,
+  buildKickUrl,
   formatLivePostBody,
   formatOfflinePostBody,
+  replaceTemplateVariables,
+  type TemplateVariables
 } from '../src/formatters.js';
 import {
   DEFAULT_CONCLUDING_POST_BODY,
@@ -71,57 +74,22 @@ const toDashboardPlatform = (s: UnifiedStreamInfo): DashboardPlatform => ({
 
 const formatSidebarWidgetText = (
   isLive: boolean,
-  streamInfo: UnifiedStreamInfo | null,
-  displayName: string,
-  channelName: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
+  vars: TemplateVariables,
   customLiveText?: string,
   customOfflineText?: string,
   liveFooter?: string,
   offlineFooter?: string
 ): string => {
-  if (isLive && streamInfo) {
-    const title = streamInfo.title || 'Live Stream';
-    const gameName = streamInfo.game_name || 'Just Chatting';
-    const viewerCount =
-      streamInfo.viewer_count !== undefined ? streamInfo.viewer_count.toLocaleString() : '0';
-
-    let uptimeStr = '';
-    if (streamInfo.started_at) {
-      const startTime = new Date(streamInfo.started_at).getTime();
-      const diffMs = Date.now() - startTime;
-      const diffHrs = Math.floor(diffMs / 3600000);
-      const diffMins = Math.floor((diffMs % 3600000) / 60000);
-      uptimeStr = diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
-    }
-
+  if (isLive) {
     const content = customLiveText || DEFAULT_LIVE_SIDEBAR;
-    let result = content
-      .replace(/{channel}/g, channelName)
-      .replace(/{display_name}/g, displayName)
-      .replace(/{game}/g, gameName)
-      .replace(/{viewers}/g, viewerCount)
-      .replace(/{uptime}/g, uptimeStr)
-      .replace(/{title}/g, title);
-
-    result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-    result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-    result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-    if (liveFooter) result += `\n\n${liveFooter}`;
+    let result = replaceTemplateVariables(content, vars, true);
+    if (liveFooter) result += `\n\n${replaceTemplateVariables(liveFooter, vars, true)}`;
     return result;
   }
 
   const content = customOfflineText || DEFAULT_OFFLINE_SIDEBAR;
-  let result = content.replace(/{channel}/g, channelName).replace(/{display_name}/g, displayName);
-
-  result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-  result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-  result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-  if (offlineFooter) result += `\n\n${offlineFooter}`;
+  let result = replaceTemplateVariables(content, vars, false);
+  if (offlineFooter) result += `\n\n${replaceTemplateVariables(offlineFooter, vars, false)}`;
   return result;
 };
 
@@ -130,28 +98,18 @@ const formatSidebarWidgetText = (
 // ---------------------------------------------------------------------------
 
 const ensureStickyOfflinePost = async (
-  channel: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
+  vars: TemplateVariables,
   preloadedOfflineBody?: string,
   preloadedOfflineFooter?: string,
   preloadedOfflineTitle?: string
 ) => {
-  const cachedDisplayName = await redis.get('twitch_display_name');
-  const displayName = cachedDisplayName || channel;
   const concludingBody = formatOfflinePostBody(
-    channel,
-    twitchUrl,
-    youtubeUrl,
-    kickUrl,
+    vars,
     preloadedOfflineBody,
-    preloadedOfflineFooter,
-    undefined,
-    displayName
+    preloadedOfflineFooter
   );
   const templateTitle = preloadedOfflineTitle || DEFAULT_OFFLINE_POST_TITLE;
-  const offlinePostTitle = templateTitle.replace(/{display_name}/g, displayName);
+  const offlinePostTitle = replaceTemplateVariables(templateTitle, vars, false);
   const offlinePostId = await redis.get('offline_post_id');
   let offlinePostExists = false;
 
@@ -623,23 +581,52 @@ export const runStatusCheck = async (): Promise<void> => {
     currentState = StreamState.GRACE_PERIOD;
   }
 
+  const buildTemplateVars = async (stream: UnifiedStreamInfo | null, dateStr?: string): Promise<TemplateVariables> => {
+    let streamDisplayName = '';
+    if (stream) {
+      streamDisplayName = stream.user_name || defaultChannel;
+    } else {
+      streamDisplayName = (await redis.get('twitch_display_name')) || defaultChannel;
+    }
+    
+    let streamUptime = '';
+    if (stream && stream.started_at) {
+      const startTime = new Date(stream.started_at).getTime();
+      const diffMs = Date.now() - startTime;
+      const diffHrs = Math.floor(diffMs / 3600000);
+      const diffMins = Math.floor((diffMs % 3600000) / 60000);
+      streamUptime = diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
+    }
+
+    return {
+      twitchChannel: twitchChannel as string,
+      youtubeChannel: youtubeChannel as string,
+      kickChannel: kickChannel as string,
+      twitchUrl,
+      youtubeUrl,
+      kickUrl,
+      streamHandle: stream?.user_name || defaultChannel, 
+      streamDisplayName,
+      streamTitle: stream?.title || 'Live Stream',
+      streamGame: stream?.game_name || 'Just Chatting',
+      streamViewers: stream?.viewer_count !== undefined ? stream.viewer_count.toLocaleString() : '0',
+      streamUptime,
+      dateStr
+    };
+  };
+
+  const currentVars = await buildTemplateVars(streamInfo);
+
   switch (currentState) {
     case StreamState.LIVE: {
       if (!streamInfo) break;
       const postBody = formatLivePostBody(
-      streamInfo,
-      defaultChannel,
-      twitchUrl,
-      youtubeUrl,
-      kickUrl,
-      livePostBody,
-      livePostFooter
-    );
-    const displayName = streamInfo.user_name || defaultChannel;
-    const templateTitle = livePostTitle || DEFAULT_LIVE_POST_TITLE;
-    const postTitle = templateTitle
-      .replace(/{display_name}/g, displayName)
-      .replace(/{title}/g, streamInfo.title || 'Live Stream');
+        currentVars,
+        livePostBody,
+        livePostFooter
+      );
+      const templateTitle = livePostTitle || DEFAULT_LIVE_POST_TITLE;
+      const postTitle = replaceTemplateVariables(templateTitle, currentVars, true);
 
     const offlineSince = await redis.get('offline_since');
     if (offlineSince) {
@@ -649,7 +636,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
     if (!isCurrentlyPinned) {
       await redis.set('is_live_pinned', 'true');
-      await redis.set('twitch_display_name', displayName);
+      await redis.set('twitch_display_name', currentVars.streamDisplayName);
 
       if (streamInfo.platform === 'twitch') {
         if (streamInfo.user_id) await redis.set('twitch_broadcaster_id', streamInfo.user_id);
@@ -808,14 +795,13 @@ export const runStatusCheck = async (): Promise<void> => {
       const livePlatformsJson = JSON.stringify(liveStreams.map(toDashboardPlatform));
       await Promise.all([
         redis.set('dashboard_platform', streamInfo.platform),
-        redis.set('dashboard_display_name', displayName),
+        redis.set('dashboard_display_name', currentVars.streamDisplayName),
         redis.set('dashboard_title', streamInfo.title || ''),
         redis.set('dashboard_started_at', streamInfo.started_at || new Date().toISOString()),
         redis.set('dashboard_game', gameName),
         redis.set('dashboard_viewers', viewerCount),
         redis.set('dashboard_thumbnail', thumbnail),
         redis.set('dashboard_live_platforms', livePlatformsJson),
-        // 7 days TTL (604800 seconds)
         redis.expire('dashboard_platform', 604800),
         redis.expire('dashboard_display_name', 604800),
         redis.expire('dashboard_title', 604800),
@@ -852,8 +838,6 @@ export const runStatusCheck = async (): Promise<void> => {
         const broadcasterId = await redis.get('twitch_broadcaster_id');
         const startedAt = await redis.get('twitch_started_at');
         const streamTitle = (await redis.get('twitch_stream_title')) || 'Recent Stream';
-        const cachedDisplayName = await redis.get('twitch_display_name');
-        const displayName = cachedDisplayName || defaultChannel;
 
         let cleanupSafe = true;
 
@@ -893,15 +877,9 @@ export const runStatusCheck = async (): Promise<void> => {
               } else {
                 try {
                   const concludingBody = formatOfflinePostBody(
-                    defaultChannel,
-                    twitchUrl,
-                    youtubeUrl,
-                    kickUrl,
+                    currentVars,
                     concludingPostBody,
-                    concludingPostFooter,
-                    DEFAULT_CONCLUDING_POST_BODY,
-                    displayName,
-                    streamTitle
+                    concludingPostFooter
                   );
                   await post.edit({ text: concludingBody });
                   console.log(`Successfully updated concluding body for post: ${postId}`);
@@ -921,7 +899,6 @@ export const runStatusCheck = async (): Promise<void> => {
             }
           } catch (e: any) {
             console.error('Failed to conclude/unsticky/delete/remove post:', e);
-            // If the post is simply not found, we can safely cleanup. Otherwise, we might want to retry.
             if (e && e.message && !e.message.toLowerCase().includes('not found')) {
                cleanupSafe = false;
             }
@@ -944,7 +921,7 @@ export const runStatusCheck = async (): Promise<void> => {
                 startedAt,
                 streamTitle,
                 twitchChannel || '',
-                displayName,
+                currentVars.streamDisplayName,
                 highlightsHeader,
                 highlightsFooter,
                 highlightsFlairId,
@@ -958,7 +935,7 @@ export const runStatusCheck = async (): Promise<void> => {
 
         if (stickyOfflinePost) {
           try {
-            await ensureStickyOfflinePost(defaultChannel, twitchUrl, youtubeUrl, kickUrl, offlinePostBody, offlinePostFooter, offlinePostTitle);
+            await ensureStickyOfflinePost(currentVars, offlinePostBody, offlinePostFooter, offlinePostTitle);
           } catch (err) {
             console.error('Failed to ensure sticky offline post:', err);
           }
@@ -1014,19 +991,9 @@ export const runStatusCheck = async (): Promise<void> => {
   // Sidebar widget
   if (updateSidebarWidget) {
     try {
-      const cachedDisplayName = await redis.get('twitch_display_name');
-      const displayName =
-        isLive && streamInfo
-          ? streamInfo.user_name || defaultChannel
-          : cachedDisplayName || defaultChannel;
       const widgetText = formatSidebarWidgetText(
         isLive,
-        streamInfo,
-        displayName as string,
-        defaultChannel,
-        twitchUrl,
-        youtubeUrl,
-        kickUrl,
+        currentVars,
         liveSidebarText,
         offlineSidebarText,
         liveSidebarFooter,
@@ -1217,8 +1184,10 @@ export const createDashboardPost = async (): Promise<string> => {
   return `Dashboard created and stickied: ${dashboardTitle}`;
 };
 
-export const restartLiveSticky = async (): Promise<string> => {
-  console.log('Manual LiveSticky restart triggered. Clearing Redis state...');
+export const refreshLiveSticky = async (): Promise<string> => {
+  console.log('Manual LiveSticky refresh triggered. Clearing Redis state...');
+  await redis.del('dashboard_avatar_url');
+
   await Promise.all([
     redis.del('is_live_pinned'),
     redis.del('live_post_id'),
@@ -1238,12 +1207,21 @@ export const restartLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_post_score'),
   ]);
 
+  const enableDashboard = await get<boolean>('enableDashboard');
+  if (enableDashboard) {
+    try {
+      await createDashboardPost();
+    } catch (e) {
+      console.error('Failed to re-create dashboard during refresh:', e);
+    }
+  }
+
   // Run one immediate check so state is rebuilt without waiting for the cron.
   try {
     await runStatusCheck();
   } catch (e) {
-    console.error('Immediate status check after restart failed:', e);
+    console.error('Immediate status check after refresh failed:', e);
   }
 
-  return 'LiveSticky has been restarted!';
+  return 'LiveSticky has been refreshed!';
 };

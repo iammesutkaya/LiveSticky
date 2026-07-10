@@ -10,6 +10,22 @@ import {
 } from './templates.js';
 import type { UnifiedStreamInfo } from './platforms.js';
 
+export interface TemplateVariables {
+  twitchChannel?: string;
+  youtubeChannel?: string;
+  kickChannel?: string;
+  twitchUrl?: string;
+  youtubeUrl?: string;
+  kickUrl?: string;
+  streamHandle?: string;
+  streamDisplayName?: string;
+  streamTitle?: string;
+  streamGame?: string;
+  streamViewers?: string;
+  streamUptime?: string;
+  dateStr?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Placeholder removal helpers
 // ---------------------------------------------------------------------------
@@ -34,15 +50,15 @@ export const removeTwitchLink = (text: string): string =>
   text
     .split('\n')
     .map((line) => {
-      if (line.includes('twitch.tv/{channel}') || line.includes('{twitch_url}')) {
+      if (line.includes('twitch.tv/{channel}') || line.includes('{twitch_url}') || line.includes('twitch.tv/{twitch_channel}') || line.includes('twitch.tv/{stream_handle}')) {
         const cleaned = line
           .replace(
-            /\s*([|•·\-‐‑⁃]|\s{2,})?\s*(🟪\s*)?(\*\*)?\[.*?\]\((https:\/\/twitch\.tv\/\{channel\}|\{twitch_url\})\)(\*\*)?/gi,
+            /\s*([|•·\-‐‑⁃]|\s{2,})?\s*(🟪\s*)?(\*\*)?\[.*?\]\((https:\/\/twitch\.tv\/\{channel\}|https:\/\/twitch\.tv\/\{twitch_channel\}|https:\/\/twitch\.tv\/\{stream_handle\}|\{twitch_url\})\)(\*\*)?/gi,
             ''
           )
           .replace(/^\s*([|•·\-‐‑⁃])\s*/, '')
           .replace(/\s*([|•·\-‐‑⁃])\s*$/, '');
-        return cleaned.includes('twitch.tv/{channel}') || cleaned.includes('{twitch_url}')
+        return cleaned.includes('twitch.tv/{channel}') || cleaned.includes('{twitch_url}') || cleaned.includes('twitch.tv/{twitch_channel}') || cleaned.includes('twitch.tv/{stream_handle}')
           ? null
           : cleaned;
       }
@@ -90,66 +106,82 @@ export const buildKickUrl = (channel?: string | null): string | undefined => {
 // Post body formatters
 // ---------------------------------------------------------------------------
 
+export const replaceTemplateVariables = (text: string, vars: TemplateVariables, isLive: boolean): string => {
+  let result = text;
+  
+  // Backwards compatibility legacy handle logic: Twitch > YouTube > Kick
+  const legacyChannel = vars.twitchChannel || vars.youtubeChannel || vars.kickChannel || '';
+  
+  // Platform specific variables
+  result = result.replace(/{twitch_channel}/g, vars.twitchChannel || '');
+  result = result.replace(/{youtube_channel}/g, vars.youtubeChannel || '');
+  result = result.replace(/{kick_channel}/g, vars.kickChannel || '');
+
+  // Active stream variables (alias legacy variables to active stream)
+  if (isLive) {
+    result = result
+      .replace(/{stream_handle}/g, vars.streamHandle || '')
+      .replace(/{stream_display_name}/g, vars.streamDisplayName || '')
+      .replace(/{display_name}/g, vars.streamDisplayName || '')
+      .replace(/{stream_title}/g, vars.streamTitle || '')
+      .replace(/{title}/g, vars.streamTitle || '')
+      .replace(/{stream_game}/g, vars.streamGame || '')
+      .replace(/{game}/g, vars.streamGame || '')
+      .replace(/{stream_viewers}/g, vars.streamViewers || '')
+      .replace(/{viewers}/g, vars.streamViewers || '')
+      .replace(/{stream_uptime}/g, vars.streamUptime || '')
+      .replace(/{uptime}/g, vars.streamUptime || '');
+  } else {
+    // Offline fallback aliases
+    result = result
+      .replace(/{stream_handle}/g, vars.streamHandle || '')
+      .replace(/{stream_display_name}/g, vars.streamDisplayName || '')
+      .replace(/{display_name}/g, vars.streamDisplayName || '')
+      .replace(/{stream_title}/g, vars.streamTitle || '')
+      .replace(/{title}/g, vars.streamTitle || '');
+  }
+
+  // Legacy channel fallback always processes
+  result = result.replace(/{channel}/g, legacyChannel);
+  
+  if (vars.dateStr) {
+    result = result.replace(/{date}/g, vars.dateStr);
+  }
+
+  // Link variables (with cleanup if missing)
+  result = vars.twitchUrl ? result.replace(/{twitch_url}/g, vars.twitchUrl) : removeTwitchLink(result);
+  result = vars.youtubeUrl ? result.replace(/{youtube_url}/g, vars.youtubeUrl) : removeYoutubeLink(result);
+  result = vars.kickUrl ? result.replace(/{kick_url}/g, vars.kickUrl) : removeKickLink(result);
+
+  return result;
+};
+
 export const formatLivePostBody = (
-  streamInfo: UnifiedStreamInfo,
-  channelName: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
+  vars: TemplateVariables,
   customBody?: string,
   footer?: string
 ): string => {
-  const title = streamInfo.title || 'Live Stream';
-  const gameName = streamInfo.game_name || 'Just Chatting';
-  const viewerCount =
-    streamInfo.viewer_count !== undefined ? streamInfo.viewer_count.toLocaleString() : '0';
-  const startedAt = streamInfo.started_at ? new Date(streamInfo.started_at) : new Date();
-
-  const elapsedMs = Date.now() - startedAt.getTime();
-  const hours = Math.floor(elapsedMs / 3600000);
-  const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-  const uptimeText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-
-  const displayName = streamInfo.user_name || channelName;
   const content = customBody || DEFAULT_LIVE_POST_BODY;
+  let result = replaceTemplateVariables(content, vars, true);
 
-  let result = content
-    .replace(/{channel}/g, channelName)
-    .replace(/{display_name}/g, displayName)
-    .replace(/{game}/g, gameName)
-    .replace(/{viewers}/g, viewerCount)
-    .replace(/{uptime}/g, uptimeText)
-    .replace(/{title}/g, title);
-
-  result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-  result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-  result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-  if (footer) result += `\n\n${footer}`;
+  if (footer) {
+    result += `\n\n${replaceTemplateVariables(footer, vars, true)}`;
+  }
   return result;
 };
 
 export const formatOfflinePostBody = (
-  channelName: string,
-  twitchUrl?: string,
-  youtubeUrl?: string,
-  kickUrl?: string,
+  vars: TemplateVariables,
   customBody?: string,
   footer?: string,
-  defaultTemplate: string = DEFAULT_OFFLINE_POST_BODY,
-  displayName?: string,
-  title?: string
+  defaultTemplate: string = DEFAULT_OFFLINE_POST_BODY
 ): string => {
   const content = customBody || defaultTemplate;
-  let result = content.replace(/{channel}/g, channelName);
+  let result = replaceTemplateVariables(content, vars, false);
 
-  result = twitchUrl ? result.replace(/{twitch_url}/g, twitchUrl) : removeTwitchLink(result);
-  if (displayName) result = result.replace(/{display_name}/g, displayName);
-  if (title) result = result.replace(/{title}/g, title);
-  result = youtubeUrl ? result.replace(/{youtube_url}/g, youtubeUrl) : removeYoutubeLink(result);
-  result = kickUrl ? result.replace(/{kick_url}/g, kickUrl) : removeKickLink(result);
-
-  if (footer) result += `\n\n${footer}`;
+  if (footer) {
+    result += `\n\n${replaceTemplateVariables(footer, vars, false)}`;
+  }
   return result;
 };
 
