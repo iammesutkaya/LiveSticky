@@ -1138,12 +1138,12 @@ body {
   mask-size: 100% 100%;
 }
 
-/* Watermark attribution */
-.watermark {
-  font-size: 9px;
+/* Modal author attribution */
+.modal-attribution {
+  font-size: 11px;
   color: var(--text-faint);
   text-align: center;
-  margin-top: 4px;
+  margin-top: 24px;
   opacity: 0.65;
   font-weight: 500;
   letter-spacing: 0.03em;
