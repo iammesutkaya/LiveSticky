@@ -7,17 +7,17 @@
     "build": "vite build && node scripts/build-server.mjs && node scripts/sync-demo.cjs",
     "test": "vitest run",
     "upload": "npm run build && bash scripts/upload.sh",
-    "release": "bash scripts/release.sh",
+    "release": "bash scripts/release.sh --public",
     "release:public": "bash scripts/release.sh --public",
     "publish:public": "bash scripts/release.sh --public"
   },
   "dependencies": {
-    "@devvit/public-api": "0.13.7",
-    "@devvit/web": "0.13.7",
+    "@devvit/public-api": "0.13.8",
+    "@devvit/web": "0.13.8",
     "express": "^4.21.0"
   },
   "devDependencies": {
-    "@devvit/start": "0.13.7",
+    "@devvit/start": "0.13.8",
     "@types/express": "^5.0.0",
     "typescript": "5.8.3",
     "vite": "^7.3.5",
