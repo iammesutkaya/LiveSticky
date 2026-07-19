@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.72">
-  <link rel="stylesheet" href="landing.css?v=1.1.72">
+  <link rel="stylesheet" href="style.css?v=1.1.73">
+  <link rel="stylesheet" href="landing.css?v=1.1.73">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.72</span>
+          <span class="badge badge-green logo-version">v1.1.73</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -183,17 +183,11 @@
           </div>
         </div>
 
-        <div class="tab-nav height-tabs" role="tablist" aria-label="Dashboard frame height">
+        <div class="tab-nav showcase-tabs height-tabs" role="tablist" aria-label="Dashboard frame height">
           <button class="tab-btn active" role="tab" aria-selected="true"
-            onclick="setDashboardHeight('tall', this)">
-            <svg class="lucide lucide-max" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-            <span>Tall Mode (512px)</span>
-          </button>
+            onclick="setDashboardHeight('tall', this)">Tall (512px)</button>
           <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardHeight('compact', this)">
-            <svg class="lucide lucide-min" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg>
-            <span>Compact Mode (320px)</span>
-          </button>
+            onclick="setDashboardHeight('compact', this)">Compact (320px)</button>
         </div>
       </section>
     </div> <!-- /hero-split -->
@@ -570,22 +564,28 @@
       if (demoIframe && demoIframe.contentWindow) {
         demoIframe.contentWindow.postMessage({ type: 'heightMode', heightMode: height }, '*');
       }
+
+      updateTabIndicator(btn);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const activeBtn = document.querySelector('.showcase-tabs .tab-btn.active');
-      if (activeBtn) {
-        setTimeout(() => {
-          updateTabIndicator(activeBtn);
-        }, 100);
-      }
+      document.querySelectorAll('.showcase-tabs').forEach(tabsNav => {
+        const activeBtn = tabsNav.querySelector('.tab-btn.active');
+        if (activeBtn) {
+          setTimeout(() => {
+            updateTabIndicator(activeBtn);
+          }, 100);
+        }
+      });
     });
 
     window.addEventListener('resize', () => {
-      const activeBtn = document.querySelector('.showcase-tabs .tab-btn.active');
-      if (activeBtn) {
-        updateTabIndicator(activeBtn);
-      }
+      document.querySelectorAll('.showcase-tabs').forEach(tabsNav => {
+        const activeBtn = tabsNav.querySelector('.tab-btn.active');
+        if (activeBtn) {
+          updateTabIndicator(activeBtn);
+        }
+      });
     });
   </script>
   <script src="main.js?v=1.1.38"></script>

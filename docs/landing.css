@@ -572,56 +572,9 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .height-tabs {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-line);
-  border-radius: var(--radius-full);
-  padding: 4px;
-  gap: 4px;
-  width: auto;
+  margin-top: 0;
+  margin-bottom: 0;
   border-bottom: none !important;
-}
-
-.height-tabs .tab-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: transparent;
-  border: 1px solid transparent;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-}
-
-.height-tabs .tab-btn svg {
-  color: var(--text-muted);
-  transition: color 0.2s ease;
-}
-
-.height-tabs .tab-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-card-hover);
-}
-
-.height-tabs .tab-btn:hover svg {
-  color: var(--text-primary);
-}
-
-.height-tabs .tab-btn.active {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-line);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
-.height-tabs .tab-btn.active svg {
-  color: var(--accent-gold);
 }
 
 #demo-iframe {
