@@ -533,14 +533,17 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 
-.showcase-controls {
+.showcase {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   max-width: 480px;
-  flex-wrap: wrap;
+}
+
+.showcase-tabs {
+  width: 100%;
 }
 
 .showcase-container {
@@ -557,6 +560,13 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 .showcase-container.compact-mode {
   height: 320px;
+}
+
+.height-tabs {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
 }
 
 #demo-iframe {

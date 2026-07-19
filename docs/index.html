@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.69">
-  <link rel="stylesheet" href="landing.css?v=1.1.69">
+  <link rel="stylesheet" href="style.css?v=1.1.70">
+  <link rel="stylesheet" href="landing.css?v=1.1.70">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.69</span>
+          <span class="badge badge-green logo-version">v1.1.70</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -162,32 +162,30 @@
 
       <!-- Dashboard Showcase -->
       <section class="showcase">
-        <div class="showcase-controls">
-          <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
-            <button class="tab-btn active" role="tab" aria-selected="true"
-              onclick="setDashboardView('multistream', this)">
-              <span class="desktop-label">Multi-Stream</span>
-              <span class="mobile-label">Multi</span>
-            </button>
-            <button class="tab-btn" role="tab" aria-selected="false"
-              onclick="setDashboardView('stream', this)">
-              <span class="desktop-label">Single-Stream</span>
-              <span class="mobile-label">Single</span>
-            </button>
-            <button class="tab-btn" role="tab" aria-selected="false"
-              onclick="setDashboardView('offline', this)">Offline</button>
-          </div>
-
-          <div class="tab-nav height-tabs" role="tablist" aria-label="Dashboard frame height">
-            <button class="tab-btn active" role="tab" aria-selected="true"
-              onclick="setDashboardHeight('tall', this)">Tall (512px)</button>
-            <button class="tab-btn" role="tab" aria-selected="false"
-              onclick="setDashboardHeight('compact', this)">Compact (320px)</button>
-          </div>
+        <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
+          <button class="tab-btn active" role="tab" aria-selected="true"
+            onclick="setDashboardView('multistream', this)">
+            <span class="desktop-label">Multi-Stream</span>
+            <span class="mobile-label">Multi</span>
+          </button>
+          <button class="tab-btn" role="tab" aria-selected="false"
+            onclick="setDashboardView('stream', this)">
+            <span class="desktop-label">Single-Stream</span>
+            <span class="mobile-label">Single</span>
+          </button>
+          <button class="tab-btn" role="tab" aria-selected="false"
+            onclick="setDashboardView('offline', this)">Offline</button>
         </div>
 
         <div class="showcase-container">
           <iframe id="demo-iframe" src="demo/index.html?mock=multistream" title="LiveSticky Demo Dashboard"></iframe>
+        </div>
+
+        <div class="tab-nav height-tabs" role="tablist" aria-label="Dashboard frame height">
+          <button class="tab-btn active" role="tab" aria-selected="true"
+            onclick="setDashboardHeight('tall', this)">Tall (512px)</button>
+          <button class="tab-btn" role="tab" aria-selected="false"
+            onclick="setDashboardHeight('compact', this)">Compact (320px)</button>
         </div>
       </section>
     </div> <!-- /hero-split -->
