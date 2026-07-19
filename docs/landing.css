@@ -533,16 +533,30 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 
+.showcase-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  flex-wrap: wrap;
+}
+
 .showcase-container {
   background: var(--bg-card);
   border: 1px solid var(--border-line);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
   width: 100%;
   max-width: 480px;
   height: 512px;
+}
+
+.showcase-container.compact-mode {
+  height: 320px;
 }
 
 #demo-iframe {
