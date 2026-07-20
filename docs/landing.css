@@ -593,17 +593,19 @@ html.theme-light .showcase-tabs .tab-indicator {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
+  width: auto;
   height: 38px;
+  padding: 0 14px;
   border-radius: var(--radius-xl);
   background: var(--bg-card);
   border: 1px solid var(--border-line);
   color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
   outline: none;
-  padding: 0;
 }
 
 .height-toggle-btn:hover {
