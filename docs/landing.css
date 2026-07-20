@@ -600,7 +600,7 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 .showcase-top-row .showcase-tabs.height-tabs .tab-btn {
   flex: none;
-  padding: 0 14px;
+  padding: 8px 14px;
 }
 
 #demo-iframe {
