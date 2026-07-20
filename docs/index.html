@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.106">
-  <link rel="stylesheet" href="landing.css?v=1.1.106">
+  <link rel="stylesheet" href="style.css?v=1.1.107">
+  <link rel="stylesheet" href="landing.css?v=1.1.107">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.106</span>
+          <span class="badge badge-green logo-version">v1.1.107</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -162,32 +162,26 @@
 
       <!-- Dashboard Showcase -->
       <section class="showcase">
-        <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
-          <button class="tab-btn active" role="tab" aria-selected="true"
-            onclick="setDashboardView('multistream', this)">
-            <span class="desktop-label">Multi-Stream</span>
-            <span class="mobile-label">Multi</span>
+        <div class="showcase-header-bar">
+          <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
+            <button class="tab-btn active" role="tab" aria-selected="true"
+              onclick="setDashboardView('multistream', this)">Multi</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+              onclick="setDashboardView('stream', this)">Single</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+              onclick="setDashboardView('offline', this)">Offline</button>
+          </div>
+          <button class="height-toggle-btn" id="heightToggleBtn" type="button"
+            onclick="toggleDashboardHeight()" title="Switch to Compact view (320px)" aria-label="Toggle Dashboard Height">
+            <svg class="icon-tall" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="8 3 12 7 16 3"></polyline><polyline points="8 21 12 17 16 21"></polyline><line x1="12" y1="7" x2="12" y2="17"></line></svg>
+            <svg class="icon-compact" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="8 7 12 3 16 7"></polyline><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="3" x2="12" y2="21"></line></svg>
           </button>
-          <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardView('stream', this)">
-            <span class="desktop-label">Single-Stream</span>
-            <span class="mobile-label">Single</span>
-          </button>
-          <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardView('offline', this)">Offline</button>
         </div>
 
         <div class="showcase-stage">
           <div class="showcase-container">
             <iframe id="demo-iframe" src="demo/index.html?mock=multistream" title="LiveSticky Demo Dashboard"></iframe>
           </div>
-        </div>
-
-        <div class="tab-nav showcase-tabs height-tabs" role="tablist" aria-label="Dashboard frame height">
-          <button class="tab-btn active" role="tab" aria-selected="true"
-            onclick="setDashboardHeight('tall', this)">Tall (512px)</button>
-          <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardHeight('compact', this)">Compact (320px)</button>
         </div>
       </section>
     </div> <!-- /hero-split -->
@@ -539,19 +533,16 @@
       updateTabIndicator(btn);
     }
 
-    function setDashboardHeight(height, btn) {
-      if (btn.classList.contains('active')) return;
+    function toggleDashboardHeight() {
+      const newMode = activeHeightMode === 'tall' ? 'compact' : 'tall';
+      setDashboardHeightMode(newMode);
+    }
 
+    function setDashboardHeightMode(height) {
       activeHeightMode = height;
-      const tabs = btn.parentElement;
-      tabs.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-
+      const toggleBtn = document.getElementById('heightToggleBtn');
       const container = document.querySelector('.showcase-container');
+
       if (container) {
         if (height === 'compact') {
           container.classList.add('compact-mode');
@@ -560,12 +551,20 @@
         }
       }
 
+      if (toggleBtn) {
+        if (height === 'compact') {
+          toggleBtn.classList.add('is-compact');
+          toggleBtn.setAttribute('title', 'Switch to Tall view (512px)');
+        } else {
+          toggleBtn.classList.remove('is-compact');
+          toggleBtn.setAttribute('title', 'Switch to Compact view (320px)');
+        }
+      }
+
       const demoIframe = document.getElementById('demo-iframe');
       if (demoIframe && demoIframe.contentWindow) {
         demoIframe.contentWindow.postMessage({ type: 'heightMode', heightMode: height }, '*');
       }
-
-      updateTabIndicator(btn);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
