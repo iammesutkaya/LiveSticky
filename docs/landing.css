@@ -578,7 +578,6 @@ html.theme-light .showcase-tabs .tab-indicator {
   max-width: 340px;
   margin-top: 4px;
   margin-bottom: 0;
-  border-bottom: none !important;
 }
 
 #demo-iframe {
