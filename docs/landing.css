@@ -594,7 +594,13 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .showcase-top-row .showcase-tabs.height-tabs {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.showcase-top-row .showcase-tabs.height-tabs .tab-btn {
   flex: none;
+  padding: 0 14px;
 }
 
 #demo-iframe {
