@@ -604,8 +604,8 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .showcase-top-row .showcase-tabs.height-tabs {
-  flex: 0 0 100px;
-  width: 100px;
+  flex: 0 0 135px;
+  width: 135px;
   box-sizing: border-box;
 }
 
