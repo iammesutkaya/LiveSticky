@@ -4,11 +4,11 @@
         <img alt="" class="thumb-img" style="display:none">
         <div class="pulse-ring"></div>
         <span class="platform-badge platform-${e.platform}">${i}<span class="pb-name">${r}</span></span>
+        <span class="viewer-chip"><span class="vc-num">0</span><span class="vc-label">viewers</span></span>
       </div>
       <div class="stream-card-info">
         <div class="stream-card-title"></div>
         <div class="stream-card-meta">
-          <span class="viewer-chip"><span class="vc-num">0</span><span class="vc-label">viewers</span></span>
           <span class="meta-text meta-cat"></span>
           <span class="meta-sep">·</span>
           <span class="meta-text meta-up"></span>
