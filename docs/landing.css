@@ -574,57 +574,55 @@ html.theme-light .showcase-tabs .tab-indicator {
   height: 320px;
 }
 
-.showcase-unified-tabs {
-  max-width: 440px;
+.showcase-top-row {
   width: 100%;
-  margin: 0 auto 12px;
+  max-width: 480px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.showcase-unified-tabs .tab-btn {
+.showcase-top-row .showcase-tabs {
+  margin: 0;
+  max-width: none;
   flex: 1;
-  text-align: center;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
 }
 
-.showcase-unified-tabs .tab-divider {
-  width: 1px;
-  height: 18px;
-  background: var(--border-line);
-  margin: 0 4px;
+.mini-height-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-xl);
   flex-shrink: 0;
 }
 
-.showcase-unified-tabs .height-toggle-btn {
-  flex: none;
-  padding: 6px 12px;
-  font-size: 12px;
+.mini-height-btn {
+  padding: 4px 8px;
+  font-size: 11px;
   font-weight: 600;
-  border-radius: var(--radius-lg);
   color: var(--text-muted);
   background: transparent;
   border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
   outline: none;
 }
 
-.showcase-unified-tabs .height-toggle-btn:hover {
+.mini-height-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-surface-hover);
 }
 
-.showcase-unified-tabs .height-toggle-btn.is-compact {
+.mini-height-btn.active {
   color: var(--gold-text);
-  background: var(--gold-dim);
+  background: var(--bg-surface-hover);
   border-color: var(--gold-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 #demo-iframe {

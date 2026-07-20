@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.110">
-  <link rel="stylesheet" href="landing.css?v=1.1.110">
+  <link rel="stylesheet" href="style.css?v=1.1.111">
+  <link rel="stylesheet" href="landing.css?v=1.1.111">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.110</span>
+          <span class="badge badge-green logo-version">v1.1.111</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -162,16 +162,22 @@
 
       <!-- Dashboard Showcase -->
       <section class="showcase">
-        <div class="tab-nav showcase-tabs showcase-unified-tabs" role="tablist" aria-label="Dashboard views and frame controls">
-          <button class="tab-btn active" role="tab" aria-selected="true"
-            onclick="setDashboardView('multistream', this)">Multi-Stream</button>
-          <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardView('stream', this)">Single-Stream</button>
-          <button class="tab-btn" role="tab" aria-selected="false"
-            onclick="setDashboardView('offline', this)">Offline</button>
-          <span class="tab-divider" aria-hidden="true"></span>
-          <button class="tab-btn height-toggle-btn" id="heightToggleBtn" role="tab" aria-selected="false" type="button"
-            onclick="toggleDashboardHeight()" title="Toggle Compact view (320px)" aria-label="Toggle Compact View">Compact</button>
+        <div class="showcase-top-row">
+          <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
+            <button class="tab-btn active" role="tab" aria-selected="true"
+              onclick="setDashboardView('multistream', this)">Multi-Stream</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+              onclick="setDashboardView('stream', this)">Single-Stream</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+              onclick="setDashboardView('offline', this)">Offline</button>
+          </div>
+
+          <div class="mini-height-toggle" role="tablist" aria-label="Showcase frame height">
+            <button class="mini-height-btn active" id="heightTallBtn" role="tab" aria-selected="true"
+              onclick="setDashboardHeight('tall', this)">512px</button>
+            <button class="mini-height-btn" id="heightCompactBtn" role="tab" aria-selected="false"
+              onclick="setDashboardHeight('compact', this)">320px</button>
+          </div>
         </div>
 
         <div class="showcase-stage">
@@ -529,31 +535,28 @@
       updateTabIndicator(btn);
     }
 
-    function toggleDashboardHeight() {
-      const newMode = activeHeightMode === 'tall' ? 'compact' : 'tall';
-      setDashboardHeightMode(newMode);
-    }
+    function setDashboardHeight(height, btn) {
+      if (btn && btn.classList.contains('active')) return;
 
-    function setDashboardHeightMode(height) {
       activeHeightMode = height;
-      const toggleBtn = document.getElementById('heightToggleBtn');
-      const container = document.querySelector('.showcase-container');
+      const toggleGroup = document.querySelector('.mini-height-toggle');
+      if (toggleGroup) {
+        toggleGroup.querySelectorAll('.mini-height-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+      }
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      }
 
+      const container = document.querySelector('.showcase-container');
       if (container) {
         if (height === 'compact') {
           container.classList.add('compact-mode');
         } else {
           container.classList.remove('compact-mode');
-        }
-      }
-
-      if (toggleBtn) {
-        if (height === 'compact') {
-          toggleBtn.classList.add('is-compact');
-          toggleBtn.setAttribute('title', 'Switch to Tall view (512px)');
-        } else {
-          toggleBtn.classList.remove('is-compact');
-          toggleBtn.setAttribute('title', 'Switch to Compact view (320px)');
         }
       }
 
