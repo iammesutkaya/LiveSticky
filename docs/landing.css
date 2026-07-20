@@ -465,11 +465,14 @@ html.theme-light .inline-youtube { background: #cc0000; }
 
 .showcase-tabs {
   position: relative; /* for absolute positioned indicator child */
+  display: flex;
+  align-items: center;
   border-bottom: none !important;
   padding: 4px !important;
   margin-bottom: 0;
   width: 100%;
   max-width: 480px;
+  height: 38px;
   box-sizing: border-box;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border) !important;
@@ -481,8 +484,12 @@ html.theme-light .inline-youtube { background: #cc0000; }
   position: relative;
   z-index: 1; /* sit above indicator */
   font-size: 0.8rem;
-  padding: 6px 8px;
-  line-height: 1.2;
+  padding: 0 8px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   font-weight: 600;
   background: transparent;
   border: 1px solid transparent;
@@ -580,7 +587,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   width: 100%;
   max-width: 480px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 12px;
@@ -605,8 +612,10 @@ html.theme-light .showcase-tabs .tab-indicator {
 .showcase-top-row .showcase-tabs.height-tabs .tab-btn {
   flex: 1 1 0;
   min-width: 0;
-  padding: 6px 0;
-  text-align: center;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.8rem;
 }
 
