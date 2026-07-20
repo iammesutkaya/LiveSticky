@@ -609,24 +609,14 @@ html.theme-light .showcase-tabs .tab-indicator {
 .height-toggle-btn:hover {
   background: var(--bg-surface-hover);
   color: var(--text-primary);
+  border-color: var(--text-faint);
 }
 
 .height-toggle-btn.is-compact {
-  background: var(--bg-card);
+  background: var(--bg-surface-hover);
   color: var(--gold-text);
   border-color: var(--gold-border);
-}
-
-.height-toggle-btn .icon-compact {
-  display: none;
-}
-
-.height-toggle-btn.is-compact .icon-tall {
-  display: none;
-}
-
-.height-toggle-btn.is-compact .icon-compact {
-  display: block;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
 }
 
 #demo-iframe {
