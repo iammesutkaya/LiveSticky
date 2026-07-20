@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.111">
-  <link rel="stylesheet" href="landing.css?v=1.1.111">
+  <link rel="stylesheet" href="style.css?v=1.1.112">
+  <link rel="stylesheet" href="landing.css?v=1.1.112">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.111</span>
+          <span class="badge badge-green logo-version">v1.1.112</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -165,17 +165,17 @@
         <div class="showcase-top-row">
           <div class="tab-nav showcase-tabs" role="tablist" aria-label="Dashboard views">
             <button class="tab-btn active" role="tab" aria-selected="true"
-              onclick="setDashboardView('multistream', this)">Multi-Stream</button>
+              onclick="setDashboardView('multistream', this)">Multi</button>
             <button class="tab-btn" role="tab" aria-selected="false"
-              onclick="setDashboardView('stream', this)">Single-Stream</button>
+              onclick="setDashboardView('stream', this)">Single</button>
             <button class="tab-btn" role="tab" aria-selected="false"
               onclick="setDashboardView('offline', this)">Offline</button>
           </div>
 
-          <div class="mini-height-toggle" role="tablist" aria-label="Showcase frame height">
-            <button class="mini-height-btn active" id="heightTallBtn" role="tab" aria-selected="true"
+          <div class="tab-nav showcase-tabs height-tabs" role="tablist" aria-label="Showcase frame height">
+            <button class="tab-btn active" id="heightTallBtn" role="tab" aria-selected="true"
               onclick="setDashboardHeight('tall', this)">512px</button>
-            <button class="mini-height-btn" id="heightCompactBtn" role="tab" aria-selected="false"
+            <button class="tab-btn" id="heightCompactBtn" role="tab" aria-selected="false"
               onclick="setDashboardHeight('compact', this)">320px</button>
           </div>
         </div>
@@ -539,17 +539,13 @@
       if (btn && btn.classList.contains('active')) return;
 
       activeHeightMode = height;
-      const toggleGroup = document.querySelector('.mini-height-toggle');
-      if (toggleGroup) {
-        toggleGroup.querySelectorAll('.mini-height-btn').forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-      }
-      if (btn) {
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-      }
+      const tabs = btn.parentElement;
+      tabs.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
 
       const container = document.querySelector('.showcase-container');
       if (container) {
@@ -564,6 +560,8 @@
       if (demoIframe && demoIframe.contentWindow) {
         demoIframe.contentWindow.postMessage({ type: 'heightMode', heightMode: height }, '*');
       }
+
+      updateTabIndicator(btn);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
