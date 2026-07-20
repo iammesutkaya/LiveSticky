@@ -480,8 +480,8 @@ html.theme-light .inline-youtube { background: #cc0000; }
 .showcase-tabs .tab-btn {
   position: relative;
   z-index: 1; /* sit above indicator */
-  font-size: 0.85rem;
-  padding: 8px 14px;
+  font-size: 0.8rem;
+  padding: 6px 8px;
   line-height: 1.2;
   font-weight: 600;
   background: transparent;
@@ -492,6 +492,7 @@ html.theme-light .inline-youtube { background: #cc0000; }
   flex: 1;
   text-align: center;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .mobile-label {
@@ -580,7 +581,7 @@ html.theme-light .showcase-tabs .tab-indicator {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -595,14 +596,14 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .showcase-top-row .showcase-tabs.height-tabs {
-  flex: 0 0 155px;
-  width: 155px;
+  flex: 0 0 115px;
+  width: 115px;
   box-sizing: border-box;
 }
 
 .showcase-top-row .showcase-tabs.height-tabs .tab-btn {
   flex: 1;
-  padding: 8px 0;
+  padding: 6px 0;
   text-align: center;
 }
 
