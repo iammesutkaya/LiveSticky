@@ -591,16 +591,19 @@ html.theme-light .showcase-tabs .tab-indicator {
 
 .showcase-top-row .showcase-tabs:first-child {
   flex: 1;
+  min-width: 0;
 }
 
 .showcase-top-row .showcase-tabs.height-tabs {
-  flex: 0 0 auto;
-  width: auto;
+  flex: 0 0 155px;
+  width: 155px;
+  box-sizing: border-box;
 }
 
 .showcase-top-row .showcase-tabs.height-tabs .tab-btn {
-  flex: none;
-  padding: 8px 14px;
+  flex: 1;
+  padding: 8px 0;
+  text-align: center;
 }
 
 #demo-iframe {
