@@ -489,7 +489,8 @@ html.theme-light .inline-youtube { background: #cc0000; }
   color: var(--text-muted);
   border-radius: 20px;
   transition: color 0.25s ease;
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   text-align: center;
   box-sizing: border-box;
   white-space: nowrap;
@@ -602,7 +603,8 @@ html.theme-light .showcase-tabs .tab-indicator {
 }
 
 .showcase-top-row .showcase-tabs.height-tabs .tab-btn {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 6px 0;
   text-align: center;
   font-size: 0.8rem;

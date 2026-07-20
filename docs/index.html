@@ -48,8 +48,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.136">
-  <link rel="stylesheet" href="landing.css?v=1.1.136">
+  <link rel="stylesheet" href="style.css?v=1.1.137">
+  <link rel="stylesheet" href="landing.css?v=1.1.137">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.136</span>
+          <span class="badge badge-green logo-version">v1.1.137</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -503,11 +503,9 @@
         indicator.className = 'tab-indicator';
         tabs.appendChild(indicator);
       }
-      const btnRect = btn.getBoundingClientRect();
-      const tabsRect = tabs.getBoundingClientRect();
 
-      const left = btnRect.left - tabsRect.left;
-      const width = btnRect.width;
+      const left = btn.offsetLeft;
+      const width = btn.offsetWidth;
 
       indicator.style.transform = `translateX(${left}px)`;
       indicator.style.width = `${width}px`;
