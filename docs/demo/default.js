@@ -9,20 +9,16 @@
           <span class="vc-sep" style="display:none">·</span>
           <span class="vc-up" style="display:none"></span>
         </span>
+        <span class="reddit-thread-chip hidden" role="button" aria-label="Join live discussion thread on Reddit" title="Join live discussion thread on Reddit">
+          <svg class="rtc-icon" width="13" height="12" viewBox="0 0 19.21 16.8" fill="currentColor">
+            <path d="M13.99,0c1.1,0,2,.89,2,2s-.9,2-2,2c-.95,0-1.74-.66-1.95-1.54h0c-1.15.16-2.03,1.15-2.03,2.34h0c1.78.07,3.4.57,4.69,1.37.47-.36,1.06-.58,1.71-.58,1.55,0,2.8,1.25,2.8,2.8,0,1.12-.66,2.08-1.6,2.53-.09,3.26-3.64,5.88-8,5.88S1.71,14.18,1.61,10.93c-.95-.45-1.61-1.41-1.61-2.54,0-1.55,1.26-2.8,2.8-2.8.64,0,1.24.22,1.71.59,1.27-.79,2.88-1.29,4.64-1.36h0c0-1.67,1.26-3.04,2.88-3.22C12.22.68,13.03,0,13.99,0ZM5.91,8.38c-.78,0-1.46.78-1.51,1.8-.05,1.02.64,1.43,1.43,1.43s1.37-.37,1.42-1.39c.05-1.02-.55-1.84-1.34-1.84ZM13.31,8.38c-.79,0-1.39.82-1.34,1.84.05,1.02.63,1.39,1.42,1.39s1.47-.41,1.43-1.43c-.05-1.02-.72-1.8-1.51-1.8ZM9.61,12.39c-.97,0-1.91.05-2.77.14-.15.02-.24.17-.18.31.48,1.15,1.62,1.96,2.95,1.96s2.47-.81,2.95-1.96c.06-.14-.04-.29-.18-.31-.86-.09-1.8-.14-2.77-.14Z"/>
+          </svg>
+          <span class="rtc-num">0</span>
+        </span>
       </div>
       <div class="stream-card-info">
-        <div class="info-top">
-          <div class="stream-card-title"></div>
-          <div class="meta-text meta-cat"></div>
-        </div>
-        <div class="info-bottom">
-          <span class="reddit-thread-chip hidden" role="button" aria-label="Join live discussion thread on Reddit" title="Join live discussion thread on Reddit">
-            <svg class="rtc-icon" width="13" height="12" viewBox="0 0 19.21 16.8" fill="currentColor">
-              <path d="M13.99,0c1.1,0,2,.89,2,2s-.9,2-2,2c-.95,0-1.74-.66-1.95-1.54h0c-1.15.16-2.03,1.15-2.03,2.34h0c1.78.07,3.4.57,4.69,1.37.47-.36,1.06-.58,1.71-.58,1.55,0,2.8,1.25,2.8,2.8,0,1.12-.66,2.08-1.6,2.53-.09,3.26-3.64,5.88-8,5.88S1.71,14.18,1.61,10.93c-.95-.45-1.61-1.41-1.61-2.54,0-1.55,1.26-2.8,2.8-2.8.64,0,1.24.22,1.71.59,1.27-.79,2.88-1.29,4.64-1.36h0c0-1.67,1.26-3.04,2.88-3.22C12.22.68,13.03,0,13.99,0ZM5.91,8.38c-.78,0-1.46.78-1.51,1.8-.05,1.02.64,1.43,1.43,1.43s1.37-.37,1.42-1.39c.05-1.02-.55-1.84-1.34-1.84ZM13.31,8.38c-.79,0-1.39.82-1.34,1.84.05,1.02.63,1.39,1.42,1.39s1.47-.41,1.43-1.43c-.05-1.02-.72-1.8-1.51-1.8ZM9.61,12.39c-.97,0-1.91.05-2.77.14-.15.02-.24.17-.18.31.48,1.15,1.62,1.96,2.95,1.96s2.47-.81,2.95-1.96c.06-.14-.04-.29-.18-.31-.86-.09-1.8-.14-2.77-.14Z"/>
-            </svg>
-            <span class="rtc-num">0</span>
-          </span>
-        </div>
+        <div class="stream-card-title"></div>
+        <div class="meta-text meta-cat"></div>
       </div>
     </div>`,s.addEventListener("click",f=>{f.preventDefault();const u=qn(e.platform);u&&me(u)});const o=s.querySelector(".reddit-thread-chip");return o&&o.addEventListener("click",f=>{f.preventDefault(),f.stopPropagation(),Xe&&me(Xe)}),s}function Dt(e){const t=K.querySelector(`[data-platform="${e.platform}"]`);if(!t)return;t.querySelector(".stream-card-title").textContent=e.title||"Live Stream",t.querySelector(".vc-num").textContent=dt(e.viewers);const n=t.querySelector(".vc-up"),s=t.querySelector(".vc-sep"),r=t.querySelector(".meta-cat"),i=e.game||"",o=e.uptime||"";r&&(r.textContent=i,r.style.display=i?"":"none"),n&&(n.textContent=o,n.style.display=o?"":"none"),s&&(s.style.display=o?"":"none");const f=t.querySelector(".thumb"),u=t.querySelector(".thumb-img"),h=(e.thumbnail||"").replace("{width}","480").replace("{height}","270");if(!h){u.style.display="none",u.dataset.src="",f&&f.classList.remove("skeleton");return}if(u.dataset.src===h&&u.style.display==="block"){f&&f.classList.remove("skeleton");return}if(u.dataset.src=h,vt.has(h)){const p=vt.get(h);if(p){u.src=p,u.style.display="block",f&&f.classList.remove("skeleton");return}}f&&f.classList.add("skeleton"),ms(h).then(p=>{u.dataset.src===h&&(p?(u.src=p,u.style.display="block",f&&f.classList.remove("skeleton")):(u.style.display="none",f&&f.classList.remove("skeleton")))})}let pe=0,gt=new URLSearchParams(window.location.search).get("heightMode"),Ct=[];window.addEventListener("message",e=>{if(e.data&&e.data.type==="heightMode"){if(gt===e.data.heightMode)return;gt=e.data.heightMode,ct="",Ct.length>0&&(qt(Ct),K&&(K.style.animation="none",K.offsetHeight,K.style.animation="fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)"))}});function qt(e){const t=e.length>1,n=gt?gt==="compact":window.innerHeight<=380,s=e.map(r=>r.platform).join(",")+(t?n?`|compact:${pe}`:"|tall":n?"|single:compact":"|single:tall");if(pe>=e.length&&(pe=0),s!==ct){if(K.innerHTML="",!t)K.appendChild(En(e[0],!0));else if(n){const r=document.createElement("div");r.className="platform-selector-chips",r.role="tablist",r.ariaLabel="Select live stream platform",e.forEach((u,h)=>{const p=document.createElement("button");p.type="button",p.className=`platform-chip platform-${u.platform}${h===pe?" active":""}`,p.role="tab",p.ariaSelected=h===pe?"true":"false";const d=Wn[u.platform]||u.platform,c=fo[u.platform]||"",E=dt(u.viewers);p.innerHTML=`
           <span class="chip-logo">${c}</span>
