@@ -49,8 +49,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.170">
-  <link rel="stylesheet" href="landing.css?v=1.1.170">
+  <link rel="stylesheet" href="style.css?v=1.1.171">
+  <link rel="stylesheet" href="landing.css?v=1.1.171">
 </head>
 
 <body>
@@ -107,7 +107,7 @@
               <img src="icon.png?v=2" alt="LiveSticky Logo" class="logo-image" width="64" height="64">
             </div>
           </div>
-          <span class="badge badge-green logo-version">v1.1.170</span>
+          <span class="badge badge-green logo-version">v1.1.171</span>
         </div>
         <h1>LiveSticky</h1>
         <a href="https://www.reddit.com/user/iammesutkaya" target="_blank" rel="noopener noreferrer"
@@ -181,16 +181,16 @@
           </div>
 
           <div class="tab-nav showcase-tabs height-tabs" role="tablist" aria-label="Showcase frame height">
-            <button class="tab-btn active" id="heightTallBtn" role="tab" aria-selected="true"
-              onclick="setDashboardHeight('tall', this)" title="512px Tall View">512</button>
-            <button class="tab-btn" id="heightCompactBtn" role="tab" aria-selected="false"
+            <button class="tab-btn active" id="heightCompactBtn" role="tab" aria-selected="true"
               onclick="setDashboardHeight('compact', this)" title="320px Compact View">320</button>
+            <button class="tab-btn" id="heightTallBtn" role="tab" aria-selected="false"
+              onclick="setDashboardHeight('tall', this)" title="512px Tall View">512</button>
           </div>
         </div>
 
-        <div class="showcase-stage">
-          <div class="showcase-container">
-            <iframe id="demo-iframe" src="demo/index.html?mock=multistream" title="LiveSticky Demo Dashboard"></iframe>
+        <div class="showcase-stage compact-mode">
+          <div class="showcase-container compact-mode">
+            <iframe id="demo-iframe" src="demo/index.html?mock=multistream&heightMode=compact" title="LiveSticky Demo Dashboard"></iframe>
           </div>
         </div>
       </section>
@@ -520,7 +520,7 @@
       indicator.style.width = `${width}px`;
     }
 
-    let activeHeightMode = 'tall';
+    let activeHeightMode = 'compact';
 
     function setDashboardView(view, btn) {
       if (btn.classList.contains('active')) return;
