@@ -12,7 +12,7 @@
     "publish:public": "bash scripts/release.sh --public"
   },
   "dependencies": {
-    "@devvit/public-api": "0.13.8",
+    "@devvit/public-api": "0.13.9",
     "@devvit/web": "0.13.8",
     "express": "^4.21.0"
   },
