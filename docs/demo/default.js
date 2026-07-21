@@ -14,8 +14,7 @@
       <span class="rtc-score-wrap" style="display:none">
         <span class="rtc-score">0</span>
         <svg class="rtc-up-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m5 12 7-7 7 7"/>
-          <path d="M12 19V5"/>
+          <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
         </svg>
       </span>
     </span>`;s.innerHTML=`
