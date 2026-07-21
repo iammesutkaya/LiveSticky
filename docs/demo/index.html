@@ -56,10 +56,13 @@
           <h1 id="display-name" class="display-name">Streamer</h1>
           <div id="header-sub" class="header-sub" aria-live="polite"></div>
         </div>
-        <div id="status-indicator" class="status-indicator offline"
-             role="status" aria-live="polite" aria-label="Stream status: offline">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span id="status-label" class="status-label">OFFLINE</span>
+        <div class="header-status-wrap">
+          <div id="status-indicator" class="status-indicator offline"
+               role="status" aria-live="polite" aria-label="Stream status: offline">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-label" class="status-label">OFFLINE</span>
+          </div>
+          <span id="header-uptime" class="header-uptime hidden"></span>
         </div>
       </header>
 
