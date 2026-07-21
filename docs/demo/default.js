@@ -8,7 +8,7 @@
       <span class="rtc-comments-wrap">
         <span class="rtc-num">0</span>
         <svg class="rtc-msg-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
         </svg>
       </span>
       <span class="rtc-score-wrap" style="display:none">
