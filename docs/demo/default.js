@@ -7,13 +7,13 @@
       </span>
       <span class="rtc-comments-wrap">
         <span class="rtc-num">0</span>
-        <svg class="rtc-msg-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="rtc-msg-icon" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
         </svg>
       </span>
       <span class="rtc-score-wrap" style="display:none">
         <span class="rtc-score">0</span>
-        <svg class="rtc-up-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="rtc-up-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
         </svg>
       </span>
