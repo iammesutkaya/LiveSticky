@@ -14,7 +14,7 @@
   "dependencies": {
     "@devvit/public-api": "0.13.9",
     "@devvit/web": "0.13.9",
-    "express": "^4.21.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@devvit/start": "0.13.9",
