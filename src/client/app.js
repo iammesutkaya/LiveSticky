@@ -13,10 +13,21 @@ import { formatTimeAgo, formatNumber } from './utils.js';
 
 let isNavigating = false;
 function safeNavigateTo(url) {
-  if (isNavigating) return;
+  if (!url || isNavigating) return;
   isNavigating = true;
-  navigateTo(url);
-  setTimeout(() => { isNavigating = false; }, 1000);
+  let devvitHandled = false;
+  try {
+    if (typeof navigateTo === 'function') {
+      navigateTo(url);
+      devvitHandled = true;
+    }
+  } catch (err) {
+    devvitHandled = false;
+  }
+  if (!devvitHandled) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+  setTimeout(() => { isNavigating = false; }, 800);
 }
 // ---------------------------------------------------------------------------
 // Platform metadata
@@ -220,11 +231,25 @@ async function fetchProxiedImage(cdnUrl) {
   }
 }
 
+const MAX_THUMB_CACHE_SIZE = 20;
+
 /** Cached proxy fetch for thumbnails - one blob per distinct CDN url. */
 async function getThumbBlob(cdnUrl) {
   if (thumbBlobCache.has(cdnUrl)) return thumbBlobCache.get(cdnUrl);
   const blob = await fetchProxiedImage(cdnUrl);
-  if (blob) thumbBlobCache.set(cdnUrl, blob);
+  if (blob) {
+    if (thumbBlobCache.size >= MAX_THUMB_CACHE_SIZE) {
+      const oldestKey = thumbBlobCache.keys().next().value;
+      if (oldestKey) {
+        const oldBlobUrl = thumbBlobCache.get(oldestKey);
+        if (oldBlobUrl && oldBlobUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(oldBlobUrl);
+        }
+        thumbBlobCache.delete(oldestKey);
+      }
+    }
+    thumbBlobCache.set(cdnUrl, blob);
+  }
   return blob;
 }
 
@@ -326,40 +351,75 @@ function platformsFromData(data) {
 // ---------------------------------------------------------------------------
 
 function buildCard(p, cinematic) {
-  const card = document.createElement('div');
+  const url = platformUrl(p.platform) || '#';
+  const card = document.createElement('a');
+  card.href = url;
+  card.target = '_blank';
+  card.rel = 'noopener noreferrer';
   card.className = `stream-card${cinematic ? ' cinematic' : ''}`;
   card.dataset.platform = p.platform;
   const name = PLATFORM_NAME[p.platform] || p.platform;
   const logo = PLATFORM_LOGO[p.platform] || '';
 
+  const chipHtml = `
+    <span class="reddit-thread-chip hidden" role="button" aria-label="Join live discussion thread on Reddit" title="Join live discussion thread on Reddit">
+      <span class="rtc-badge" aria-hidden="true">
+        <svg class="rtc-icon" width="10" height="9" viewBox="0 0 19.21 16.8" fill="currentColor">
+          <path d="M13.99,0c1.1,0,2,.89,2,2s-.9,2-2,2c-.95,0-1.74-.66-1.95-1.54h0c-1.15.16-2.03,1.15-2.03,2.34h0c1.78.07,3.4.57,4.69,1.37.47-.36,1.06-.58,1.71-.58,1.55,0,2.8,1.26,2.8,2.8,0,1.12-.66,2.08-1.6,2.53-.09,3.26-3.64,5.88-8,5.88S1.71,14.18,1.61,10.93c-.95-.45-1.61-1.41-1.61-2.54,0-1.55,1.26-2.8,2.8-2.8.64,0,1.24.22,1.71.59,1.27-.79,2.88-1.29,4.64-1.36h0c0-1.67,1.26-3.04,2.88-3.22C12.22.68,13.03,0,13.99,0ZM5.91,8.38c-.78,0-1.46.78-1.51,1.8-.05,1.02.64,1.43,1.43,1.43s1.37-.37,1.42-1.39c.05-1.02-.55-1.84-1.34-1.84ZM13.31,8.38c-.79,0-1.39.82-1.34,1.84.05,1.02.63,1.39,1.42,1.39s1.47-.41,1.43-1.43c-.05-1.02-.72-1.8-1.51-1.8ZM9.61,12.39c-.97,0-1.91.05-2.77.14-.15.02-.24.17-.18.31.48,1.15,1.62,1.96,2.95,1.96s2.47-.81,2.95-1.96c.06-.14-.04-.29-.18-.31-.86-.09-1.8-.14-2.77-.14Z"/>
+        </svg>
+      </span>
+      <span class="rtc-comments-wrap">
+        <span class="rtc-num">0</span>
+        <svg class="rtc-msg-icon" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+        </svg>
+      </span>
+      <span class="rtc-score-wrap" style="display:none">
+        <span class="rtc-score">0</span>
+        <svg class="rtc-up-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
+        </svg>
+      </span>
+    </span>`;
+
   card.innerHTML = `
     <div class="stream-card-main">
-      <div class="thumb platform-${p.platform}">
+      <div class="thumb platform-${p.platform} skeleton">
         <img alt="" class="thumb-img" style="display:none">
-        <div class="pulse-ring"></div>
-        <span class="platform-badge platform-${p.platform}">${logo}</span>
+        <span class="platform-badge platform-${p.platform}">${logo}<span class="pb-name">${name}</span></span>
+        <span class="viewer-chip">
+          <svg class="vc-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="vc-num">0</span>
+        </span>
+        ${cinematic ? chipHtml : ''}
       </div>
       <div class="stream-card-info">
-        <div class="stream-card-title"></div>
-        <div class="stream-card-meta">
-          <span class="viewer-chip"><span class="vc-num">0</span><span class="vc-label">viewers</span></span>
-          <span class="meta-text meta-cat"></span>
-          <span class="meta-sep">·</span>
-          <span class="meta-text meta-up"></span>
+        <div class="info-top">
+          <div class="stream-card-title"></div>
+          <div class="meta-text meta-cat"></div>
         </div>
+        ${!cinematic ? `
+          <div class="info-bottom">
+            <span class="rtc-label">Join the live thread</span>
+            ${chipHtml}
+          </div>` : ''}
       </div>
-    </div>
-    <a class="watch-btn platform-${p.platform}" href="#" aria-label="Watch on ${name}">
-      <span class="wb-logo">${logo}</span>
-      <span>Watch on ${name}</span>
-      <span class="wb-arrow">${ARROW_SVG}</span>
-    </a>`;
+    </div>`;
 
   card.addEventListener('click', (e) => {
     e.preventDefault();
-    const url = platformUrl(p.platform);
-    if (url) safeNavigateTo(url);
+    const targetUrl = platformUrl(p.platform);
+    if (targetUrl) safeNavigateTo(targetUrl);
   });
+
+  const threadChip = card.querySelector('.reddit-thread-chip');
+  if (threadChip) {
+    threadChip.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (redditThreadUrl) safeNavigateTo(redditThreadUrl);
+    });
+  }
 
   return card;
 }
@@ -372,84 +432,256 @@ function updateCard(p) {
   card.querySelector('.vc-num').textContent = formatNumber(p.viewers);
 
   const cat = card.querySelector('.meta-cat');
-  const sep = card.querySelector('.meta-sep');
-  const up = card.querySelector('.meta-up');
   const game = p.game || '';
-  const uptime = p.uptime || '';
-  cat.textContent = game;
-  up.textContent = uptime;
-  cat.style.display = game ? '' : 'none';
-  up.style.display = uptime ? '' : 'none';
-  sep.style.display = game && uptime ? '' : 'none';
 
-  // Watch button destination
-  const url = platformUrl(p.platform);
-  const watch = card.querySelector('.watch-btn');
-  if (url) watch.href = url;
+  if (cat) {
+    cat.textContent = game;
+    cat.style.display = game ? '' : 'none';
+  }
 
   // Thumbnail - Twitch URLs carry {width}x{height} placeholders.
+  const thumbContainer = card.querySelector('.thumb');
   const img = card.querySelector('.thumb-img');
-  const pulse = card.querySelector('.pulse-ring');
   const cdnSrc = (p.thumbnail || '').replace('{width}', '480').replace('{height}', '270');
   if (!cdnSrc) {
     img.style.display = 'none';
     img.dataset.src = '';
-    if (pulse) pulse.style.display = '';
+    if (thumbContainer) thumbContainer.classList.remove('skeleton');
     return;
   }
-  if (img.dataset.src === cdnSrc) return; // already loaded/loading this exact url
+  if (img.dataset.src === cdnSrc && img.style.display === 'block') {
+    if (thumbContainer) thumbContainer.classList.remove('skeleton');
+    return; // already rendered
+  }
   img.dataset.src = cdnSrc;
+
+  // Synchronous cache hit check to eliminate thumbnail flickering when switching demo sizes/views
+  if (thumbBlobCache.has(cdnSrc)) {
+    const cachedBlobUrl = thumbBlobCache.get(cdnSrc);
+    if (cachedBlobUrl) {
+      img.src = cachedBlobUrl;
+      img.style.display = 'block';
+      if (thumbContainer) thumbContainer.classList.remove('skeleton');
+      return;
+    }
+  }
+
+  if (thumbContainer) thumbContainer.classList.add('skeleton');
+
   getThumbBlob(cdnSrc).then((blobUrl) => {
     if (img.dataset.src !== cdnSrc) return; // url changed while fetching
     if (blobUrl) {
-      img.onload = () => { 
-        img.style.display = 'block'; 
-        if (pulse) pulse.style.display = 'none';
-      };
       img.src = blobUrl;
+      img.style.display = 'block';
+      if (thumbContainer) thumbContainer.classList.remove('skeleton');
     } else {
       img.style.display = 'none';
-      if (pulse) pulse.style.display = '';
+      if (thumbContainer) thumbContainer.classList.remove('skeleton');
     }
   });
 }
 
+let activePlatformIndex = 0;
+let forcedHeightMode = new URLSearchParams(window.location.search).get('heightMode');
+let currentPlatforms = [];
+
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'heightMode') {
+    if (forcedHeightMode === e.data.heightMode) return;
+    forcedHeightMode = e.data.heightMode;
+    lastListSignature = '';
+    if (currentPlatforms.length > 0) {
+      renderPlatformList(currentPlatforms);
+      if (platformListEl) {
+        platformListEl.style.animation = 'none';
+        void platformListEl.offsetHeight;
+        platformListEl.style.animation = 'fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+    }
+  }
+});
+
 function renderPlatformList(platforms) {
-  const cinematic = platforms.length === 1;
-  const signature = platforms.map((p) => p.platform).join(',') + (cinematic ? '|c' : '');
+  const isMultistream = platforms.length > 1;
+  const isCompactLayout = forcedHeightMode
+    ? (forcedHeightMode === 'compact')
+    : (window.innerHeight <= 380);
+
+  const signature = platforms.map((p) => p.platform).join(',') + 
+    (isMultistream
+      ? (isCompactLayout ? `|compact:${activePlatformIndex}` : '|tall')
+      : (isCompactLayout ? '|single:compact' : '|single:tall'));
+
+  // Make sure activePlatformIndex stays in bounds if platforms list changes
+  if (activePlatformIndex >= platforms.length) {
+    activePlatformIndex = 0;
+  }
 
   if (signature !== lastListSignature) {
     platformListEl.innerHTML = '';
-    platforms.forEach((p) => platformListEl.appendChild(buildCard(p, cinematic)));
+
+    if (!isMultistream) {
+      // Single live platform: ALWAYS use cinematic 16:9 hero layout!
+      platformListEl.appendChild(buildCard(platforms[0], true));
+    } else if (isCompactLayout) {
+      // Multistream + Compact Mode (320px): Chips on TOP, Hero card (standard card without watch bar) BELOW
+      const chipsEl = document.createElement('div');
+      chipsEl.className = 'platform-selector-chips';
+      chipsEl.role = 'tablist';
+      chipsEl.ariaLabel = 'Select live stream platform';
+
+      platforms.forEach((p, idx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `platform-chip platform-${p.platform}${idx === activePlatformIndex ? ' active' : ''}`;
+        chip.role = 'tab';
+        chip.ariaSelected = idx === activePlatformIndex ? 'true' : 'false';
+
+        const name = PLATFORM_NAME[p.platform] || p.platform;
+        const logo = PLATFORM_LOGO[p.platform] || '';
+        const viewersFormatted = formatNumber(p.viewers);
+
+        chip.innerHTML = `
+          <span class="chip-logo">${logo}</span>
+          <span class="chip-name">${name}</span>
+          <span class="chip-viewers">${viewersFormatted}</span>
+        `;
+
+        chip.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (activePlatformIndex === idx) {
+            // Clicking active chip navigates to watch
+            const url = platformUrl(p.platform);
+            if (url) safeNavigateTo(url);
+            return;
+          }
+          activePlatformIndex = idx;
+          lastListSignature = '';
+          renderPlatformList(platforms);
+        });
+
+        chipsEl.appendChild(chip);
+      });
+
+      platformListEl.appendChild(chipsEl);
+
+      // Hero Card below chips - standard card layout, watch button hidden for compact mode
+      const activePlatform = platforms[activePlatformIndex] || platforms[0];
+      const heroCard = buildCard(activePlatform, false);
+      heroCard.classList.add('compact-hero-card');
+      const watchBtn = heroCard.querySelector('.watch-btn');
+      if (watchBtn) watchBtn.style.display = 'none';
+      platformListEl.appendChild(heroCard);
+    } else {
+      // Multistream + Tall Mode (512px): render ALL platforms as cards!
+      platforms.forEach((p) => {
+        platformListEl.appendChild(buildCard(p, false));
+      });
+    }
+
     lastListSignature = signature;
   }
 
-  platforms.forEach(updateCard);
+  // Update card data & thumbnails
+  if (!isMultistream) {
+    updateCard(platforms[0]);
+  } else if (isCompactLayout) {
+    const activePlatform = platforms[activePlatformIndex] || platforms[0];
+    updateCard(activePlatform);
+
+    // Update chip viewer counts in place
+    platforms.forEach((p, idx) => {
+      const chip = platformListEl.querySelectorAll('.platform-chip')[idx];
+      if (chip) {
+        const vEl = chip.querySelector('.chip-viewers');
+        if (vEl) vEl.textContent = formatNumber(p.viewers);
+      }
+    });
+  } else {
+    // Tall layout: update all cards
+    platforms.forEach((p) => {
+      updateCard(p);
+    });
+  }
+
+  updateRedditThread(currentState);
 }
 
+// Re-evaluate platform list layout on window resize
+window.addEventListener('resize', () => {
+  if (currentPlatforms.length > 0) {
+    lastListSignature = '';
+    renderPlatformList(currentPlatforms);
+  }
+});
+
 // ---------------------------------------------------------------------------
-// Reddit live-thread row
+// Reddit live-thread chip
 // ---------------------------------------------------------------------------
 
 function updateRedditThread(data) {
-  if (!redditThreadEl) return;
+  const isCompactLayout = forcedHeightMode
+    ? (forcedHeightMode === 'compact')
+    : (window.innerHeight <= 380);
+
+  const chips = platformListEl ? platformListEl.querySelectorAll('.reddit-thread-chip') : [];
+
   if (data.isLive && data.livePostId) {
     const postId = String(data.livePostId).replace(/^t3_/, '');
     redditThreadUrl = `https://www.reddit.com/comments/${postId}`;
-    redditThreadEl.href = redditThreadUrl;
 
-    const parts = [];
     const comments = Number(data.postComments) || 0;
     const score = Number(data.postScore) || 0;
-    if (comments > 0) parts.push(`${formatNumber(comments)} comment${comments === 1 ? '' : 's'}`);
-    if (score > 0) parts.push(`${formatNumber(score)} upvote${score === 1 ? '' : 's'}`);
-    if (redditThreadMetaEl) redditThreadMetaEl.textContent = parts.join(' · ');
 
-    redditThreadEl.classList.remove('hidden');
+    if (isCompactLayout) {
+      // Compact (320px) mode: show integrated round pill chip inside card, hide standalone button
+      if (platformListEl) {
+        platformListEl.querySelectorAll('.info-bottom').forEach(el => el.style.display = '');
+      }
+      const countText = formatNumber(comments);
+      const ariaLabel = `Reddit live discussion thread: ${comments} comment${comments === 1 ? '' : 's'}${score > 0 ? `, ${score} upvote${score === 1 ? '' : 's'}` : ''}`;
+      chips.forEach(chip => {
+        chip.href = redditThreadUrl;
+        chip.setAttribute('aria-label', ariaLabel);
+        chip.setAttribute('title', ariaLabel);
+        const numEl = chip.querySelector('.rtc-num');
+        if (numEl) numEl.textContent = countText;
+
+        const scoreWrap = chip.querySelector('.rtc-score-wrap');
+        const scoreEl = chip.querySelector('.rtc-score');
+        if (scoreWrap && scoreEl) {
+          if (score > 0) {
+            scoreEl.textContent = formatNumber(score);
+            scoreWrap.style.display = 'inline-flex';
+          } else {
+            scoreWrap.style.display = 'none';
+          }
+        }
+        chip.classList.remove('hidden');
+      });
+      if (redditThreadEl) redditThreadEl.classList.add('hidden');
+    } else {
+      // Tall (512px) mode: hide in-card CTA (.info-bottom), show standalone CTA button below
+      if (platformListEl) {
+        platformListEl.querySelectorAll('.info-bottom').forEach(el => el.style.display = 'none');
+      }
+      chips.forEach(chip => chip.classList.add('hidden'));
+      if (redditThreadEl) {
+        redditThreadEl.href = redditThreadUrl;
+        const parts = [];
+        parts.push(`${formatNumber(comments)} comment${comments === 1 ? '' : 's'}`);
+        if (score > 0) parts.push(`${formatNumber(score)} upvote${score === 1 ? '' : 's'}`);
+        if (redditThreadMetaEl) redditThreadMetaEl.textContent = parts.join('   ');
+        redditThreadEl.classList.remove('hidden');
+      }
+    }
   } else {
     redditThreadUrl = null;
-    if (redditThreadMetaEl) redditThreadMetaEl.textContent = '';
-    redditThreadEl.classList.add('hidden');
+    chips.forEach(chip => chip.classList.add('hidden'));
+    if (redditThreadEl) {
+      if (redditThreadMetaEl) redditThreadMetaEl.textContent = '';
+      redditThreadEl.classList.add('hidden');
+    }
   }
 }
 
@@ -511,15 +743,19 @@ function updateDashboard(data) {
   }
 
   const platforms = platformsFromData(data);
+  currentPlatforms = platforms;
 
-  // Header subtitle - live: how/where they're streaming; offline: last-live time
+  // Header subtitle - live: how/where they're streaming + uptime; offline: last-live time
   if (headerSubEl) {
+    const activeUptime = isNowLive && platforms.length > 0 ? (platforms[0].uptime || data.uptime || '') : '';
+    const uptimeSuffix = activeUptime ? `  •  ${activeUptime}` : '';
+
     if (isNowLive && platforms.length > 1) {
-      headerSubEl.textContent = `Live on ${platforms.length} platforms`;
+      headerSubEl.textContent = `Live on ${platforms.length} platforms${uptimeSuffix}`;
     } else if (isNowLive && platforms.length === 1) {
-      headerSubEl.textContent = `Live on ${PLATFORM_NAME[platforms[0].platform] || 'stream'}`;
+      headerSubEl.textContent = `Live on ${PLATFORM_NAME[platforms[0].platform] || 'stream'}${uptimeSuffix}`;
     } else if (isNowLive) {
-      headerSubEl.textContent = 'Live now';
+      headerSubEl.textContent = `Live now${uptimeSuffix}`;
     } else {
       const ago = formatTimeAgo(data.lastLiveAt);
       headerSubEl.textContent = ago ? `Last live ${ago}` : 'Offline';
@@ -541,7 +777,7 @@ function updateDashboard(data) {
     if (offlineSubtextEl) {
       const hasChannels = config.twitchUrl || config.youtubeUrl || config.kickUrl;
       offlineSubtextEl.textContent = hasChannels
-        ? 'Follow below to get notified when the stream goes live.'
+        ? 'Follow below to get notified when live.'
         : 'Check back soon!';
     }
   }
@@ -698,6 +934,7 @@ async function init() {
   const linkWebsite = $('link-website');
   const linkReddit = $('link-reddit');
   const linkVersion = $('link-version');
+  const linkAuthor = $('link-author');
 
   if (aboutTrigger && aboutModal && closeModalBtn) {
     // Remember what had focus so we can restore it when the modal closes.
@@ -737,13 +974,19 @@ async function init() {
   if (linkReddit) {
     linkReddit.addEventListener('click', (e) => {
       e.preventDefault();
-      safeNavigateTo('https://livesticky.com/about');
+      safeNavigateTo('https://developers.reddit.com/apps/live-sticky');
     });
   }
   if (linkVersion) {
     linkVersion.addEventListener('click', (e) => {
       e.preventDefault();
       safeNavigateTo('https://developers.reddit.com/apps/live-sticky');
+    });
+  }
+  if (linkAuthor) {
+    linkAuthor.addEventListener('click', (e) => {
+      e.preventDefault();
+      safeNavigateTo('https://www.reddit.com/user/iammesutkaya');
     });
   }
 }

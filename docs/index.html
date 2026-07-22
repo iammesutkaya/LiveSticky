@@ -536,7 +536,12 @@
       const demoIframe = document.getElementById('demo-iframe');
       if (demoIframe) {
         const currentTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
-        demoIframe.src = `demo/index.html?mock=${view}&theme=${currentTheme}&heightMode=${activeHeightMode}`;
+        const targetUrl = `demo/index.html?mock=${view}&theme=${currentTheme}&heightMode=${activeHeightMode}`;
+        if (demoIframe.contentWindow) {
+          demoIframe.contentWindow.location.replace(targetUrl);
+        } else {
+          demoIframe.src = targetUrl;
+        }
       }
 
       updateTabIndicator(btn);

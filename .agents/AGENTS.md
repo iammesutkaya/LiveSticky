@@ -11,3 +11,6 @@
 # Publishing Constraints
 - Never publish the app to Devvit without the `--public` flag. Always submit public releases so that visibility is never set to unlisted.
 
+# Hover Effects Constraints
+- Do NOT use colored box-shadow glows on hover for buttons, pills, or chips (no glow on hover). Keep hover transitions clean and sleek with background color shifts or subtle translateY transforms without colored drop-shadow glows.
+

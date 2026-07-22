@@ -6,6 +6,10 @@
     "entrypoints": {
       "default": {
         "entry": "index.html",
+        "height": "regular"
+      },
+      "tall": {
+        "entry": "index.html",
         "height": "tall"
       }
     }
@@ -72,6 +76,22 @@
         "defaultValue": false,
         "helpText": "Powers a persistent interactive dashboard post."
       },
+      "dashboardHeight": {
+        "type": "select",
+        "label": "⚙️ Dashboard Post Height",
+        "options": [
+          {
+            "label": "Compact (320px)",
+            "value": "regular"
+          },
+          {
+            "label": "Tall (512px)",
+            "value": "tall"
+          }
+        ],
+        "defaultValue": "regular",
+        "helpText": "Select the height of your interactive dashboard post. Compact (320px) keeps the post extra tight on community feeds. Tall (512px) provides extra visual room."
+      },
       "updateSidebarWidget": {
         "type": "boolean",
         "label": "⚙️ Sidebar Widget",
@@ -124,6 +144,12 @@
         "label": "⚙️ Delete Live Post when Offline",
         "defaultValue": false,
         "helpText": "Deletes the live post and all its comments when the stream ends."
+      },
+      "lockLivePostWhenOffline": {
+        "type": "boolean",
+        "label": "⚙️ Lock Live Thread when Offline",
+        "defaultValue": false,
+        "helpText": "Locks the live post comments when the stream ends so no new comments can be added."
       },
       "offlineGracePeriod": {
         "type": "number",

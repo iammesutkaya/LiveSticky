@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LiveSticky Dashboard</title>
   <script>
+    // If opened directly as top window outside of an iframe, redirect to landing page
+    try {
+      if (window.self === window.top) {
+        window.location.replace('../index.html');
+      }
+    } catch (e) {}
+
     // Immediately set theme based on query parameter or fallback
     const params = new URLSearchParams(window.location.search);
     const theme = params.get('theme');

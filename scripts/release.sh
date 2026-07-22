@@ -34,6 +34,7 @@ VERSION="$EXPLICIT_VERSION"
 echo "📝 Updating webview and website version tags to v${VERSION}..."
 
 # Update webview client source HTML
+sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g" src/client/index.html
 sed -i.bak -E "s|Version [0-9]+\.[0-9]+\.[0-9]+|Version ${VERSION}|g" src/client/index.html
 rm -f src/client/index.html.bak
 
@@ -54,7 +55,7 @@ npm run build
 
 echo "🚀 Publishing to Devvit..."
 # Devvit output will still print the version, but we already applied it
-npx devvit@0.13.7 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr
+npx devvit@0.13.9 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr
 
 # Commit and push. Stage the whole website folder and the client html:
 git add docs src/client/index.html

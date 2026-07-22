@@ -56,7 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const url = new URL(iframe.src, window.location.href);
       url.searchParams.set('theme', currentTheme);
-      iframe.src = url.toString();
+      if (iframe.contentWindow) {
+        iframe.contentWindow.location.replace(url.toString());
+      } else {
+        iframe.src = url.toString();
+      }
     } catch (e) {
       console.error('Error modifying iframe src:', e);
     }

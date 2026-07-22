@@ -202,7 +202,7 @@ const postStreamHighlights = async (
     const templateHeader = customHeader?.trim() || DEFAULT_HIGHLIGHTS_POST_HEADER;
     const header = replaceTemplateVariables(templateHeader, vars, false);
 
-    let body = header;
+    let body = header ? `${header}\n\n` : '';
     topClips.forEach((clip: any, index: number) => {
       const views = clip.view_count !== undefined ? clip.view_count.toLocaleString() : '0';
       const title = clip.title || 'Untitled Clip';
@@ -437,6 +437,7 @@ export const runStatusCheck = async (): Promise<void> => {
     offlineFlairText,
     removeOfflinePost,
     deleteOfflinePost,
+    lockLivePostWhenOffline,
     stickyOfflinePost,
     updateSidebarWidget,
     enableHighlightsPost,
@@ -472,6 +473,7 @@ export const runStatusCheck = async (): Promise<void> => {
     get('offlineFlairText'),
     get<boolean>('removeOfflinePost'),
     get<boolean>('deleteOfflinePost'),
+    get<boolean>('lockLivePostWhenOffline'),
     get<boolean>('stickyOfflinePost'),
     get<boolean>('updateSidebarWidget'),
     get<boolean>('enableHighlightsPost'),
@@ -812,74 +814,88 @@ export const runStatusCheck = async (): Promise<void> => {
     const gracePeriodMin =
       offlineGracePeriod !== undefined && offlineGracePeriod >= 0 ? offlineGracePeriod : 6;
 
+    let shouldCleanup = false;
+    let firstOfflineTime = Date.now();
+
     if (!offlineSince) {
-      await redis.set('offline_since', Date.now().toString());
-      console.log(`Stream detected offline. Starting ${gracePeriodMin}-minute grace period buffer...`);
+      if (gracePeriodMin === 0) {
+        shouldCleanup = true;
+        console.log('Stream detected offline and grace period is 0. Concluding immediately...');
+      } else {
+        await redis.set('offline_since', Date.now().toString());
+        console.log(`Stream detected offline. Starting ${gracePeriodMin}-minute grace period buffer...`);
+      }
     } else {
-      const firstOfflineTime = parseInt(offlineSince, 10);
+      firstOfflineTime = parseInt(offlineSince, 10);
       const elapsedMinutes = (Date.now() - firstOfflineTime) / 60000;
       console.log(
         `Stream is still offline. Grace period active: ${elapsedMinutes.toFixed(1)}m elapsed of ${gracePeriodMin}m.`
       );
 
       if (elapsedMinutes >= gracePeriodMin) {
-        console.log('Grace period expired! Concluding post and unpinning...');
+        shouldCleanup = true;
+      }
+    }
 
-        const postId = await redis.get('live_post_id');
-        const broadcasterId = await redis.get('twitch_broadcaster_id');
-        const startedAt = await redis.get('twitch_started_at');
+    if (shouldCleanup) {
+      console.log('Grace period expired! Concluding post and unpinning...');
 
-        let cleanupSafe = true;
+      const postId = await redis.get('live_post_id');
+      const broadcasterId = await redis.get('twitch_broadcaster_id');
+      const startedAt = await redis.get('twitch_started_at');
 
-        if (enableDynamicFlair) {
-          if (enableDashboard) {
-            const dashPostId = await redis.get('dashboard_post_id');
-            if (dashPostId) await resetDynamicPostFlair(dashPostId, subreddit.name, liveFlairId, offlineFlairText);
-          }
-          if (enableLivePost && postId) {
-            await resetDynamicPostFlair(postId, subreddit.name, liveFlairId, offlineFlairText);
-          }
+      let cleanupSafe = true;
+
+      if (enableDynamicFlair) {
+        if (enableDashboard) {
+          const dashPostId = await redis.get('dashboard_post_id');
+          if (dashPostId) await resetDynamicPostFlair(dashPostId, subreddit.name, liveFlairId, offlineFlairText);
         }
-
-        if (streamerRedditUsername) {
-          try {
-            await reddit.setUserFlair({
-              subredditName: subreddit.name,
-              username: streamerRedditUsername as string,
-              text: (offlineUserFlairText as string) || '',
-            });
-            console.log(`Applied OFFLINE user flair to ${streamerRedditUsername}`);
-          } catch (err) {
-            console.error(`Failed to apply OFFLINE user flair to ${streamerRedditUsername}:`, err);
-          }
-        }
-
         if (enableLivePost && postId) {
-          try {
-            const post = await reddit.getPostById(postId as `t3_${string}`);
-            if (deleteOfflinePost) {
-              console.log(`Deleting post completely: ${postId}`);
-              await post.delete();
-            } else {
-              if (removeOfflinePost) {
-                console.log(`Removing post from feed: ${postId}`);
-                await post.remove();
-              } else {
-                try {
-                  const concludingBody = formatOfflinePostBody(
-                    currentVars,
-                    concludingPostBody,
-                    concludingPostFooter
-                  );
-                  await post.edit({ text: concludingBody });
-                  console.log(`Successfully updated concluding body for post: ${postId}`);
-                } catch (editError) {
-                  console.error('Failed to update concluding body:', editError);
-                }
-                await post.unsticky();
-                console.log(`Successfully unpinned concluding post: ${postId}`);
-              }
+          await resetDynamicPostFlair(postId, subreddit.name, liveFlairId, offlineFlairText);
+        }
+      }
 
+      if (streamerRedditUsername) {
+        try {
+          await reddit.setUserFlair({
+            subredditName: subreddit.name,
+            username: streamerRedditUsername as string,
+            text: (offlineUserFlairText as string) || '',
+          });
+          console.log(`Applied OFFLINE user flair to ${streamerRedditUsername}`);
+        } catch (err) {
+          console.error(`Failed to apply OFFLINE user flair to ${streamerRedditUsername}:`, err);
+        }
+      }
+
+      if (enableLivePost && postId) {
+        try {
+          const post = await reddit.getPostById(postId as `t3_${string}`);
+          if (deleteOfflinePost) {
+            console.log(`Deleting post completely: ${postId}`);
+            await post.delete();
+          } else {
+            if (removeOfflinePost) {
+              console.log(`Removing post from feed: ${postId}`);
+              await post.remove();
+            } else {
+              try {
+                const concludingBody = formatOfflinePostBody(
+                  currentVars,
+                  concludingPostBody,
+                  concludingPostFooter
+                );
+                await post.edit({ text: concludingBody });
+                console.log(`Successfully updated concluding body for post: ${postId}`);
+              } catch (editError) {
+                console.error('Failed to update concluding body:', editError);
+              }
+              await post.unsticky();
+              console.log(`Successfully unpinned concluding post: ${postId}`);
+            }
+
+            if (lockLivePostWhenOffline) {
               try {
                 await post.lock();
                 console.log(`Successfully locked concluding post: ${postId}`);
@@ -887,58 +903,64 @@ export const runStatusCheck = async (): Promise<void> => {
                 console.error('Failed to lock concluding post:', lockError);
               }
             }
-          } catch (e: any) {
-            console.error('Failed to conclude/unsticky/delete/remove post:', e);
-            if (e && e.message && !e.message.toLowerCase().includes('not found')) {
-               cleanupSafe = false;
-            }
+          }
+        } catch (e: any) {
+          console.error('Failed to conclude/unsticky/delete/remove post:', e);
+          const errorStr = String(e?.message || e || '').toLowerCase();
+          const isNotFound =
+            errorStr.includes('not found') ||
+            errorStr.includes('not_found') ||
+            errorStr.includes('notfound') ||
+            errorStr.includes('404');
+          if (!isNotFound) {
+            cleanupSafe = false;
           }
         }
+      }
 
-        if (enableHighlightsPost && broadcasterId && startedAt) {
-          try {
-            const twitchClientId = await get('twitchClientId');
-            const twitchClientSecret = await get('twitchClientSecret');
-            const twitchToken = twitchClientId && twitchClientSecret
-              ? await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis)
-              : null;
+      if (enableHighlightsPost && broadcasterId && startedAt) {
+        try {
+          const twitchClientId = await get('twitchClientId');
+          const twitchClientSecret = await get('twitchClientSecret');
+          const twitchToken = twitchClientId && twitchClientSecret
+            ? await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis)
+            : null;
 
-            if (twitchToken) {
-              await postStreamHighlights(
-                twitchClientId as string,
-                twitchToken,
-                broadcasterId,
-                startedAt,
-                currentVars,
-                highlightsHeader,
-                highlightsFooter,
-                highlightsFlairId,
-                highlightsPostTitle
-              );
-            }
-          } catch (highlightsError) {
-            console.error('Failed to trigger postStreamHighlights:', highlightsError);
+          if (twitchToken) {
+            await postStreamHighlights(
+              twitchClientId as string,
+              twitchToken,
+              broadcasterId,
+              startedAt,
+              currentVars,
+              highlightsHeader,
+              highlightsFooter,
+              highlightsFlairId,
+              highlightsPostTitle
+            );
           }
+        } catch (highlightsError) {
+          console.error('Failed to trigger postStreamHighlights:', highlightsError);
         }
+      }
 
-        if (stickyOfflinePost) {
-          try {
-            await ensureStickyOfflinePost(currentVars, offlinePostBody, offlinePostFooter, offlinePostTitle);
-          } catch (err) {
-            console.error('Failed to ensure sticky offline post:', err);
-          }
+      if (stickyOfflinePost) {
+        try {
+          await ensureStickyOfflinePost(currentVars, offlinePostBody, offlinePostFooter, offlinePostTitle);
+        } catch (err) {
+          console.error('Failed to ensure sticky offline post:', err);
         }
+      }
 
-        if (cleanupSafe) {
-          // Record when the stream actually went offline (first offline detection)
-          await redis.set('last_live_at', new Date(firstOfflineTime).toISOString());
-          await redis.del('is_live_pinned');
-          await redis.del('offline_since');
-          await redis.del('live_post_id');
-          await redis.del('twitch_broadcaster_id');
-          await redis.del('twitch_started_at');
-          await redis.del('twitch_stream_title');
-        }
+      if (cleanupSafe) {
+        // Record when the stream actually went offline (first offline detection)
+        await redis.set('last_live_at', new Date(firstOfflineTime).toISOString());
+        await redis.del('is_live_pinned');
+        await redis.del('offline_since');
+        await redis.del('live_post_id');
+        await redis.del('twitch_broadcaster_id');
+        await redis.del('twitch_started_at');
+        await redis.del('twitch_stream_title');
       }
     }
   }
@@ -1021,7 +1043,7 @@ export const runStatusCheck = async (): Promise<void> => {
   // Sync dashboard config keys for the custom post webview
   try {
     await syncDashboardConfig(twitchChannel, youtubeChannel, kickChannel);
-    if (!isLive) {
+    if (currentState === StreamState.OFFLINE) {
       // Keep dashboard_display_name fresh in the offline path so the
       // /api/stream-status endpoint never falls back to the generic 'Streamer'
       // placeholder. twitch_display_name is written on the first live tick and
@@ -1060,19 +1082,37 @@ export const runStatusCheck = async (): Promise<void> => {
       redis.get('last_live_at'),
     ]);
     const realtimeDisplayName =
-      isLive && streamInfo
+      currentState !== StreamState.OFFLINE && streamInfo
         ? streamInfo.user_name || defaultChannel
         : (await redis.get('twitch_display_name')) ?? defaultChannel;
 
     // Per-platform payload (uptime computed fresh at push time).
-    const platforms = liveStreams.map((s) => ({
-      platform: s.platform,
-      title: s.title || '',
-      game: s.game_name || '',
-      viewers: (s.viewer_count ?? 0).toString(),
-      uptime: computeUptime(s.started_at),
-      thumbnail: s.thumbnail_url || '',
-    }));
+    let platforms: any[] = [];
+    if (currentState === StreamState.GRACE_PERIOD) {
+      const cachedLivePlatforms = await redis.get('dashboard_live_platforms');
+      if (cachedLivePlatforms) {
+        try {
+          const parsed = JSON.parse(cachedLivePlatforms);
+          platforms = parsed.map((p: any) => ({
+            platform: p.platform,
+            title: p.title || '',
+            game: p.game || '',
+            viewers: p.viewers || '0',
+            uptime: p.startedAt ? computeUptime(p.startedAt) : p.uptime || '',
+            thumbnail: p.thumbnail || '',
+          }));
+        } catch {}
+      }
+    } else {
+      platforms = liveStreams.map((s) => ({
+        platform: s.platform,
+        title: s.title || '',
+        game: s.game_name || '',
+        viewers: (s.viewer_count ?? 0).toString(),
+        uptime: computeUptime(s.started_at),
+        thumbnail: s.thumbnail_url || '',
+      }));
+    }
 
     // Reddit live-post engagement (comments + score) for the "Join the live
     // thread" row. Fetched once here (not per dashboard poll) and cached so the
@@ -1080,7 +1120,7 @@ export const runStatusCheck = async (): Promise<void> => {
     // relevant - there's nothing to show once the stream concludes.
     let postComments = 0;
     let postScore = 0;
-    if (isLive && cachedLivePostId) {
+    if (currentState !== StreamState.OFFLINE && cachedLivePostId) {
       try {
         const livePost = await reddit.getPostById(cachedLivePostId as `t3_${string}`);
         postComments = livePost.numberOfComments ?? 0;
@@ -1099,19 +1139,39 @@ export const runStatusCheck = async (): Promise<void> => {
       ]);
     }
 
+    const isLiveForRealtime = currentState !== StreamState.OFFLINE;
+    const realtimePlatform = isLiveForRealtime
+      ? (streamInfo?.platform || (await redis.get('dashboard_platform')) || null)
+      : null;
+    const realtimeTitle = isLiveForRealtime
+      ? (streamInfo?.title || (await redis.get('dashboard_title')) || '')
+      : '';
+    const realtimeGame = isLiveForRealtime
+      ? (streamInfo?.game_name || (await redis.get('dashboard_game')) || 'Just Chatting')
+      : 'Just Chatting';
+    const realtimeViewers = isLiveForRealtime
+      ? (streamInfo?.viewer_count?.toString() || (await redis.get('dashboard_viewers')) || '0')
+      : '0';
+    const realtimeStartedAt = isLiveForRealtime
+      ? (streamInfo?.started_at || (await redis.get('dashboard_started_at')) || undefined)
+      : undefined;
+    const realtimeThumbnail = isLiveForRealtime
+      ? (streamInfo?.thumbnail_url || (await redis.get('dashboard_thumbnail')) || '')
+      : '';
+
     await realtime.send('livesticky_dashboard', {
       type: 'status-update' as const,
       data: {
-        isLive,
-        platform: (isLive && streamInfo ? streamInfo.platform : null) ?? null,
+        isLive: isLiveForRealtime,
+        platform: realtimePlatform,
         platforms,
         displayName: realtimeDisplayName,
-        title: isLive && streamInfo ? streamInfo.title ?? '' : '',
-        game: isLive && streamInfo ? streamInfo.game_name ?? '' : '',
-        viewers: isLive && streamInfo ? (streamInfo.viewer_count ?? 0).toString() : '0',
-        uptime: computeUptime(streamInfo?.started_at),
-        thumbnail: isLive && streamInfo ? streamInfo.thumbnail_url ?? '' : '',
-        livePostId: (isLive ? cachedLivePostId : null) ?? null,
+        title: realtimeTitle,
+        game: realtimeGame,
+        viewers: realtimeViewers,
+        uptime: computeUptime(realtimeStartedAt),
+        thumbnail: realtimeThumbnail,
+        livePostId: (isLiveForRealtime ? cachedLivePostId : null) ?? null,
         postComments,
         postScore,
         lastLiveAt: cachedLastLiveAt ?? null,
@@ -1155,21 +1215,30 @@ export const createDashboardPost = async (): Promise<string> => {
   }
 
   const dashboardTitle = await get<string>('dashboardPostTitle') || 'LiveSticky Dashboard';
+  const dashboardHeightRaw = await get<unknown>('dashboardHeight');
+  const dashboardHeight = Array.isArray(dashboardHeightRaw)
+    ? (dashboardHeightRaw[0] as string | undefined)
+    : (dashboardHeightRaw as string | undefined);
+  const val = String(dashboardHeight || 'regular').toLowerCase();
+  const isCompact = val !== 'tall';
+
+  console.log(`Creating dashboard post. heightSetting="${dashboardHeight}", isCompact=${isCompact}`);
 
   const post = await reddit.submitCustomPost({
     subredditName: subreddit.name,
     title: dashboardTitle,
-    entry: 'default',
+    entry: isCompact ? 'default' : 'tall',
     textFallback: { text: dashboardTitle },
-    // Devvit's EntrypointHeight type doesn't accept the bare 'tall' literal, so
-    // the cast is required here (matches the "tall" entrypoint in devvit.json).
-    styles: { height: 'tall' as any },
+    styles: {
+      height: (isCompact ? 'REGULAR' : 'TALL') as any,
+      heightPixels: isCompact ? 320 : 512,
+    } as any,
   });
 
   await redis.set('dashboard_post_id', post.id);
   await pinPostWithFallback(post.id);
   console.log(`Created new LiveSticky Dashboard post: ${post.id}`);
-  return `Dashboard created and stickied: ${dashboardTitle}`;
+  return `Dashboard created (${isCompact ? 'Compact 320px' : 'Tall 512px'}): ${dashboardTitle}`;
 };
 
 export const refreshLiveSticky = async (): Promise<string> => {
@@ -1190,6 +1259,13 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_post_score'),
   ]);
 
+  const dashboardHeightRaw = await get<unknown>('dashboardHeight');
+  const dashboardHeight = Array.isArray(dashboardHeightRaw)
+    ? (dashboardHeightRaw[0] as string | undefined)
+    : (dashboardHeightRaw as string | undefined);
+  const val = String(dashboardHeight || 'regular').toLowerCase();
+  const isCompact = val !== 'tall';
+
   const enableDashboard = await get<boolean>('enableDashboard');
   if (enableDashboard) {
     try {
@@ -1206,5 +1282,5 @@ export const refreshLiveSticky = async (): Promise<string> => {
     console.error('Immediate status check after refresh failed:', e);
   }
 
-  return 'LiveSticky has been refreshed!';
+  return `LiveSticky refreshed!`;
 };
