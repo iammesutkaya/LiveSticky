@@ -767,6 +767,7 @@ body {
   align-self: auto;
   flex: 1;
   min-height: 0;
+  aspect-ratio: auto;
   object-fit: cover;
   border-radius: 0;
 }
@@ -813,8 +814,7 @@ body {
 
 .stream-card.cinematic .stream-card-info {
   padding: 10px 12px;
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -1236,16 +1236,18 @@ body {
 
   .stream-card.cinematic .thumb {
     width: 100%;
-    max-height: 145px;
-    aspect-ratio: 16 / 9;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: auto;
     object-fit: cover;
+    flex: 1;
+    min-height: 0;
   }
 
   .stream-card.cinematic .stream-card-info {
     padding: 6px 10px 8px;
     gap: 2px;
-    flex: 1;
-    min-height: 0;
+    flex: 0 0 auto;
   }
 
   .stream-card.cinematic .stream-card-title {
