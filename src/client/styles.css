@@ -754,6 +754,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 0;
+  gap: 0;
   flex: 1;
   min-height: 0;
 }
@@ -813,6 +814,8 @@ body {
 .stream-card.cinematic .stream-card-info {
   padding: 10px 12px;
   flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
