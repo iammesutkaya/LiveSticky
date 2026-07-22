@@ -21,7 +21,7 @@
     "@types/express": "^5.0.0",
     "typescript": "5.8.3",
     "vite": "^7.3.5",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   },
   "private": true
 }
