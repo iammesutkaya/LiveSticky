@@ -11,9 +11,13 @@
 import { connectRealtime, navigateTo } from '@devvit/web/client';
 import { formatTimeAgo, formatNumber } from './utils.js';
 
+const urlParams = new URLSearchParams(window.location.search);
+const mockMode = urlParams.get('mock');
+const isMockMode = mockMode !== null;
+
 let isNavigating = false;
 function safeNavigateTo(url) {
-  if (!url || isNavigating) return;
+  if (isMockMode || !url || isNavigating) return;
   isNavigating = true;
   let devvitHandled = false;
   try {
@@ -102,9 +106,6 @@ let redditThreadUrl = null;
 // ---------------------------------------------------------------------------
 // Mock Mode Configuration
 // ---------------------------------------------------------------------------
-const urlParams = new URLSearchParams(window.location.search);
-const mockMode = urlParams.get('mock');
-const isMockMode = mockMode !== null;
 
 const MOCK_CONFIG = {
   twitchChannel: 'stickyfox',
