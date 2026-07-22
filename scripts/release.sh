@@ -60,6 +60,9 @@ npx devvit@0.13.9 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr
 # Commit and push. Stage the whole website folder and the client html:
 git add docs src/client/index.html
 git commit -m "chore: bump app and website version to v${VERSION}"
-env -u GITHUB_TOKEN git push
+if ! env -u GITHUB_TOKEN git push 2>/dev/null; then
+  echo "🔑 Retrying git push using GitHub CLI token..."
+  env -u GITHUB_TOKEN git push "https://iammesutkaya:$(gh auth token 2>/dev/null)@github.com/iammesutkaya/LiveSticky.git" main
+fi
 
 echo "🎉 Done! Webview + Website + Devvit → v${VERSION}"
