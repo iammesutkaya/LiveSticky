@@ -71,12 +71,6 @@ rm -f src/client/index.html.bak
 sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g" docs/index.html
 rm -f docs/index.html.bak
 
-if [ -f docs/changelog.html ]; then
-  DASH_VERSION=$(echo "$VERSION" | tr '.' '-')
-  sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g; s|v[0-9]+-[0-9]+-[0-9]+|v${DASH_VERSION}|g" docs/changelog.html
-  rm -f docs/changelog.html.bak
-fi
-
 for page in docs/*.html docs/demo/*.html; do
   # Rewrite existing ".css?v=X.Y.Z" busters and add one to any bare ".css" link.
   sed -i.bak -E "s|(\.css)(\?v=[0-9]+\.[0-9]+\.[0-9]+)?\"|\1?v=${VERSION}\"|g" "$page"
