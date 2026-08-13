@@ -165,7 +165,7 @@
             <tr><td>🔴 Live Sidebar Widget Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the live sidebar widget.</td></tr>
             <tr><td>🎬 Concluding Post Body</td><td>Paragraph</td><td>Body for the concluding post.</td></tr>
             <tr><td>🎬 Concluding Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the concluding post.</td></tr>
-            <tr><td>🎬 Highlights Post Title</td><td>String</td><td>Title for the reused clip compilation post. Set once when the post is first created; Reddit does not allow editing a title afterwards, so avoid per-stream values like {date}.</td></tr>
+            <tr><td>🎬 Highlights Post Title</td><td>String</td><td>Title for the stream highlights post. Supports {stream_display_name}, {stream_title}, and {date}. Note: {date} is automatically ignored when "Reuse Single Highlights Post" is enabled so the master thread title stays timeless.</td></tr>
             <tr><td>🎬 Highlights Post Header Text</td><td>Paragraph</td><td>Intro shown at the top of the clip compilation post, above the newest stream's clips.</td></tr>
             <tr><td>🎬 Highlights Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the clip compilation post.</td></tr>
             <tr><td>🏆 Monthly Top 20 Post Title</td><td>String</td><td>Title for the monthly top-20 clips post. Supports {month} and {stream_display_name}.</td></tr>

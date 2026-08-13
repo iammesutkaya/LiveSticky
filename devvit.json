@@ -545,7 +545,7 @@
           "highlightsPostTitle": {
             "type": "string",
             "label": "🎬 Highlights Post Title",
-            "helpText": "Title for the reused clip compilation post. Set once when the post is first created; Reddit does not allow editing a post title afterwards, so avoid per-stream values like {date}. If empty, the default template is used.",
+            "helpText": "Title for the stream highlights post. Supports {stream_display_name}, {stream_title}, and {date}. Note: {date} is automatically ignored when \"Reuse Single Highlights Post\" is enabled so the master thread title stays timeless.",
             "defaultValue": "🎬 Top Clips - {stream_display_name}"
           },
           "highlightsHeader": {

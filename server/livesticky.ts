@@ -336,7 +336,16 @@ const postStreamHighlights = async (
 
     if (!postId) {
       const templateTitle = customTitle?.trim() || DEFAULT_HIGHLIGHTS_POST_TITLE;
-      const postTitle = replaceTemplateVariables(templateTitle, vars, false);
+      let titleTemplateToUse = templateTitle;
+      if (reusePost) {
+        const stripped = titleTemplateToUse
+          .replace(/\s*\(\s*\{date\}\s*\)/gi, '')
+          .replace(/\s*[-–—,]\s*\{date\}/gi, '')
+          .replace(/\s*\{date\}/gi, '')
+          .trim();
+        titleTemplateToUse = stripped || DEFAULT_HIGHLIGHTS_POST_TITLE;
+      }
+      const postTitle = replaceTemplateVariables(titleTemplateToUse, vars, false);
       const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
       const created = await reddit.submitPost({
         title: safeTitle,

@@ -226,7 +226,7 @@ The stream has concluded. VODs and highlights may be available via the links bel
           <div class="code-container">
             <pre><code>🎬 Top Clips - {stream_display_name}</code></pre>
           </div>
-          <p class="tmpl-note">Title for highlights posts. When <strong>Reuse Single Highlights Post</strong> is enabled, Reddit does not allow editing post titles after creation, so avoid per-stream values like <code>{date}</code>. When disabled (default), a new post is created for each stream session so <code>{date}</code> and <code>{stream_title}</code> can be included freely.</p>
+          <p class="tmpl-note">Title for highlights posts. Supports <code>{stream_display_name}</code>, <code>{stream_title}</code>, and <code>{date}</code>. When <strong>Reuse Single Highlights Post</strong> is enabled, <code>{date}</code> is automatically ignored so the master thread title stays timeless. When disabled (default), a new post is created for each stream session so <code>{date}</code> and <code>{stream_title}</code> are rendered freely.</p>
         </details>
 
         <details class="tmpl-item">
