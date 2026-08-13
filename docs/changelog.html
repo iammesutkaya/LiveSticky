@@ -95,7 +95,7 @@
           <nav aria-label="Jump to a version">
             <span class="changelog-toc-label">Versions</span>
             <ul>
-              <li><a href="#v1-1-242">v1.1.242</a></li>
+              <li><a href="#v1-1-243">v1.1.243</a></li>
             </ul>
           </nav>
         </aside>
@@ -104,13 +104,14 @@
 
         <article class="changelog-entry">
           <div class="changelog-head">
-            <h2 id="v1-1-242">v1.1.242</h2>
+            <h2 id="v1-1-243">v1.1.243</h2>
             <span class="changelog-date">August 2026</span>
           </div>
-          <p>A big update to the stream-highlights feature: the clip compilation is now a single, reused post instead of a fresh post after every stream, plus an optional wiki archive and a new monthly top-20 post.</p>
+          <p>A big update to the stream-highlights feature: support for single reused posts or per-stream posts linked sequentially, plus an optional wiki archive and a new monthly top-20 post.</p>
 
           <h3>Added</h3>
           <ul>
+            <li><strong>Previous Stream Clip Link</strong>: when using per-stream highlights posts (default mode), LiveSticky automatically links to the previous stream's clip post at the bottom of the body. Also available as a <code>{previous_highlights_url}</code> template placeholder.</li>
             <li><strong>Reuse Single Highlights Post</strong> setting (opt-in): recycles a single permanent master clips post after each stream instead of creating a new post every time. Default is off (creates a new highlights post per stream session).</li>
             <li><strong>Wiki Clip Archive</strong> (opt-in): keeps the full clip history on subreddit wiki pages (one for stream clips, one for the monthly top-20) and links to them from the posts. Off by default; requires wiki to be enabled on your subreddit.</li>
             <li><strong>Monthly Top 20 Clips Post</strong>: publishes the 20 most-watched Twitch clips from the previous calendar month. Features an intuitive schedule selector (Start of month, Middle of month, or End of month) and 24h publish time in your configured Streamer Timezone.</li>
