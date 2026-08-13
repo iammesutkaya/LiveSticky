@@ -403,27 +403,24 @@ h1 {
   font-family: monospace;
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .changelog-sidebar .changelog-sidebar-date {
+  display: block;
   font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: var(--text-muted) !important;
   font-weight: 400;
 }
 
 .changelog-sidebar a:hover .changelog-ver,
 .changelog-sidebar a.is-active .changelog-ver {
-  color: var(--accent-gold, currentColor);
-}
-
-.changelog-sidebar a:hover .changelog-sidebar-date,
-.changelog-sidebar a.is-active .changelog-sidebar-date {
-  color: var(--text-secondary);
+  color: var(--accent-gold, #f59e0b);
 }
 
 .changelog-sidebar a.is-active {
-  border-left-color: var(--accent-gold, currentColor);
+  border-left-color: var(--accent-gold, #f59e0b);
 }
 
 @media (max-width: 768px) {
@@ -448,17 +445,17 @@ h1 {
   }
 
   .changelog-sidebar a {
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     border-left: none;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-    border-radius: 999px;
+    border-radius: 12px;
   }
 
   .changelog-sidebar a.is-active {
-    border-color: var(--accent-gold, currentColor);
+    border-color: var(--accent-gold, #f59e0b);
   }
 }
 
