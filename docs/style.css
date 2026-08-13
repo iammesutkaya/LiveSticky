@@ -389,22 +389,41 @@ h1 {
 }
 
 .changelog-sidebar a {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   padding: 6px 14px;
   border-left: 2px solid transparent;
-  font-family: monospace;
-  font-size: 0.85rem;
   text-decoration: none;
   color: var(--text-secondary);
+  transition: all 0.15s ease;
 }
 
-.changelog-sidebar a:hover {
+.changelog-sidebar .changelog-ver {
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.changelog-sidebar .changelog-sidebar-date {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.changelog-sidebar a:hover .changelog-ver,
+.changelog-sidebar a.is-active .changelog-ver {
   color: var(--accent-gold, currentColor);
+}
+
+.changelog-sidebar a:hover .changelog-sidebar-date,
+.changelog-sidebar a.is-active .changelog-sidebar-date {
+  color: var(--text-secondary);
 }
 
 .changelog-sidebar a.is-active {
   border-left-color: var(--accent-gold, currentColor);
-  color: var(--accent-gold, currentColor);
 }
 
 @media (max-width: 768px) {
@@ -429,6 +448,9 @@ h1 {
   }
 
   .changelog-sidebar a {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     border-left: none;
     padding: 4px 12px;
     border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
