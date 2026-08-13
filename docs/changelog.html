@@ -32,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.239">
-  <link rel="stylesheet" href="landing.css?v=1.1.239">
+  <link rel="stylesheet" href="style.css?v=1.1.240">
+  <link rel="stylesheet" href="landing.css?v=1.1.240">
 
 </head>
 
@@ -111,17 +111,17 @@
 
           <h3>Added</h3>
           <ul>
+            <li><strong>Reuse Single Highlights Post</strong> setting (opt-in): recycles a single permanent master clips post after each stream instead of creating a new post every time. Default is off (creates a new highlights post per stream session).</li>
             <li><strong>Wiki Clip Archive</strong> (opt-in): keeps the full clip history on subreddit wiki pages (one for stream clips, one for the monthly top-20) and links to them from the posts. Off by default; requires wiki to be enabled on your subreddit.</li>
             <li><strong>Monthly Top 20 Clips Post</strong>: publishes the 20 most-watched Twitch clips from the previous calendar month. You choose the day of month and hour it drops (in your configured Streamer Timezone).</li>
-            <li><strong>Sticky Highlights Post</strong> setting: keeps the reused clip compilation pinned, re-pinning it after each stream if it slips.</li>
+            <li><strong>Sticky Highlights Post</strong> setting: keeps the clip compilation pinned, re-pinning it after each stream if it slips.</li>
             <li>New <code>{month}</code> template variable for the monthly post, plus dedicated Monthly Top 20 title, header, and footer templates.</li>
           </ul>
 
           <h3>Changed</h3>
           <ul>
-            <li>The stream highlights post is now a <strong>single reused "Top Clips" post</strong> that updates in place after each stream (same URL, no feed congestion) instead of a new post every time.</li>
-            <li>When the wiki archive is off, the highlights post shows a compact in-body archive of the last few streams.</li>
-            <li>Default highlights title changed to <code>🎬 Top Clips - {stream_display_name}</code>; because the post is reused, its title can no longer include per-stream values like <code>{date}</code>.</li>
+            <li>Stream highlights post defaults to creating a <strong>new post per stream session</strong>, allowing per-stream variables like <code>{date}</code> and <code>{stream_title}</code> in post titles. Subreddits wanting a single master sticky post can toggle on <strong>Reuse Single Highlights Post</strong>.</li>
+            <li>When the wiki archive is off and single post reuse is enabled, the highlights post shows a compact in-body archive of recent streams.</li>
           </ul>
 
           <h3>Fixed</h3>

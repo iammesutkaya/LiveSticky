@@ -30,8 +30,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.239">
-  <link rel="stylesheet" href="landing.css?v=1.1.239">
+  <link rel="stylesheet" href="style.css?v=1.1.240">
+  <link rel="stylesheet" href="landing.css?v=1.1.240">
 </head>
 <body>
 
@@ -127,8 +127,9 @@
             <tr><td>⚙️ Lock Live Thread when Offline</td><td>Boolean</td><td>Locks the live thread post comments when the stream ends so no new comments can be added. (Default: Off)</td></tr>
             <tr><td>⚙️ Disconnect Grace Period (Minutes)</td><td>Number</td><td>Minutes to wait before concluding the live post (prevents duplicates during crashes).</td></tr>
             <tr><td>⚙️ Streamer Timezone</td><td>Select</td><td>Select your local timezone for {date} template variables in post titles & body (covers 27 major global regions). Defaults to UTC.</td></tr>
-            <tr><td>⚙️ Stream Highlights Post</td><td>Boolean</td><td>Maintains a single, reused "Top Clips" post that updates after every stream. It appends the latest stream's top clips and edits the same post in place (same URL, no feed clutter).</td></tr>
-            <tr><td>⚙️ Sticky Highlights Post</td><td>Boolean</td><td>Pins the reused clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post.</td></tr>
+            <tr><td>⚙️ Stream Highlights Post</td><td>Boolean</td><td>Automatically posts a compilation of top Twitch clips generated during the stream when it ends.</td></tr>
+            <tr><td>⚙️ Sticky Highlights Post</td><td>Boolean</td><td>Pins the clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post.</td></tr>
+            <tr><td>⚙️ Reuse Single Highlights Post</td><td>Boolean</td><td>Recycles a single permanent clips post after each stream instead of creating a new post every time. When off (default), a new highlights post is created for each stream session.</td></tr>
             <tr><td>⚙️ Monthly Top 20 Clips Post</td><td>Boolean</td><td>Posts a compilation of the top 20 most-watched Twitch clips from the previous calendar month. Use the day/hour settings to choose when it drops.</td></tr>
             <tr><td>⚙️ Monthly Post - Day of Month</td><td>Number</td><td>Day of the month (1-28) to publish the monthly top-20 post. It always covers the previous complete calendar month. Values above 28 are treated as 28 so it never skips a short month. Default: 1.</td></tr>
             <tr><td>⚙️ Monthly Post - Hour (0-23)</td><td>Number</td><td>Hour of the day (0-23) to publish the monthly top-20 post, in your configured Streamer Timezone (defaults to UTC). Default: 12.</td></tr>

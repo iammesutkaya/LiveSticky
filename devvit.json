@@ -388,6 +388,12 @@
             "defaultValue": false,
             "helpText": "Pins the reused clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post."
           },
+          "reuseHighlightsPost": {
+            "type": "boolean",
+            "label": "⚙️ Reuse Single Highlights Post",
+            "defaultValue": false,
+            "helpText": "Recycles a single permanent clips post after each stream instead of creating a new post every time. When off (default), a new highlights post is created for each stream session."
+          },
           "enableMonthlyHighlights": {
             "type": "boolean",
             "label": "⚙️ Monthly Top 20 Clips Post",

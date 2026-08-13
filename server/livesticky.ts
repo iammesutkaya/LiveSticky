@@ -274,7 +274,8 @@ const postStreamHighlights = async (
   flairTemplateId?: string,
   customTitle?: string,
   sticky?: boolean,
-  wikiArchive?: boolean
+  wikiArchive?: boolean,
+  reusePost?: boolean
 ) => {
   try {
     console.log(`Fetching top clips for broadcaster ${broadcasterId} since ${startedAt}...`);
@@ -285,7 +286,7 @@ const postStreamHighlights = async (
       console.log('No clips generated during this stream session. Highlights post unchanged.');
       return;
     }
-    console.log(`Adding edition of ${raw.length} clips to the reused highlights post...`);
+    console.log(`Adding edition of ${raw.length} clips to the ${reusePost ? 'reused' : 'new per-stream'} highlights post...`);
 
     // Prepend this stream's edition and cap the archive.
     let editions: HighlightsEdition[] = [];
@@ -317,10 +318,10 @@ const postStreamHighlights = async (
       ? buildLatestClipsBody(latestEdition, vars, header, footer, archiveUrl)
       : buildHighlightsBody(editions, vars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
 
-    const existingPostId = await redis.get('highlights_post_id');
+    const existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
 
-    // Try to edit the existing post; if it's gone (deleted/removed), fall through
-    // to creating a new one.
+    // Try to edit the existing post if reusePost is enabled; if it's gone or reusePost is false,
+    // fall through to creating a new one.
     let postId: `t3_${string}` | null = null;
     if (existingPostId) {
       try {
@@ -343,7 +344,7 @@ const postStreamHighlights = async (
         text: body,
       });
       postId = created.id;
-      console.log(`Created reused highlights post: ${postId}`);
+      console.log(`Created ${reusePost ? 'reused highlights post (initial)' : 'per-stream highlights post'}: ${postId}`);
 
       if (flairTemplateId) {
         try {
@@ -359,7 +360,9 @@ const postStreamHighlights = async (
       await pinPostWithFallback(postId);
     }
 
-    await redis.set('highlights_post_id', postId);
+    if (reusePost) {
+      await redis.set('highlights_post_id', postId);
+    }
     await redis.set('highlights_editions', JSON.stringify(editions));
   } catch (error) {
     console.error('Error updating stream highlights post:', error);
@@ -1246,6 +1249,7 @@ export const runStatusCheck = async (): Promise<void> => {
         try {
           const twitchClientId = await get('twitchClientId');
           const twitchClientSecret = await get('twitchClientSecret');
+          const reuseHighlightsPost = (await get<boolean>('reuseHighlightsPost')) ?? false;
           const twitchToken = twitchClientId && twitchClientSecret
             ? await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis)
             : null;
@@ -1262,7 +1266,8 @@ export const runStatusCheck = async (): Promise<void> => {
               highlightsFlairId,
               highlightsPostTitle,
               stickyHighlightsPost,
-              enableWikiArchive
+              enableWikiArchive,
+              reuseHighlightsPost
             );
           }
         } catch (highlightsError) {
