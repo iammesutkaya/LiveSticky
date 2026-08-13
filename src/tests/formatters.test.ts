@@ -292,3 +292,30 @@ describe('wiki archive mode', () => {
     expect(noLink).not.toContain('Browse all monthly compilations');
   });
 });
+
+describe('previousHighlightsUrl link', () => {
+  const mkEdition = (n: number): HighlightsEdition => ({
+    dateStr: `Day ${n}`,
+    clips: [{ title: `Clip ${n}`, url: `https://clips.twitch.tv/${n}`, views: n, creator: `user${n}` }],
+  });
+
+  it('replaces {previous_highlights_url} in templates', () => {
+    const result = replaceTemplateVariables(
+      'Previous: {previous_highlights_url}',
+      { previousHighlightsUrl: 'https://reddit.com/r/sub/comments/123' },
+      false
+    );
+    expect(result).toBe('Previous: https://reddit.com/r/sub/comments/123');
+  });
+
+  it('automatically appends previous stream clip link to highlights body if not in template', () => {
+    const body = buildHighlightsBody(
+      [mkEdition(2)],
+      { previousHighlightsUrl: 'https://reddit.com/r/sub/comments/prev123' },
+      'HEADER',
+      'FOOTER',
+      6
+    );
+    expect(body).toContain('📌 **Previous Stream Clips:** [View highlights from previous stream](https://reddit.com/r/sub/comments/prev123)');
+  });
+});

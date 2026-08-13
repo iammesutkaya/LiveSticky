@@ -302,6 +302,21 @@ const postStreamHighlights = async (
     editions = editions.slice(0, ARCHIVE_MAX_EDITIONS);
 
     const subreddit = await reddit.getCurrentSubreddit();
+
+    // If per-stream mode (reusePost is false), fetch the previous stream's clip post ID to link to it
+    const activeVars: TemplateVariables = { ...vars };
+    if (!reusePost) {
+      try {
+        const lastHighlightsPostId = await redis.get('last_highlights_post_id');
+        if (lastHighlightsPostId) {
+          const cleanId = (lastHighlightsPostId as string).replace(/^t3_/, '');
+          activeVars.previousHighlightsUrl = `https://www.reddit.com/r/${subreddit.name}/comments/${cleanId}`;
+        }
+      } catch (redisErr) {
+        console.warn('Could not fetch last_highlights_post_id:', redisErr);
+      }
+    }
+
     const header = customHeader?.trim() || DEFAULT_HIGHLIGHTS_POST_HEADER;
     const footer = customFooter?.trim() || DEFAULT_HIGHLIGHTS_POST_FOOTER;
 
@@ -311,12 +326,12 @@ const postStreamHighlights = async (
       ? await updateWikiArchive(
           subreddit.name,
           CLIP_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(editions, vars.streamDisplayName || '')
+          buildWikiArchive(editions, activeVars.streamDisplayName || '')
         )
       : null;
     const body = archiveUrl
-      ? buildLatestClipsBody(latestEdition, vars, header, footer, archiveUrl)
-      : buildHighlightsBody(editions, vars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
+      ? buildLatestClipsBody(latestEdition, activeVars, header, footer, archiveUrl)
+      : buildHighlightsBody(editions, activeVars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
 
     const existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
 
@@ -345,7 +360,7 @@ const postStreamHighlights = async (
           .trim();
         titleTemplateToUse = stripped || DEFAULT_HIGHLIGHTS_POST_TITLE;
       }
-      const postTitle = replaceTemplateVariables(titleTemplateToUse, vars, false);
+      const postTitle = replaceTemplateVariables(titleTemplateToUse, activeVars, false);
       const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
       const created = await reddit.submitPost({
         title: safeTitle,
@@ -371,6 +386,8 @@ const postStreamHighlights = async (
 
     if (reusePost) {
       await redis.set('highlights_post_id', postId);
+    } else {
+      await redis.set('last_highlights_post_id', postId);
     }
     await redis.set('highlights_editions', JSON.stringify(editions));
   } catch (error) {

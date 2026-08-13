@@ -24,6 +24,7 @@ export interface TemplateVariables {
   streamUptime?: string;
   dateStr?: string;
   monthLabel?: string;
+  previousHighlightsUrl?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -148,6 +149,10 @@ export const replaceTemplateVariables = (text: string, vars: TemplateVariables, 
     result = result.replace(/{month}/g, vars.monthLabel);
   }
 
+  if (vars.previousHighlightsUrl) {
+    result = result.replace(/{previous_highlights_url}/g, vars.previousHighlightsUrl);
+  }
+
   // Link variables (with cleanup if missing)
   result = vars.twitchUrl ? result.replace(/{twitch_url}/g, vars.twitchUrl) : removeTwitchLink(result);
   result = vars.youtubeUrl ? result.replace(/{youtube_url}/g, vars.youtubeUrl) : removeYoutubeLink(result);
@@ -253,6 +258,10 @@ export const buildHighlightsBody = (
     }
   });
 
+  if (vars.previousHighlightsUrl && !headerTemplate.includes('{previous_highlights_url}') && !footerTemplate.includes('{previous_highlights_url}')) {
+    body += `\n📌 **Previous Stream Clips:** [View highlights from previous stream](${vars.previousHighlightsUrl})\n\n`;
+  }
+
   body += replaceTemplateVariables(footerTemplate, vars, false);
   return body;
 };
@@ -272,6 +281,11 @@ export const buildLatestClipsBody = (
   let body = header ? `${header}\n\n` : '';
   body += `## 🎬 ${latest.dateStr}\n\n${renderClipList(latest.clips)}\n`;
   body += `\n📚 **[Browse the full clip archive →](${archiveUrl})**\n\n`;
+
+  if (vars.previousHighlightsUrl && !headerTemplate.includes('{previous_highlights_url}') && !footerTemplate.includes('{previous_highlights_url}')) {
+    body += `📌 **Previous Stream Clips:** [View highlights from previous stream](${vars.previousHighlightsUrl})\n\n`;
+  }
+
   body += replaceTemplateVariables(footerTemplate, vars, false);
   return body;
 };
