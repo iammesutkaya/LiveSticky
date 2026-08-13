@@ -401,16 +401,31 @@
             "helpText": "Posts a compilation of the top 20 most-watched Twitch clips from the previous calendar month. Use the day/hour settings below to choose when it drops."
           },
           "monthlyHighlightsDay": {
-            "type": "number",
-            "label": "⚙️ Monthly Post - Day of Month",
-            "defaultValue": 1,
-            "helpText": "Day of the month (1-28) to publish the monthly top-20 post. It always covers the previous complete calendar month. Values above 28 are treated as 28 so it never skips a short month."
+            "type": "select",
+            "label": "⚙️ Monthly Post - Schedule Day",
+            "options": [
+              {
+                "label": "Start of new month (1st of month - Default)",
+                "value": "START"
+              },
+              {
+                "label": "Middle of month (15th of month)",
+                "value": "MIDDLE"
+              },
+              {
+                "label": "End of month (Last day of month)",
+                "value": "END"
+              }
+            ],
+            "defaultValue": "START",
+            "helpText": "Select when to publish the monthly top-20 compilation post. It always covers the previous complete calendar month."
           },
-          "monthlyHighlightsHour": {
-            "type": "number",
-            "label": "⚙️ Monthly Post - Hour (0-23)",
-            "defaultValue": 12,
-            "helpText": "Hour of the day (0-23) to publish the monthly top-20 post, in your configured timezone (see Streamer Timezone; defaults to UTC)."
+          "monthlyHighlightsTime": {
+            "type": "string",
+            "label": "⚙️ Monthly Post - Publish Time (24h format)",
+            "defaultValue": "12:00",
+            "placeholder": "13:30",
+            "helpText": "Time of day in 24h format (e.g., 13:30 or 09:00) in your configured Streamer Timezone (defaults to 12:00)."
           },
           "enableWikiArchive": {
             "type": "boolean",

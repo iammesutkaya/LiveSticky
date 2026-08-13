@@ -394,18 +394,19 @@ export const runMonthlyHighlights = async (): Promise<void> => {
   // in the streamer's timezone (falling back to UTC). A per-month dedupe key makes
   // sure it fires exactly once even if the matched hour is hit more than once.
   const now = new Date();
-  const [dayRaw, hourRaw, tzRaw] = await Promise.all([
-    get<number>('monthlyHighlightsDay'),
+  const [dayRaw, timeRaw, hourRaw, tzRaw] = await Promise.all([
+    get<string | number>('monthlyHighlightsDay'),
+    get<string>('monthlyHighlightsTime'),
     get<number>('monthlyHighlightsHour'),
     get('streamerTimezone'),
   ]);
-  const configuredDay = Math.min(Math.max(Math.round(Number(dayRaw ?? 1)), 1), 28);
-  const configuredHour = Math.min(Math.max(Math.round(Number(hourRaw ?? 12)), 0), 23);
   const tz = (tzRaw as string | undefined)?.trim() || 'UTC';
 
+  let localYear = now.getUTCFullYear();
+  let localMonth = now.getUTCMonth() + 1; // 1-indexed (1-12)
   let localDay = now.getUTCDate();
   let localHour = now.getUTCHours();
-  let firedKey = `${now.getUTCFullYear()}-${now.getUTCMonth()}`;
+  let firedKey = `${localYear}-${localMonth}`;
   try {
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone: tz,
@@ -416,11 +417,45 @@ export const runMonthlyHighlights = async (): Promise<void> => {
       hourCycle: 'h23',
     }).formatToParts(now);
     const part = (t: string) => parts.find((p) => p.type === t)?.value;
+    localYear = Number(part('year'));
+    localMonth = Number(part('month'));
     localDay = Number(part('day'));
     localHour = Number(part('hour'));
-    firedKey = `${part('year')}-${part('month')}`;
+    firedKey = `${localYear}-${localMonth}`;
   } catch {
     console.warn(`Invalid streamer timezone "${tz}", using UTC for monthly schedule.`);
+  }
+
+  // Determine configured target day of the month
+  let configuredDay = 1;
+  const dayStr = String(dayRaw ?? 'START').toUpperCase().trim();
+  if (dayStr === 'END' || dayStr === 'LAST') {
+    // Dynamic last day of current month in local timezone (28, 29, 30, or 31)
+    configuredDay = new Date(localYear, localMonth, 0).getDate();
+  } else if (dayStr === 'MIDDLE') {
+    configuredDay = 15;
+  } else if (dayStr === 'START') {
+    configuredDay = 1;
+  } else {
+    const numDay = parseInt(dayStr, 10);
+    configuredDay = Number.isFinite(numDay) ? Math.min(Math.max(numDay, 1), 31) : 1;
+  }
+
+  // Determine configured target hour (from 24h time string like "13:30" or legacy hour number)
+  let configuredHour = 12;
+  if (timeRaw && typeof timeRaw === 'string' && timeRaw.trim().length > 0) {
+    const timeMatch = timeRaw.trim().match(/^(\d{1,2})/);
+    if (timeMatch) {
+      const parsedHour = parseInt(timeMatch[1], 10);
+      if (Number.isFinite(parsedHour) && parsedHour >= 0 && parsedHour <= 23) {
+        configuredHour = parsedHour;
+      }
+    }
+  } else if (hourRaw !== undefined && hourRaw !== null) {
+    const numHour = Number(hourRaw);
+    if (Number.isFinite(numHour)) {
+      configuredHour = Math.min(Math.max(Math.round(numHour), 0), 23);
+    }
   }
 
   if (localDay !== configuredDay || localHour !== configuredHour) {
