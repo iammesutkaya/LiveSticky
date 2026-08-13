@@ -471,6 +471,42 @@ h1 {
   color: var(--text-muted, var(--text-secondary));
 }
 
+.changelog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+.changelog-badge.in-review {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.changelog-badge.live {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+html.theme-light .changelog-badge.in-review {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+html.theme-light .changelog-badge.live {
+  background: #d1fae5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
 /* Swatch colors for design.html (dynamically linked to variables) */
 .swatch-bg-primary { background: var(--bg-primary); }
 .swatch-bg-card { background: var(--bg-card); }
