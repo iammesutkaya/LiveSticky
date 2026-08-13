@@ -318,4 +318,17 @@ describe('previousHighlightsUrl link', () => {
     );
     expect(body).toContain('📌 **Previous Stream Clips:** [View highlights from previous stream](https://reddit.com/r/sub/comments/prev123)');
   });
+
+  it('places previous stream link BEFORE the wiki archive link in buildLatestClipsBody', () => {
+    const body = buildLatestClipsBody(
+      mkEdition(2),
+      { previousHighlightsUrl: 'https://reddit.com/r/sub/comments/prev123' },
+      'HEADER',
+      'FOOTER',
+      'https://reddit.com/r/sub/wiki/clip-archive'
+    );
+    expect(body).toContain('Previous Stream Clips');
+    expect(body).toContain('Browse the full clip archive');
+    expect(body.indexOf('Previous Stream Clips')).toBeLessThan(body.indexOf('Browse the full clip archive'));
+  });
 });

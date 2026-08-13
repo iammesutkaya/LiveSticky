@@ -280,12 +280,12 @@ export const buildLatestClipsBody = (
   const header = replaceTemplateVariables(headerTemplate, vars, false);
   let body = header ? `${header}\n\n` : '';
   body += `## 🎬 ${latest.dateStr}\n\n${renderClipList(latest.clips)}\n`;
-  body += `\n📚 **[Browse the full clip archive →](${archiveUrl})**\n\n`;
 
   if (vars.previousHighlightsUrl && !headerTemplate.includes('{previous_highlights_url}') && !footerTemplate.includes('{previous_highlights_url}')) {
-    body += `📌 **Previous Stream Clips:** [View highlights from previous stream](${vars.previousHighlightsUrl})\n\n`;
+    body += `\n📌 **Previous Stream Clips:** [View highlights from previous stream](${vars.previousHighlightsUrl})\n`;
   }
 
+  body += `\n📚 **[Browse the full clip archive →](${archiveUrl})**\n\n`;
   body += replaceTemplateVariables(footerTemplate, vars, false);
   return body;
 };
