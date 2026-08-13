@@ -21,13 +21,13 @@
     .footer-logo { width: 40px; height: 40px; }
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 Not Found | LiveSticky</title>
-  <meta name="description" content="Page not found.">
-  
-  <meta property="og:title" content="404 Not Found - LiveSticky">
-  <meta property="og:description" content="Frequently Asked Questions about LiveSticky.">
+  <title>Changelog | LiveSticky</title>
+  <meta name="description" content="Release notes and version history for LiveSticky.">
+
+  <meta property="og:title" content="Changelog - LiveSticky">
+  <meta property="og:description" content="Release notes and version history for LiveSticky.">
   <meta property="og:type" content="website">
-  
+  <meta property="og:url" content="https://livesticky.com/changelog.html">
   <meta property="og:image" content="https://livesticky.com/icon.png?v=2">
   <meta name="twitter:card" content="summary">
 
@@ -82,20 +82,76 @@
       </nav>
     </header>
 
-    
-    <header class="header-left error-header">
-      <h1 class="gradient-text error-title">404</h1>
-      <p class="subtitle error-subtitle">Page Not Found</p>
+    <header class="header-left">
+      <h1>Changelog</h1>
+      <p class="subtitle">Release notes and version history for LiveSticky.</p>
     </header>
-    <section class="section unboxed-section pt-0 error-section">
-      <div class="content article-content">
-        <p class="error-description">
-          The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
-        </p>
-        <a href="index.html" class="button button-primary error-action">Return Home</a>
+
+    <section class="section unboxed-section pt-0">
+      <div class="content changelog-layout">
+
+        <!-- New release? Add a sidebar <li> here (newest first) AND a matching <article> below with the same id. -->
+        <aside class="changelog-sidebar">
+          <nav aria-label="Jump to a version">
+            <span class="changelog-toc-label">Versions</span>
+            <ul>
+              <li><a href="#v1-1-239">v1.1.239</a></li>
+            </ul>
+          </nav>
+        </aside>
+
+        <div class="changelog-main article-content">
+
+        <article class="changelog-entry">
+          <div class="changelog-head">
+            <h2 id="v1-1-239">v1.1.239</h2>
+            <span class="changelog-date">August 2026</span>
+          </div>
+          <p>A big update to the stream-highlights feature: the clip compilation is now a single, reused post instead of a fresh post after every stream, plus an optional wiki archive and a new monthly top-20 post.</p>
+
+          <h3>Added</h3>
+          <ul>
+            <li><strong>Wiki Clip Archive</strong> (opt-in): keeps the full clip history on subreddit wiki pages (one for stream clips, one for the monthly top-20) and links to them from the posts. Off by default; requires wiki to be enabled on your subreddit.</li>
+            <li><strong>Monthly Top 20 Clips Post</strong>: publishes the 20 most-watched Twitch clips from the previous calendar month. You choose the day of month and hour it drops (in your configured Streamer Timezone).</li>
+            <li><strong>Sticky Highlights Post</strong> setting: keeps the reused clip compilation pinned, re-pinning it after each stream if it slips.</li>
+            <li>New <code>{month}</code> template variable for the monthly post, plus dedicated Monthly Top 20 title, header, and footer templates.</li>
+          </ul>
+
+          <h3>Changed</h3>
+          <ul>
+            <li>The stream highlights post is now a <strong>single reused "Top Clips" post</strong> that updates in place after each stream (same URL, no feed congestion) instead of a new post every time.</li>
+            <li>When the wiki archive is off, the highlights post shows a compact in-body archive of the last few streams.</li>
+            <li>Default highlights title changed to <code>🎬 Top Clips - {stream_display_name}</code>; because the post is reused, its title can no longer include per-stream values like <code>{date}</code>.</li>
+          </ul>
+
+          <h3>Fixed</h3>
+          <ul>
+            <li><strong>YouTube livestreams were not being detected</strong> on the dashboard even while live. Fixed.</li>
+            <li>The <code>{date}</code> variable now correctly respects the configured Streamer Timezone instead of always using UTC.</li>
+          </ul>
+        </article>
+
+        </div>
       </div>
     </section>
 
+    <script>
+      // Highlight the version in the sidebar whose section is near the top.
+      (function () {
+        const links = Array.from(document.querySelectorAll('.changelog-sidebar a'));
+        if (!links.length) return;
+        const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+        const heads = Array.from(document.querySelectorAll('.changelog-head h2'));
+        const setActive = (id) => links.forEach((a) => a.classList.toggle('is-active', a === byId.get(id)));
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); });
+          },
+          { rootMargin: '-80px 0px -70% 0px' }
+        );
+        heads.forEach((h) => obs.observe(h));
+      })();
+    </script>
 
   </div>
 

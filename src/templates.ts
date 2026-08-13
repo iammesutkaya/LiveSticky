@@ -107,13 +107,13 @@ Follow the channels below to get notified when {stream_display_name} goes live!
 // ---------------------------------------------------------------------------
 // Highlights post (shown when stream highlights are enabled)
 // ---------------------------------------------------------------------------
-export const DEFAULT_HIGHLIGHTS_POST_TITLE = "🎬 Top Clips from {stream_display_name}'s stream ({date})";
+// This is one persistent post that LiveSticky re-edits after every stream, so
+// the title cannot contain per-stream values like {date} (Reddit does not allow
+// editing a post title). Per-stream dates live in the body headings instead.
+export const DEFAULT_HIGHLIGHTS_POST_TITLE = "🎬 Top Clips - {stream_display_name}";
 
 export const DEFAULT_HIGHLIGHTS_POST_HEADER = `\
-**Title:**
-{stream_title}
-
-Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.`;
+The most-watched Twitch clips from {stream_display_name}'s recent streams, compiled automatically by LiveSticky. Newest stream first.`;
 
 // ---------------------------------------------------------------------------
 // Highlights post footer (shown below the auto-generated clip list)
@@ -121,3 +121,15 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
 export const DEFAULT_HIGHLIGHTS_POST_FOOTER = `\
 ---
 *Watch VODs and catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*`;
+
+// ---------------------------------------------------------------------------
+// Monthly highlights post (top clips of the whole month)
+// ---------------------------------------------------------------------------
+export const DEFAULT_MONTHLY_HIGHLIGHTS_POST_TITLE = "🏆 Top 20 Clips of {month} - {stream_display_name}";
+
+export const DEFAULT_MONTHLY_HIGHLIGHTS_POST_HEADER = `\
+The 20 most-watched Twitch clips from {month}, compiled automatically by LiveSticky.`;
+
+export const DEFAULT_MONTHLY_HIGHLIGHTS_POST_FOOTER = `\
+---
+*Catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*`;

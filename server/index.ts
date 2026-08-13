@@ -4,6 +4,7 @@ import { redis } from '@devvit/web/server';
 import {
   runStatusCheck,
   refreshLiveSticky,
+  runMonthlyHighlights,
 } from './livesticky.js';
 import { buildYouTubeUrl } from '../src/formatters.js';
 
@@ -22,6 +23,7 @@ app.get('/api/stream-status', async (_req, res) => {
   try {
     const [
       isLivePinned,
+      isLiveNow,
       livePostId,
       dashboardPlatform,
       dashboardLivePlatforms,
@@ -40,6 +42,7 @@ app.get('/api/stream-status', async (_req, res) => {
       postScore,
     ] = await Promise.all([
       redis.get('is_live_pinned'),
+      redis.get('is_live_now'),
       redis.get('live_post_id'),
       redis.get('dashboard_platform'),
       redis.get('dashboard_live_platforms'),
@@ -58,7 +61,7 @@ app.get('/api/stream-status', async (_req, res) => {
       redis.get('dashboard_post_score'),
     ]);
 
-    const isLive = isLivePinned === 'true';
+    const isLive = isLiveNow !== undefined ? isLiveNow === 'true' : isLivePinned === 'true';
     const displayName = dashboardDisplayName || legacyDisplayName || 'Streamer';
     const startedAt = dashboardStartedAt || legacyStartedAt;
     const streamTitle = dashboardTitle || legacyTitle || '';
@@ -207,6 +210,16 @@ app.post('/internal/scheduler/check-status', async (_req, res) => {
   } catch (error) {
     console.error('Scheduled status check failed:', error);
     res.status(500).json({ error: 'status check failed' });
+  }
+});
+
+app.post('/internal/scheduler/monthly-highlights', async (_req, res) => {
+  try {
+    await runMonthlyHighlights();
+    res.json({});
+  } catch (error) {
+    console.error('Monthly highlights job failed:', error);
+    res.status(500).json({ error: 'monthly highlights failed' });
   }
 });
 

@@ -224,10 +224,18 @@ async function fetchProxiedImage(cdnUrl) {
   if (!proxyUrl) return null;
   try {
     const res = await fetch(proxyUrl);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      if (cdnUrl.includes('/hqlive.jpg')) {
+        return fetchProxiedImage(cdnUrl.replace('/hqlive.jpg', '/hqdefault.jpg'));
+      }
+      return null;
+    }
     const blob = await res.blob();
     return URL.createObjectURL(blob);
   } catch {
+    if (cdnUrl.includes('/hqlive.jpg')) {
+      return fetchProxiedImage(cdnUrl.replace('/hqlive.jpg', '/hqdefault.jpg'));
+    }
     return null;
   }
 }

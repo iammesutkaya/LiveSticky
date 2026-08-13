@@ -254,13 +254,15 @@ async function fetchYouTubeStatus(
     );
     if (!liveItem) return null;
 
-    const details = liveItem.liveStreamingDetails;
-    const title = liveItem.snippet?.title || 'YouTube Livestream';
-    const thumbnail =
+    const videoId = liveItem.id;
+    const staticThumbnail =
       liveItem.snippet?.thumbnails?.high?.url ??
       liveItem.snippet?.thumbnails?.medium?.url ??
       '';
+    const thumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqlive.jpg` : staticThumbnail;
     const userName = liveItem.snippet?.channelTitle || channel;
+    const title = liveItem.snippet?.title || '';
+    const details = liveItem.liveStreamingDetails;
     const parsedViewers = details?.concurrentViewers ? parseInt(details.concurrentViewers, 10) : 0;
     const viewers = Number.isNaN(parsedViewers) ? 0 : parsedViewers;
     const startedAt = details?.actualStartTime || new Date().toISOString();

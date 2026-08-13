@@ -8,7 +8,13 @@ import {
   removeTwitchLink,
   removeKickLink,
   computeUptime,
+  replaceTemplateVariables,
+  buildHighlightsBody,
+  buildLatestClipsBody,
+  buildWikiArchive,
+  buildSingleClipsBody,
   type TemplateVariables,
+  type HighlightsEdition,
 } from '../formatters.js';
 
 const mockVars: TemplateVariables = {
@@ -189,5 +195,100 @@ describe('computeUptime', () => {
   it('returns empty string for future timestamps', () => {
     const startedAt = new Date(now + 60000).toISOString();
     expect(computeUptime(startedAt)).toBe('');
+  });
+});
+
+describe('replaceTemplateVariables - monthly var', () => {
+  it('replaces {month} for monthly posts', () => {
+    const result = replaceTemplateVariables('Top clips of {month}', { monthLabel: 'August 2026' }, false);
+    expect(result).toBe('Top clips of August 2026');
+  });
+});
+
+describe('buildHighlightsBody - reused post archive', () => {
+  const mkEdition = (n: number): HighlightsEdition => ({
+    dateStr: `Day ${n}`,
+    clips: [{ title: `Clip ${n}`, url: `https://clips.twitch.tv/${n}`, views: n * 100, creator: `user${n}` }],
+  });
+
+  it('puts the newest edition on top and older ones under a Previous divider', () => {
+    const body = buildHighlightsBody([mkEdition(3), mkEdition(2), mkEdition(1)], {}, 'HEADER', 'FOOTER', 6);
+    expect(body.startsWith('HEADER')).toBe(true);
+    expect(body).toContain('## 🎬 Day 3');
+    expect(body).toContain('### Previous compilations');
+    expect(body).toContain('#### Day 2');
+    expect(body).toContain('#### Day 1');
+    // Newest must appear before the "Previous compilations" divider.
+    expect(body.indexOf('Day 3')).toBeLessThan(body.indexOf('Previous compilations'));
+    expect(body.endsWith('FOOTER')).toBe(true);
+  });
+
+  it('has no Previous divider when there is only one edition', () => {
+    const body = buildHighlightsBody([mkEdition(1)], {}, 'H', 'F', 6);
+    expect(body).not.toContain('Previous compilations');
+  });
+
+  it('caps the archive to maxEditions (oldest dropped)', () => {
+    const editions = [5, 4, 3, 2, 1].map(mkEdition); // newest-first
+    const body = buildHighlightsBody(editions, {}, 'H', 'F', 3);
+    expect(body).toContain('Day 5');
+    expect(body).toContain('Day 4');
+    expect(body).toContain('Day 3');
+    expect(body).not.toContain('Day 2');
+    expect(body).not.toContain('Day 1');
+  });
+
+  it('renders clip metadata (title link, views, creator)', () => {
+    const body = buildSingleClipsBody(
+      [{ title: 'Epic play', url: 'https://clips.twitch.tv/x', views: 1234, creator: 'clipper' }],
+      { monthLabel: 'August 2026' },
+      'Top of {month}',
+      'END'
+    );
+    expect(body).toContain('Top of August 2026');
+    expect(body).toContain('**[Epic play](https://clips.twitch.tv/x)**');
+    expect(body).toContain('1,234');
+    expect(body).toContain('clipper');
+    expect(body).toContain('END');
+  });
+});
+
+describe('wiki archive mode', () => {
+  const mkEdition = (n: number): HighlightsEdition => ({
+    dateStr: `Day ${n}`,
+    clips: [{ title: `Clip ${n}`, url: `https://clips.twitch.tv/${n}`, views: n, creator: `user${n}` }],
+  });
+
+  it('buildLatestClipsBody shows only the latest edition plus an archive link', () => {
+    const body = buildLatestClipsBody(mkEdition(3), {}, 'HEADER', 'FOOTER', 'https://reddit.com/r/x/wiki/archive');
+    expect(body).toContain('## 🎬 Day 3');
+    expect(body).toContain('[Browse the full clip archive →](https://reddit.com/r/x/wiki/archive)');
+    // Only the newest edition is inlined; older ones live on the wiki.
+    expect(body).not.toContain('Day 2');
+    expect(body).not.toContain('Previous compilations');
+    expect(body).toContain('FOOTER');
+  });
+
+  it('buildWikiArchive lists every edition newest-first with the display name', () => {
+    const page = buildWikiArchive([mkEdition(3), mkEdition(2), mkEdition(1)], 'CoolStreamer');
+    expect(page).toContain('# 🎬 Clip Archive - CoolStreamer');
+    expect(page).toContain('## Day 3');
+    expect(page).toContain('## Day 2');
+    expect(page).toContain('## Day 1');
+    expect(page.indexOf('Day 3')).toBeLessThan(page.indexOf('Day 1'));
+  });
+
+  it('buildWikiArchive accepts a custom title/intro (monthly archive)', () => {
+    const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🏆 Monthly Top 20 Archive', 'monthly intro');
+    expect(page).toContain('# 🏆 Monthly Top 20 Archive - CoolStreamer');
+    expect(page).toContain('monthly intro');
+  });
+
+  it('buildSingleClipsBody adds a monthly archive link only when a URL is given', () => {
+    const clips = [{ title: 'c', url: 'https://clips.twitch.tv/c', views: 1, creator: 'u' }];
+    const withLink = buildSingleClipsBody(clips, {}, 'H', 'F', 'https://reddit.com/r/x/wiki/m');
+    expect(withLink).toContain('[Browse all monthly compilations →](https://reddit.com/r/x/wiki/m)');
+    const noLink = buildSingleClipsBody(clips, {}, 'H', 'F');
+    expect(noLink).not.toContain('Browse all monthly compilations');
   });
 });

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ensure working directory is always the repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$ROOT_DIR"
+
 # -------------------------------------------------------
 # release.sh — Publish to Devvit, auto-update website version tags
 # Usage: ./scripts/release.sh [--version X.Y.Z] [--public]
@@ -13,7 +18,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --version)
       EXPLICIT_VERSION="$2"
-      FLAGS+=("--version" "$2")
       shift 2
       ;;
     *)
@@ -24,12 +28,35 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$EXPLICIT_VERSION" ]; then
-  echo "❌ Error: You must provide an explicit version for release (e.g., --version 1.0.239)"
-  echo "This ensures the webview dashboard and website tags all match the published version exactly."
-  exit 1
+  CURRENT_VERSION=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' src/client/index.html | head -n 1 | sed 's/^v//' || echo "")
+  if [ -n "$CURRENT_VERSION" ]; then
+    MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+    MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+    PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
+    NEW_PATCH=$((PATCH + 1))
+    VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+    echo "💡 No --version specified. Auto-bumping patch version: v${CURRENT_VERSION} -> v${VERSION}"
+  else
+    echo "❌ Error: Could not auto-detect current version from src/client/index.html, and no --version was provided."
+    exit 1
+  fi
+else
+  VERSION="$EXPLICIT_VERSION"
 fi
 
-VERSION="$EXPLICIT_VERSION"
+HAS_VERSION_FLAG=false
+HAS_PUBLIC_FLAG=false
+for flag in "${FLAGS[@]+"${FLAGS[@]}"}"; do
+  if [[ "$flag" == "--version" ]]; then HAS_VERSION_FLAG=true; fi
+  if [[ "$flag" == "--public" ]]; then HAS_PUBLIC_FLAG=true; fi
+done
+
+if [ "$HAS_VERSION_FLAG" = false ]; then
+  FLAGS+=("--version" "$VERSION")
+fi
+if [ "$HAS_PUBLIC_FLAG" = false ]; then
+  FLAGS+=("--public")
+fi
 
 echo "📝 Updating webview and website version tags to v${VERSION}..."
 
@@ -50,16 +77,25 @@ for page in docs/*.html docs/demo/*.html; do
   rm -f "${page}.bak"
 done
 
+# Stamp today's date into every <lastmod> in the sitemap so search engines see
+# the site as freshly updated on each release.
+if [ -f docs/sitemap.xml ]; then
+  TODAY=$(date +%F)
+  sed -i.bak -E "s|<lastmod>[0-9]{4}-[0-9]{2}-[0-9]{2}</lastmod>|<lastmod>${TODAY}</lastmod>|g" docs/sitemap.xml
+  rm -f docs/sitemap.xml.bak
+  echo "🗺️  Stamped sitemap lastmod → ${TODAY}"
+fi
+
 echo "✅ Rebuilding webview client with new version..."
 npm run build
 
 echo "🚀 Publishing to Devvit..."
 # Devvit output will still print the version, but we already applied it
-npx devvit@0.13.9 publish ${FLAGS[@]+"${FLAGS[@]}"} 2>&1 | tee /dev/stderr
+npx devvit publish "${FLAGS[@]}" 2>&1 | tee /dev/stderr
 
-# Commit and push. Stage the whole website folder and the client html:
-git add docs src/client/index.html
-git commit -m "chore: bump app and website version to v${VERSION}"
+# Commit and push. Stage all repository changes (source + docs):
+git add -A
+git commit -m "release: v${VERSION}"
 if ! env -u GITHUB_TOKEN git push 2>/dev/null; then
   echo "🔑 Retrying git push using GitHub CLI token..."
   env -u GITHUB_TOKEN git push "https://iammesutkaya:$(gh auth token 2>/dev/null)@github.com/iammesutkaya/LiveSticky.git" main

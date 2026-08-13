@@ -21,7 +21,13 @@ import {
   formatLivePostBody,
   formatOfflinePostBody,
   replaceTemplateVariables,
-  type TemplateVariables
+  buildHighlightsBody,
+  buildLatestClipsBody,
+  buildWikiArchive,
+  buildSingleClipsBody,
+  type TemplateVariables,
+  type ClipInfo,
+  type HighlightsEdition,
 } from '../src/formatters.js';
 import {
   DEFAULT_LIVE_SIDEBAR,
@@ -31,6 +37,9 @@ import {
   DEFAULT_LIVE_POST_TITLE,
   DEFAULT_OFFLINE_POST_TITLE,
   DEFAULT_HIGHLIGHTS_POST_TITLE,
+  DEFAULT_MONTHLY_HIGHLIGHTS_POST_TITLE,
+  DEFAULT_MONTHLY_HIGHLIGHTS_POST_HEADER,
+  DEFAULT_MONTHLY_HIGHLIGHTS_POST_FOOTER,
 } from '../src/templates.js';
 
 const get = <T = string>(name: string) => settings.get<T>(name);
@@ -158,6 +167,102 @@ const ensureStickyOfflinePost = async (
 // Stream highlights (Twitch clips)
 // ---------------------------------------------------------------------------
 
+/**
+ * Fetch the top-viewed Twitch clips for a broadcaster in a time window.
+ * Returns clips sorted by view_count desc, sliced to `top`, or null on error.
+ * `first` is the API page size (max 100); `top` is how many we keep.
+ */
+const fetchTopClips = async (
+  clientId: string,
+  token: string,
+  broadcasterId: string,
+  startedAt: string,
+  endedAt: string,
+  first: number,
+  top: number
+): Promise<any[] | null> => {
+  const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${broadcasterId}&started_at=${startedAt}&ended_at=${endedAt}&first=${first}`;
+  const res = await fetch(url, {
+    headers: { 'Client-ID': clientId, Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    console.error(`Failed to fetch clips from Twitch Helix API: ${res.status} ${res.statusText}`);
+    return null;
+  }
+  const json = await res.json();
+  const clips = json.data || [];
+  return clips
+    .sort((a: any, b: any) => (b.view_count || 0) - (a.view_count || 0))
+    .slice(0, top);
+};
+
+/** Map raw Twitch Helix clip objects to our slim ClipInfo shape. */
+const toClipInfos = (raw: any[]): ClipInfo[] =>
+  raw.map((c: any) => ({
+    title: c.title || 'Untitled Clip',
+    url: c.url,
+    views: c.view_count || 0,
+    creator: c.creator_name || 'Anonymous',
+  }));
+
+// Editions shown inline in the post body when the wiki archive is unavailable.
+// ponytail: fixed cap; 6 editions x 5 clips stays well under Reddit's body limit.
+const MAX_HIGHLIGHTS_EDITIONS = 6;
+// Editions retained in Redis / rendered onto the wiki archive page. The wiki page
+// itself holds the full browsable history; these keep Redis + the page comfortable.
+const ARCHIVE_MAX_EDITIONS = 50;
+const MONTHLY_ARCHIVE_MAX_EDITIONS = 24; // ~2 years of monthly compilations
+const CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip-archive';
+const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
+
+/**
+ * Writes markdown to a subreddit wiki page (create-or-update) and returns its
+ * public URL, or null if the sub has no wiki / the app can't write to it (callers
+ * then fall back to inlining the content). Pages are rewritten wholesale by the
+ * caller each time so they stay deterministic - no markdown parsing.
+ */
+const updateWikiArchive = async (
+  subredditName: string,
+  page: string,
+  content: string
+): Promise<string | null> => {
+  try {
+    let exists = false;
+    try {
+      await reddit.getWikiPage(subredditName, page);
+      exists = true;
+    } catch {
+      exists = false;
+    }
+
+    if (exists) {
+      await reddit.updateWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive update' });
+    } else {
+      await reddit.createWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive init' });
+      // permLevel 0 = follow the subreddit's wiki read settings; listed so it
+      // shows up in the wiki index for readers.
+      try {
+        await reddit.updateWikiPageSettings({ subredditName, page, listed: true, permLevel: 0 });
+      } catch (settingsErr) {
+        console.warn(`Could not update wiki page settings for ${page}:`, settingsErr);
+      }
+    }
+
+    return `https://www.reddit.com/r/${subredditName}/wiki/${page}`;
+  } catch (wikiErr) {
+    console.warn(`Wiki page ${page} unavailable, falling back to inline content:`, wikiErr);
+    return null;
+  }
+};
+
+/**
+ * Updates the single, reused "Top Clips" post at the end of a stream. Instead of
+ * creating a fresh post every time, it appends the latest stream's clips as a
+ * new edition and edits the same post in place (same URL, no feed congestion).
+ * Full history lives in a wiki page (linked from the post); if the wiki isn't
+ * available it falls back to a bounded in-body archive. Created once, re-edited
+ * forever after.
+ */
 const postStreamHighlights = async (
   clientId: string,
   token: string,
@@ -167,78 +272,273 @@ const postStreamHighlights = async (
   customHeader?: string,
   customFooter?: string,
   flairTemplateId?: string,
-  customTitle?: string
+  customTitle?: string,
+  sticky?: boolean,
+  wikiArchive?: boolean
 ) => {
   try {
     console.log(`Fetching top clips for broadcaster ${broadcasterId} since ${startedAt}...`);
     const endedAt = new Date().toISOString();
-    const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${broadcasterId}&started_at=${startedAt}&ended_at=${endedAt}&first=20`;
-
-    const res = await fetch(url, {
-      headers: { 'Client-ID': clientId, Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      console.error(`Failed to fetch clips from Twitch Helix API: ${res.status} ${res.statusText}`);
+    const raw = await fetchTopClips(clientId, token, broadcasterId, startedAt, endedAt, 20, 5);
+    if (raw === null) return;
+    if (raw.length === 0) {
+      console.log('No clips generated during this stream session. Highlights post unchanged.');
       return;
     }
+    console.log(`Adding edition of ${raw.length} clips to the reused highlights post...`);
 
-    const json = await res.json();
-    const clips = json.data || [];
-    if (clips.length === 0) {
-      console.log('No clips generated during this stream session.');
-      return;
+    // Prepend this stream's edition and cap the archive.
+    let editions: HighlightsEdition[] = [];
+    try {
+      const stored = await redis.get('highlights_editions');
+      if (stored) editions = JSON.parse(stored) as HighlightsEdition[];
+    } catch (parseErr) {
+      console.error('Failed to parse stored highlights editions, starting fresh:', parseErr);
     }
-
-    const topClips = clips
-      .sort((a: any, b: any) => (b.view_count || 0) - (a.view_count || 0))
-      .slice(0, 5);
-
-    console.log(`Found ${clips.length} clips. Posting top ${topClips.length} clips to Reddit...`);
-
-    const templateTitle = customTitle?.trim() || DEFAULT_HIGHLIGHTS_POST_TITLE;
-    const postTitle = replaceTemplateVariables(templateTitle, vars, false);
-
-    const templateHeader = customHeader?.trim() || DEFAULT_HIGHLIGHTS_POST_HEADER;
-    const header = replaceTemplateVariables(templateHeader, vars, false);
-
-    let body = header ? `${header}\n\n` : '';
-    topClips.forEach((clip: any, index: number) => {
-      const views = clip.view_count !== undefined ? clip.view_count.toLocaleString() : '0';
-      const title = clip.title || 'Untitled Clip';
-      const creator = clip.creator_name || 'Anonymous';
-      body += `${index + 1}. **[${title}](${clip.url})**\n`;
-      body += `   * **Views:** ${views}\n`;
-      body += `   * **Clipped by:** ${creator}\n\n`;
-    });
-
-    const templateFooter = customFooter?.trim() || DEFAULT_HIGHLIGHTS_POST_FOOTER;
-    body += replaceTemplateVariables(templateFooter, vars, false);
+    const dateStr = vars.dateStr || new Date().toISOString().slice(0, 10);
+    const latestEdition: HighlightsEdition = { dateStr, clips: toClipInfos(raw) };
+    editions.unshift(latestEdition);
+    editions = editions.slice(0, ARCHIVE_MAX_EDITIONS);
 
     const subreddit = await reddit.getCurrentSubreddit();
+    const header = customHeader?.trim() || DEFAULT_HIGHLIGHTS_POST_HEADER;
+    const footer = customFooter?.trim() || DEFAULT_HIGHLIGHTS_POST_FOOTER;
+
+    // Full history goes to the wiki; the post links to it. If the wiki is
+    // unavailable, keep the browsable history inline (bounded) instead.
+    const archiveUrl = wikiArchive
+      ? await updateWikiArchive(
+          subreddit.name,
+          CLIP_ARCHIVE_WIKI_PAGE,
+          buildWikiArchive(editions, vars.streamDisplayName || '')
+        )
+      : null;
+    const body = archiveUrl
+      ? buildLatestClipsBody(latestEdition, vars, header, footer, archiveUrl)
+      : buildHighlightsBody(editions, vars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
+
+    const existingPostId = await redis.get('highlights_post_id');
+
+    // Try to edit the existing post; if it's gone (deleted/removed), fall through
+    // to creating a new one.
+    let postId: `t3_${string}` | null = null;
+    if (existingPostId) {
+      try {
+        const post = await reddit.getPostById(existingPostId as `t3_${string}`);
+        await post.edit({ text: body });
+        postId = existingPostId as `t3_${string}`;
+        console.log(`Updated reused highlights post: ${existingPostId}`);
+      } catch (editErr) {
+        console.warn(`Could not edit existing highlights post ${existingPostId}, creating a new one:`, editErr);
+      }
+    }
+
+    if (!postId) {
+      const templateTitle = customTitle?.trim() || DEFAULT_HIGHLIGHTS_POST_TITLE;
+      const postTitle = replaceTemplateVariables(templateTitle, vars, false);
+      const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
+      const created = await reddit.submitPost({
+        title: safeTitle,
+        subredditName: subreddit.name,
+        text: body,
+      });
+      postId = created.id;
+      console.log(`Created reused highlights post: ${postId}`);
+
+      if (flairTemplateId) {
+        try {
+          await reddit.setPostFlair({ postId, subredditName: subreddit.name, flairTemplateId });
+        } catch (flairError) {
+          console.error('Failed to set flair on highlights post:', flairError);
+        }
+      }
+    }
+
+    // Keep it pinned if the mod opted in (re-pin each run in case it slipped).
+    if (sticky) {
+      await pinPostWithFallback(postId);
+    }
+
+    await redis.set('highlights_post_id', postId);
+    await redis.set('highlights_editions', JSON.stringify(editions));
+  } catch (error) {
+    console.error('Error updating stream highlights post:', error);
+  }
+};
+
+/**
+ * Posts a "Top 20 clips of the month" compilation. Fired by the monthly
+ * scheduler cron on the 1st, covering the previous calendar month. Independent
+ * of the per-stream highlights post; not stickied (it's an archive).
+ */
+export const runMonthlyHighlights = async (): Promise<void> => {
+  const enableMonthly = await get<boolean>('enableMonthlyHighlights');
+  if (!enableMonthly) {
+    console.log('Monthly highlights disabled. Skipping.');
+    return;
+  }
+
+  // This job runs hourly; only proceed at the mod-configured day + hour, resolved
+  // in the streamer's timezone (falling back to UTC). A per-month dedupe key makes
+  // sure it fires exactly once even if the matched hour is hit more than once.
+  const now = new Date();
+  const [dayRaw, hourRaw, tzRaw] = await Promise.all([
+    get<number>('monthlyHighlightsDay'),
+    get<number>('monthlyHighlightsHour'),
+    get('streamerTimezone'),
+  ]);
+  const configuredDay = Math.min(Math.max(Math.round(Number(dayRaw ?? 1)), 1), 28);
+  const configuredHour = Math.min(Math.max(Math.round(Number(hourRaw ?? 12)), 0), 23);
+  const tz = (tzRaw as string | undefined)?.trim() || 'UTC';
+
+  let localDay = now.getUTCDate();
+  let localHour = now.getUTCHours();
+  let firedKey = `${now.getUTCFullYear()}-${now.getUTCMonth()}`;
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      hourCycle: 'h23',
+    }).formatToParts(now);
+    const part = (t: string) => parts.find((p) => p.type === t)?.value;
+    localDay = Number(part('day'));
+    localHour = Number(part('hour'));
+    firedKey = `${part('year')}-${part('month')}`;
+  } catch {
+    console.warn(`Invalid streamer timezone "${tz}", using UTC for monthly schedule.`);
+  }
+
+  if (localDay !== configuredDay || localHour !== configuredHour) {
+    return; // Not the scheduled slot this hour.
+  }
+
+  const lastPosted = await redis.get('monthly_last_posted');
+  if (lastPosted === firedKey) {
+    console.log(`Monthly highlights already posted for ${firedKey}. Skipping.`);
+    return;
+  }
+
+  const broadcasterId = await redis.get('twitch_broadcaster_id');
+  if (!broadcasterId) {
+    console.log('No Twitch broadcaster ID stored yet. Skipping monthly highlights.');
+    return;
+  }
+
+  const clientId = await get('twitchClientId');
+  const clientSecret = await get('twitchClientSecret');
+  const token = clientId && clientSecret
+    ? await getOrRefreshTwitchToken(clientId, clientSecret, redis)
+    : null;
+  if (!token || !clientId) {
+    console.error('Missing Twitch credentials. Skipping monthly highlights.');
+    return;
+  }
+
+  // Previous calendar month: [first day of last month, first day of this month).
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const monthLabel = monthStart.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+
+  try {
+    const raw = await fetchTopClips(
+      clientId as string,
+      token,
+      broadcasterId,
+      monthStart.toISOString(),
+      monthEnd.toISOString(),
+      100,
+      20
+    );
+    if (raw === null) return;
+    if (raw.length === 0) {
+      console.log(`No clips found for ${monthLabel}. Skipping monthly highlights post.`);
+      return;
+    }
+
+    const [twitchChannel, customTitle, customHeader, customFooter, flairTemplateId] =
+      await Promise.all([
+        get('twitchChannel'),
+        get('monthlyHighlightsPostTitle'),
+        get('monthlyHighlightsHeader'),
+        get('monthlyHighlightsFooter'),
+        get('highlightsFlairId'),
+      ]);
+
+    const displayName = (await redis.get('twitch_display_name')) || (twitchChannel as string) || '';
+    const vars: TemplateVariables = {
+      twitchChannel: twitchChannel as string | undefined,
+      twitchUrl: twitchChannel ? `https://twitch.tv/${(twitchChannel as string).trim()}` : undefined,
+      streamDisplayName: displayName,
+      monthLabel,
+    };
+
+    const subreddit = await reddit.getCurrentSubreddit();
+
+    // Append this month to the monthly wiki archive and link the post to it.
+    let monthlyEditions: HighlightsEdition[] = [];
+    try {
+      const stored = await redis.get('monthly_editions');
+      if (stored) monthlyEditions = JSON.parse(stored) as HighlightsEdition[];
+    } catch (parseErr) {
+      console.error('Failed to parse stored monthly editions, starting fresh:', parseErr);
+    }
+    monthlyEditions.unshift({ dateStr: monthLabel, clips: toClipInfos(raw) });
+    monthlyEditions = monthlyEditions.slice(0, MONTHLY_ARCHIVE_MAX_EDITIONS);
+
+    const wikiArchive = await get<boolean>('enableWikiArchive');
+    const archiveUrl = wikiArchive
+      ? await updateWikiArchive(
+          subreddit.name,
+          MONTHLY_ARCHIVE_WIKI_PAGE,
+          buildWikiArchive(
+            monthlyEditions,
+            displayName,
+            '🏆 Monthly Top 20 Archive',
+            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.'
+          )
+        )
+      : null;
+
+    const templateTitle = (customTitle as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_TITLE;
+    const postTitle = replaceTemplateVariables(templateTitle, vars, false);
+    const body = buildSingleClipsBody(
+      toClipInfos(raw),
+      vars,
+      (customHeader as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_HEADER,
+      (customFooter as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_FOOTER,
+      archiveUrl || undefined
+    );
+
     const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
-    const highlightsPost = await reddit.submitPost({
+    const monthlyPost = await reddit.submitPost({
       title: safeTitle,
       subredditName: subreddit.name,
       text: body,
     });
-
-    console.log(`Successfully created stream highlights post: ${highlightsPost.id}`);
+    console.log(`Created monthly highlights post for ${monthLabel}: ${monthlyPost.id}`);
+    await redis.set('monthly_editions', JSON.stringify(monthlyEditions));
+    await redis.set('monthly_last_posted', firedKey);
 
     if (flairTemplateId) {
       try {
         await reddit.setPostFlair({
-          postId: highlightsPost.id,
+          postId: monthlyPost.id,
           subredditName: subreddit.name,
-          flairTemplateId,
+          flairTemplateId: flairTemplateId as string,
         });
-        console.log(`Successfully applied flair to highlights post: ${flairTemplateId}`);
       } catch (flairError) {
-        console.error('Failed to set flair on highlights post:', flairError);
+        console.error('Failed to set flair on monthly highlights post:', flairError);
       }
     }
   } catch (error) {
-    console.error('Error creating stream highlights post:', error);
+    console.error('Error creating monthly highlights post:', error);
   }
 };
 
@@ -454,6 +754,8 @@ export const runStatusCheck = async (): Promise<void> => {
     highlightsHeader,
     highlightsFooter,
     highlightsFlairId,
+    stickyHighlightsPost,
+    enableWikiArchive,
     offlineGracePeriod,
     suggestedSortRaw,
     enableDashboard,
@@ -465,6 +767,7 @@ export const runStatusCheck = async (): Promise<void> => {
     streamerRedditUsername,
     liveUserFlairText,
     offlineUserFlairText,
+    streamerTimezone,
   ] = await Promise.all([
     get('twitchChannel'),
     get('youtubeChannel'),
@@ -490,6 +793,8 @@ export const runStatusCheck = async (): Promise<void> => {
     get('highlightsHeader'),
     get('highlightsFooter'),
     get('highlightsFlairId'),
+    get<boolean>('stickyHighlightsPost'),
+    get<boolean>('enableWikiArchive'),
     get<number>('offlineGracePeriod'),
     get<unknown>('suggestedSort'),
     get<boolean>('enableDashboard'),
@@ -501,6 +806,7 @@ export const runStatusCheck = async (): Promise<void> => {
     get('streamerRedditUsername'),
     get('liveUserFlairText'),
     get('offlineUserFlairText'),
+    get('streamerTimezone'),
   ]);
   const suggestedSort = Array.isArray(suggestedSortRaw)
     ? (suggestedSortRaw[0] as string | undefined)
@@ -585,11 +891,27 @@ export const runStatusCheck = async (): Promise<void> => {
       streamUptime = diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
     }
 
-    const dateStr = new Date().toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const activeStartedAt = stream?.started_at || (await redis.get('dashboard_started_at')) || (await redis.get('twitch_started_at'));
+    const parsedStart = activeStartedAt ? new Date(activeStartedAt) : null;
+    const dateObj = (parsedStart && !isNaN(parsedStart.getTime())) ? parsedStart : new Date();
+
+    let dateStr = '';
+    try {
+      const tz = (streamerTimezone as string | undefined)?.trim();
+      dateStr = dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: tz && tz !== '' ? tz : 'UTC',
+      });
+    } catch {
+      dateStr = dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+      });
+    }
 
     return {
       twitchChannel: twitchChannel as string,
@@ -787,6 +1109,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const thumbnail = streamInfo.thumbnail_url || '';
       const livePlatformsJson = JSON.stringify(liveStreams.map(toDashboardPlatform));
       await Promise.all([
+        redis.set('is_live_now', 'true'),
         redis.set('dashboard_platform', streamInfo.platform),
         redis.set('dashboard_display_name', currentVars.streamDisplayName || ''),
         redis.set('dashboard_title', streamInfo.title || ''),
@@ -810,6 +1133,7 @@ export const runStatusCheck = async (): Promise<void> => {
   }
   break;
   case StreamState.GRACE_PERIOD: {
+    await redis.set('is_live_now', 'false');
     const offlineSince = await redis.get('offline_since');
     const gracePeriodMin =
       offlineGracePeriod !== undefined && offlineGracePeriod >= 0 ? offlineGracePeriod : 6;
@@ -936,7 +1260,9 @@ export const runStatusCheck = async (): Promise<void> => {
               highlightsHeader,
               highlightsFooter,
               highlightsFlairId,
-              highlightsPostTitle
+              highlightsPostTitle,
+              stickyHighlightsPost,
+              enableWikiArchive
             );
           }
         } catch (highlightsError) {
@@ -1052,6 +1378,7 @@ export const runStatusCheck = async (): Promise<void> => {
       const offlineDisplayName =
         (await redis.get('twitch_display_name')) || defaultChannel;
       await Promise.all([
+        redis.set('is_live_now', 'false'),
         redis.set('dashboard_display_name', offlineDisplayName),
         redis.del('dashboard_platform'),
         redis.del('dashboard_title'),
@@ -1139,7 +1466,7 @@ export const runStatusCheck = async (): Promise<void> => {
       ]);
     }
 
-    const isLiveForRealtime = currentState !== StreamState.OFFLINE;
+    const isLiveForRealtime = currentState === StreamState.LIVE;
     const realtimePlatform = isLiveForRealtime
       ? (streamInfo?.platform || (await redis.get('dashboard_platform')) || null)
       : null;
@@ -1258,13 +1585,6 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_post_comments'),
     redis.del('dashboard_post_score'),
   ]);
-
-  const dashboardHeightRaw = await get<unknown>('dashboardHeight');
-  const dashboardHeight = Array.isArray(dashboardHeightRaw)
-    ? (dashboardHeightRaw[0] as string | undefined)
-    : (dashboardHeightRaw as string | undefined);
-  const val = String(dashboardHeight || 'regular').toLowerCase();
-  const isCompact = val !== 'tall';
 
   const enableDashboard = await get<boolean>('enableDashboard');
   if (enableDashboard) {

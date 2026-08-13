@@ -30,8 +30,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.238">
-  <link rel="stylesheet" href="landing.css?v=1.1.238">
+  <link rel="stylesheet" href="style.css?v=1.1.239">
+  <link rel="stylesheet" href="landing.css?v=1.1.239">
 </head>
 <body>
 
@@ -69,6 +69,7 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <a href="faq.html" class="nav-dropdown-item" role="menuitem">FAQ</a>
+            <a href="changelog.html" class="nav-dropdown-item" role="menuitem">Changelog</a>
             <a href="#" class="nav-dropdown-item contact-email" role="menuitem" data-user="support" data-domain="livesticky.com">Contact Support</a>
           <a href="https://github.com/iammesutkaya/LiveSticky/issues" target="_blank" rel="noopener noreferrer" class="nav-dropdown-item" role="menuitem">Report Bug via GitHub</a>
           </div>
@@ -99,6 +100,7 @@
             <tr><td><code>{stream_viewers}</code></td><td>Current live viewer count</td><td>15,420</td></tr>
             <tr><td><code>{stream_uptime}</code></td><td>Stream uptime</td><td>2h 15m</td></tr>
             <tr><td><code>{date}</code></td><td>Today's date (formatted in configured <code>⚙️ Streamer Timezone</code>)</td><td>July 27, 2026</td></tr>
+            <tr><td><code>{month}</code></td><td>Month covered by the Monthly Top 20 post (that post only)</td><td>July 2026</td></tr>
             <tr class="table-subheader"><td colspan="3"><strong>🔗 Platform-Specific Variables (Static)</strong></td></tr>
             <tr><td><code>{twitch_channel}</code></td><td>Configured Twitch channel</td><td>streamer</td></tr>
             <tr><td><code>{youtube_channel}</code></td><td>Configured YouTube channel</td><td>streamer</td></tr>
@@ -222,17 +224,15 @@ The stream has concluded. VODs and highlights may be available via the links bel
         <details class="tmpl-item">
           <summary>Highlights Post Title</summary>
           <div class="code-container">
-            <pre><code>🎬 Top Clips from {stream_display_name}'s stream ({date})</code></pre>
+            <pre><code>🎬 Top Clips - {stream_display_name}</code></pre>
           </div>
+          <p class="tmpl-note">This is one reused post that updates after every stream, so avoid per-stream values like <code>{date}</code> here; Reddit does not allow editing a post title after it is created.</p>
         </details>
 
         <details class="tmpl-item">
           <summary>Highlights Post Header Text</summary>
           <div class="code-container">
-            <pre><code>**Title:**
-{stream_title}
-
-Here are the most-watched Twitch clips from today's stream, compiled automatically by LiveSticky.</code></pre>
+            <pre><code>The most-watched Twitch clips from {stream_display_name}'s recent streams, compiled automatically by LiveSticky. Newest stream first.</code></pre>
           </div>
         </details>
 
@@ -241,6 +241,28 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
           <div class="code-container">
             <pre><code>---
 *Watch VODs and catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Monthly Top 20 Post Title</summary>
+          <div class="code-container">
+            <pre><code>🏆 Top 20 Clips of {month} - {stream_display_name}</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Monthly Top 20 Header Text</summary>
+          <div class="code-container">
+            <pre><code>The 20 most-watched Twitch clips from {month}, compiled automatically by LiveSticky.</code></pre>
+          </div>
+        </details>
+
+        <details class="tmpl-item">
+          <summary>Monthly Top 20 Footer Text</summary>
+          <div class="code-container">
+            <pre><code>---
+*Catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*</code></pre>
           </div>
         </details>
       </div>
@@ -268,6 +290,7 @@ Here are the most-watched Twitch clips from today's stream, compiled automatical
         <div class="footer-col">
           <span class="footer-col-title">Support</span>
           <a href="faq.html">FAQ</a>
+          <a href="changelog.html">Changelog</a>
           <a href="https://github.com/iammesutkaya/LiveSticky/issues" target="_blank" rel="noopener noreferrer">Report Bug via GitHub</a>
           <a href="#" class="contact-email" data-user="support" data-domain="livesticky.com">Contact Support</a>
         </div>

@@ -8,7 +8,6 @@ import {
   DEFAULT_LIVE_POST_BODY,
   DEFAULT_OFFLINE_POST_BODY,
 } from './templates.js';
-import type { UnifiedStreamInfo } from './platforms.js';
 
 export interface TemplateVariables {
   twitchChannel?: string;
@@ -24,6 +23,7 @@ export interface TemplateVariables {
   streamViewers?: string;
   streamUptime?: string;
   dateStr?: string;
+  monthLabel?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +144,10 @@ export const replaceTemplateVariables = (text: string, vars: TemplateVariables, 
     result = result.replace(/{date}/g, vars.dateStr);
   }
 
+  if (vars.monthLabel) {
+    result = result.replace(/{month}/g, vars.monthLabel);
+  }
+
   // Link variables (with cleanup if missing)
   result = vars.twitchUrl ? result.replace(/{twitch_url}/g, vars.twitchUrl) : removeTwitchLink(result);
   result = vars.youtubeUrl ? result.replace(/{youtube_url}/g, vars.youtubeUrl) : removeYoutubeLink(result);
@@ -193,4 +197,119 @@ export const computeUptime = (startedAt: string | null | undefined): string => {
   const hours = Math.floor(elapsedMs / 3600000);
   const minutes = Math.floor((elapsedMs % 3600000) / 60000);
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
+// ---------------------------------------------------------------------------
+// Clip compilation body building (shared by the reused per-stream highlights
+// post and the monthly top-20 post)
+// ---------------------------------------------------------------------------
+
+export interface ClipInfo {
+  title: string;
+  url: string;
+  views: number;
+  creator: string;
+}
+
+/** One stream's worth of clips, kept in the reused highlights post's archive. */
+export interface HighlightsEdition {
+  dateStr: string;
+  clips: ClipInfo[];
+}
+
+/** Render a numbered markdown list from clips (no header/footer). */
+export const renderClipList = (clips: ClipInfo[]): string =>
+  clips
+    .map(
+      (c, i) =>
+        `${i + 1}. **[${c.title || 'Untitled Clip'}](${c.url})**\n` +
+        `   * **Views:** ${(c.views || 0).toLocaleString()}\n` +
+        `   * **Clipped by:** ${c.creator || 'Anonymous'}\n`
+    )
+    .join('\n');
+
+/**
+ * Build the full body of the reused highlights post: header, the newest stream's
+ * clips, then up to `maxEditions - 1` older editions under a "Previous
+ * compilations" divider, then footer. `editions` is newest-first.
+ */
+export const buildHighlightsBody = (
+  editions: HighlightsEdition[],
+  vars: TemplateVariables,
+  headerTemplate: string,
+  footerTemplate: string,
+  maxEditions: number
+): string => {
+  const header = replaceTemplateVariables(headerTemplate, vars, false);
+  const capped = editions.slice(0, maxEditions);
+
+  let body = header ? `${header}\n\n` : '';
+  capped.forEach((edition, idx) => {
+    if (idx === 0) {
+      body += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+    } else {
+      if (idx === 1) body += `\n---\n\n### Previous compilations\n\n`;
+      body += `#### ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+    }
+  });
+
+  body += replaceTemplateVariables(footerTemplate, vars, false);
+  return body;
+};
+
+/**
+ * Build the reused post body when the full history lives in a wiki page: header,
+ * only the newest stream's clips, a link to the wiki archive, then footer.
+ */
+export const buildLatestClipsBody = (
+  latest: HighlightsEdition,
+  vars: TemplateVariables,
+  headerTemplate: string,
+  footerTemplate: string,
+  archiveUrl: string
+): string => {
+  const header = replaceTemplateVariables(headerTemplate, vars, false);
+  let body = header ? `${header}\n\n` : '';
+  body += `## 🎬 ${latest.dateStr}\n\n${renderClipList(latest.clips)}\n`;
+  body += `\n📚 **[Browse the full clip archive →](${archiveUrl})**\n\n`;
+  body += replaceTemplateVariables(footerTemplate, vars, false);
+  return body;
+};
+
+/**
+ * Build the full wiki archive page markdown: every stored edition, newest first.
+ * `title` and `intro` default to the per-stream clip archive wording; the monthly
+ * archive passes its own.
+ */
+export const buildWikiArchive = (
+  editions: HighlightsEdition[],
+  displayName: string,
+  title: string = '🎬 Clip Archive',
+  intro: string = 'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.'
+): string => {
+  const who = displayName ? ` - ${displayName}` : '';
+  let out = `# ${title}${who}\n\n${intro}\n\n`;
+  editions.forEach((edition) => {
+    out += `## ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+  });
+  return out;
+};
+
+/**
+ * Build a single-section clips post body (used by the monthly top-20 post). When
+ * `archiveUrl` is given, links to the wiki archive of past compilations.
+ */
+export const buildSingleClipsBody = (
+  clips: ClipInfo[],
+  vars: TemplateVariables,
+  headerTemplate: string,
+  footerTemplate: string,
+  archiveUrl?: string
+): string => {
+  const header = replaceTemplateVariables(headerTemplate, vars, false);
+  let body = header ? `${header}\n\n` : '';
+  body += `${renderClipList(clips)}\n`;
+  if (archiveUrl) body += `\n📚 **[Browse all monthly compilations →](${archiveUrl})**\n\n`;
+  body += replaceTemplateVariables(footerTemplate, vars, false);
+  return body;
 };

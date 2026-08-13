@@ -335,6 +335,142 @@ h1 {
   word-break: break-word;
 }
 
+.tmpl-note {
+  margin: 0 20px 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted, var(--text-secondary));
+}
+
+.tmpl-note code {
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+/* Changelog page */
+.changelog-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.changelog-sidebar {
+  position: sticky;
+  top: 90px;
+}
+
+.changelog-toc-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, var(--text-secondary));
+  margin-bottom: 12px;
+  /* Align with the link text: 2px active border + 14px link padding. */
+  padding-left: 16px;
+}
+
+.changelog-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Suppress the shared .content li bullet + indent inside the version list. */
+.changelog-sidebar li {
+  padding-left: 0;
+}
+
+.changelog-sidebar li::before {
+  display: none;
+}
+
+.changelog-sidebar a {
+  display: block;
+  padding: 6px 14px;
+  border-left: 2px solid transparent;
+  font-family: monospace;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+}
+
+.changelog-sidebar a:hover {
+  color: var(--accent-gold, currentColor);
+}
+
+.changelog-sidebar a.is-active {
+  border-left-color: var(--accent-gold, currentColor);
+  color: var(--accent-gold, currentColor);
+}
+
+@media (max-width: 768px) {
+  .changelog-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .changelog-sidebar {
+    position: static;
+    top: auto;
+  }
+
+  .changelog-toc-label {
+    padding-left: 0;
+  }
+
+  .changelog-sidebar ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .changelog-sidebar a {
+    border-left: none;
+    padding: 4px 12px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+    border-radius: 999px;
+  }
+
+  .changelog-sidebar a.is-active {
+    border-color: var(--accent-gold, currentColor);
+  }
+}
+
+.changelog-entry {
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+/* Offset anchored version headings so they clear the top nav on jump. */
+.changelog-head h2 {
+  scroll-margin-top: 90px;
+}
+
+.changelog-entry:last-child {
+  border-bottom: none;
+}
+
+.changelog-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.changelog-head h2 {
+  margin: 0;
+}
+
+.changelog-date {
+  font-size: 0.85rem;
+  color: var(--text-muted, var(--text-secondary));
+}
+
 /* Swatch colors for design.html (dynamically linked to variables) */
 .swatch-bg-primary { background: var(--bg-primary); }
 .swatch-bg-card { background: var(--bg-card); }
