@@ -400,18 +400,16 @@ function buildCard(p, cinematic) {
           <svg class="vc-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span class="vc-num">0</span>
         </span>
-        ${cinematic ? chipHtml : ''}
       </div>
       <div class="stream-card-info">
         <div class="info-top">
           <div class="stream-card-title"></div>
           <div class="meta-text meta-cat"></div>
         </div>
-        ${!cinematic ? `
-          <div class="info-bottom">
-            <span class="rtc-label">Join the live thread</span>
-            ${chipHtml}
-          </div>` : ''}
+        <div class="info-bottom">
+          <span class="rtc-label">Join the live thread</span>
+          ${chipHtml}
+        </div>
       </div>
     </div>`;
 
