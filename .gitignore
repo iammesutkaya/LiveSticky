@@ -10,3 +10,8 @@ public/*.js.map
 
 .claude/settings.local.json
 transform.js
+
+# Internal local documentation (gitignored)
+CURRENT_STATE.md
+ROADMAP.md
+notes/
