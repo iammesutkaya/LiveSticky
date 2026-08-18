@@ -55,6 +55,36 @@ const computeUptime = (startedAt?: string): string => {
 };
 
 /**
+ * Self-healing helper: Searches the subreddit for an existing post of a given type
+ * when Redis state is missing or lost (e.g. after server crash, cache clear, or cold restart).
+ * Prevents duplicate post creation on Reddit by discovering and reconnecting to active posts.
+ */
+const findExistingSubredditPost = async (
+  subredditName: string,
+  queryKeyword: string,
+  timeframe: 'day' | 'week' | 'month' | 'year' = 'month'
+): Promise<string | null> => {
+  try {
+    const searchListing = reddit.searchPosts({
+      subredditName,
+      query: queryKeyword,
+      sort: 'new',
+      timeframe,
+      limit: 5,
+    });
+    const posts = await searchListing.all();
+    if (posts && posts.length > 0) {
+      const candidate = posts[0];
+      console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
+      return candidate.id;
+    }
+  } catch (err) {
+    console.error(`[Self-Healing] Search failed for "${queryKeyword}":`, err);
+  }
+  return null;
+};
+
+/**
  * Shape persisted to Redis (`dashboard_live_platforms`) and returned to the
  * dashboard webview - one entry per simultaneously-live platform.
  */
@@ -114,7 +144,16 @@ const ensureStickyOfflinePost = async (
   );
   const templateTitle = preloadedOfflineTitle?.trim() || DEFAULT_OFFLINE_POST_TITLE;
   const offlinePostTitle = replaceTemplateVariables(templateTitle, vars, false);
-  const offlinePostId = await redis.get('offline_post_id');
+  let offlinePostId = await redis.get('offline_post_id');
+  if (!offlinePostId) {
+    const subreddit = await reddit.getCurrentSubreddit();
+    const recoveredId = await findExistingSubredditPost(subreddit.name, 'is offline', 'month');
+    if (recoveredId) {
+      offlinePostId = recoveredId;
+      await redis.set('offline_post_id', recoveredId);
+      console.log(`[Self-Healing] Reconnected offline_post_id from search: ${recoveredId}`);
+    }
+  }
   let offlinePostExists = false;
 
   if (offlinePostId) {
@@ -333,7 +372,15 @@ const postStreamHighlights = async (
       ? buildLatestClipsBody(latestEdition, activeVars, header, footer, archiveUrl)
       : buildHighlightsBody(editions, activeVars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
 
-    const existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
+    let existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
+    if (reusePost && !existingPostId) {
+      const recoveredId = await findExistingSubredditPost(subreddit.name, 'Top Clips', 'year');
+      if (recoveredId) {
+        existingPostId = recoveredId;
+        await redis.set('highlights_post_id', recoveredId);
+        console.log(`[Self-Healing] Reconnected highlights_post_id from search: ${recoveredId}`);
+      }
+    }
 
     // Try to edit the existing post if reusePost is enabled; if it's gone or reusePost is false,
     // fall through to creating a new one.
@@ -1063,62 +1110,89 @@ export const runStatusCheck = async (): Promise<void> => {
       }
 
       if (enableLivePost) {
-        console.log('Stream went live! Posting and pinning standard live post...');
-        try {
-          const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
-          const post = await reddit.submitPost({
-            title: safeTitle,
-            subredditName: subreddit.name,
-            text: postBody,
-          });
-          await pinPostWithFallback(post.id);
+        let existingLivePostId = await redis.get('live_post_id');
+        if (!existingLivePostId) {
+          const recoveredId = await findExistingSubredditPost(subreddit.name, 'is LIVE', 'day');
+          if (recoveredId) {
+            existingLivePostId = recoveredId;
+            await redis.set('live_post_id', recoveredId);
+            console.log(`[Self-Healing] Reconnected live_post_id from search: ${recoveredId}`);
+          }
+        }
 
-          if (suggestedSort && suggestedSort !== 'BLANK') {
-            try {
-              await post.setSuggestedCommentSort(suggestedSort as any);
-              console.log(`Successfully set suggested comment sort to ${suggestedSort}.`);
-            } catch (sortError) {
-              console.error(`Failed to set suggested comment sort to ${suggestedSort}:`, sortError);
+        if (existingLivePostId) {
+          console.log(`[Self-Healing] Found active live post (${existingLivePostId}). Updating and re-pinning instead of recreating.`);
+          try {
+            const post = await reddit.getPostById(existingLivePostId as `t3_${string}`);
+            await post.edit({ text: postBody });
+            await pinPostWithFallback(existingLivePostId);
+            if (enableDynamicFlair) {
+              await updateDynamicPostFlair(existingLivePostId, subreddit.name, streamInfo, liveFlairId);
             }
+          } catch (recoveryErr) {
+            console.error('[Self-Healing] Failed to update recovered live post, will create new post:', recoveryErr);
+            existingLivePostId = null;
           }
+        }
 
-          if (liveFlairId) {
-            try {
-              await reddit.setPostFlair({
-                postId: post.id,
-                subredditName: subreddit.name,
-                flairTemplateId: liveFlairId,
-              });
-              console.log(`Successfully applied post flair: ${liveFlairId}`);
-            } catch (flairError) {
-              console.error('Failed to set post flair:', flairError);
+        if (!existingLivePostId) {
+          console.log('Stream went live! Posting and pinning standard live post...');
+          try {
+            const safeTitle = postTitle.length > 300 ? postTitle.slice(0, 297) + '...' : postTitle;
+            const post = await reddit.submitPost({
+              title: safeTitle,
+              subredditName: subreddit.name,
+              text: postBody,
+            });
+            await pinPostWithFallback(post.id);
+
+            if (suggestedSort && suggestedSort !== 'BLANK') {
+              try {
+                await post.setSuggestedCommentSort(suggestedSort as any);
+                console.log(`Successfully set suggested comment sort to ${suggestedSort}.`);
+              } catch (sortError) {
+                console.error(`Failed to set suggested comment sort to ${suggestedSort}:`, sortError);
+              }
             }
-          }
 
-          if (enableDynamicFlair) {
-            await updateDynamicPostFlair(post.id, subreddit.name, streamInfo, liveFlairId);
-          }
-
-          const liveCommentText = await get('liveCommentText');
-          if (liveCommentText) {
-            try {
-              const comment = await reddit.submitComment({ id: post.id, text: liveCommentText });
-              await comment.distinguish(true);
-              console.log('Successfully posted and pinned moderator comment.');
-            } catch (commentError) {
-              console.error('Failed to post moderator comment:', commentError);
+            if (liveFlairId) {
+              try {
+                await reddit.setPostFlair({
+                  postId: post.id,
+                  subredditName: subreddit.name,
+                  flairTemplateId: liveFlairId,
+                });
+                console.log(`Successfully applied post flair: ${liveFlairId}`);
+              } catch (flairError) {
+                console.error('Failed to set post flair:', flairError);
+              }
             }
-          }
 
-          await redis.set('live_post_id', post.id);
-          console.log(`Successfully posted and pinned: ${post.id}`);
-        } catch (e: any) {
-          console.error('Failed to post stream status to Reddit:', e);
-          if (e && e.message && e.message.includes('400')) {
-             console.error('Reddit API returned 400 Bad Request. Discarding lock recovery to prevent infinite loop. Please check your settings for oversized text.');
-          } else {
-             console.log('Resetting lock...');
-             await redis.del('is_live_pinned');
+            if (enableDynamicFlair) {
+              await updateDynamicPostFlair(post.id, subreddit.name, streamInfo, liveFlairId);
+            }
+
+            const liveCommentText = await get('liveCommentText');
+            if (liveCommentText) {
+              try {
+                const comment = await reddit.submitComment({ id: post.id, text: liveCommentText });
+                await comment.distinguish(true);
+                console.log('Successfully posted and pinned moderator comment.');
+              } catch (commentError) {
+                console.error('Failed to post moderator comment:', commentError);
+              }
+            }
+
+            await redis.set('live_post_id', post.id);
+            console.log(`Successfully posted and pinned: ${post.id}`);
+          } catch (e: any) {
+            console.error('Failed to post stream status to Reddit:', e);
+            if (e && e.message && e.message.includes('400')) {
+               console.error('Reddit API returned 400 Bad Request. Discarding lock recovery to prevent infinite loop. Please check your settings for oversized text.');
+            } else {
+               console.log('Resetting lock...');
+               await redis.del('is_live_pinned');
+            }
           }
         }
       }
