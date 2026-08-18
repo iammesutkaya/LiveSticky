@@ -116,13 +116,13 @@
         <article class="changelog-entry">
           <div class="changelog-head">
             <h2 id="v1-1-249">v1.1.249</h2>
-            <span class="changelog-badge live">Released</span>
+            <span class="changelog-badge in-review">In Review</span>
           </div>
-          <p>Devvit 0.14.1 upgrade featuring self-healing post recovery, duplicate post prevention, and single-stream card UI refinements.</p>
+          <p>Devvit 0.14.1 platform upgrade featuring self-healing post recovery to prevent duplicate posts, plus single-stream card layout refinements.</p>
 
           <h3>Added</h3>
           <ul>
-            <li><strong>Self-Healing Post Recovery</strong>: powered by Devvit 0.14.1's <code>searchPosts()</code> API. If Redis state is missing or lost (e.g. after a server restart or cache clear), LiveSticky automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones—re-linking and updating existing posts to prevent duplicate posts on Reddit.</li>
+            <li><strong>Self-Healing Post Recovery</strong>: powered by Devvit 0.14.1's <code>searchPosts()</code> API. If Redis state is missing or lost (e.g. after a server restart or cache clear), LiveSticky automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones, re-linking and updating existing posts to prevent duplicate posts on Reddit.</li>
             <li>Upgraded core Devvit SDK packages to <strong>v0.14.1</strong>.</li>
           </ul>
 
