@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-249">
+                  <span class="changelog-ver">v1.1.249</span>
+                  <span class="changelog-sidebar-date">August 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-244">
                   <span class="changelog-ver">v1.1.244</span>
                   <span class="changelog-sidebar-date">August 2026</span>
@@ -109,8 +115,28 @@
 
         <article class="changelog-entry">
           <div class="changelog-head">
+            <h2 id="v1-1-249">v1.1.249</h2>
+            <span class="changelog-badge live">Released</span>
+          </div>
+          <p>Devvit 0.14.1 upgrade featuring self-healing post recovery, duplicate post prevention, and single-stream card UI refinements.</p>
+
+          <h3>Added</h3>
+          <ul>
+            <li><strong>Self-Healing Post Recovery</strong>: powered by Devvit 0.14.1's <code>searchPosts()</code> API. If Redis state is missing or lost (e.g. after a server restart or cache clear), LiveSticky automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones—re-linking and updating existing posts to prevent duplicate posts on Reddit.</li>
+            <li>Upgraded core Devvit SDK packages to <strong>v0.14.1</strong>.</li>
+          </ul>
+
+          <h3>Fixed</h3>
+          <ul>
+            <li><strong>Single-Stream vs Multi-Stream Layout Match</strong>: unified single-stream (cinematic) and multi-stream card layouts in compact mode. The Reddit live discussion thread pill chip now consistently sits in the info section on the right, preventing chip collisions inside the thumbnail image box.</li>
+            <li>Improved responsive 16:9 thumbnail cropping with top-centered object positioning on desktop and embedded demo containers.</li>
+          </ul>
+        </article>
+
+        <article class="changelog-entry">
+          <div class="changelog-head">
             <h2 id="v1-1-244">v1.1.244</h2>
-            <span class="changelog-badge in-review">In Review</span>
+            <span class="changelog-badge live">Released</span>
           </div>
           <p>A big update to the stream-highlights feature: support for single reused posts or per-stream posts linked sequentially, plus an optional wiki archive and a new monthly top-20 post.</p>
 
