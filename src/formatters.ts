@@ -227,11 +227,11 @@ export const renderClipListHtml = (clips: ClipInfo[]): string =>
         c.redditThumbnailUrl ||
         (c.thumbnailUrl && (c.thumbnailUrl.includes('redd.it') || c.thumbnailUrl.includes('reddit.com')) ? c.thumbnailUrl : '');
       const thumbHtml = imgUrl
-        ? `<a href="${c.url}" style="text-decoration: none;"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="360" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
+        ? `<a href="${c.url}"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="360" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
         : '';
       return (
         `  <li style="margin-bottom: 16px;">\n` +
-        `    <strong><a href="${c.url}" style="text-decoration: none;">🎬 ${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `    <strong><a href="${c.url}">${c.title || 'Untitled Clip'}</a></strong><br>\n` +
         `    ${thumbHtml}` +
         `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
         `  </li>`
