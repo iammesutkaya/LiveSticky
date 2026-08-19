@@ -214,6 +214,7 @@ export interface ClipInfo {
   url: string;
   views: number;
   creator: string;
+  thumbnailUrl?: string;
 }
 
 /** One stream's worth of clips, kept in the reused highlights post's archive. */
@@ -294,13 +295,18 @@ export const buildLatestClipsBody = (
 export const renderClipListHtml = (clips: ClipInfo[]): string =>
   '<ol>\n' +
   clips
-    .map(
-      (c) =>
-        `  <li>\n` +
+    .map((c) => {
+      const thumbHtml = c.thumbnailUrl
+        ? `<a href="${c.url}"><img src="${c.thumbnailUrl}" alt="${c.title || 'Clip Thumbnail'}" width="280" style="border-radius: 6px; margin: 6px 0;"></a><br>\n`
+        : '';
+      return (
+        `  <li style="margin-bottom: 14px;">\n` +
         `    <strong><a href="${c.url}">${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `    ${thumbHtml}` +
         `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
         `  </li>`
-    )
+      );
+    })
     .join('\n') +
   '\n</ol>';
 

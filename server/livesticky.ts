@@ -243,6 +243,7 @@ const toClipInfos = (raw: any[]): ClipInfo[] =>
     url: c.url,
     views: c.view_count || 0,
     creator: c.creator_name || 'Anonymous',
+    thumbnailUrl: c.thumbnail_url || '',
   }));
 
 // Editions shown inline in the post body when the wiki archive is unavailable.
