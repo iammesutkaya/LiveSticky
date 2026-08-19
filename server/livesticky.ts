@@ -266,6 +266,7 @@ const writeWikiPageVersion = async (
   wikiVersion: 'v1' | 'v2'
 ): Promise<boolean> => {
   try {
+    const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
     let exists = false;
     try {
       await reddit.getWikiPage(subredditName, page, { wikiVersion });
@@ -275,9 +276,9 @@ const writeWikiPageVersion = async (
     }
 
     if (exists) {
-      await reddit.updateWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive update', wikiVersion });
+      await reddit.updateWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive update', wikiVersion });
     } else {
-      await reddit.createWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive init', wikiVersion });
+      await reddit.createWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive init', wikiVersion });
     }
 
     try {
@@ -299,19 +300,19 @@ const writeWikiPageVersion = async (
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
   const indexContent = `# 🎬 LiveSticky Stream Archives
 
-> **Community Stream Archives & Clip Compilations**  
-> Automatically recorded and compiled by [LiveSticky](https://livesticky.com).
+Community stream archives and clip compilations for **/r/${subredditName}**, updated automatically by [LiveSticky](https://livesticky.com).
 
----
+***
 
-### 📚 Available Archives
+### 🎬 [Browse Stream Clip Archive](/r/${subredditName}/wiki/livesticky/clip-archive)
+Top Twitch clips from every stream session, organized newest-first.
 
-| Archive | Description | Link |
-| :--- | :--- | :--- |
-| **🎬 Stream Clips Archive** | Top Twitch clips from every stream session, organized newest-first. | **[Browse Stream Clips →](/r/${subredditName}/wiki/livesticky/clip-archive)** |
-| **🏆 Monthly Top 20** | Monthly compilation of the top 20 most-watched clips across the channel. | **[Browse Monthly Top 20 →](/r/${subredditName}/wiki/livesticky/monthly-archive)** |
+***
 
----
+### 🏆 [Browse Monthly Top 20 Compilations](/r/${subredditName}/wiki/livesticky/monthly-archive)
+Monthly compilation of the top 20 most-watched clips across the channel.
+
+***
 
 *Powered by [LiveSticky](https://livesticky.com) • Real-Time Subreddit Stream Engine*
 `;

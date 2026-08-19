@@ -286,7 +286,6 @@ describe('wiki archive mode', () => {
 
   it('buildWikiArchive includes hub backlink when subredditName is passed', () => {
     const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🎬 Clip Archive', 'intro', 'my_sub');
-    expect(page).toContain('[← Back to LiveSticky Archive Hub](/r/my_sub/wiki/livesticky)');
     expect(page).toContain('[← Return to LiveSticky Archive Hub](/r/my_sub/wiki/livesticky)');
   });
 

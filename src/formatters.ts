@@ -303,16 +303,16 @@ export const buildWikiArchive = (
   subredditName?: string
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
-  const hubBacklink = subredditName ? `> 📚 **[← Back to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n>\n` : '';
-  let out = `# ${title}${who}\n\n${hubBacklink}> *${intro}*\n\n---\n\n`;
+  const hubBacklink = subredditName ? `📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n\n` : '';
+  let out = `# ${title}${who}\n\n${hubBacklink}*${intro}*\n\n***\n\n`;
   editions.forEach((edition, idx) => {
-    out += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+    out += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n\n`;
     if (idx < editions.length - 1) {
-      out += `---\n\n`;
+      out += `***\n\n`;
     }
   });
   if (subredditName) {
-    out += `\n---\n\n📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n`;
+    out += `***\n\n📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n`;
   }
   return out;
 };
