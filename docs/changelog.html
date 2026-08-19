@@ -32,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.249">
-  <link rel="stylesheet" href="landing.css?v=1.1.249">
+  <link rel="stylesheet" href="style.css?v=1.1.250">
+  <link rel="stylesheet" href="landing.css?v=1.1.250">
 
 </head>
 
@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-250">
+                  <span class="changelog-ver">v1.1.250</span>
+                  <span class="changelog-sidebar-date">August 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-249">
                   <span class="changelog-ver">v1.1.249</span>
                   <span class="changelog-sidebar-date">August 2026</span>
@@ -115,8 +121,29 @@
 
         <article class="changelog-entry">
           <div class="changelog-head">
+            <h2 id="v1-1-250">v1.1.250</h2>
+            <span class="changelog-badge live">Released</span>
+          </div>
+          <p>Devvit Wiki V2 integration featuring dual-write support across Old Reddit and New Reddit / mobile apps, parent wiki index auto-creation, and 100% automated wiki section cleanup.</p>
+
+          <h3>Added</h3>
+          <ul>
+            <li><strong>Devvit Wiki V2 &amp; Dual-Write Support</strong>: LiveSticky now publishes clip compilation pages to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; mobile apps). Fixes empty clip archive pages on modern Reddit interfaces.</li>
+            <li><strong>Auto-Managed Wiki Index Page</strong>: automatically creates and updates the parent <code>/wiki/livesticky</code> directory landing page, eliminating <em>"livesticky does not exist"</em> errors when navigating to the root wiki section.</li>
+            <li><strong>100% Automated Wiki Namespace Cleanup</strong>: dynamically inspects subreddit wiki pages and automatically unlists/hides legacy or duplicate orphan pages (such as <code>clip_archive</code>) from the wiki navigation sidebar without requiring manual moderator intervention.</li>
+          </ul>
+
+          <h3>Fixed</h3>
+          <ul>
+            <li><strong>Clip Archive Link Availability</strong>: resolved issue where clicking <code>/wiki/livesticky/clip-archive/</code> on modern Reddit or official mobile apps resulted in an unpopulated blank page.</li>
+            <li><strong>Duplicate Sidebar Entries</strong>: resolved duplicate sidebar list items on subreddit wikis by setting legacy non-canonical page paths to unlisted mod-only mode.</li>
+          </ul>
+        </article>
+
+        <article class="changelog-entry">
+          <div class="changelog-head">
             <h2 id="v1-1-249">v1.1.249</h2>
-            <span class="changelog-badge in-review">In Review</span>
+            <span class="changelog-badge live">Released</span>
           </div>
           <p>Devvit 0.14.1 platform upgrade featuring self-healing post recovery to prevent duplicate posts, plus single-stream card layout refinements.</p>
 

@@ -42,6 +42,13 @@
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/refresh"
+      },
+      {
+        "label": "Clean Up LiveSticky Wiki Pages",
+        "description": "Unlists and hides all LiveSticky clip archive pages from the subreddit wiki.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/clean-wiki"
       }
     ]
   },

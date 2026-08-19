@@ -251,14 +251,115 @@ const MAX_HIGHLIGHTS_EDITIONS = 6;
 // itself holds the full browsable history; these keep Redis + the page comfortable.
 const ARCHIVE_MAX_EDITIONS = 50;
 const MONTHLY_ARCHIVE_MAX_EDITIONS = 24; // ~2 years of monthly compilations
+const INDEX_WIKI_PAGE = 'livesticky';
 const CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip-archive';
 const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
+const LEGACY_CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip_archive';
 
 /**
- * Writes markdown to a subreddit wiki page (create-or-update) and returns its
- * public URL, or null if the sub has no wiki / the app can't write to it (callers
- * then fall back to inlining the content). Pages are rewritten wholesale by the
- * caller each time so they stay deterministic - no markdown parsing.
+ * Writes markdown to a specific wiki version ('v1' or 'v2').
+ */
+const writeWikiPageVersion = async (
+  subredditName: string,
+  page: string,
+  content: string,
+  wikiVersion: 'v1' | 'v2'
+): Promise<boolean> => {
+  try {
+    let exists = false;
+    try {
+      await reddit.getWikiPage(subredditName, page, { wikiVersion });
+      exists = true;
+    } catch {
+      exists = false;
+    }
+
+    if (exists) {
+      await reddit.updateWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive update', wikiVersion });
+    } else {
+      await reddit.createWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive init', wikiVersion });
+    }
+
+    try {
+      await reddit.updateWikiPageSettings({ subredditName, page, listed: true, permLevel: 0, wikiVersion });
+    } catch (settingsErr) {
+      console.warn(`Could not update wiki page settings for ${page} (${wikiVersion}):`, settingsErr);
+    }
+
+    return true;
+  } catch (err) {
+    console.warn(`Could not write wiki page ${page} (${wikiVersion}):`, err);
+    return false;
+  }
+};
+
+/**
+ * Ensures the parent /wiki/livesticky index page exists and links to both archives.
+ */
+const updateWikiIndex = async (subredditName: string): Promise<void> => {
+  const indexContent = `# 🎬 LiveSticky Stream Archives
+
+Welcome to the stream archive hub powered by LiveSticky!
+
+- 🎬 **[Browse Stream Clip Archive](https://www.reddit.com/r/${subredditName}/wiki/livesticky/clip-archive)**
+- 🏆 **[Browse Monthly Top 20 Compilations](https://www.reddit.com/r/${subredditName}/wiki/livesticky/monthly-archive)**
+`;
+  await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v1');
+  await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v2');
+};
+
+/**
+ * Automatically manages LiveSticky's wiki space:
+ * 1. Queries all existing wiki pages on the subreddit (v1 and v2).
+ * 2. Identifies any pages matching LiveSticky's namespace (`livesticky/`, `livesticky_`, or legacy `clip_archive`)
+ *    that are NOT our canonical pages (`livesticky`, `livesticky/clip-archive`, `livesticky/monthly-archive`).
+ * 3. Automatically unlists and hides all non-canonical/legacy pages (`listed: false`, `permLevel: 2`),
+ *    keeping the wiki sidebar 100% clean with zero manual moderator effort.
+ */
+const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
+  const CANONICAL_PAGES = new Set([
+    INDEX_WIKI_PAGE, // 'livesticky'
+    CLIP_ARCHIVE_WIKI_PAGE, // 'livesticky/clip-archive'
+    MONTHLY_ARCHIVE_WIKI_PAGE, // 'livesticky/monthly-archive'
+  ]);
+
+  for (const wikiVersion of ['v1', 'v2'] as const) {
+    try {
+      const allPages = await reddit.getWikiPages(subredditName, { wikiVersion });
+      for (const rawPage of allPages) {
+        const page = rawPage.trim();
+        const lower = page.toLowerCase();
+        const isLiveStickyNamespace =
+          lower.startsWith('livesticky/') ||
+          lower.startsWith('livesticky_') ||
+          lower === 'livesticky' ||
+          lower.includes('clip_archive');
+
+        if (isLiveStickyNamespace && !CANONICAL_PAGES.has(lower)) {
+          try {
+            await reddit.updateWikiPageSettings({
+              subredditName,
+              page,
+              listed: false,
+              permLevel: 2, // Mods only
+              wikiVersion,
+            });
+            console.log(`[Auto-Clean Wiki] Unlisted non-canonical wiki page: ${page} (${wikiVersion})`);
+          } catch (err) {
+            console.warn(`Could not unlist wiki page ${page} (${wikiVersion}):`, err);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn(`Could not fetch wiki pages list for ${subredditName} (${wikiVersion}):`, err);
+    }
+  }
+};
+
+/**
+ * Writes markdown to a subreddit wiki page (create-or-update) across both
+ * Wiki V1 (Old Reddit) and Wiki V2 (New Reddit / Mobile Apps) so the content
+ * is visible regardless of which interface readers use.
  */
 const updateWikiArchive = async (
   subredditName: string,
@@ -266,25 +367,40 @@ const updateWikiArchive = async (
   content: string
 ): Promise<string | null> => {
   try {
-    let exists = false;
+    // Write to Wiki V1 (Old Reddit wiki)
+    const v1Success = await writeWikiPageVersion(subredditName, page, content, 'v1');
+
+    // Check if Wiki V2 is supported/enabled and write to Wiki V2 (New Reddit / Mobile apps)
+    let v2Enabled = false;
     try {
-      await reddit.getWikiPage(subredditName, page);
-      exists = true;
-    } catch {
-      exists = false;
+      v2Enabled = await reddit.isWikiV2Enabled(subredditName);
+    } catch (checkErr) {
+      console.warn(`Could not check isWikiV2Enabled for ${subredditName}:`, checkErr);
+      v2Enabled = true;
     }
 
-    if (exists) {
-      await reddit.updateWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive update' });
-    } else {
-      await reddit.createWikiPage({ subredditName, page, content, reason: 'LiveSticky: archive init' });
-      // permLevel 0 = follow the subreddit's wiki read settings; listed so it
-      // shows up in the wiki index for readers.
-      try {
-        await reddit.updateWikiPageSettings({ subredditName, page, listed: true, permLevel: 0 });
-      } catch (settingsErr) {
-        console.warn(`Could not update wiki page settings for ${page}:`, settingsErr);
-      }
+    let v2Success = false;
+    if (v2Enabled) {
+      v2Success = await writeWikiPageVersion(subredditName, page, content, 'v2');
+    }
+
+    if (!v1Success && !v2Success) {
+      console.warn(`Wiki page ${page} unavailable in both v1 and v2, falling back to inline content.`);
+      return null;
+    }
+
+    // Ensure parent /wiki/livesticky page exists so visiting /wiki/livesticky doesn't show "does not exist"
+    try {
+      await updateWikiIndex(subredditName);
+    } catch (idxErr) {
+      console.warn(`Could not update wiki index page for ${subredditName}:`, idxErr);
+    }
+
+    // Automatically clean up any non-canonical or duplicate wiki pages in the livesticky namespace
+    try {
+      await autoCleanManagedWiki(subredditName);
+    } catch (cleanErr) {
+      console.warn(`Could not auto-clean wiki pages for ${subredditName}:`, cleanErr);
     }
 
     return `https://www.reddit.com/r/${subredditName}/wiki/${page}`;
@@ -1742,5 +1858,81 @@ export const refreshLiveSticky = async (): Promise<string> => {
     console.error('Immediate status check after refresh failed:', e);
   }
 
+  // Re-sync stored clip editions to the wiki (both v1 and v2)
+  try {
+    const storedHighlights = await redis.get('highlights_editions');
+    if (storedHighlights) {
+      const editions = JSON.parse(storedHighlights) as HighlightsEdition[];
+      if (editions.length > 0) {
+        const subreddit = await reddit.getCurrentSubreddit();
+        const displayName = (await redis.get('twitch_display_name')) || '';
+        await updateWikiArchive(
+          subreddit.name,
+          CLIP_ARCHIVE_WIKI_PAGE,
+          buildWikiArchive(editions, displayName)
+        );
+      }
+    }
+  } catch (wikiErr) {
+    console.warn('Failed to re-sync clip archive wiki page during refresh:', wikiErr);
+  }
+
+  try {
+    const storedMonthly = await redis.get('monthly_editions');
+    if (storedMonthly) {
+      const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
+      if (editions.length > 0) {
+        const subreddit = await reddit.getCurrentSubreddit();
+        const displayName = (await redis.get('twitch_display_name')) || '';
+        await updateWikiArchive(
+          subreddit.name,
+          MONTHLY_ARCHIVE_WIKI_PAGE,
+          buildWikiArchive(
+            editions,
+            displayName,
+            '🏆 Monthly Top 20 Archive',
+            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.'
+          )
+        );
+      }
+    }
+  } catch (wikiErr) {
+    console.warn('Failed to re-sync monthly archive wiki page during refresh:', wikiErr);
+  }
+
   return `LiveSticky refreshed!`;
+};
+
+/**
+ * Unlists and hides all LiveSticky wiki pages from the subreddit wiki (v1 and v2).
+ */
+export const cleanWikiArchive = async (): Promise<string> => {
+  const subreddit = await reddit.getCurrentSubreddit();
+  const pagesToClean = [
+    INDEX_WIKI_PAGE,
+    CLIP_ARCHIVE_WIKI_PAGE,
+    MONTHLY_ARCHIVE_WIKI_PAGE,
+    LEGACY_CLIP_ARCHIVE_WIKI_PAGE,
+    'livesticky_clip_archive',
+  ];
+
+  let cleanedCount = 0;
+  for (const page of pagesToClean) {
+    for (const wikiVersion of ['v1', 'v2'] as const) {
+      try {
+        await reddit.updateWikiPageSettings({
+          subredditName: subreddit.name,
+          page,
+          listed: false,
+          permLevel: 2, // Mods only
+          wikiVersion,
+        });
+        cleanedCount++;
+      } catch {
+        // Ignore if page doesn't exist
+      }
+    }
+  }
+
+  return `Cleaned up LiveSticky wiki pages (${cleanedCount} page entries unlisted).`;
 };
