@@ -24,6 +24,7 @@ import {
   buildHighlightsBody,
   buildLatestClipsBody,
   buildWikiArchive,
+  buildWikiArchiveHtml,
   buildSingleClipsBody,
   type TemplateVariables,
   type ClipInfo,
@@ -311,25 +312,23 @@ const writeWikiPageVersion = async (
  * Ensures the parent /wiki/livesticky index page exists and links to both archives.
  */
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
-  const indexContent = `# 🎬 LiveSticky Stream Archives
+  const indexContent = `<h1>🎬 LiveSticky Stream Archives</h1>
 
-Community stream archives and clip compilations for **/r/${subredditName}**, updated automatically by [LiveSticky](https://livesticky.com).
+<p>Community stream archives and clip compilations for <strong>/r/${subredditName}</strong>, updated automatically by <a href="https://livesticky.com">LiveSticky</a>.</p>
 
----
+<hr>
 
-### 🎬 [Browse Stream Clip Archive](/r/${subredditName}/wiki/livesticky/clip-archive)
+<h3>🎬 <a href="/r/${subredditName}/wiki/livesticky/clip-archive">Browse Stream Clip Archive</a></h3>
+<p>Top Twitch clips from every stream session, organized newest-first.</p>
 
-Top Twitch clips from every stream session, organized newest-first.
+<hr>
 
----
+<h3>🏆 <a href="/r/${subredditName}/wiki/livesticky/monthly-archive">Browse Monthly Top 20 Compilations</a></h3>
+<p>Monthly compilation of the top 20 most-watched clips across the channel.</p>
 
-### 🏆 [Browse Monthly Top 20 Compilations](/r/${subredditName}/wiki/livesticky/monthly-archive)
+<hr>
 
-Monthly compilation of the top 20 most-watched clips across the channel.
-
----
-
-*Powered by [LiveSticky](https://livesticky.com) • Real-Time Subreddit Stream Engine*
+<p><em>Powered by <a href="https://livesticky.com">LiveSticky</a> • Real-Time Subreddit Stream Engine</em></p>
 `;
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v1');
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v2');
@@ -1945,7 +1944,7 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
       try {
         const editions = JSON.parse(storedHighlights) as HighlightsEdition[];
         if (editions.length > 0) {
-          clipContent = buildWikiArchive(
+          clipContent = buildWikiArchiveHtml(
             editions,
             displayName,
             '🎬 Clip Archive',
@@ -1958,19 +1957,18 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
       }
     }
     if (!clipContent) {
-      clipContent = `# 🎬 Clip Archive${displayName ? ` - ${displayName}` : ''}
+      clipContent = `<h1>🎬 Clip Archive${displayName ? ` - ${displayName}` : ''}</h1>
 
-> 📚 **[← Back to LiveSticky Archive Hub](/r/${subName}/wiki/livesticky)**
->
-> *Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.*
+<p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
+<p><em>Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.</em></p>
 
----
+<hr>
 
-*No stream clip compilations archived yet. Clips will appear here automatically after stream sessions end.*
+<p><em>No stream clip compilations archived yet. Clips will appear here automatically after stream sessions end.</em></p>
 
----
+<hr>
 
-📚 **[← Return to LiveSticky Archive Hub](/r/${subName}/wiki/livesticky)**
+<p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 `;
     }
     await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v1');
@@ -1982,7 +1980,7 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
       try {
         const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
         if (editions.length > 0) {
-          const monthlyContent = buildWikiArchive(
+          const monthlyContent = buildWikiArchiveHtml(
             editions,
             displayName,
             '🏆 Monthly Top 20 Archive',

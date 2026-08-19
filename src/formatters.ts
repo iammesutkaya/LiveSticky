@@ -290,6 +290,45 @@ export const buildLatestClipsBody = (
   return body;
 };
 
+/** Render an HTML ordered list from clips for Wiki pages. */
+export const renderClipListHtml = (clips: ClipInfo[]): string =>
+  '<ol>\n' +
+  clips
+    .map(
+      (c) =>
+        `  <li>\n` +
+        `    <strong><a href="${c.url}">${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
+        `  </li>`
+    )
+    .join('\n') +
+  '\n</ol>';
+
+/**
+ * Build the full wiki archive page HTML: every stored edition, newest first.
+ */
+export const buildWikiArchiveHtml = (
+  editions: HighlightsEdition[],
+  displayName: string,
+  title: string = '🎬 Clip Archive',
+  intro: string = 'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
+  subredditName?: string
+): string => {
+  const who = displayName ? ` - ${displayName}` : '';
+  const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
+  let out = `<h1>${title}${who}</h1>\n${hubBacklink}<p><em>${intro}</em></p>\n<hr>\n`;
+  editions.forEach((edition, idx) => {
+    out += `<h2>🎬 ${edition.dateStr}</h2>\n${renderClipListHtml(edition.clips)}\n`;
+    if (idx < editions.length - 1) {
+      out += `<hr>\n`;
+    }
+  });
+  if (subredditName) {
+    out += `<hr>\n<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n`;
+  }
+  return out;
+};
+
 /**
  * Build the full wiki archive page markdown: every stored edition, newest first.
  * `title` and `intro` default to the per-stream clip archive wording; the monthly
