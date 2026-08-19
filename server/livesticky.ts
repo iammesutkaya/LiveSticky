@@ -389,21 +389,21 @@ const writeWikiPageVersion = async (
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
   const indexContent = `<h1>🎬 LiveSticky Stream Archives</h1>
 
-<p>Community stream archives and clip compilations for <strong>/r/${subredditName}</strong>, updated automatically by <a href="https://livesticky.com">LiveSticky</a>.</p>
+<p>Community stream archives and clip compilations for <strong>/r/${subredditName}</strong>, updated automatically by <a href="https://livesticky.com" style="text-decoration: none;">LiveSticky</a>.</p>
 
 <hr>
 
-<h3>🎬 <a href="/r/${subredditName}/wiki/livesticky/clip-archive">Browse Stream Clip Archive</a></h3>
+<h3>🎬 <a href="/r/${subredditName}/wiki/livesticky/clip-archive" style="text-decoration: none;">Browse Stream Clip Archive</a></h3>
 <p>Top Twitch clips from every stream session, organized newest-first.</p>
 
 <hr>
 
-<h3>🏆 <a href="/r/${subredditName}/wiki/livesticky/monthly-archive">Browse Monthly Top 20 Compilations</a></h3>
+<h3>🏆 <a href="/r/${subredditName}/wiki/livesticky/monthly-archive" style="text-decoration: none;">Browse Monthly Top 20 Compilations</a></h3>
 <p>Monthly compilation of the top 20 most-watched clips across the channel.</p>
 
 <hr>
 
-<p><em>Powered by <a href="https://livesticky.com">LiveSticky</a> • Real-Time Subreddit Stream Engine</em></p>
+<p><em>Powered by <a href="https://livesticky.com" style="text-decoration: none;">LiveSticky</a> • Real-Time Subreddit Stream Engine</em></p>
 `;
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v1');
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v2');

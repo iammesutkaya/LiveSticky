@@ -227,11 +227,11 @@ export const renderClipListHtml = (clips: ClipInfo[]): string =>
         c.redditThumbnailUrl ||
         (c.thumbnailUrl && (c.thumbnailUrl.includes('redd.it') || c.thumbnailUrl.includes('reddit.com')) ? c.thumbnailUrl : '');
       const thumbHtml = imgUrl
-        ? `<a href="${c.url}"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="320" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
+        ? `<a href="${c.url}" style="text-decoration: none;"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="360" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
         : '';
       return (
-        `  <li style="margin-bottom: 14px;">\n` +
-        `    <strong><a href="${c.url}">🎬 ${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `  <li style="margin-bottom: 16px;">\n` +
+        `    <strong><a href="${c.url}" style="text-decoration: none;">🎬 ${c.title || 'Untitled Clip'}</a></strong><br>\n` +
         `    ${thumbHtml}` +
         `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
         `  </li>`
@@ -327,7 +327,7 @@ export const buildWikiArchiveHtml = (
   subredditName?: string
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
-  const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
+  const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky" style="text-decoration: none;">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
   let out = `<h1>${title}${who}</h1>\n${hubBacklink}<p><em>${intro}</em></p>\n<hr>\n`;
   editions.forEach((edition, idx) => {
     out += `<h2>🎬 ${edition.dateStr}</h2>\n${renderClipListHtml(edition.clips)}\n`;
@@ -336,7 +336,7 @@ export const buildWikiArchiveHtml = (
     }
   });
   if (subredditName) {
-    out += `<hr>\n<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n`;
+    out += `<hr>\n<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky" style="text-decoration: none;">← Return to LiveSticky Archive Hub</a></strong></p>\n`;
   }
   return out;
 };
