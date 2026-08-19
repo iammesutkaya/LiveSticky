@@ -299,13 +299,21 @@ export const buildWikiArchive = (
   editions: HighlightsEdition[],
   displayName: string,
   title: string = '🎬 Clip Archive',
-  intro: string = 'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.'
+  intro: string = 'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
+  subredditName?: string
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
-  let out = `# ${title}${who}\n\n${intro}\n\n`;
-  editions.forEach((edition) => {
-    out += `## ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+  const hubBacklink = subredditName ? `> 📚 **[← Back to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n>\n` : '';
+  let out = `# ${title}${who}\n\n${hubBacklink}> *${intro}*\n\n---\n\n`;
+  editions.forEach((edition, idx) => {
+    out += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n`;
+    if (idx < editions.length - 1) {
+      out += `---\n\n`;
+    }
   });
+  if (subredditName) {
+    out += `\n---\n\n📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n`;
+  }
   return out;
 };
 

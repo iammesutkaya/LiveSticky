@@ -299,10 +299,21 @@ const writeWikiPageVersion = async (
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
   const indexContent = `# 🎬 LiveSticky Stream Archives
 
-Welcome to the stream archive hub powered by LiveSticky!
+> **Community Stream Archives & Clip Compilations**  
+> Automatically recorded and compiled by [LiveSticky](https://livesticky.com).
 
-- 🎬 **[Browse Stream Clip Archive](https://www.reddit.com/r/${subredditName}/wiki/livesticky/clip-archive)**
-- 🏆 **[Browse Monthly Top 20 Compilations](https://www.reddit.com/r/${subredditName}/wiki/livesticky/monthly-archive)**
+---
+
+### 📚 Available Archives
+
+| Archive | Description | Link |
+| :--- | :--- | :--- |
+| **🎬 Stream Clips Archive** | Top Twitch clips from every stream session, organized newest-first. | **[Browse Stream Clips →](/r/${subredditName}/wiki/livesticky/clip-archive)** |
+| **🏆 Monthly Top 20** | Monthly compilation of the top 20 most-watched clips across the channel. | **[Browse Monthly Top 20 →](/r/${subredditName}/wiki/livesticky/monthly-archive)** |
+
+---
+
+*Powered by [LiveSticky](https://livesticky.com) • Real-Time Subreddit Stream Engine*
 `;
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v1');
   await writeWikiPageVersion(subredditName, INDEX_WIKI_PAGE, indexContent, 'v2');
@@ -481,7 +492,13 @@ const postStreamHighlights = async (
       ? await updateWikiArchive(
           subreddit.name,
           CLIP_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(editions, activeVars.streamDisplayName || '')
+          buildWikiArchive(
+            editions,
+            activeVars.streamDisplayName || '',
+            '🎬 Clip Archive',
+            'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
+            subreddit.name
+          )
         )
       : null;
     const body = archiveUrl
@@ -719,7 +736,6 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     monthlyEditions.unshift({ dateStr: monthLabel, clips: toClipInfos(raw) });
     monthlyEditions = monthlyEditions.slice(0, MONTHLY_ARCHIVE_MAX_EDITIONS);
 
-    const wikiArchive = await get<boolean>('enableWikiArchive');
     const archiveUrl = wikiArchive
       ? await updateWikiArchive(
           subreddit.name,
@@ -728,7 +744,8 @@ export const runMonthlyHighlights = async (): Promise<void> => {
             monthlyEditions,
             displayName,
             '🏆 Monthly Top 20 Archive',
-            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.'
+            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.',
+            subreddit.name
           )
         )
       : null;
@@ -1869,7 +1886,13 @@ export const refreshLiveSticky = async (): Promise<string> => {
         await updateWikiArchive(
           subreddit.name,
           CLIP_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(editions, displayName)
+          buildWikiArchive(
+            editions,
+            displayName,
+            '🎬 Clip Archive',
+            'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
+            subreddit.name
+          )
         );
       }
     }
@@ -1891,7 +1914,8 @@ export const refreshLiveSticky = async (): Promise<string> => {
             editions,
             displayName,
             '🏆 Monthly Top 20 Archive',
-            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.'
+            'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.',
+            subreddit.name
           )
         );
       }

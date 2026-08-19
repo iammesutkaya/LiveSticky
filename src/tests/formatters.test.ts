@@ -272,9 +272,9 @@ describe('wiki archive mode', () => {
   it('buildWikiArchive lists every edition newest-first with the display name', () => {
     const page = buildWikiArchive([mkEdition(3), mkEdition(2), mkEdition(1)], 'CoolStreamer');
     expect(page).toContain('# 🎬 Clip Archive - CoolStreamer');
-    expect(page).toContain('## Day 3');
-    expect(page).toContain('## Day 2');
-    expect(page).toContain('## Day 1');
+    expect(page).toContain('## 🎬 Day 3');
+    expect(page).toContain('## 🎬 Day 2');
+    expect(page).toContain('## 🎬 Day 1');
     expect(page.indexOf('Day 3')).toBeLessThan(page.indexOf('Day 1'));
   });
 
@@ -282,6 +282,12 @@ describe('wiki archive mode', () => {
     const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🏆 Monthly Top 20 Archive', 'monthly intro');
     expect(page).toContain('# 🏆 Monthly Top 20 Archive - CoolStreamer');
     expect(page).toContain('monthly intro');
+  });
+
+  it('buildWikiArchive includes hub backlink when subredditName is passed', () => {
+    const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🎬 Clip Archive', 'intro', 'my_sub');
+    expect(page).toContain('[← Back to LiveSticky Archive Hub](/r/my_sub/wiki/livesticky)');
+    expect(page).toContain('[← Return to LiveSticky Archive Hub](/r/my_sub/wiki/livesticky)');
   });
 
   it('buildSingleClipsBody adds a monthly archive link only when a URL is given', () => {
