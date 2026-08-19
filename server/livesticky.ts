@@ -7,7 +7,7 @@
  * (no Blocks runtime), which is required for the custom-post webview dashboard
  * to render.
  */
-import { reddit, redis, settings, realtime } from '@devvit/web/server';
+import { reddit, redis, settings, realtime, media } from '@devvit/web/server';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 import {
   LinksAndCommentsDefinition,
@@ -236,7 +236,41 @@ const fetchTopClips = async (
     .slice(0, top);
 };
 
-/** Map raw Twitch Helix clip objects to our slim ClipInfo shape. */
+const uploadThumbnailToReddit = async (url: string): Promise<string | null> => {
+  if (!url || !url.startsWith('http')) return null;
+  try {
+    const asset = await media.upload({ url, type: 'image' });
+    if (asset && asset.mediaUrl) {
+      console.log(`[Media Upload] Uploaded clip thumbnail to Reddit CDN: ${asset.mediaUrl}`);
+      return asset.mediaUrl;
+    }
+  } catch (err) {
+    console.warn(`[Media Upload] Could not upload thumbnail ${url} to Reddit CDN:`, err);
+  }
+  return null;
+};
+
+/** Map raw Twitch Helix clip objects to our slim ClipInfo shape, uploading thumbnails to Reddit CDN. */
+const toClipInfosAsync = async (raw: any[]): Promise<ClipInfo[]> => {
+  const clips: ClipInfo[] = [];
+  for (const c of raw) {
+    let redditThumbnailUrl = '';
+    const rawThumb = c.thumbnail_url || (c.url ? `https://clips-media-assets2.twitch.tv/${c.url.split('/').pop()}-preview-480x272.jpg` : '');
+    if (rawThumb) {
+      const uploaded = await uploadThumbnailToReddit(rawThumb);
+      if (uploaded) redditThumbnailUrl = uploaded;
+    }
+    clips.push({
+      title: c.title || 'Untitled Clip',
+      url: c.url,
+      views: c.view_count || 0,
+      creator: c.creator_name || 'Anonymous',
+      thumbnailUrl: redditThumbnailUrl || c.thumbnail_url || '',
+      redditThumbnailUrl,
+    });
+  }
+  return clips;
+};
 const toClipInfos = (raw: any[]): ClipInfo[] =>
   raw.map((c: any) => ({
     title: c.title || 'Untitled Clip',
@@ -504,7 +538,8 @@ const postStreamHighlights = async (
       console.error('Failed to parse stored highlights editions, starting fresh:', parseErr);
     }
     const dateStr = vars.dateStr || new Date().toISOString().slice(0, 10);
-    const latestEdition: HighlightsEdition = { dateStr, clips: toClipInfos(raw) };
+    const clipInfos = await toClipInfosAsync(raw);
+    const latestEdition: HighlightsEdition = { dateStr, clips: clipInfos };
     editions.unshift(latestEdition);
     editions = editions.slice(0, ARCHIVE_MAX_EDITIONS);
 
@@ -774,14 +809,15 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     } catch (parseErr) {
       console.error('Failed to parse stored monthly editions, starting fresh:', parseErr);
     }
-    monthlyEditions.unshift({ dateStr: monthLabel, clips: toClipInfos(raw) });
+    const monthlyClipInfos = await toClipInfosAsync(raw);
+    monthlyEditions.unshift({ dateStr: monthLabel, clips: monthlyClipInfos });
     monthlyEditions = monthlyEditions.slice(0, MONTHLY_ARCHIVE_MAX_EDITIONS);
 
     const archiveUrl = wikiArchive
       ? await updateWikiArchive(
           subreddit.name,
           MONTHLY_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(
+          buildWikiArchiveHtml(
             monthlyEditions,
             displayName,
             '🏆 Monthly Top 20 Archive',
@@ -794,7 +830,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     const templateTitle = (customTitle as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_TITLE;
     const postTitle = replaceTemplateVariables(templateTitle, vars, false);
     const body = buildSingleClipsBody(
-      toClipInfos(raw),
+      monthlyClipInfos,
       vars,
       (customHeader as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_HEADER,
       (customFooter as string)?.trim() || DEFAULT_MONTHLY_HIGHLIGHTS_POST_FOOTER,

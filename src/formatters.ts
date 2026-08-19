@@ -215,7 +215,30 @@ export interface ClipInfo {
   views: number;
   creator: string;
   thumbnailUrl?: string;
+  redditThumbnailUrl?: string;
 }
+
+/** Render an HTML ordered list from clips for Wiki pages. */
+export const renderClipListHtml = (clips: ClipInfo[]): string =>
+  '<ol>\n' +
+  clips
+    .map((c) => {
+      const imgUrl =
+        c.redditThumbnailUrl ||
+        (c.thumbnailUrl && (c.thumbnailUrl.includes('redd.it') || c.thumbnailUrl.includes('reddit.com')) ? c.thumbnailUrl : '');
+      const thumbHtml = imgUrl
+        ? `<a href="${c.url}"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="320" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
+        : '';
+      return (
+        `  <li style="margin-bottom: 14px;">\n` +
+        `    <strong><a href="${c.url}">🎬 ${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `    ${thumbHtml}` +
+        `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
+        `  </li>`
+      );
+    })
+    .join('\n') +
+  '\n</ol>';
 
 /** One stream's worth of clips, kept in the reused highlights post's archive. */
 export interface HighlightsEdition {
@@ -291,19 +314,7 @@ export const buildLatestClipsBody = (
   return body;
 };
 
-/** Render an HTML ordered list from clips for Wiki pages. */
-export const renderClipListHtml = (clips: ClipInfo[]): string =>
-  '<ol>\n' +
-  clips
-    .map(
-      (c) =>
-        `  <li style="margin-bottom: 12px;">\n` +
-        `    <strong><a href="${c.url}">🎬 ${c.title || 'Untitled Clip'}</a></strong><br>\n` +
-        `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
-        `  </li>`
-    )
-    .join('\n') +
-  '\n</ol>';
+
 
 /**
  * Build the full wiki archive page HTML: every stored edition, newest first.
