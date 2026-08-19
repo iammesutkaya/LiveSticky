@@ -266,6 +266,19 @@ const writeWikiPageVersion = async (
   wikiVersion: 'v1' | 'v2'
 ): Promise<boolean> => {
   try {
+    if (wikiVersion === 'v2') {
+      try {
+        const v2Enabled = await reddit.isWikiV2Enabled(subredditName);
+        if (!v2Enabled) {
+          console.log(`[Wiki V2] Subreddit ${subredditName} does not have Wiki V2 enabled. Skipping V2 write.`);
+          return false;
+        }
+      } catch (checkErr) {
+        console.warn(`[Wiki V2] Failed checking isWikiV2Enabled for ${subredditName}:`, checkErr);
+        return false;
+      }
+    }
+
     const formattedContent = content.replace(/\r\n/g, '\n').trim();
     let exists = false;
     try {
@@ -337,6 +350,15 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
   ]);
 
   for (const wikiVersion of ['v1', 'v2'] as const) {
+    if (wikiVersion === 'v2') {
+      try {
+        const v2Enabled = await reddit.isWikiV2Enabled(subredditName);
+        if (!v2Enabled) continue;
+      } catch {
+        continue;
+      }
+    }
+
     // 1. Ensure canonical pages are public and listed
     for (const page of CANONICAL_PAGES) {
       try {
