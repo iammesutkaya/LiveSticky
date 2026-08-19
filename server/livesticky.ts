@@ -1796,6 +1796,13 @@ export const runStatusCheck = async (): Promise<void> => {
   } catch (realtimeErr) {
     console.error('Failed to publish to Realtime channel:', realtimeErr);
   }
+
+  // Ensure wiki pages (hub, clip archive, sidebar visibility) are initialized and managed
+  try {
+    await ensureWikiArchiveReady(subreddit.name);
+  } catch (wikiReadyErr) {
+    console.warn('Failed to ensure wiki archive readiness during status check:', wikiReadyErr);
+  }
 };
 
 // ---------------------------------------------------------------------------
@@ -1890,54 +1897,93 @@ export const refreshLiveSticky = async (): Promise<string> => {
     console.error('Immediate status check after refresh failed:', e);
   }
 
-  // Re-sync stored clip editions to the wiki (both v1 and v2)
+  // Ensure wiki pages (hub, clip archive, sidebar visibility) are initialized and managed
   try {
+    await ensureWikiArchiveReady();
+  } catch (wikiErr) {
+    console.warn('Failed to sync wiki archive during refresh:', wikiErr);
+  }
+
+  return `LiveSticky refreshed!`;
+};
+
+/**
+ * Ensures the wiki archive hub, canonical pages, and sidebar listing are fully initialized
+ * and up to date, even if no clip editions are stored in Redis yet.
+ */
+export const ensureWikiArchiveReady = async (subredditName?: string): Promise<void> => {
+  try {
+    const wikiArchive = await get<boolean>('enableWikiArchive');
+    if (!wikiArchive) return;
+
+    const subName = subredditName || (await reddit.getCurrentSubreddit()).name;
+    const displayName = (await redis.get('twitch_display_name')) || '';
+
+    // 1. Ensure parent /wiki/livesticky hub page exists
+    await updateWikiIndex(subName);
+
+    // 2. Ensure /wiki/livesticky/clip-archive exists (create placeholder if empty)
     const storedHighlights = await redis.get('highlights_editions');
+    let clipContent = '';
     if (storedHighlights) {
-      const editions = JSON.parse(storedHighlights) as HighlightsEdition[];
-      if (editions.length > 0) {
-        const subreddit = await reddit.getCurrentSubreddit();
-        const displayName = (await redis.get('twitch_display_name')) || '';
-        await updateWikiArchive(
-          subreddit.name,
-          CLIP_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(
+      try {
+        const editions = JSON.parse(storedHighlights) as HighlightsEdition[];
+        if (editions.length > 0) {
+          clipContent = buildWikiArchive(
             editions,
             displayName,
             '🎬 Clip Archive',
             'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
-            subreddit.name
-          )
-        );
+            subName
+          );
+        }
+      } catch {
+        // Fallback
       }
     }
-  } catch (wikiErr) {
-    console.warn('Failed to re-sync clip archive wiki page during refresh:', wikiErr);
-  }
+    if (!clipContent) {
+      clipContent = `# 🎬 Clip Archive${displayName ? ` - ${displayName}` : ''}
 
-  try {
+> 📚 **[← Back to LiveSticky Archive Hub](/r/${subName}/wiki/livesticky)**
+>
+> *Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.*
+
+---
+
+*No stream clip compilations archived yet. Clips will appear here automatically after stream sessions end.*
+
+---
+
+📚 **[← Return to LiveSticky Archive Hub](/r/${subName}/wiki/livesticky)**
+`;
+    }
+    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v1');
+    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v2');
+
+    // 3. Sync monthly archive if stored
     const storedMonthly = await redis.get('monthly_editions');
     if (storedMonthly) {
-      const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
-      if (editions.length > 0) {
-        const subreddit = await reddit.getCurrentSubreddit();
-        const displayName = (await redis.get('twitch_display_name')) || '';
-        await updateWikiArchive(
-          subreddit.name,
-          MONTHLY_ARCHIVE_WIKI_PAGE,
-          buildWikiArchive(
+      try {
+        const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
+        if (editions.length > 0) {
+          const monthlyContent = buildWikiArchive(
             editions,
             displayName,
             '🏆 Monthly Top 20 Archive',
             'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.',
-            subreddit.name
-          )
-        );
+            subName
+          );
+          await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v1');
+          await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v2');
+        }
+      } catch {
+        // Ignore
       }
     }
-  } catch (wikiErr) {
-    console.warn('Failed to re-sync monthly archive wiki page during refresh:', wikiErr);
-  }
 
-  return `LiveSticky refreshed!`;
+    // 4. Ensure canonical pages are listed and non-canonical pages are cleaned
+    await autoCleanManagedWiki(subName);
+  } catch (err) {
+    console.warn('Could not ensure wiki archive readiness:', err);
+  }
 };
