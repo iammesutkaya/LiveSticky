@@ -321,11 +321,10 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
 
 /**
  * Automatically manages LiveSticky's wiki space:
- * 1. Queries all existing wiki pages on the subreddit (v1 and v2).
- * 2. Identifies any pages matching LiveSticky's namespace (`livesticky/`, `livesticky_`, or legacy `clip_archive`)
- *    that are NOT our canonical pages (`livesticky`, `livesticky/clip-archive`, `livesticky/monthly-archive`).
- * 3. Automatically unlists and hides all non-canonical/legacy pages (`listed: false`, `permLevel: 2`),
- *    keeping the wiki sidebar 100% clean with zero manual moderator effort.
+ * 1. Ensures canonical pages ('livesticky', 'livesticky/clip-archive', 'livesticky/monthly-archive') are listed: true and permLevel: 0 (public).
+ * 2. Queries all existing wiki pages on the subreddit (v1 and v2).
+ * 3. Identifies any non-canonical pages matching LiveSticky's namespace (`livesticky/`, `livesticky_`, or `clip_archive`)
+ *    and automatically unlists them (`listed: false`, `permLevel: 2`), keeping the sidebar clean.
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
   const CANONICAL_PAGES = new Set([
@@ -335,6 +334,22 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
   ]);
 
   for (const wikiVersion of ['v1', 'v2'] as const) {
+    // 1. Ensure canonical pages are public and listed
+    for (const page of CANONICAL_PAGES) {
+      try {
+        await reddit.updateWikiPageSettings({
+          subredditName,
+          page,
+          listed: true,
+          permLevel: 0, // Public
+          wikiVersion,
+        });
+      } catch {
+        // Page may not exist yet
+      }
+    }
+
+    // 2. Scan and unlist any orphan/legacy non-canonical pages
     try {
       const allPages = await reddit.getWikiPages(subredditName, { wikiVersion });
       for (const rawPage of allPages) {
@@ -1925,38 +1940,4 @@ export const refreshLiveSticky = async (): Promise<string> => {
   }
 
   return `LiveSticky refreshed!`;
-};
-
-/**
- * Unlists and hides all LiveSticky wiki pages from the subreddit wiki (v1 and v2).
- */
-export const cleanWikiArchive = async (): Promise<string> => {
-  const subreddit = await reddit.getCurrentSubreddit();
-  const pagesToClean = [
-    INDEX_WIKI_PAGE,
-    CLIP_ARCHIVE_WIKI_PAGE,
-    MONTHLY_ARCHIVE_WIKI_PAGE,
-    LEGACY_CLIP_ARCHIVE_WIKI_PAGE,
-    'livesticky_clip_archive',
-  ];
-
-  let cleanedCount = 0;
-  for (const page of pagesToClean) {
-    for (const wikiVersion of ['v1', 'v2'] as const) {
-      try {
-        await reddit.updateWikiPageSettings({
-          subredditName: subreddit.name,
-          page,
-          listed: false,
-          permLevel: 2, // Mods only
-          wikiVersion,
-        });
-        cleanedCount++;
-      } catch {
-        // Ignore if page doesn't exist
-      }
-    }
-  }
-
-  return `Cleaned up LiveSticky wiki pages (${cleanedCount} page entries unlisted).`;
 };

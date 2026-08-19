@@ -4,7 +4,6 @@ import { redis } from '@devvit/web/server';
 import {
   runStatusCheck,
   refreshLiveSticky,
-  cleanWikiArchive,
   runMonthlyHighlights,
 } from './livesticky.js';
 import { buildYouTubeUrl } from '../src/formatters.js';
@@ -251,17 +250,6 @@ app.post('/internal/menu/refresh', async (_req, res) => {
     console.error('Failed to refresh LiveSticky:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     res.json({ showToast: `❌ Refresh failed: ${message.slice(0, 80)}` });
-  }
-});
-
-app.post('/internal/menu/clean-wiki', async (_req, res) => {
-  try {
-    const message = await cleanWikiArchive();
-    res.json({ showToast: message });
-  } catch (error) {
-    console.error('Failed to clean LiveSticky wiki:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    res.json({ showToast: `❌ Wiki cleanup failed: ${message.slice(0, 80)}` });
   }
 });
 
