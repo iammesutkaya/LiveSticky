@@ -250,12 +250,52 @@ const uploadThumbnailToReddit = async (url: string): Promise<string | null> => {
   return null;
 };
 
+/** Fetch the official thumbnail_url for a Twitch clip directly from Twitch Helix API. */
+const fetchTwitchClipThumbnail = async (clipUrl: string): Promise<string | null> => {
+  if (!clipUrl) return null;
+  try {
+    const match = clipUrl.match(/(?:clips\.twitch\.tv\/|twitch\.tv\/[^/]+\/clip\/)([A-Za-z0-9_-]+)/);
+    if (!match || !match[1]) return null;
+    const clipId = match[1];
+
+    const twitchClientId = await get<string>('twitchClientId');
+    const twitchClientSecret = await get<string>('twitchClientSecret');
+    if (!twitchClientId || !twitchClientSecret) return null;
+
+    const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis);
+    if (!token) return null;
+
+    const res = await fetch(`https://api.twitch.tv/helix/clips?id=${clipId}`, {
+      headers: {
+        'Client-ID': twitchClientId,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) return null;
+    const data = (await res.json()) as { data?: Array<{ thumbnail_url?: string }> };
+    if (data.data && data.data.length > 0 && data.data[0].thumbnail_url) {
+      return data.data[0].thumbnail_url;
+    }
+  } catch (err) {
+    console.warn(`Could not fetch Twitch clip thumbnail for ${clipUrl}:`, err);
+  }
+  return null;
+};
+
+const getOrResolveClipThumbnail = async (clip: ClipInfo): Promise<string | null> => {
+  if (clip.thumbnailUrl && clip.thumbnailUrl.startsWith('http')) {
+    return clip.thumbnailUrl;
+  }
+  return await fetchTwitchClipThumbnail(clip.url);
+};
+
 /** Map raw Twitch Helix clip objects to our slim ClipInfo shape, uploading thumbnails to Reddit CDN. */
 const toClipInfosAsync = async (raw: any[]): Promise<ClipInfo[]> => {
   const clips: ClipInfo[] = [];
   for (const c of raw) {
     let redditThumbnailUrl = '';
-    const rawThumb = c.thumbnail_url || (c.url ? `https://clips-media-assets2.twitch.tv/${c.url.split('/').pop()}-preview-480x272.jpg` : '');
+    const rawThumb = c.thumbnail_url || (await fetchTwitchClipThumbnail(c.url)) || '';
     if (rawThumb) {
       const uploaded = await uploadThumbnailToReddit(rawThumb);
       if (uploaded) redditThumbnailUrl = uploaded;
@@ -1985,8 +2025,8 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
         for (const edition of editions) {
           for (const clip of edition.clips) {
             if (!clip.redditThumbnailUrl) {
-              const rawThumb = clip.thumbnailUrl || (clip.url ? `https://clips-media-assets2.twitch.tv/${clip.url.split('/').pop()}-preview-480x272.jpg` : '');
-              if (rawThumb && rawThumb.startsWith('http')) {
+              const rawThumb = await getOrResolveClipThumbnail(clip);
+              if (rawThumb) {
                 const uploaded = await uploadThumbnailToReddit(rawThumb);
                 if (uploaded) {
                   clip.redditThumbnailUrl = uploaded;
@@ -2040,8 +2080,8 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
         for (const edition of editions) {
           for (const clip of edition.clips) {
             if (!clip.redditThumbnailUrl) {
-              const rawThumb = clip.thumbnailUrl || (clip.url ? `https://clips-media-assets2.twitch.tv/${clip.url.split('/').pop()}-preview-480x272.jpg` : '');
-              if (rawThumb && rawThumb.startsWith('http')) {
+              const rawThumb = await getOrResolveClipThumbnail(clip);
+              if (rawThumb) {
                 const uploaded = await uploadThumbnailToReddit(rawThumb);
                 if (uploaded) {
                   clip.redditThumbnailUrl = uploaded;
