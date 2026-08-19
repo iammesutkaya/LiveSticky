@@ -246,7 +246,7 @@ describe('buildHighlightsBody - reused post archive', () => {
       'END'
     );
     expect(body).toContain('Top of August 2026');
-    expect(body).toContain('**1. [Epic play](https://clips.twitch.tv/x)**');
+    expect(body).toContain('1. **[Epic play](https://clips.twitch.tv/x)**');
     expect(body).toContain('1,234');
     expect(body).toContain('clipper');
     expect(body).toContain('END');

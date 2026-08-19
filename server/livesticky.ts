@@ -300,27 +300,21 @@ const writeWikiPageVersion = async (
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
   const indexContent = `# 🎬 LiveSticky Stream Archives
 
-Community stream archives and clip compilations for **/r/${subredditName}**, updated automatically by [LiveSticky](https://livesticky.com).<br>
+Community stream archives and clip compilations for **/r/${subredditName}**, updated automatically by [LiveSticky](https://livesticky.com).
 
-***
-
-<br>
+---
 
 ### 🎬 [Browse Stream Clip Archive](/r/${subredditName}/wiki/livesticky/clip-archive)
 
-Top Twitch clips from every stream session, organized newest-first.<br>
+Top Twitch clips from every stream session, organized newest-first.
 
-***
-
-<br>
+---
 
 ### 🏆 [Browse Monthly Top 20 Compilations](/r/${subredditName}/wiki/livesticky/monthly-archive)
 
-Monthly compilation of the top 20 most-watched clips across the channel.<br>
+Monthly compilation of the top 20 most-watched clips across the channel.
 
-***
-
-<br>
+---
 
 *Powered by [LiveSticky](https://livesticky.com) • Real-Time Subreddit Stream Engine*
 `;
