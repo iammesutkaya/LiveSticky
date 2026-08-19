@@ -327,7 +327,7 @@ export const buildWikiArchiveHtml = (
   subredditName?: string
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
-  const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky" style="text-decoration: none;">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
+  const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
   let out = `<h1>${title}${who}</h1>\n${hubBacklink}<p><em>${intro}</em></p>\n<hr>\n`;
   editions.forEach((edition, idx) => {
     out += `<h2>🎬 ${edition.dateStr}</h2>\n${renderClipListHtml(edition.clips)}\n`;
@@ -336,7 +336,7 @@ export const buildWikiArchiveHtml = (
     }
   });
   if (subredditName) {
-    out += `<hr>\n<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky" style="text-decoration: none;">← Return to LiveSticky Archive Hub</a></strong></p>\n`;
+    out += `<hr>\n<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n`;
   }
   return out;
 };
