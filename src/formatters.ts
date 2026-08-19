@@ -227,11 +227,11 @@ export const renderClipList = (clips: ClipInfo[]): string =>
   clips
     .map(
       (c, i) =>
-        `${i + 1}. **[${c.title || 'Untitled Clip'}](${c.url})**\n` +
-        `   * **Views:** ${(c.views || 0).toLocaleString()}\n` +
-        `   * **Clipped by:** ${c.creator || 'Anonymous'}\n`
+        `${i + 1}. **[${c.title || 'Untitled Clip'}](${c.url})**  \n` +
+        `   * **Views:** ${(c.views || 0).toLocaleString()}  \n` +
+        `   * **Clipped by:** ${c.creator || 'Anonymous'}`
     )
-    .join('\n');
+    .join('\n\n');
 
 /**
  * Build the full body of the reused highlights post: header, the newest stream's

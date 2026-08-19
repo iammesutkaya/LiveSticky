@@ -266,7 +266,7 @@ const writeWikiPageVersion = async (
   wikiVersion: 'v1' | 'v2'
 ): Promise<boolean> => {
   try {
-    const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
+    const formattedContent = content.replace(/\r\n/g, '\n').trim();
     let exists = false;
     try {
       await reddit.getWikiPage(subredditName, page, { wikiVersion });
@@ -305,11 +305,13 @@ Community stream archives and clip compilations for **/r/${subredditName}**, upd
 ***
 
 ### 🎬 [Browse Stream Clip Archive](/r/${subredditName}/wiki/livesticky/clip-archive)
+
 Top Twitch clips from every stream session, organized newest-first.
 
 ***
 
 ### 🏆 [Browse Monthly Top 20 Compilations](/r/${subredditName}/wiki/livesticky/monthly-archive)
+
 Monthly compilation of the top 20 most-watched clips across the channel.
 
 ***
