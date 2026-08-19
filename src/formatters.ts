@@ -291,16 +291,29 @@ export const buildLatestClipsBody = (
   return body;
 };
 
+/** Get thumbnail image URL for a clip, falling back to Twitch CDN preview pattern. */
+export const getClipThumbnail = (c: ClipInfo): string => {
+  if (c.thumbnailUrl && c.thumbnailUrl.trim()) return c.thumbnailUrl.trim();
+  if (c.url) {
+    const match = c.url.match(/(?:clips\.twitch\.tv\/|twitch\.tv\/[^/]+\/clip\/)([A-Za-z0-9_-]+)/);
+    if (match && match[1]) {
+      return `https://clips-media-assets2.twitch.tv/${match[1]}-preview-480x272.jpg`;
+    }
+  }
+  return '';
+};
+
 /** Render an HTML ordered list from clips for Wiki pages. */
 export const renderClipListHtml = (clips: ClipInfo[]): string =>
   '<ol>\n' +
   clips
     .map((c) => {
-      const thumbHtml = c.thumbnailUrl
-        ? `<a href="${c.url}"><img src="${c.thumbnailUrl}" alt="${c.title || 'Clip Thumbnail'}" width="280" style="border-radius: 6px; margin: 6px 0;"></a><br>\n`
+      const thumbUrl = getClipThumbnail(c);
+      const thumbHtml = thumbUrl
+        ? `<a href="${c.url}"><img src="${thumbUrl}" alt="${c.title || 'Clip Thumbnail'}" width="320" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
         : '';
       return (
-        `  <li style="margin-bottom: 14px;">\n` +
+        `  <li style="margin-bottom: 16px;">\n` +
         `    <strong><a href="${c.url}">${c.title || 'Untitled Clip'}</a></strong><br>\n` +
         `    ${thumbHtml}` +
         `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
