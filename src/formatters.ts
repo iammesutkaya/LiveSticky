@@ -227,11 +227,10 @@ export const renderClipList = (clips: ClipInfo[]): string =>
   clips
     .map(
       (c, i) =>
-        `${i + 1}. **[${c.title || 'Untitled Clip'}](${c.url})**  \n` +
-        `   * **Views:** ${(c.views || 0).toLocaleString()}  \n` +
-        `   * **Clipped by:** ${c.creator || 'Anonymous'}`
+        `**${i + 1}. [${c.title || 'Untitled Clip'}](${c.url})**<br>\n` +
+        `👁️ **Views:** ${(c.views || 0).toLocaleString()} &bull; 👤 **Clipped by:** ${c.creator || 'Anonymous'}`
     )
-    .join('\n\n');
+    .join('\n\n<br>\n\n');
 
 /**
  * Build the full body of the reused highlights post: header, the newest stream's
@@ -303,16 +302,16 @@ export const buildWikiArchive = (
   subredditName?: string
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
-  const hubBacklink = subredditName ? `📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n\n` : '';
-  let out = `# ${title}${who}\n\n${hubBacklink}*${intro}*\n\n***\n\n`;
+  const hubBacklink = subredditName ? `📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**<br>\n\n` : '';
+  let out = `# ${title}${who}\n\n${hubBacklink}*${intro}*<br>\n\n---\n\n<br>\n\n`;
   editions.forEach((edition, idx) => {
-    out += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n\n`;
+    out += `## 🎬 ${edition.dateStr}\n\n<br>\n\n${renderClipList(edition.clips)}\n\n<br>\n\n`;
     if (idx < editions.length - 1) {
-      out += `***\n\n`;
+      out += `---\n\n<br>\n\n`;
     }
   });
   if (subredditName) {
-    out += `***\n\n📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n`;
+    out += `---\n\n<br>\n\n📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n`;
   }
   return out;
 };
