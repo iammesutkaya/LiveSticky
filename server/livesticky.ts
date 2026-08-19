@@ -279,7 +279,7 @@ const writeWikiPageVersion = async (
       }
     }
 
-    const formattedContent = content.replace(/\r\n/g, '\n').trim();
+    const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
     let exists = false;
     try {
       await reddit.getWikiPage(subredditName, page, { wikiVersion });
@@ -1905,15 +1905,6 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_post_comments'),
     redis.del('dashboard_post_score'),
   ]);
-
-  const enableDashboard = await get<boolean>('enableDashboard');
-  if (enableDashboard) {
-    try {
-      await createDashboardPost();
-    } catch (e) {
-      console.error('Failed to re-create dashboard during refresh:', e);
-    }
-  }
 
   // Run one immediate check so state is rebuilt without waiting for the cron.
   try {
