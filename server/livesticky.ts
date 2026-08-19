@@ -383,7 +383,8 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
           lower.startsWith('livesticky/') ||
           lower.startsWith('livesticky_') ||
           lower === 'livesticky' ||
-          lower.includes('clip_archive');
+          lower.includes('clip_archive') ||
+          lower.includes('clip-archive');
 
         if (isLiveStickyNamespace && !CANONICAL_PAGES.has(lower)) {
           try {
@@ -1974,26 +1975,42 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
     await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v1');
     await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v2');
 
-    // 3. Sync monthly archive if stored
+    // 3. Ensure /wiki/livesticky/monthly-archive exists (create placeholder if empty)
     const storedMonthly = await redis.get('monthly_editions');
+    let monthlyContent = '';
     if (storedMonthly) {
       try {
         const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
         if (editions.length > 0) {
-          const monthlyContent = buildWikiArchiveHtml(
+          monthlyContent = buildWikiArchiveHtml(
             editions,
             displayName,
             '🏆 Monthly Top 20 Archive',
             'The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.',
             subName
           );
-          await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v1');
-          await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v2');
         }
       } catch {
-        // Ignore
+        // Fallback
       }
     }
+    if (!monthlyContent) {
+      monthlyContent = `<h1>🏆 Monthly Top 20 Archive${displayName ? ` - ${displayName}` : ''}</h1>
+
+<p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
+<p><em>The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.</em></p>
+
+<hr>
+
+<p><em>No monthly top 20 compilations archived yet. Monthly compilations will appear here automatically on the 1st of each month.</em></p>
+
+<hr>
+
+<p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
+`;
+    }
+    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v1');
+    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v2');
 
     // 4. Ensure canonical pages are listed and non-canonical pages are cleaned
     await autoCleanManagedWiki(subName);
