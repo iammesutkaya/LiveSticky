@@ -1981,6 +1981,24 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
     if (storedHighlights) {
       try {
         const editions = JSON.parse(storedHighlights) as HighlightsEdition[];
+        let updated = false;
+        for (const edition of editions) {
+          for (const clip of edition.clips) {
+            if (!clip.redditThumbnailUrl) {
+              const rawThumb = clip.thumbnailUrl || (clip.url ? `https://clips-media-assets2.twitch.tv/${clip.url.split('/').pop()}-preview-480x272.jpg` : '');
+              if (rawThumb && rawThumb.startsWith('http')) {
+                const uploaded = await uploadThumbnailToReddit(rawThumb);
+                if (uploaded) {
+                  clip.redditThumbnailUrl = uploaded;
+                  updated = true;
+                }
+              }
+            }
+          }
+        }
+        if (updated) {
+          await redis.set('highlights_editions', JSON.stringify(editions));
+        }
         if (editions.length > 0) {
           clipContent = buildWikiArchiveHtml(
             editions,
@@ -2018,6 +2036,24 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
     if (storedMonthly) {
       try {
         const editions = JSON.parse(storedMonthly) as HighlightsEdition[];
+        let updated = false;
+        for (const edition of editions) {
+          for (const clip of edition.clips) {
+            if (!clip.redditThumbnailUrl) {
+              const rawThumb = clip.thumbnailUrl || (clip.url ? `https://clips-media-assets2.twitch.tv/${clip.url.split('/').pop()}-preview-480x272.jpg` : '');
+              if (rawThumb && rawThumb.startsWith('http')) {
+                const uploaded = await uploadThumbnailToReddit(rawThumb);
+                if (uploaded) {
+                  clip.redditThumbnailUrl = uploaded;
+                  updated = true;
+                }
+              }
+            }
+          }
+        }
+        if (updated) {
+          await redis.set('monthly_editions', JSON.stringify(editions));
+        }
         if (editions.length > 0) {
           monthlyContent = buildWikiArchiveHtml(
             editions,
