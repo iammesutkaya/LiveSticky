@@ -417,10 +417,14 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
  *    and automatically unlists them (`listed: false`, `permLevel: 2`), keeping the sidebar clean.
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
-  const CANONICAL_PAGES = [
-    INDEX_WIKI_PAGE, // 'livesticky'
-    CLIP_ARCHIVE_WIKI_PAGE, // 'livesticky/clip-archive'
-    MONTHLY_ARCHIVE_WIKI_PAGE, // 'livesticky/monthly-archive'
+  const ALL_LIVESTICKY_PAGES = [
+    'livesticky',
+    'livesticky/clip-archive',
+    'livesticky/monthly-archive',
+    'LiveSticky',
+    'LiveSticky/clip-archive',
+    'LiveSticky/monthly-archive',
+    'livesticky/clip_archive',
   ];
 
   for (const wikiVersion of ['v1', 'v2'] as const) {
@@ -433,8 +437,8 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
       }
     }
 
-    // Ensure canonical pages are public and listed
-    for (const page of CANONICAL_PAGES) {
+    // Ensure all pages in LiveSticky namespace are listed: true and permLevel: 0 (Public)
+    for (const page of ALL_LIVESTICKY_PAGES) {
       try {
         await reddit.updateWikiPageSettings({
           subredditName,
@@ -445,22 +449,6 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
         });
       } catch {
         // Page may not exist yet
-      }
-    }
-
-    // Reset permission level to 0 for any leftover orphan test pages so moderators can edit and manage them
-    const orphanPages = ['LiveSticky', 'LiveSticky/clip-archive', 'LiveSticky/monthly-archive', 'livesticky/clip_archive'];
-    for (const page of orphanPages) {
-      try {
-        await reddit.updateWikiPageSettings({
-          subredditName,
-          page,
-          listed: false,
-          permLevel: 0, // Standard editable permission level
-          wikiVersion,
-        });
-      } catch {
-        // Page doesn't exist
       }
     }
   }
@@ -2051,8 +2039,10 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 `;
     }
-    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v1');
-    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v2');
+    for (const page of [CLIP_ARCHIVE_WIKI_PAGE, 'LiveSticky/clip-archive', 'LiveSticky/clip_archive']) {
+      await writeWikiPageVersion(subName, page, clipContent, 'v1');
+      await writeWikiPageVersion(subName, page, clipContent, 'v2');
+    }
 
     // 3. Ensure /wiki/livesticky/monthly-archive exists (create placeholder if empty)
     const storedMonthly = await redis.get('monthly_editions');
@@ -2106,8 +2096,10 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 `;
     }
-    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v1');
-    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v2');
+    for (const page of [MONTHLY_ARCHIVE_WIKI_PAGE, 'LiveSticky/monthly-archive']) {
+      await writeWikiPageVersion(subName, page, monthlyContent, 'v1');
+      await writeWikiPageVersion(subName, page, monthlyContent, 'v2');
+    }
 
     // 4. Ensure canonical pages are listed and non-canonical pages are cleaned
     await autoCleanManagedWiki(subName);
