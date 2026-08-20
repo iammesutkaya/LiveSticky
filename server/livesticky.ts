@@ -417,15 +417,11 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
  *    and automatically unlists them (`listed: false`, `permLevel: 2`), keeping the sidebar clean.
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
-  const ALL_LIVESTICKY_PAGES = [
-    'livesticky',
-    'livesticky/clip-archive',
-    'livesticky/monthly-archive',
-    'LiveSticky',
-    'LiveSticky/clip-archive',
-    'LiveSticky/monthly-archive',
-    'livesticky/clip_archive',
-  ];
+  const CANONICAL_PAGES = new Set([
+    INDEX_WIKI_PAGE, // 'livesticky'
+    CLIP_ARCHIVE_WIKI_PAGE, // 'livesticky/clip-archive'
+    MONTHLY_ARCHIVE_WIKI_PAGE, // 'livesticky/monthly-archive'
+  ]);
 
   for (const wikiVersion of ['v1', 'v2'] as const) {
     if (wikiVersion === 'v2') {
@@ -437,8 +433,8 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
       }
     }
 
-    // Ensure all pages in LiveSticky namespace are listed: true and permLevel: 0 (Public)
-    for (const page of ALL_LIVESTICKY_PAGES) {
+    // 1. Ensure canonical pages are public and listed
+    for (const page of CANONICAL_PAGES) {
       try {
         await reddit.updateWikiPageSettings({
           subredditName,
@@ -450,6 +446,39 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
       } catch {
         // Page may not exist yet
       }
+    }
+
+    // 2. Scan and unlist all non-canonical/orphan pages in the LiveSticky namespace
+    try {
+      const allPages = await reddit.getWikiPages(subredditName, { wikiVersion });
+      for (const rawPage of allPages) {
+        const page = rawPage.trim();
+        const lower = page.toLowerCase();
+        const isLiveStickyNamespace =
+          lower.startsWith('livesticky/') ||
+          lower.startsWith('livesticky_') ||
+          lower === 'livesticky' ||
+          lower.includes('clip_archive') ||
+          lower.includes('clip-archive') ||
+          lower.includes('monthly-archive');
+
+        if (isLiveStickyNamespace && !CANONICAL_PAGES.has(page)) {
+          try {
+            await reddit.updateWikiPageSettings({
+              subredditName,
+              page,
+              listed: false,
+              permLevel: 2, // Unlist non-canonical page
+              wikiVersion,
+            });
+            console.log(`[Auto-Clean Wiki] Unlisted orphan wiki page: ${page} (${wikiVersion})`);
+          } catch (err) {
+            console.warn(`Could not unlist orphan wiki page ${page} (${wikiVersion}):`, err);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn(`Could not fetch wiki pages list for ${subredditName} (${wikiVersion}):`, err);
     }
   }
 };
@@ -2039,10 +2068,8 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 `;
     }
-    for (const page of [CLIP_ARCHIVE_WIKI_PAGE, 'LiveSticky/clip-archive', 'LiveSticky/clip_archive']) {
-      await writeWikiPageVersion(subName, page, clipContent, 'v1');
-      await writeWikiPageVersion(subName, page, clipContent, 'v2');
-    }
+    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v1');
+    await writeWikiPageVersion(subName, CLIP_ARCHIVE_WIKI_PAGE, clipContent, 'v2');
 
     // 3. Ensure /wiki/livesticky/monthly-archive exists (create placeholder if empty)
     const storedMonthly = await redis.get('monthly_editions');
@@ -2096,10 +2123,8 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 `;
     }
-    for (const page of [MONTHLY_ARCHIVE_WIKI_PAGE, 'LiveSticky/monthly-archive']) {
-      await writeWikiPageVersion(subName, page, monthlyContent, 'v1');
-      await writeWikiPageVersion(subName, page, monthlyContent, 'v2');
-    }
+    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v1');
+    await writeWikiPageVersion(subName, MONTHLY_ARCHIVE_WIKI_PAGE, monthlyContent, 'v2');
 
     // 4. Ensure canonical pages are listed and non-canonical pages are cleaned
     await autoCleanManagedWiki(subName);
