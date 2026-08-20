@@ -10,3 +10,9 @@
 # Hover Effects Constraints
 - Do NOT use colored box-shadow glows on hover for buttons, pills, or chips (no glow on hover). Keep hover transitions clean and sleek with background color shifts or subtle translateY transforms without colored drop-shadow glows.
 
+# Reddit Wiki Slug Constraints
+- NEVER alter or test changing canonical Reddit wiki page slug strings (e.g. changing `'livesticky'` to `'LiveSticky'`).
+- Reddit Wiki API has no `DeleteWikiPage` method. Once a wiki page slug is created on Reddit, it is permanently recorded in the subreddit's database and cannot be deleted.
+- Changing slug casing or names creates orphan pages that cannot be removed from Reddit's database index, creating clutter for moderators.
+
+
