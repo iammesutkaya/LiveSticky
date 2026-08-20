@@ -327,9 +327,9 @@ const MAX_HIGHLIGHTS_EDITIONS = 6;
 // itself holds the full browsable history; these keep Redis + the page comfortable.
 const ARCHIVE_MAX_EDITIONS = 50;
 const MONTHLY_ARCHIVE_MAX_EDITIONS = 24; // ~2 years of monthly compilations
-const INDEX_WIKI_PAGE = 'LiveSticky';
-const CLIP_ARCHIVE_WIKI_PAGE = 'LiveSticky/clip-archive';
-const MONTHLY_ARCHIVE_WIKI_PAGE = 'LiveSticky/monthly-archive';
+const INDEX_WIKI_PAGE = 'livesticky';
+const CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip-archive';
+const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
 const LEGACY_CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip_archive';
 
 /**
@@ -393,12 +393,12 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
 
 <hr>
 
-<h3>🎬 <a href="/r/${subredditName}/wiki/LiveSticky/clip-archive">Browse Stream Clip Archive</a></h3>
+<h3>🎬 <a href="/r/${subredditName}/wiki/livesticky/clip-archive">Browse Stream Clip Archive</a></h3>
 <p>Top Twitch clips from every stream session, organized newest-first.</p>
 
 <hr>
 
-<h3>🏆 <a href="/r/${subredditName}/wiki/LiveSticky/monthly-archive">Browse Monthly Top 20 Compilations</a></h3>
+<h3>🏆 <a href="/r/${subredditName}/wiki/livesticky/monthly-archive">Browse Monthly Top 20 Compilations</a></h3>
 <p>Monthly compilation of the top 20 most-watched clips across the channel.</p>
 
 <hr>
