@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-285">
+                  <span class="changelog-ver">v1.1.285</span>
+                  <span class="changelog-sidebar-date">August 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-250">
                   <span class="changelog-ver">v1.1.250</span>
                   <span class="changelog-sidebar-date">August 2026</span>
@@ -118,6 +124,27 @@
         </aside>
 
         <div class="changelog-main article-content">
+
+        <article class="changelog-entry">
+          <div class="changelog-head">
+            <h2 id="v1-1-285">v1.1.285</h2>
+            <span class="changelog-badge live">Released</span>
+          </div>
+          <p>Devvit Wiki V2 dual-write engine with native HTML clip thumbnail cards, automated archive hub navigation, and canonical wiki page routing.</p>
+
+          <h3>Added</h3>
+          <ul>
+            <li><strong>Rich HTML Clip Lists for Wiki V2</strong>: Introduced native HTML rendering for clip archives (<code>renderClipListHtml</code> and <code>buildWikiArchiveHtml</code>) complete with embedded 16:9 clip thumbnails, responsive image scaling, view counters, and creator attribution for New Reddit and official mobile apps.</li>
+            <li><strong>Subreddit Wiki Hub Navigation</strong>: Added prominent archive hub backlinks (<code>📚 Return to LiveSticky Archive Hub</code>) linking back to <code>/r/{subreddit}/wiki/livesticky</code> across monthly and stream clip archive pages.</li>
+            <li><strong>Canonical Wiki Slug Enforcement</strong>: Standardized page routing under <code>livesticky/clip-archive</code> and <code>livesticky/monthly-archive</code> with automatic detection and unlisting of legacy duplicate wiki entries.</li>
+          </ul>
+
+          <h3>Fixed</h3>
+          <ul>
+            <li><strong>Mobile Wiki Thumbnail Rendering</strong>: Fixed clip thumbnail images on Reddit Wiki V2, providing clean visual clip cards on official iOS and Android apps.</li>
+            <li><strong>Wiki Navigation Hierarchy</strong>: Refined heading structure (<code>h2</code> page titles, <code>h1</code> entry headers) to optimize table-of-contents generation on Devvit Wiki pages.</li>
+          </ul>
+        </article>
 
         <article class="changelog-entry">
           <div class="changelog-head">
