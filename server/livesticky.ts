@@ -327,9 +327,9 @@ const MAX_HIGHLIGHTS_EDITIONS = 6;
 // itself holds the full browsable history; these keep Redis + the page comfortable.
 const ARCHIVE_MAX_EDITIONS = 50;
 const MONTHLY_ARCHIVE_MAX_EDITIONS = 24; // ~2 years of monthly compilations
-const INDEX_WIKI_PAGE = 'LiveSticky';
-const CLIP_ARCHIVE_WIKI_PAGE = 'LiveSticky/Clip Archive';
-const MONTHLY_ARCHIVE_WIKI_PAGE = 'LiveSticky/Monthly Archive';
+const INDEX_WIKI_PAGE = 'livesticky';
+const CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip-archive';
+const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
 const LEGACY_CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip_archive';
 
 /**
@@ -393,12 +393,12 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
 
 <hr>
 
-<h3>🎬 <a href="/r/${subredditName}/wiki/LiveSticky/Clip Archive">Browse Stream Clip Archive</a></h3>
+<h3>🎬 <a href="/r/${subredditName}/wiki/livesticky/clip-archive">Browse Stream Clip Archive</a></h3>
 <p>Top Twitch clips from every stream session, organized newest-first.</p>
 
 <hr>
 
-<h3>🏆 <a href="/r/${subredditName}/wiki/LiveSticky/Monthly Archive">Browse Monthly Top 20 Compilations</a></h3>
+<h3>🏆 <a href="/r/${subredditName}/wiki/livesticky/monthly-archive">Browse Monthly Top 20 Compilations</a></h3>
 <p>Monthly compilation of the top 20 most-watched clips across the channel.</p>
 
 <hr>
@@ -418,9 +418,9 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
   const CANONICAL_PAGES = new Set([
-    INDEX_WIKI_PAGE.toLowerCase(), // 'livesticky'
-    CLIP_ARCHIVE_WIKI_PAGE.toLowerCase(), // 'livesticky/clip archive'
-    MONTHLY_ARCHIVE_WIKI_PAGE.toLowerCase(), // 'livesticky/monthly archive'
+    INDEX_WIKI_PAGE, // 'livesticky'
+    CLIP_ARCHIVE_WIKI_PAGE, // 'livesticky/clip-archive'
+    MONTHLY_ARCHIVE_WIKI_PAGE, // 'livesticky/monthly-archive'
   ]);
 
   for (const wikiVersion of ['v1', 'v2'] as const) {
@@ -434,7 +434,7 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
     }
 
     // 1. Ensure canonical pages are public and listed
-    for (const page of [INDEX_WIKI_PAGE, CLIP_ARCHIVE_WIKI_PAGE, MONTHLY_ARCHIVE_WIKI_PAGE]) {
+    for (const page of CANONICAL_PAGES) {
       try {
         await reddit.updateWikiPageSettings({
           subredditName,
