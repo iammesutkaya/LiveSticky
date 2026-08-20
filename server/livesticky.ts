@@ -387,7 +387,7 @@ const writeWikiPageVersion = async (
  * Ensures the parent /wiki/livesticky index page exists and links to both archives.
  */
 const updateWikiIndex = async (subredditName: string): Promise<void> => {
-  const indexContent = `<h1>🎬 LiveSticky Stream Archives</h1>
+  const indexContent = `<h2>LiveSticky Stream Archives</h2>
 
 <p>Community stream archives and clip compilations for <strong>/r/${subredditName}</strong>, updated automatically by <a href="https://livesticky.com">LiveSticky</a>.</p>
 
@@ -2053,7 +2053,7 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
       }
     }
     if (!clipContent) {
-      clipContent = `<h1>🎬 Clip Archive${displayName ? ` - ${displayName}` : ''}</h1>
+      clipContent = `<h2>Clip Archive${displayName ? ` - ${displayName}` : ''}</h2>
 
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 <p><em>Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.</em></p>
@@ -2108,7 +2108,7 @@ export const ensureWikiArchiveReady = async (subredditName?: string): Promise<vo
       }
     }
     if (!monthlyContent) {
-      monthlyContent = `<h1>🏆 Monthly Top 20 Archive${displayName ? ` - ${displayName}` : ''}</h1>
+      monthlyContent = `<h2>Monthly Top 20 Archive${displayName ? ` - ${displayName}` : ''}</h2>
 
 <p>📚 <strong><a href="/r/${subName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>
 <p><em>The top 20 Twitch clips from each month, compiled automatically by LiveSticky. Newest first.</em></p>
