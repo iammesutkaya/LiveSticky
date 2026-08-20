@@ -328,9 +328,9 @@ export const buildWikiArchiveHtml = (
 ): string => {
   const who = displayName ? ` - ${displayName}` : '';
   const hubBacklink = subredditName ? `<p>📚 <strong><a href="/r/${subredditName}/wiki/livesticky">← Return to LiveSticky Archive Hub</a></strong></p>\n` : '';
-  let out = `<h2>${title}${who}</h2>\n${hubBacklink}<p><em>${intro}</em></p>\n<hr>\n`;
+  let out = `<h1>${title}${who}</h1>\n${hubBacklink}<p><em>${intro}</em></p>\n<hr>\n`;
   editions.forEach((edition, idx) => {
-    out += `<h2>🎬 ${edition.dateStr}</h2>\n${renderClipListHtml(edition.clips)}\n`;
+    out += `<h1>${edition.dateStr}</h1>\n${renderClipListHtml(edition.clips)}\n`;
     if (idx < editions.length - 1) {
       out += `<hr>\n`;
     }
@@ -349,7 +349,7 @@ export const buildWikiArchiveHtml = (
 export const buildWikiArchive = (
   editions: HighlightsEdition[],
   displayName: string,
-  title: string = '🎬 Clip Archive',
+  title: string = 'Clip Archive',
   intro: string = 'Top Twitch clips from every stream, compiled automatically by LiveSticky. Newest first.',
   subredditName?: string
 ): string => {
@@ -357,7 +357,7 @@ export const buildWikiArchive = (
   const hubBacklink = subredditName ? `📚 **[← Return to LiveSticky Archive Hub](/r/${subredditName}/wiki/livesticky)**\n\n` : '';
   let out = `# ${title}${who}\n\n${hubBacklink}*${intro}*\n\n---\n\n`;
   editions.forEach((edition, idx) => {
-    out += `## 🎬 ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n\n`;
+    out += `# ${edition.dateStr}\n\n${renderClipList(edition.clips)}\n\n`;
     if (idx < editions.length - 1) {
       out += `---\n\n`;
     }

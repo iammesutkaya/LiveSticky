@@ -271,10 +271,10 @@ describe('wiki archive mode', () => {
 
   it('buildWikiArchive lists every edition newest-first with the display name', () => {
     const page = buildWikiArchive([mkEdition(3), mkEdition(2), mkEdition(1)], 'CoolStreamer');
-    expect(page).toContain('# 🎬 Clip Archive - CoolStreamer');
-    expect(page).toContain('## 🎬 Day 3');
-    expect(page).toContain('## 🎬 Day 2');
-    expect(page).toContain('## 🎬 Day 1');
+    expect(page).toContain('# Clip Archive - CoolStreamer');
+    expect(page).toContain('# Day 3');
+    expect(page).toContain('# Day 2');
+    expect(page).toContain('# Day 1');
     expect(page.indexOf('Day 3')).toBeLessThan(page.indexOf('Day 1'));
   });
 
@@ -285,7 +285,7 @@ describe('wiki archive mode', () => {
   });
 
   it('buildWikiArchive includes hub backlink when subredditName is passed', () => {
-    const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🎬 Clip Archive', 'intro', 'my_sub');
+    const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', 'Clip Archive', 'intro', 'my_sub');
     expect(page).toContain('[← Return to LiveSticky Archive Hub](/r/my_sub/wiki/livesticky)');
   });
 
