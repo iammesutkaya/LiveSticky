@@ -271,7 +271,7 @@ describe('wiki archive mode', () => {
 
   it('buildWikiArchive lists every edition newest-first with the display name', () => {
     const page = buildWikiArchive([mkEdition(3), mkEdition(2), mkEdition(1)], 'CoolStreamer');
-    expect(page).toContain('# Clip Archive - CoolStreamer');
+    expect(page).toContain('## Clip Archive - CoolStreamer');
     expect(page).toContain('# Day 3');
     expect(page).toContain('# Day 2');
     expect(page).toContain('# Day 1');
@@ -280,7 +280,7 @@ describe('wiki archive mode', () => {
 
   it('buildWikiArchive accepts a custom title/intro (monthly archive)', () => {
     const page = buildWikiArchive([mkEdition(1)], 'CoolStreamer', '🏆 Monthly Top 20 Archive', 'monthly intro');
-    expect(page).toContain('# 🏆 Monthly Top 20 Archive - CoolStreamer');
+    expect(page).toContain('## 🏆 Monthly Top 20 Archive - CoolStreamer');
     expect(page).toContain('monthly intro');
   });
 
