@@ -78,6 +78,39 @@ interface YouTubeVideoItem {
 // YouTube channel-ID resolution
 // ---------------------------------------------------------------------------
 
+/**
+ * Calculates seconds until midnight Pacific Time (PST/PDT), when YouTube's daily API quota resets.
+ * Defaults to 12 hours (43200 seconds) if calculation fails.
+ */
+function getSecondsUntilYouTubeQuotaReset(): number {
+  try {
+    const now = new Date();
+    const nowPtString = now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+    const nowPt = new Date(nowPtString);
+    const nextMidnightPt = new Date(nowPt);
+    nextMidnightPt.setHours(24, 0, 0, 0);
+    const diffSeconds = Math.floor((nextMidnightPt.getTime() - nowPt.getTime()) / 1000);
+    if (diffSeconds > 0 && diffSeconds <= 86400) {
+      return diffSeconds;
+    }
+  } catch (err) {
+    console.error('Error calculating YouTube quota reset time:', err);
+  }
+  return 43200; // 12 hours fallback
+}
+
+export async function isYouTubeQuotaBlocked(redis: RedisClient): Promise<boolean> {
+  const blocked = await redis.get('yt_quota_blocked');
+  return blocked === 'true';
+}
+
+export async function setYouTubeQuotaBlocked(redis: RedisClient): Promise<void> {
+  const ttl = getSecondsUntilYouTubeQuotaReset();
+  await redis.set('yt_quota_blocked', 'true');
+  await redis.expire('yt_quota_blocked', ttl);
+  console.warn(`YouTube API quota marked blocked in Redis for ${ttl} seconds.`);
+}
+
 async function resolveYouTubeChannelId(
   channel: string,
   apiKey: string,
@@ -118,7 +151,12 @@ async function resolveYouTubeChannelId(
 
   const cacheKey = `yt_resolved_id_${handle.toLowerCase()}`;
   const cachedId = await redis.get(cacheKey);
-  if (cachedId) return cachedId;
+  if (cachedId) {
+    if (cachedId === 'NOT_FOUND') return null;
+    return cachedId;
+  }
+
+  if (await isYouTubeQuotaBlocked(redis)) return null;
 
   // Cheap path first: channels.list?forHandle costs 1 quota unit, vs 100 for
   // search.list. Most handles resolve here, so search becomes a rare fallback.
@@ -126,6 +164,10 @@ async function resolveYouTubeChannelId(
     console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via forHandle (1 unit)...`);
     const url = `https://youtube.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(handle)}`;
     const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (res.status === 403) {
+      await setYouTubeQuotaBlocked(redis);
+      return null;
+    }
     if (res.ok) {
       const data = await res.json() as { items?: Array<{ id?: string }> };
       const channelId = data.items?.[0]?.id;
@@ -148,8 +190,14 @@ async function resolveYouTubeChannelId(
     const res = await fetch(searchUrl, {
       headers: { 'x-goog-api-key': apiKey },
     });
+    if (res.status === 403) {
+      await setYouTubeQuotaBlocked(redis);
+      return null;
+    }
     if (!res.ok) {
       console.error(`YouTube handle resolution request failed: ${res.statusText}`);
+      await redis.set(cacheKey, 'NOT_FOUND');
+      await redis.expire(cacheKey, 21600); // 6 hours
       return null;
     }
 
@@ -165,6 +213,9 @@ async function resolveYouTubeChannelId(
     console.error(`Error resolving YouTube channel handle:`, err);
   }
 
+  // Cache NOT_FOUND for 6 hours so we don't repeat failed search lookups every 2 minutes
+  await redis.set(cacheKey, 'NOT_FOUND');
+  await redis.expire(cacheKey, 21600); // 6 hours
   return null;
 }
 
@@ -183,13 +234,24 @@ async function resolveYouTubeUploadsPlaylist(
 
   const cacheKey = `yt_uploads_${channelId}`;
   const cached = await redis.get(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    if (cached === 'NOT_FOUND') return null;
+    return cached;
+  }
+
+  if (await isYouTubeQuotaBlocked(redis)) return null;
 
   try {
     const url = `https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}`;
     const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    if (res.status === 403) {
+      await setYouTubeQuotaBlocked(redis);
+      return null;
+    }
     if (!res.ok) {
       console.error(`YouTube uploads-playlist request failed: ${res.statusText}`);
+      await redis.set(cacheKey, 'NOT_FOUND');
+      await redis.expire(cacheKey, 21600); // 6 hours
       return null;
     }
     const data = await res.json() as { items?: YouTubeChannelContentItem[] };
@@ -202,6 +264,9 @@ async function resolveYouTubeUploadsPlaylist(
   } catch (err) {
     console.error('Error resolving YouTube uploads playlist:', err);
   }
+
+  await redis.set(cacheKey, 'NOT_FOUND');
+  await redis.expire(cacheKey, 21600); // 6 hours
   return null;
 }
 
@@ -218,6 +283,8 @@ async function fetchYouTubeStatus(
   // A live broadcast appears in the channel's public uploads playlist, so we can
   // detect it with two 1-unit calls (playlistItems + videos) instead of the
   // 100-unit search.list call. ~2 quota units per poll vs ~100.
+  if (await isYouTubeQuotaBlocked(redis)) return null;
+
   const uploadsPlaylist = await resolveYouTubeUploadsPlaylist(channel, apiKey, redis);
   if (!uploadsPlaylist) return null;
 
@@ -225,6 +292,12 @@ async function fetchYouTubeStatus(
     // 1 unit: the most recent uploads - a live stream sits at the top.
     const plUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=5&playlistId=${uploadsPlaylist}`;
     const plRes = await fetch(plUrl, { headers: { 'x-goog-api-key': apiKey } });
+    if (plRes.status === 403) {
+      console.error('YouTube API quota exceeded or forbidden (403).');
+      await setYouTubeQuotaBlocked(redis);
+      if (onError) await onError('YouTube', 'YouTube API quota exceeded (HTTP 403). LiveSticky cannot fetch your stream status until your quota resets.');
+      return null;
+    }
     if (!plRes.ok) {
       console.error(`YouTube playlistItems request failed: ${plRes.statusText}`);
       return null;
@@ -241,6 +314,7 @@ async function fetchYouTubeStatus(
     if (!vRes.ok) {
       if (vRes.status === 403) {
         console.error('YouTube API quota exceeded or forbidden (403).');
+        await setYouTubeQuotaBlocked(redis);
         if (onError) await onError('YouTube', 'YouTube API quota exceeded (HTTP 403). LiveSticky cannot fetch your stream status until your quota resets.');
       }
       return null;
@@ -682,18 +756,22 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
         if (avatarUrl) break;
       } else if (p === 'youtube' && youtubeChannel && youtubeApiKey) {
         try {
-          const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
-          if (channelId) {
-            const res = await fetch(
-              `https://youtube.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}`,
-              { headers: { 'x-goog-api-key': youtubeApiKey } }
-            );
-            if (res.ok) {
-              const data = await res.json() as YouTubeChannelsResponse;
-              const item = data.items?.[0];
-              avatarUrl = item?.snippet?.thumbnails?.high?.url
-                ?? item?.snippet?.thumbnails?.medium?.url
-                ?? '';
+          if (!(await isYouTubeQuotaBlocked(context.redis))) {
+            const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
+            if (channelId) {
+              const res = await fetch(
+                `https://youtube.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}`,
+                { headers: { 'x-goog-api-key': youtubeApiKey } }
+              );
+              if (res.status === 403) {
+                await setYouTubeQuotaBlocked(context.redis);
+              } else if (res.ok) {
+                const data = await res.json() as YouTubeChannelsResponse;
+                const item = data.items?.[0];
+                avatarUrl = item?.snippet?.thumbnails?.high?.url
+                  ?? item?.snippet?.thumbnails?.medium?.url
+                  ?? '';
+              }
             }
           }
         } catch (err) {

@@ -1972,6 +1972,8 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_live_platforms'),
     redis.del('dashboard_post_comments'),
     redis.del('dashboard_post_score'),
+    redis.del('yt_quota_blocked'),
+    redis.del('modmail_cooldown_youtube'),
   ]);
 
   // Run one immediate check so state is rebuilt without waiting for the cron.
