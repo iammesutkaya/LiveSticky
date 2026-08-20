@@ -405,10 +405,8 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
 
 <p><em>Powered by <a href="https://livesticky.com">LiveSticky</a> • Real-Time Subreddit Stream Engine</em></p>
 `;
-  for (const page of ['livesticky', 'LiveSticky']) {
-    await writeWikiPageVersion(subredditName, page, indexContent, 'v1');
-    await writeWikiPageVersion(subredditName, page, indexContent, 'v2');
-  }
+  await writeWikiPageVersion(subredditName, 'livesticky', indexContent, 'v1');
+  await writeWikiPageVersion(subredditName, 'livesticky', indexContent, 'v2');
 };
 
 /**
@@ -419,10 +417,15 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
  *    and automatically unlists them (`listed: false`, `permLevel: 2`), keeping the sidebar clean.
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
-  const ALL_LIVESTICKY_PAGES = [
+  // The only pages LiveSticky wants visible in the sidebar index.
+  const CANONICAL_PAGES = [
     'livesticky',
     'livesticky/clip-archive',
     'livesticky/monthly-archive',
+  ];
+  // Legacy / duplicate pages from earlier naming. Reddit has no page-delete API,
+  // so the best we can do is unlist them (drop from the sidebar) and blank them.
+  const LEGACY_PAGES = [
     'LiveSticky',
     'LiveSticky/clip-archive',
     'LiveSticky/monthly-archive',
@@ -440,19 +443,31 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
       }
     }
 
-    // Ensure all pages in LiveSticky namespace are listed: true and permLevel: 0 (Public)
-    // so no pages display the unlisted 🚫 icon in Moderator View.
-    for (const page of ALL_LIVESTICKY_PAGES) {
+    // Canonical pages: public + listed.
+    for (const page of CANONICAL_PAGES) {
       try {
-        await reddit.updateWikiPageSettings({
-          subredditName,
-          page,
-          listed: true,
-          permLevel: 0, // Public
-          wikiVersion,
-        });
+        await reddit.updateWikiPageSettings({ subredditName, page, listed: true, permLevel: 0, wikiVersion });
       } catch {
-        // Page may not exist yet
+        // Page may not exist yet.
+      }
+    }
+
+    // Legacy pages: unlist (gone from sidebar) and blank the content.
+    for (const page of LEGACY_PAGES) {
+      try {
+        await reddit.getWikiPage(subredditName, page, { wikiVersion });
+      } catch {
+        continue; // Doesn't exist — nothing to clean.
+      }
+      try {
+        await reddit.updateWikiPage({ subredditName, page, content: '', reason: 'LiveSticky: retire legacy page', wikiVersion });
+      } catch {
+        // Ignore blanking failure.
+      }
+      try {
+        await reddit.updateWikiPageSettings({ subredditName, page, listed: false, permLevel: 2, wikiVersion });
+      } catch {
+        // Ignore settings failure.
       }
     }
   }
