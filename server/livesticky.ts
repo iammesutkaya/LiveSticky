@@ -462,7 +462,7 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
           lower.includes('clip-archive') ||
           lower.includes('monthly-archive');
 
-        if (isLiveStickyNamespace && !CANONICAL_PAGES.has(lower)) {
+        if (isLiveStickyNamespace && !CANONICAL_PAGES.has(page)) {
           try {
             await reddit.updateWikiPageSettings({
               subredditName,
