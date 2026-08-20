@@ -447,6 +447,22 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
         // Page may not exist yet
       }
     }
+
+    // Reset permission level to 0 for any leftover orphan test pages so moderators can edit and manage them
+    const orphanPages = ['LiveSticky', 'LiveSticky/clip-archive', 'LiveSticky/monthly-archive', 'livesticky/clip_archive'];
+    for (const page of orphanPages) {
+      try {
+        await reddit.updateWikiPageSettings({
+          subredditName,
+          page,
+          listed: false,
+          permLevel: 0, // Standard editable permission level
+          wikiVersion,
+        });
+      } catch {
+        // Page doesn't exist
+      }
+    }
   }
 };
 
