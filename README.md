@@ -56,7 +56,22 @@ Full docs, template variables, and configuration reference at **[livesticky.com]
 
 ## Privacy & security
 
-Zero user-data tracking. LiveSticky only uses the API credentials a moderator configures, and every outbound domain is declared and locked in [`devvit.json`](./devvit.json) (Twitch, YouTube, and Kick APIs plus their image CDNs). Full disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
+Zero user-data tracking. LiveSticky only uses the API credentials a moderator configures. Every outbound request goes to one of the domains below — all declared and locked in [`devvit.json`](./devvit.json):
+
+| Domain | Purpose |
+| --- | --- |
+| `id.twitch.tv` | Twitch OAuth 2.0 token endpoint |
+| `api.twitch.tv` | Twitch Helix API (live status, metadata, clips) |
+| `youtube.googleapis.com` | YouTube Data API v3 (channel resolution, live polling) |
+| `id.kick.com` | Kick OAuth 2.0 token endpoint |
+| `api.kick.com` | Kick public API (stream status, categories) |
+| `static-cdn.jtvnw.net` | Twitch image CDN (avatars, banners) |
+| `yt3.googleusercontent.com` | YouTube image CDN (channel avatars) |
+| `i.ytimg.com` | YouTube image CDN (stream thumbnails) |
+| `files.kick.com` | Kick file CDN (avatars, thumbnails) |
+| `i.redd.it` | Reddit image CDN (uploaded images) |
+
+Full security disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
 
 ---
 
