@@ -74,6 +74,25 @@ def button(name, label, icon, bg, fg, border=None):
     print(f"btn-{name}.svg  {w}x{H}  text={tw:.1f}px")
 
 
+def chip(name, label, bg, fg=WHITE, size=14.4, pad=8, radius=6, box=22, drop=4):
+    """Inline brand chip, matching .inline-brand in docs/landing.css.
+
+    `drop` is transparent space below the chip: an inline <img> sits its bottom
+    edge on the text baseline, so the padding lifts the chip to straddle it.
+    """
+    d, tw, cap = outline(label, size, weight=600)
+    w = round(pad * 2 + tw)
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{box + drop}" '
+        f'viewBox="0 0 {w} {box + drop}" role="img" aria-label="{label}">'
+        f'<rect width="{w}" height="{box}" rx="{radius}" fill="{bg}"/>'
+        f'<g transform="translate({pad},{box / 2 + cap / 2:.2f})">'
+        f'<path d="{d}" fill="{fg}"/></g></svg>'
+    )
+    (OUT / f"chip-{name}.svg").write_text(svg)
+    print(f"chip-{name}.svg  {w}x{box + drop}  text={tw:.1f}px")
+
+
 def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
     src = (ROOT / f"assets/platform-svgs/{name}.svg").read_text()
     vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', src).group(1).split()]
@@ -98,6 +117,6 @@ def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
 if __name__ == "__main__":
     button("install-reddit", "Install on Reddit", EXTERNAL, GOLD, INK)
     button("setup", "Setup Guide", ARROW, SURFACE, WHITE, border=BORDER)
-    pill("twitch", "Twitch", "#9147ff")
-    pill("youtube", "YouTube", "#ff0000")
-    pill("kick", "Kick", "#53fc18")
+    chip("twitch", "Twitch", "#9147ff")
+    chip("youtube", "YouTube", "#ff0000")
+    chip("kick", "Kick", "#53fc18", fg=INK)

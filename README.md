@@ -8,19 +8,17 @@
 
 ### Automated live threads and dashboards for streamer subreddits
 
-Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
+Never let your community miss a stream. LiveSticky watches your
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/chip-twitch.svg" height="26" alt="Twitch">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/chip-youtube.svg" height="26" alt="YouTube">
+and
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/chip-kick.svg" height="26" alt="Kick">
+channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
 <a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
 &nbsp;
 <a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
 
-<br><br>
-
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-twitch.svg" height="34" alt="Twitch">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-youtube.svg" height="34" alt="YouTube">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-kick.svg" height="34" alt="Kick">
-
-<br>
 
 Free · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
