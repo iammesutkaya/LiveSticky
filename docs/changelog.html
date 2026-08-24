@@ -131,24 +131,50 @@
 
         <div class="changelog-main article-content">
 
+        <div class="changelog-toolbar">
+          <span class="changelog-toolbar-label">Changelog View</span>
+          <div class="view-switcher" role="group" aria-label="Changelog view mode">
+            <button class="view-mode-btn is-active" id="viewBtnSimple" type="button" onclick="setChangelogView('simple')">
+              <span>💡</span> Simple View
+            </button>
+            <button class="view-mode-btn" id="viewBtnTechnical" type="button" onclick="setChangelogView('technical')">
+              <span>⚙️</span> Technical Details
+            </button>
+          </div>
+        </div>
+
         <article class="changelog-entry">
           <div class="changelog-head">
             <h2 id="v1-1-286">v1.1.286</h2>
             <span class="changelog-badge live">Released</span>
           </div>
-          <p>YouTube Data API quota circuit breaker, 6-hour negative caching for missing channels, and manual quota reset support.</p>
-
-          <h3>Added</h3>
+          <p><strong>YouTube Rate Limit Shield &amp; Mod Menu Reset</strong></p>
           <ul>
-            <li><strong>YouTube API Quota Circuit Breaker</strong>: Automatically detects HTTP 403 quota errors on YouTube Data API requests. When quota is exceeded, LiveSticky trips a circuit breaker in Redis that auto-expires at Pacific Time midnight (when YouTube daily API quotas reset), preventing redundant API requests and log spam.</li>
-            <li><strong>6-Hour Negative Caching</strong>: Failed channel handle resolutions and upload playlist lookups now cache <code>NOT_FOUND</code> in Redis for 6 hours, eliminating repeated search API calls every 2 minutes for invalid channel settings.</li>
-            <li><strong>Manual Quota Reset via Refresh</strong>: Performing a <em>Refresh LiveSticky</em> command from the Mod Menu automatically resets YouTube quota blocks and modmail notification cooldowns for instant manual recovery.</li>
+            <li><strong>Automatic Quota Protection</strong>: If YouTube's daily API limits are reached, LiveSticky now pauses YouTube status requests automatically and resumes at midnight when Google resets daily quotas—preventing error spam without breaking other platforms.</li>
+            <li><strong>Instant Mod Menu Recovery</strong>: Performing a <em>Refresh LiveSticky</em> command in the Mod Menu now immediately clears temporary rate-limit blocks for instant manual testing.</li>
           </ul>
 
-          <h3>Fixed</h3>
-          <ul>
-            <li><strong>Quota Error Handling &amp; Avatar Fetching</strong>: Short-circuits YouTube status polling and channel avatar refresh routines immediately when the quota block is active, protecting API key status across scheduled cron runs.</li>
-          </ul>
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical Breakdown &amp; Developer Notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>YouTube API Quota Circuit Breaker</strong>: Automatically detects HTTP 403 quota errors on YouTube Data API requests. When quota is exceeded, LiveSticky trips a circuit breaker in Redis (<code>yt_quota_blocked</code>) that auto-expires at Pacific Time midnight (when YouTube daily API quotas reset), preventing redundant API requests and log spam.</li>
+                <li><strong>6-Hour Negative Caching</strong>: Failed channel handle resolutions and upload playlist lookups now cache <code>NOT_FOUND</code> in Redis for 6 hours, eliminating repeated search API calls every 2 minutes for invalid channel settings.</li>
+                <li><strong>Manual Quota Reset via Refresh</strong>: Performing a <em>Refresh LiveSticky</em> command from the Mod Menu automatically resets <code>yt_quota_blocked</code> and <code>modmail_cooldown_youtube</code> Redis keys for instant manual recovery.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Quota Error Handling &amp; Avatar Fetching</strong>: Short-circuits YouTube status polling and channel avatar refresh routines immediately when the quota block is active, protecting API key status across scheduled cron runs.</li>
+              </ul>
+            </div>
+          </details>
         </article>
 
         <article class="changelog-entry">
@@ -156,20 +182,34 @@
             <h2 id="v1-1-285">v1.1.285</h2>
             <span class="changelog-badge live">Released</span>
           </div>
-          <p>Devvit Wiki V2 dual-write engine with native HTML clip thumbnail cards, automated archive hub navigation, and canonical wiki page routing.</p>
-
-          <h3>Added</h3>
+          <p><strong>Rich Visual Clip Cards on Reddit Wiki V2 &amp; Wiki Navigation Hub</strong></p>
           <ul>
-            <li><strong>Rich HTML Clip Lists for Wiki V2</strong>: Introduced native HTML rendering for clip archives (<code>renderClipListHtml</code> and <code>buildWikiArchiveHtml</code>) complete with embedded 16:9 clip thumbnails, responsive image scaling, view counters, and creator attribution for New Reddit and official mobile apps.</li>
-            <li><strong>Subreddit Wiki Hub Navigation</strong>: Added prominent archive hub backlinks (<code>📚 Return to LiveSticky Archive Hub</code>) linking back to <code>/r/{subreddit}/wiki/livesticky</code> across monthly and stream clip archive pages.</li>
-            <li><strong>Canonical Wiki Slug Enforcement</strong>: Standardized page routing under <code>livesticky/clip-archive</code> and <code>livesticky/monthly-archive</code> with automatic detection and unlisting of legacy duplicate wiki entries.</li>
+            <li><strong>Rich Clip Thumbnails</strong>: Clip compilation pages on modern Reddit (web and official iOS/Android apps) now feature visual 16:9 thumbnail cards, view counters, and clip creator credits.</li>
+            <li><strong>Subreddit Navigation Link</strong>: Added prominent <code>📚 Return to LiveSticky Archive Hub</code> links across stream and monthly clip pages for easy navigation.</li>
           </ul>
 
-          <h3>Fixed</h3>
-          <ul>
-            <li><strong>Mobile Wiki Thumbnail Rendering</strong>: Fixed clip thumbnail images on Reddit Wiki V2, providing clean visual clip cards on official iOS and Android apps.</li>
-            <li><strong>Wiki Navigation Hierarchy</strong>: Refined heading structure (<code>h2</code> page titles, <code>h1</code> entry headers) to optimize table-of-contents generation on Devvit Wiki pages.</li>
-          </ul>
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical Breakdown &amp; Developer Notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>Rich HTML Clip Lists for Wiki V2</strong>: Introduced native HTML rendering for clip archives (<code>renderClipListHtml</code> and <code>buildWikiArchiveHtml</code>) complete with embedded 16:9 clip thumbnails, responsive image scaling, view counters, and creator attribution.</li>
+                <li><strong>Subreddit Wiki Hub Navigation</strong>: Added prominent archive hub backlinks linking back to <code>/r/{subreddit}/wiki/livesticky</code> across monthly and stream clip archive pages.</li>
+                <li><strong>Canonical Wiki Slug Enforcement</strong>: Standardized page routing under <code>livesticky/clip-archive</code> and <code>livesticky/monthly-archive</code> with automatic unlisting of legacy duplicate wiki entries.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Mobile Wiki Thumbnail Rendering</strong>: Fixed clip thumbnail images on Reddit Wiki V2, providing clean visual clip cards on official iOS and Android apps.</li>
+                <li><strong>Wiki Navigation Hierarchy</strong>: Refined heading structure (<code>h2</code> page titles, <code>h1</code> entry headers) to optimize table-of-contents generation on Devvit Wiki pages.</li>
+              </ul>
+            </div>
+          </details>
         </article>
 
         <article class="changelog-entry">
@@ -177,20 +217,34 @@
             <h2 id="v1-1-250">v1.1.250</h2>
             <span class="changelog-badge live">Released</span>
           </div>
-          <p>Devvit Wiki V2 integration featuring dual-write support across Old Reddit and New Reddit / mobile apps, parent wiki index auto-creation, and 100% automated wiki section cleanup.</p>
-
-          <h3>Added</h3>
+          <p><strong>Devvit Wiki V2 Integration &amp; Automated Wiki Directory Management</strong></p>
           <ul>
-            <li><strong>Devvit Wiki V2 &amp; Dual-Write Support</strong>: LiveSticky now publishes clip compilation pages to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; mobile apps). Fixes empty clip archive pages on modern Reddit interfaces.</li>
-            <li><strong>Auto-Managed Wiki Index Page</strong>: automatically creates and updates the parent <code>/wiki/livesticky</code> directory landing page, eliminating <em>"livesticky does not exist"</em> errors when navigating to the root wiki section.</li>
-            <li><strong>100% Automated Wiki Namespace Cleanup</strong>: dynamically inspects subreddit wiki pages and automatically unlists/hides legacy or duplicate orphan pages (such as <code>clip_archive</code>) from the wiki navigation sidebar without requiring manual moderator intervention.</li>
+            <li><strong>Modern Reddit Wiki Support</strong>: Clip archive pages are now published to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; official mobile apps), eliminating blank pages.</li>
+            <li><strong>Zero Maintenance Wiki Cleanup</strong>: Automatically creates parent wiki directory pages and cleans up legacy orphan pages without requiring manual moderator edits.</li>
           </ul>
 
-          <h3>Fixed</h3>
-          <ul>
-            <li><strong>Clip Archive Link Availability</strong>: resolved issue where clicking <code>/wiki/livesticky/clip-archive/</code> on modern Reddit or official mobile apps resulted in an unpopulated blank page.</li>
-            <li><strong>Duplicate Sidebar Entries</strong>: resolved duplicate sidebar list items on subreddit wikis by setting legacy non-canonical page paths to unlisted mod-only mode.</li>
-          </ul>
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical Breakdown &amp; Developer Notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>Devvit Wiki V2 &amp; Dual-Write Support</strong>: LiveSticky now publishes clip compilation pages to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; mobile apps).</li>
+                <li><strong>Auto-Managed Wiki Index Page</strong>: Automatically creates and updates the parent <code>/wiki/livesticky</code> directory landing page, eliminating <em>"livesticky does not exist"</em> errors.</li>
+                <li><strong>100% Automated Wiki Namespace Cleanup</strong>: Dynamically inspects subreddit wiki pages and automatically unlists/hides legacy or duplicate orphan pages.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Clip Archive Link Availability</strong>: Resolved issue where clicking <code>/wiki/livesticky/clip-archive/</code> on modern Reddit resulted in an unpopulated blank page.</li>
+                <li><strong>Duplicate Sidebar Entries</strong>: Resolved duplicate sidebar list items on subreddit wikis by setting legacy non-canonical page paths to unlisted mod-only mode.</li>
+              </ul>
+            </div>
+          </details>
         </article>
 
         <article class="changelog-entry">
@@ -198,19 +252,33 @@
             <h2 id="v1-1-249">v1.1.249</h2>
             <span class="changelog-badge live">Released</span>
           </div>
-          <p>Devvit 0.14.1 platform upgrade featuring self-healing post recovery to prevent duplicate posts, plus single-stream card layout refinements.</p>
-
-          <h3>Added</h3>
+          <p><strong>Self-Healing Post Recovery &amp; Card Layout Refinements</strong></p>
           <ul>
-            <li><strong>Self-Healing Post Recovery</strong>: powered by Devvit 0.14.1's <code>searchPosts()</code> API. If Redis state is missing or lost (e.g. after a server restart or cache clear), LiveSticky automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones, re-linking and updating existing posts to prevent duplicate posts on Reddit.</li>
-            <li>Upgraded core Devvit SDK packages to <strong>v0.14.1</strong>.</li>
+            <li><strong>Self-Healing Post Recovery</strong>: If app state is cleared or reset, LiveSticky automatically detects and re-links active live posts on your subreddit instead of creating duplicate posts.</li>
+            <li><strong>Layout Polish</strong>: Unified live thread pill placement and thumbnail positioning across single-stream and multi-stream card layouts.</li>
           </ul>
 
-          <h3>Fixed</h3>
-          <ul>
-            <li><strong>Single-Stream vs Multi-Stream Layout Match</strong>: unified single-stream (cinematic) and multi-stream card layouts in compact mode. The Reddit live discussion thread pill chip now consistently sits in the info section on the right, preventing chip collisions inside the thumbnail image box.</li>
-            <li>Improved responsive 16:9 thumbnail cropping with top-centered object positioning on desktop and embedded demo containers.</li>
-          </ul>
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical Breakdown &amp; Developer Notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>Self-Healing Post Recovery</strong>: Powered by Devvit 0.14.1's <code>searchPosts()</code> API. Automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones.</li>
+                <li>Upgraded core Devvit SDK packages to <strong>v0.14.1</strong>.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Single-Stream vs Multi-Stream Layout Match</strong>: Unified single-stream (cinematic) and multi-stream card layouts in compact mode.</li>
+                <li>Improved responsive 16:9 thumbnail cropping with top-centered object positioning on desktop and embedded demo containers.</li>
+              </ul>
+            </div>
+          </details>
         </article>
 
         <article class="changelog-entry">
@@ -218,29 +286,41 @@
             <h2 id="v1-1-244">v1.1.244</h2>
             <span class="changelog-badge live">Released</span>
           </div>
-          <p>A big update to the stream-highlights feature: support for single reused posts or per-stream posts linked sequentially, plus an optional wiki archive and a new monthly top-20 post.</p>
-
-          <h3>Added</h3>
+          <p><strong>Stream Highlights Upgrade, Wiki Archive &amp; Monthly Top 20 Post</strong></p>
           <ul>
-            <li><strong>Previous Stream Clip Link</strong>: when using per-stream highlights posts (default mode), LiveSticky automatically links to the previous stream's clip post at the bottom of the body. Also available as a <code>{previous_highlights_url}</code> template placeholder.</li>
-            <li><strong>Reuse Single Highlights Post</strong> setting (opt-in): recycles a single permanent master clips post after each stream instead of creating a new post every time. Default is off (creates a new highlights post per stream session).</li>
-            <li><strong>Wiki Clip Archive</strong> (opt-in): keeps the full clip history on subreddit wiki pages (one for stream clips, one for the monthly top-20) and links to them from the posts. Off by default; requires wiki to be enabled on your subreddit.</li>
-            <li><strong>Monthly Top 20 Clips Post</strong>: publishes the 20 most-watched Twitch clips from the previous calendar month. Features an intuitive schedule selector (Start of month, Middle of month, or End of month) and 24h publish time in your configured Streamer Timezone.</li>
-            <li><strong>Sticky Highlights Post</strong> setting: keeps the clip compilation pinned, re-pinning it after each stream if it slips.</li>
-            <li>New <code>{month}</code> template variable for the monthly post, plus dedicated Monthly Top 20 title, header, and footer templates.</li>
+            <li><strong>Monthly Top 20 Clips Post</strong>: Automatically publish a monthly recap of your subreddit's top 20 Twitch clips with customizable scheduling (Start, Middle, or End of month).</li>
+            <li><strong>Flexible Stream Clip Posts</strong>: Choose between publishing a new clip post per stream session or recycling a single master sticky clips post.</li>
+            <li><strong>Permanent Wiki Archives</strong>: Store full clip histories on your subreddit wiki pages with automatic links from clip posts.</li>
           </ul>
 
-          <h3>Changed</h3>
-          <ul>
-            <li>Stream highlights post defaults to creating a <strong>new post per stream session</strong>, allowing per-stream variables like <code>{date}</code> and <code>{stream_title}</code> in post titles. Subreddits wanting a single master sticky post can toggle on <strong>Reuse Single Highlights Post</strong>.</li>
-            <li>When the wiki archive is off and single post reuse is enabled, the highlights post shows a compact in-body archive of recent streams.</li>
-          </ul>
-
-          <h3>Fixed</h3>
-          <ul>
-            <li><strong>YouTube livestreams were not being detected</strong> on the dashboard even while live. Fixed.</li>
-            <li>The <code>{date}</code> variable now correctly respects the configured Streamer Timezone instead of always using UTC.</li>
-          </ul>
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical Breakdown &amp; Developer Notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>Previous Stream Clip Link</strong>: Automatically links to the previous stream's clip post at the bottom of the body (available as <code>{previous_highlights_url}</code> template placeholder).</li>
+                <li><strong>Reuse Single Highlights Post</strong> setting (opt-in): Recycles a single permanent master clips post after each stream.</li>
+                <li><strong>Wiki Clip Archive</strong> (opt-in): Keeps full clip history on subreddit wiki pages for stream clips and monthly top-20.</li>
+                <li><strong>Monthly Top 20 Clips Post</strong>: Publishes the 20 most-watched Twitch clips from the previous calendar month.</li>
+                <li><strong>Sticky Highlights Post</strong> setting: Keeps the clip compilation pinned, re-pinning it after each stream if it slips.</li>
+              </ul>
+              <h3>Changed</h3>
+              <ul>
+                <li>Stream highlights post defaults to creating a <strong>new post per stream session</strong>, allowing per-stream variables like <code>{date}</code> and <code>{stream_title}</code> in post titles.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li>Fixed YouTube livestream detection on dashboard.</li>
+                <li>The <code>{date}</code> variable now respects the configured Streamer Timezone instead of always using UTC.</li>
+              </ul>
+            </div>
+          </details>
         </article>
 
         </div>
@@ -248,8 +328,34 @@
     </section>
 
     <script>
+      function setChangelogView(mode) {
+        const simpleBtn = document.getElementById('viewBtnSimple');
+        const techBtn = document.getElementById('viewBtnTechnical');
+        const detailsList = document.querySelectorAll('.tech-details');
+        
+        if (mode === 'technical') {
+          techBtn.classList.add('is-active');
+          simpleBtn.classList.remove('is-active');
+          detailsList.forEach(d => d.open = true);
+          try { localStorage.setItem('changelogView', 'technical'); } catch(e){}
+        } else {
+          simpleBtn.classList.add('is-active');
+          techBtn.classList.remove('is-active');
+          detailsList.forEach(d => d.open = false);
+          try { localStorage.setItem('changelogView', 'simple'); } catch(e){}
+        }
+      }
+
       // Highlight the version in the sidebar whose section is near the top.
       (function () {
+        // Restore saved view mode preference
+        try {
+          const savedView = localStorage.getItem('changelogView');
+          if (savedView === 'technical') {
+            setChangelogView('technical');
+          }
+        } catch(e){}
+
         const links = Array.from(document.querySelectorAll('.changelog-sidebar a'));
         if (!links.length) return;
         const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
