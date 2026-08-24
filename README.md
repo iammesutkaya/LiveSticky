@@ -83,7 +83,7 @@ Completely optional. Create it from the mod menu whenever you want it, or never.
 
 <div align="center">
   <a href="https://livesticky.com/demo">
-    <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard.png" width="620" alt="LiveSticky dashboard showing a streamer live on Twitch, YouTube, and Kick">
+    <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png" width="620" alt="LiveSticky dashboard showing a streamer live on Twitch, YouTube, and Kick">
   </a>
 </div>
 
