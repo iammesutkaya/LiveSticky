@@ -1085,9 +1085,16 @@ html.theme-light .theme-toggle .moon-icon {
 }
 
 .changelog-toolbar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.changelog-toolbar-label .tech-icon {
+  flex-shrink: 0;
 }
 
 .view-toggle {
