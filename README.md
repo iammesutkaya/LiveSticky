@@ -1,3 +1,5 @@
+[![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-squircle.png)](https://livesticky.com)
+
 # LiveSticky
 
 [![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.287/10b981)](https://livesticky.com/changelog.html)
