@@ -132,15 +132,14 @@
         <div class="changelog-main article-content">
 
         <div class="changelog-toolbar">
-          <span class="changelog-toolbar-label">Changelog View</span>
-          <div class="view-switcher" role="group" aria-label="Changelog view mode">
-            <button class="view-mode-btn is-active" id="viewBtnSimple" type="button" onclick="setChangelogView('simple')">
-              <span>💡</span> Simple View
-            </button>
-            <button class="view-mode-btn" id="viewBtnTechnical" type="button" onclick="setChangelogView('technical')">
-              <span>⚙️</span> Technical Details
-            </button>
-          </div>
+          <span class="changelog-toolbar-label" id="viewToggleLabel">
+            <span aria-hidden="true">⚙️</span> Technical details
+          </span>
+          <button class="view-toggle" id="viewToggle" type="button" role="switch"
+                  aria-checked="false" aria-labelledby="viewToggleLabel"
+                  onclick="toggleChangelogView()">
+            <span class="view-toggle-knob"></span>
+          </button>
         </div>
 
         <article class="changelog-entry">
@@ -335,29 +334,29 @@
 
     <script>
       function setChangelogView(mode) {
-        const simpleBtn = document.getElementById('viewBtnSimple');
-        const techBtn = document.getElementById('viewBtnTechnical');
-        const detailsList = document.querySelectorAll('.tech-details');
-        
-        if (mode === 'technical') {
-          techBtn.classList.add('is-active');
-          simpleBtn.classList.remove('is-active');
-          detailsList.forEach(d => d.open = true);
-          try { localStorage.setItem('changelogView', 'technical'); } catch(e){}
-        } else {
-          simpleBtn.classList.add('is-active');
-          techBtn.classList.remove('is-active');
-          detailsList.forEach(d => d.open = false);
-          try { localStorage.setItem('changelogView', 'simple'); } catch(e){}
-        }
+        const toggle = document.getElementById('viewToggle');
+        const technical = mode === 'technical';
+
+        if (toggle) toggle.setAttribute('aria-checked', String(technical));
+        document.querySelectorAll('.tech-details').forEach(d => { d.open = technical; });
+        try { localStorage.setItem('changelogView', technical ? 'technical' : 'simple'); } catch(e){}
+      }
+
+      function toggleChangelogView() {
+        const toggle = document.getElementById('viewToggle');
+        const on = toggle && toggle.getAttribute('aria-checked') === 'true';
+        setChangelogView(on ? 'simple' : 'technical');
       }
 
       // Highlight the version in the sidebar whose section is near the top.
       (function () {
         // Restore saved view mode preference
+        // The toggle is hidden on mobile, so don't restore a saved "technical"
+        // state there: every details block would be expanded with no visible
+        // control to collapse them again. Individual blocks stay tappable.
         try {
-          const savedView = localStorage.getItem('changelogView');
-          if (savedView === 'technical') {
+          const isMobile = window.matchMedia('(max-width: 768px)').matches;
+          if (!isMobile && localStorage.getItem('changelogView') === 'technical') {
             setChangelogView('technical');
           }
         } catch(e){}

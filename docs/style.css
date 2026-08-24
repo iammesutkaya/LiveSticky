@@ -1060,39 +1060,56 @@ html.theme-light .theme-toggle .moon-icon {
   color: var(--text-secondary);
 }
 
-.view-switcher {
-  display: inline-flex;
-  gap: 4px;
+.view-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  padding: 0;
   background: var(--bg-surface);
-  padding: 3px;
-  border-radius: 10px;
   border: 1px solid var(--border-line);
-}
-
-.view-mode-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 7px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: var(--transition-smooth);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.view-mode-btn:hover {
-  color: var(--text-primary);
-  background: var(--hover-overlay);
+.view-toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: var(--transition-smooth);
 }
 
-.view-mode-btn.is-active {
-  background: var(--bg-card);
-  color: var(--accent-gold);
-  border: 1px solid var(--glass-border);
+.view-toggle:hover {
+  border-color: var(--glass-border);
+}
+
+.view-toggle[aria-checked="true"] {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
+.view-toggle[aria-checked="true"] .view-toggle-knob {
+  left: calc(100% - 19px);
+  background: var(--text-inverse);
+}
+
+.view-toggle:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+/* The changelog reads fine as-is on small screens, and the toggle competes
+   with the content for width. Hidden here; details blocks stay tappable. */
+@media (max-width: 768px) {
+  .changelog-toolbar {
+    display: none;
+  }
 }
 
 .tech-details {
