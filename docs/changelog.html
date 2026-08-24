@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-286">
+                  <span class="changelog-ver">v1.1.286</span>
+                  <span class="changelog-sidebar-date">August 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-285">
                   <span class="changelog-ver">v1.1.285</span>
                   <span class="changelog-sidebar-date">August 2026</span>
@@ -124,6 +130,26 @@
         </aside>
 
         <div class="changelog-main article-content">
+
+        <article class="changelog-entry">
+          <div class="changelog-head">
+            <h2 id="v1-1-286">v1.1.286</h2>
+            <span class="changelog-badge live">Released</span>
+          </div>
+          <p>YouTube Data API quota circuit breaker, 6-hour negative caching for missing channels, and manual quota reset support.</p>
+
+          <h3>Added</h3>
+          <ul>
+            <li><strong>YouTube API Quota Circuit Breaker</strong>: Automatically detects HTTP 403 quota errors on YouTube Data API requests. When quota is exceeded, LiveSticky trips a circuit breaker in Redis that auto-expires at Pacific Time midnight (when YouTube daily API quotas reset), preventing redundant API requests and log spam.</li>
+            <li><strong>6-Hour Negative Caching</strong>: Failed channel handle resolutions and upload playlist lookups now cache <code>NOT_FOUND</code> in Redis for 6 hours, eliminating repeated search API calls every 2 minutes for invalid channel settings.</li>
+            <li><strong>Manual Quota Reset via Refresh</strong>: Performing a <em>Refresh LiveSticky</em> command from the Mod Menu automatically resets YouTube quota blocks and modmail notification cooldowns for instant manual recovery.</li>
+          </ul>
+
+          <h3>Fixed</h3>
+          <ul>
+            <li><strong>Quota Error Handling &amp; Avatar Fetching</strong>: Short-circuits YouTube status polling and channel avatar refresh routines immediately when the quota block is active, protecting API key status across scheduled cron runs.</li>
+          </ul>
+        </article>
 
         <article class="changelog-entry">
           <div class="changelog-head">
