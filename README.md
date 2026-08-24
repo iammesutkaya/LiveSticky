@@ -1,12 +1,12 @@
-# LiveSticky – Official Website: [livesticky.com](https://livesticky.com)
+<a href="https://livesticky.com">
+  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
+</a>
 
-![LiveSticky Header](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png)
+# LiveSticky - Automated Reddit Live Streaming Hub for Twitch, YouTube & Kick
 
-### Turn your subreddit into an automated live streaming hub for Twitch, YouTube & Kick.
+> **Automate stream promotion on Reddit.** LiveSticky monitors your Twitch, YouTube, and Kick channels in real-time to automatically create, pin, and update live discussion threads, interactive stream dashboards, and clip compilations on your subreddit.
 
 🌍 **Official Website & Interactive Demos**: **[https://livesticky.com](https://livesticky.com)**
-
-LiveSticky monitors your stream status in real-time and automatically creates, updates, and pins dedicated live discussion threads, interactive stream dashboards, and clip compilations on your subreddit.
 
 [![Official Website](https://img.shields.io/badge/Official%20Website-livesticky.com-F5D474?style=for-the-badge&logo=googlechrome)](https://livesticky.com)
 [![Install on Reddit](https://img.shields.io/badge/Install%20on%20Reddit-Devvit%20App-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com/apps/live-sticky)
