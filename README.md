@@ -88,9 +88,7 @@ LiveSticky also includes an **interactive live dashboard**: a custom post you ca
 
 Completely optional. Supports both **Compact (320px)** and **Tall (512px)** post heights:
 
-|  |  |
-| :---: | :---: |
-| [![Compact LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png)](https://livesticky.com/demo) | [![Tall LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-tall-nobg.png)](https://livesticky.com/demo) |
+[![LiveSticky dashboard in Compact and Tall post heights](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboards.png)](https://livesticky.com/demo)
 
 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
