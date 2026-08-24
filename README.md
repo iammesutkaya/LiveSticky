@@ -1,6 +1,6 @@
 # LiveSticky – Official Website: [livesticky.com](https://livesticky.com)
 
-![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/logo.png)
+![LiveSticky Header](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png)
 
 ### Turn your subreddit into an automated live streaming hub for Twitch, YouTube & Kick.
 
@@ -37,14 +37,6 @@ Visit **[livesticky.com](https://livesticky.com)** for complete guides, interact
 * 🛡️ **OBS & Wi-Fi Crash Protection**: Built-in 6-minute grace period prevents duplicate thread spam if your stream disconnects, OBS restarts, or your internet drops briefly.
 * 🎬 **Automatic VOD Archives & Top Clips**: Concludes live posts into locked VOD archives when you go offline, and automatically compiles your top Twitch clips into standalone highlight posts.
 * 📱 **Real-Time Sidebar Widget**: Auto-updates a community sidebar widget showing live status, streamer user flairs (e.g. `🔴 LIVE NOW`), and current viewer statistics.
-
----
-
-## 📸 Screenshots & Previews
-
-| Twitch Live Card | YouTube Live Card | Kick Live Card |
-| :---: | :---: | :---: |
-| ![Twitch Live Stream](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/docs/twitch-stream.png) | ![YouTube Live Stream](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/docs/youtube-stream.png) | ![Kick Live Stream](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/docs/kick-stream.png) |
 
 ---
 
