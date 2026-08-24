@@ -15,6 +15,18 @@
 ![Kick](https://badgen.net/badge/integration/Kick/53fc18)
 [![Docs](https://badgen.net/badge/docs/livesticky.com/f5d474)](https://livesticky.com)
 
+<p align="center">
+  <a href="https://livesticky.com">Website</a>
+  ·
+  <a href="https://livesticky.com/setup.html">Setup Guide</a>
+  ·
+  <a href="https://livesticky.com/demo">Live Demo</a>
+  ·
+  <a href="https://livesticky.com/configuration.html">Configuration</a>
+  ·
+  <a href="https://livesticky.com/changelog.html">Changelog</a>
+</p>
+
 </div>
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
