@@ -1,3 +1,5 @@
+<div align="center">
+
 <a href="https://livesticky.com">
   <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
 </a>
@@ -16,6 +18,8 @@
 ![Kick](https://img.shields.io/badge/Kick-53FC18?style=for-the-badge&logo=kick&logoColor=black)
 
 **Free** · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
+
+</div>
 
 <!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
 
@@ -44,6 +48,32 @@
 LiveSticky handles the whole stream lifecycle on its own. Go live and it creates and pins a live discussion thread, updating viewer count, category, and uptime every 2 minutes. Go offline and it archives the thread with the VOD link, locks comments against late spam, and unpins it. On Twitch it also compiles your top clips into a standalone highlights post. Along the way it keeps a sidebar status widget and the streamer's user flair in sync, and rides out brief crashes without spamming duplicate threads.
 
 Every part is optional and configurable. Turn on only what your community wants.
+
+<details>
+<summary><b>See the full feature list</b></summary>
+
+<br>
+
+| Feature | What it does |
+| :--- | :--- |
+| **Automatic live posts** | Polls your channels every 2 minutes, then creates and pins a discussion thread when you go live. |
+| **Real-time statistics** | Keeps the thread updated with uptime, category, and viewer count. |
+| **Crash protection** | Configurable grace period (default 6 minutes) rides out crashes and brief drops without duplicate threads. |
+| **Concluding VOD archives** | Turns the live thread into a locked offline archive with the VOD link, then unpins it. |
+| **Stream highlights post** | Compiles your top Twitch clips into a standalone highlights post when the stream ends. |
+| **Real-time sidebar widget** | Creates and auto-updates a "STREAM STATUS" widget reflecting live and offline state. |
+| **Streamer user flair** | Applies a "LIVE NOW" user flair while live and clears it when offline. |
+| **Custom post flairing** | Flairs live posts using your community's own post flair templates. |
+| **Pinned moderator comment** | Auto-posts a customizable pinned comment to promote your Discord, socials, or rules. |
+| **Permanent offline post** | Recycles a single pinned post between streams to announce news and links. |
+| **Auto-suggested comment sort** | Sets the thread to New, Live, or Q&A so it behaves like a real-time chat. |
+| **Multi-platform promotion** | Promotes YouTube and Kick alongside Twitch with side-by-side platform links. |
+| **Community Highlights fallback** | Pins to Reddit's Community Highlights carousel when both sticky slots are taken. |
+| **Rate-limit protection** | Redis caching and circuit breakers keep status checks light and never hit API limits. |
+| **One-click mod actions** | Refresh state, flush cached images, and force a status check from the mod menu. |
+| **Interactive live dashboard** | Optional custom post showing live status, stream preview, and platform links in real time. |
+
+</details>
 
 ---
 
