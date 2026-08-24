@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://livesticky.com">
-  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
+  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon.png" width="170" alt="LiveSticky">
 </a>
 
 # LiveSticky
@@ -19,6 +19,15 @@ channels and automatically posts, pins, updates, and archives a live thread ever
 &nbsp;
 <a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
 
+<a href="https://livesticky.com">Website</a>
+·
+<a href="https://livesticky.com/setup.html">Setup</a>
+·
+<a href="https://livesticky.com/demo">Demo</a>
+·
+<a href="https://livesticky.com/configuration.html">Configuration</a>
+·
+<a href="https://livesticky.com/faq.html">FAQ</a>
 
 Free · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
@@ -77,6 +86,12 @@ Every part is optional and configurable. Turn on only what your community wants.
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
 
 Completely optional. Create it from the mod menu whenever you want it, or never. The rest of the app works exactly the same either way.
+
+<div align="center">
+  <a href="https://livesticky.com/demo">
+    <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard.png" width="620" alt="LiveSticky dashboard showing a streamer live on Twitch, YouTube, and Kick">
+  </a>
+</div>
 
 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
