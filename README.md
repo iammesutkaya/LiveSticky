@@ -44,23 +44,23 @@ Every part is optional and configurable. Turn on only what your community wants.
 
 ## Features
 
-**Automatic live posts**
+**🔴 Automatic live posts**
 
 * Polls your channels every 2 minutes, then creates and pins a discussion thread when you go live.
 * Flairs the post using your community's own post flair templates.
 * Sets the suggested comment sort to New, Live, or Q&A so it behaves like a real-time chat.
 * Recycles a single permanent pinned post between streams to announce news and links.
 
-**Real-time stats**
+**📊 Real-time stats**
 
 * Keeps the thread updated with uptime, game or category, and viewer count.
 
-**Multistream aware**
+**📺 Multistream aware**
 
 * Tracks Twitch, YouTube, and Kick together, with side-by-side platform links.
 * Optional interactive dashboard post showing live status, stream preview, and platform links.
 
-**Clean archive when you wrap**
+**🎬 Clean archive when you wrap**
 
 * Configurable grace period (default 6 minutes) rides out crashes and brief drops without duplicate threads.
 * Turns the live thread into a locked offline archive with the VOD link, then unpins it.
@@ -68,12 +68,12 @@ Every part is optional and configurable. Turn on only what your community wants.
 * Publishes a monthly Top 20 clips post on a schedule you choose.
 * Keeps the full clip history on subreddit wiki pages, one for stream clips and one for the monthly Top 20, and links to them from the posts.
 
-**Sidebar widget**
+**📌 Sidebar widget**
 
 * Creates and auto-updates a "STREAM STATUS" widget reflecting live and offline state.
 * Applies a "LIVE NOW" user flair to the streamer while live, and clears it when offline.
 
-**Built for mods**
+**🛠️ Built for mods**
 
 * Auto-posts a customizable pinned comment to promote your Discord, socials, or rules.
 * Refresh state, flush cached images, and force a status check from the mod menu.
@@ -90,7 +90,7 @@ Completely optional. Supports both **Compact (320px)** and **Tall (512px)** post
 | :---: | :---: |
 | [![Compact LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png)](https://livesticky.com/demo) | [![Tall LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-tall-nobg.png)](https://livesticky.com/demo) |
 
-👉 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
+**[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
 ## Documentation
 
