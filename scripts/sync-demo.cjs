@@ -121,6 +121,10 @@ function run() {
     if (!fs.existsSync(docsDemoPath)) {
       fs.mkdirSync(docsDemoPath, { recursive: true });
     }
+    // Everything under docs/demo/ is generated. Track what this run writes so
+    // stale artefacts from older builds can be pruned below.
+    const synced = new Set();
+
     const files = fs.readdirSync(distClientPath);
     for (const file of files) {
       const srcFile = path.join(distClientPath, file);
@@ -131,6 +135,7 @@ function run() {
       } else {
         fs.copyFileSync(srcFile, destFile);
       }
+      synced.add(file);
     }
     console.log('[sync-demo] Copied client assets to docs/demo/ successfully.');
 
@@ -139,6 +144,7 @@ function run() {
     const destIcon = path.join(docsDemoPath, 'icon.png');
     if (fs.existsSync(srcIcon)) {
       fs.copyFileSync(srcIcon, destIcon);
+      synced.add('icon.png');
       console.log('[sync-demo] Copied icon.png to docs/demo/icon.png successfully.');
     }
 
@@ -146,6 +152,7 @@ function run() {
     const destFavicon = path.join(docsDemoPath, 'favicon-squircle.png');
     if (fs.existsSync(srcFavicon)) {
       fs.copyFileSync(srcFavicon, destFavicon);
+      synced.add('favicon-squircle.png');
       console.log('[sync-demo] Copied favicon-squircle.png to docs/demo/ successfully.');
     }
 
@@ -153,6 +160,7 @@ function run() {
     const destProfilePic = path.join(docsDemoPath, 'sticky-profile-pic.png');
     if (fs.existsSync(srcProfilePic)) {
       fs.copyFileSync(srcProfilePic, destProfilePic);
+      synced.add('sticky-profile-pic.png');
       console.log('[sync-demo] Copied sticky-profile-pic.png to docs/demo/ successfully.');
     }
 
@@ -162,8 +170,17 @@ function run() {
       const destImg = path.join(docsDemoPath, img);
       if (fs.existsSync(srcImg)) {
         fs.copyFileSync(srcImg, destImg);
+        synced.add(img);
         console.log(`[sync-demo] Copied ${img} to docs/demo/ successfully.`);
       }
+    }
+    // Prune stale artefacts: files left behind by earlier builds are still
+    // served from docs/demo/, so an entry point that stops being produced
+    // lingers indefinitely (compact.js sat here for weeks with dead links).
+    for (const existing of fs.readdirSync(docsDemoPath)) {
+      if (synced.has(existing)) continue;
+      fs.rmSync(path.join(docsDemoPath, existing), { recursive: true, force: true });
+      console.log(`[sync-demo] Pruned stale ${existing} from docs/demo/`);
     }
   }
 }
