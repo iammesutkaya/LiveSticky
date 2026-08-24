@@ -1,7 +1,5 @@
 <!-- github-only:start -->
-[![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-280.png)](https://livesticky.com)
-
-# LiveSticky
+[![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/banner.png)](https://livesticky.com)
 <!-- github-only:end -->
 
 [![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.297/10b981)](https://livesticky.com/changelog.html)  
