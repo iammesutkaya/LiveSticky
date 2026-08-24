@@ -98,8 +98,25 @@ echo "✅ Rebuilding webview client with new version..."
 npm run build
 
 echo "🚀 Publishing to Devvit..."
+
+# Devvit always reads README.md from the project root (no config field for it),
+# and the app listing already shows the icon and app name above the readme. So
+# publish a stripped copy without the <!-- github-only --> block, then restore.
+# The trap guarantees the full readme comes back even if publish fails.
+README_BACKUP="$(mktemp)"
+cp README.md "$README_BACKUP"
+restore_readme() { cp "$README_BACKUP" README.md; rm -f "$README_BACKUP"; }
+trap restore_readme EXIT
+
+awk '/<!-- github-only:start -->/{skip=1} !skip; /<!-- github-only:end -->/{skip=0}' \
+  "$README_BACKUP" > README.md
+echo "✂️  Stripped github-only block for the Devvit listing"
+
 # Devvit output will still print the version, but we already applied it
 npx devvit publish "${FLAGS[@]}" 2>&1 | tee /dev/stderr
+
+restore_readme
+trap - EXIT
 
 # Commit and push. Stage all repository changes (source + docs):
 git add -A
