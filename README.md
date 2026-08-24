@@ -31,26 +31,17 @@ Want to see it first? **[Try the interactive dashboard demo →](https://livesti
 
 ---
 
-## Everything it does
+## How it works
 
-| | Feature | What it does |
-| :---: | :--- | :--- |
-| 🔴 | **Automatic live posts** | Polls your channels every 2 min; creates and pins a discussion thread when you go live. |
-| 📊 | **Interactive live dashboard** | Pinnable custom post that auto-updates with live status, stream preview, and platform links. |
-| ⚡ | **Real-time stats** | Keeps the thread updated with uptime, category, and viewer count. |
-| 🛡️ | **Crash protection** | Configurable grace period (default 6 min) rides out crashes and drops without duplicate threads. |
-| 🏁 | **VOD archives** | Concludes live threads into locked offline archives with VOD links, then unpins them. |
-| 🎥 | **Top clips highlights** | Compiles your top Twitch clips into a standalone highlights post when a stream ends. |
-| 📱 | **Sidebar widget** | Auto-updating "STREAM STATUS" widget reflecting live/offline state. |
-| 👤 | **Streamer user flair** | Applies a "🔴 LIVE NOW" flair while live, clears it when offline. |
-| 🏷️ | **Custom post flair** | Flairs live posts using your community's own flair templates. |
-| 📌 | **Pinned mod comment** | Auto-posts a customizable pinned comment to promote your Discord or socials. |
-| 😴 | **Permanent offline post** | Recycles one pinned post between streams for news and links. |
-| 💬 | **Suggested comment sort** | Sets the thread to New / Live / Q&A so it behaves like live chat. |
-| 📌 | **Community Highlights fallback** | Pins to the Highlights carousel when both sticky slots are taken. |
-| 🛠️ | **One-click mod actions** | Refresh state, flush cached images, and force a status check from the mod menu. |
+LiveSticky handles the whole stream lifecycle on its own. Go live and it creates and pins a live thread plus an interactive dashboard, updating viewer count, category, and uptime every 2 minutes. Go offline and it archives the thread with the VOD, locks comments against late spam, and (on Twitch) compiles your top clips into a highlights post. Along the way it keeps a sidebar status widget and streamer flair in sync, and rides out brief crashes without spamming duplicate threads.
 
-Full docs, template variables, and configuration reference at **[livesticky.com](https://livesticky.com)** ([Setup](https://livesticky.com/setup.html) · [Customization](https://livesticky.com/customization.html) · [Config](https://livesticky.com/configuration.html) · [FAQ](https://livesticky.com/faq.html)).
+Full feature list, setup, template variables, and every configuration option live on the website:
+
+* **[Setup Guide](https://livesticky.com/setup.html)** — install and connect Twitch, YouTube, or Kick
+* **[Mod Menu & Tools](https://livesticky.com/tools.html)** — moderator actions and subreddit controls
+* **[Variables & Templates](https://livesticky.com/customization.html)** — dynamic placeholders and copy-paste post templates
+* **[Configuration Reference](https://livesticky.com/configuration.html)** — every setting, template, and mod control
+* **[FAQ](https://livesticky.com/faq.html)** — multistreaming, crash protection, and more
 
 ---
 
