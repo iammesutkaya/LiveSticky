@@ -74,23 +74,25 @@ def button(name, label, icon, bg, fg, border=None):
     print(f"btn-{name}.svg  {w}x{H}  text={tw:.1f}px")
 
 
-def chip(name, label, bg, fg=WHITE, size=14.4, pad=8, radius=6, box=22, drop=4):
+def chip(name, label, bg, fg=WHITE, size=14.4, pad=8, radius=6, box=22):
     """Inline brand chip, matching .inline-brand in docs/landing.css.
 
-    `drop` is transparent space below the chip: an inline <img> sits its bottom
-    edge on the text baseline, so the padding lifts the chip to straddle it.
+    Sits on the text line via align="middle" on the <img> (vertical-align:
+    middle), which centres the chip on the x-height. Do not pad the SVG to
+    nudge it: an inline image aligns its bottom edge to the baseline, so any
+    padding below only lifts the chip further off the line.
     """
     d, tw, cap = outline(label, size, weight=600)
     w = round(pad * 2 + tw)
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{box + drop}" '
-        f'viewBox="0 0 {w} {box + drop}" role="img" aria-label="{label}">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{box}" '
+        f'viewBox="0 0 {w} {box}" role="img" aria-label="{label}">'
         f'<rect width="{w}" height="{box}" rx="{radius}" fill="{bg}"/>'
         f'<g transform="translate({pad},{box / 2 + cap / 2:.2f})">'
         f'<path d="{d}" fill="{fg}"/></g></svg>'
     )
-    (OUT / f"chip-{name}.svg").write_text(svg)
-    print(f"chip-{name}.svg  {w}x{box + drop}  text={tw:.1f}px")
+    (OUT / f"brand-{name}.svg").write_text(svg)
+    print(f"brand-{name}.svg  {w}x{box}  text={tw:.1f}px")
 
 
 def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
