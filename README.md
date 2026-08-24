@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://livesticky.com">
-  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon.png" width="170" alt="LiveSticky">
+  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-squircle.png" width="170" alt="LiveSticky">
 </a>
 
 # LiveSticky
