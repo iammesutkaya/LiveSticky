@@ -1,41 +1,16 @@
-<div align="center">
+# LiveSticky
 
-<a href="https://livesticky.com">
-  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-squircle.png" width="170" alt="LiveSticky">
-</a>
-
-<h1 style="border-bottom: none;">LiveSticky</h1>
-
-[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky)
-[![Version](https://badgen.net/badge/version/v1.1.286/10b981)](https://livesticky.com/changelog.html)
-<br />
-![Twitch](https://badgen.net/badge/integration/Twitch%20Helix/9146ff)
-![YouTube](https://badgen.net/badge/integration/YouTube/ff0000)
-![Kick](https://badgen.net/badge/integration/Kick/53fc18)
-[![Docs](https://badgen.net/badge/docs/livesticky.com/f5d474)](https://livesticky.com)
+[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.287/10b981)](https://livesticky.com/changelog.html)
+![Twitch](https://badgen.net/badge/integration/Twitch%20Helix/9146ff) ![YouTube](https://badgen.net/badge/integration/YouTube/ff0000) ![Kick](https://badgen.net/badge/integration/Kick/53fc18) [![Docs](https://badgen.net/badge/docs/livesticky.com/f5d474)](https://livesticky.com)
 
 ### Automated live threads and dashboards for streamer subreddits
 
-<p align="center">
-  <a href="https://livesticky.com">Website</a>
-  ·
-  <a href="https://livesticky.com/setup.html">Setup Guide</a>
-  ·
-  <a href="https://livesticky.com/demo">Live Demo</a>
-  ·
-  <a href="https://livesticky.com/configuration.html">Configuration</a>
-  ·
-  <a href="https://livesticky.com/changelog.html">Changelog</a>
-</p>
-
-</div>
+[Website](https://livesticky.com) · [Setup Guide](https://livesticky.com/setup.html) · [Live Demo](https://livesticky.com/demo) · [Configuration](https://livesticky.com/configuration.html) · [Changelog](https://livesticky.com/changelog.html)
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
 * **Free & 2-Minute Setup**: Installs on your subreddit with zero code required.
 * **Active in Top Streamer Subreddits**: Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
-
-<!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
 
 ## Why mods install it
 
@@ -57,10 +32,7 @@ LiveSticky handles the whole stream lifecycle on its own. Go live and it creates
 
 Every part is optional and configurable. Turn on only what your community wants.
 
-<details>
-<summary><b>See the full feature list</b></summary>
-
-<br>
+## Feature matrix
 
 | Feature | What it does |
 | :--- | :--- |
@@ -81,8 +53,6 @@ Every part is optional and configurable. Turn on only what your community wants.
 | **One-click mod actions** | Refresh state, flush cached images, and force a status check from the mod menu. |
 | **Interactive live dashboard** | Optional custom post showing live status, stream preview, and platform links in real time. |
 
-</details>
-
 ## Want more than a thread?
 
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
@@ -91,9 +61,9 @@ Completely optional. Supports both **Compact (320px)** and **Tall (512px)** post
 
 | Compact Dashboard (320px) | Tall Dashboard (512px) |
 | :---: | :---: |
-| <a href="https://livesticky.com/demo"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png" width="450" alt="Compact LiveSticky Dashboard"></a> | <a href="https://livesticky.com/demo"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-tall-nobg.png" width="450" alt="Tall LiveSticky Dashboard"></a> |
+| [![Compact LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png)](https://livesticky.com/demo) | [![Tall LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-tall-nobg.png)](https://livesticky.com/demo) |
 
-**[Try the interactive dashboard demo](https://livesticky.com/demo)**
+👉 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
 ## Documentation
 
