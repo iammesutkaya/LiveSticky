@@ -74,26 +74,6 @@ def button(name, label, icon, bg, fg, border=None):
     print(f"btn-{name}.svg  {w}x{H}  text={tw:.1f}px")
 
 
-def chip(name, label, bg, fg=WHITE, size=16, pad=12, radius=8, box=30):
-    """Brand chip in the site's .inline-brand colours, for the platform row.
-
-    Kept on its own line rather than inline in a sentence: an inline image
-    aligns its bottom edge to the text baseline, which leaves the labels
-    riding high, and swapping words for images loses the punctuation.
-    """
-    d, tw, cap = outline(label, size, weight=600)
-    w = round(pad * 2 + tw)
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{box}" '
-        f'viewBox="0 0 {w} {box}" role="img" aria-label="{label}">'
-        f'<rect width="{w}" height="{box}" rx="{radius}" fill="{bg}"/>'
-        f'<g transform="translate({pad},{box / 2 + cap / 2:.2f})">'
-        f'<path d="{d}" fill="{fg}"/></g></svg>'
-    )
-    (OUT / f"tag-{name}.svg").write_text(svg)
-    print(f"tag-{name}.svg  {w}x{box}  text={tw:.1f}px")
-
-
 def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
     src = (ROOT / f"assets/platform-svgs/{name}.svg").read_text()
     vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', src).group(1).split()]
@@ -118,6 +98,3 @@ def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
 if __name__ == "__main__":
     button("install-reddit", "Install on Reddit", EXTERNAL, GOLD, INK)
     button("setup", "Setup Guide", ARROW, SURFACE, WHITE, border=BORDER)
-    chip("twitch", "Twitch", "#9147ff")
-    chip("youtube", "YouTube", "#ff0000")
-    chip("kick", "Kick", "#53fc18", fg=INK)

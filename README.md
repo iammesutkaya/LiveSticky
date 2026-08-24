@@ -8,9 +8,12 @@
 
 ### Automated live threads and dashboards for streamer subreddits
 
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/tag-twitch.svg" height="30" alt="Twitch">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/tag-youtube.svg" height="30" alt="YouTube">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/tag-kick.svg" height="30" alt="Kick">
+![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=flat-square&logo=reddit&logoColor=white)
+![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=flat-square&logo=twitch&logoColor=white)
+![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)
+![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=flat-square&logo=kick&logoColor=black)
+![Redis](https://img.shields.io/badge/cache-Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
+[![License](https://img.shields.io/github/license/iammesutkaya/LiveSticky?style=flat-square)](LICENSE)
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
