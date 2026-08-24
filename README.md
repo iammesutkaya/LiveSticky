@@ -1,10 +1,6 @@
-<div align="center">
-
-<a href="https://livesticky.com">
-  <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon.png" width="170" alt="LiveSticky">
-</a>
-
 # LiveSticky
+
+![LiveSticky Logo](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon.png)
 
 ### Automated live threads and dashboards for streamer subreddits
 
@@ -15,19 +11,11 @@
 ![Kick](https://img.shields.io/badge/integration-Kick-53FC18?logo=kick&logoColor=black)
 [![Docs](https://img.shields.io/badge/docs-livesticky.com-F5D474?logo=googlechrome&logoColor=black)](https://livesticky.com)
 
-</div>
-
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
 Free, installs in under 2 minutes, and already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
-<div align="center">
-  <a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
-</div>
-
-<!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
+[![Install on Reddit](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg)](https://developers.reddit.com/apps/live-sticky) [![Setup Guide](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg)](https://livesticky.com/setup.html)
 
 ## Why mods install it
 
@@ -49,10 +37,7 @@ LiveSticky handles the whole stream lifecycle on its own. Go live and it creates
 
 Every part is optional and configurable. Turn on only what your community wants.
 
-<details>
-<summary><b>See the full feature list</b></summary>
-
-<br>
+### Core Features
 
 | Feature | What it does |
 | :--- | :--- |
@@ -73,21 +58,15 @@ Every part is optional and configurable. Turn on only what your community wants.
 | **One-click mod actions** | Refresh state, flush cached images, and force a status check from the mod menu. |
 | **Interactive live dashboard** | Optional custom post showing live status, stream preview, and platform links in real time. |
 
-</details>
-
 ## Want more than a thread?
 
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
 
 Completely optional. Create it from the mod menu whenever you want it, or never. The rest of the app works exactly the same either way.
 
-<div align="center">
-  <a href="https://livesticky.com/demo">
-    <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard.png" width="620" alt="LiveSticky dashboard showing a streamer live on Twitch, YouTube, and Kick">
-  </a>
-</div>
+[![LiveSticky Dashboard](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard.png)](https://livesticky.com/demo)
 
-**[Try the interactive dashboard demo](https://livesticky.com/demo)**
+👉 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
 ## Documentation
 
