@@ -9,6 +9,7 @@
 ### Automated live threads and dashboards for streamer subreddits
 
 [![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
+[![Version](https://img.shields.io/badge/version-v1.1.286-10B981?style=flat-square)](https://livesticky.com/changelog.html)
 ![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=flat-square&logo=twitch&logoColor=white)
 ![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)
 ![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=flat-square&logo=kick&logoColor=black)
@@ -20,9 +21,11 @@ Never let your community miss a stream. LiveSticky watches your Twitch, YouTube,
 
 Free, installs in under 2 minutes, and already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
-<a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
-&nbsp;
-<a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
+<div align="center">
+  <a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
+</div>
 
 <!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
 
