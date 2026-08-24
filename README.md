@@ -10,15 +10,15 @@
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
-<a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
+<a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
 &nbsp;
-<a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/btn-setup.svg" height="46" alt="Setup Guide"></a>
+<a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
 
 <br><br>
 
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-twitch.svg" height="34" alt="Twitch">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-youtube.svg" height="34" alt="YouTube">
-<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-kick.svg" height="34" alt="Kick">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-twitch.svg" height="34" alt="Twitch">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-youtube.svg" height="34" alt="YouTube">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/pill-kick.svg" height="34" alt="Kick">
 
 <br>
 
