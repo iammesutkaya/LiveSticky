@@ -1038,3 +1038,139 @@ html.theme-light .theme-toggle .moon-icon {
     margin-bottom: 4px !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Changelog Progressive Disclosure (Toolbar & Tech Details Drawer)
+   --------------------------------------------------------------------------- */
+.changelog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+}
+
+.changelog-toolbar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.view-switcher {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg-surface);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border-line);
+}
+
+.view-mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.view-mode-btn:hover {
+  color: var(--text-primary);
+  background: var(--hover-overlay);
+}
+
+.view-mode-btn.is-active {
+  background: var(--bg-card);
+  color: var(--accent-gold);
+  border: 1px solid var(--glass-border);
+}
+
+.tech-details {
+
+  margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.tech-details[open] {
+  border-color: var(--glass-border);
+}
+
+.tech-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: var(--transition-smooth);
+}
+
+.tech-summary::-webkit-details-marker {
+  display: none;
+}
+
+.tech-summary:hover {
+  color: var(--text-primary);
+  background: var(--hover-overlay);
+}
+
+.tech-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tech-chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+}
+
+.tech-details[open] .tech-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-gold);
+}
+
+.tech-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--border-line);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+html.theme-light .tech-content {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.tech-content h3 {
+  font-size: 0.85rem;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.tech-content h3:first-child {
+  margin-top: 0;
+}
+
+.tech-content ul {
+  margin-bottom: 12px;
+}
+
