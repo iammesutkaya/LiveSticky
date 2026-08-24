@@ -127,4 +127,4 @@ Zero user-data tracking. LiveSticky only uses the API credentials a moderator co
 
 Full security disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
 
-Free for any subreddit · source published for review, not reuse ([license](https://github.com/iammesutkaya/LiveSticky/blob/main/LICENSE)) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
+Free for any subreddit · [source-available](https://github.com/iammesutkaya/LiveSticky/blob/main/LICENSE) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
