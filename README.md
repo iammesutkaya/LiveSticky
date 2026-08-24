@@ -13,7 +13,7 @@
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
-* **Free & 2-Minute Setup**: Installs on your subreddit with zero code required.
+* **Free & no code required**: Installing takes a couple of clicks. Connecting a platform means creating API credentials once, and the Setup Guide walks you through each one.
 * **Active in Top Streamer Subreddits**: Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
 <!-- github-only:start -->
@@ -31,7 +31,7 @@ Never let your community miss a stream. LiveSticky watches your Twitch, YouTube,
 ## Quick start
 
 1. **[Add LiveSticky to your subreddit](https://developers.reddit.com/apps/live-sticky)** from the Reddit Developer Directory.
-2. Enter your Twitch, YouTube, or Kick channel names in Subreddit Settings. Full walkthrough in the **[2-minute Setup Guide](https://livesticky.com/setup.html)**.
+2. Create API credentials for Twitch, YouTube, or Kick and paste them into Subreddit Settings with your channel name. One-time job, walked through step by step in the **[Setup Guide](https://livesticky.com/setup.html)**.
 3. Go live. LiveSticky posts a pinned thread and keeps it updated every 2 minutes.
 
 ## How it works
@@ -127,4 +127,4 @@ Zero user-data tracking. LiveSticky only uses the API credentials a moderator co
 
 Full security disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
 
-Free to use · [source-available](https://github.com/iammesutkaya/LiveSticky/blob/main/LICENSE) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
+Free for any subreddit · source published for review, not reuse ([license](https://github.com/iammesutkaya/LiveSticky/blob/main/LICENSE)) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
