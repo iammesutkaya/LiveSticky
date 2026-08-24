@@ -107,11 +107,17 @@ let redditThreadUrl = null;
 // Mock Mode Configuration
 // ---------------------------------------------------------------------------
 
+// Every link in the demo points back at the demo itself. Clicks are already
+// intercepted, but the href still leaks through right-click "Open link",
+// middle-click and "Copy link address" - and a plausible-looking channel URL
+// resolves to a real, unaffiliated account on each platform.
+const MOCK_LINK = 'https://livesticky.com/demo';
+
 const MOCK_CONFIG = {
   twitchChannel: 'stickyfox',
-  twitchUrl: 'https://twitch.tv/stickyfox',
-  youtubeUrl: 'https://youtube.com/c/stickyfox',
-  kickUrl: 'https://kick.com/stickyfox',
+  twitchUrl: MOCK_LINK,
+  youtubeUrl: MOCK_LINK,
+  kickUrl: MOCK_LINK,
 };
 
 const MOCK_STATUS = {
