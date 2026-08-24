@@ -74,13 +74,12 @@ def button(name, label, icon, bg, fg, border=None):
     print(f"btn-{name}.svg  {w}x{H}  text={tw:.1f}px")
 
 
-def chip(name, label, bg, fg=WHITE, size=14.4, pad=8, radius=6, box=22):
-    """Inline brand chip, matching .inline-brand in docs/landing.css.
+def chip(name, label, bg, fg=WHITE, size=16, pad=12, radius=8, box=30):
+    """Brand chip in the site's .inline-brand colours, for the platform row.
 
-    Sits on the text line via align="middle" on the <img> (vertical-align:
-    middle), which centres the chip on the x-height. Do not pad the SVG to
-    nudge it: an inline image aligns its bottom edge to the baseline, so any
-    padding below only lifts the chip further off the line.
+    Kept on its own line rather than inline in a sentence: an inline image
+    aligns its bottom edge to the text baseline, which leaves the labels
+    riding high, and swapping words for images loses the punctuation.
     """
     d, tw, cap = outline(label, size, weight=600)
     w = round(pad * 2 + tw)
@@ -91,8 +90,8 @@ def chip(name, label, bg, fg=WHITE, size=14.4, pad=8, radius=6, box=22):
         f'<g transform="translate({pad},{box / 2 + cap / 2:.2f})">'
         f'<path d="{d}" fill="{fg}"/></g></svg>'
     )
-    (OUT / f"brand-{name}.svg").write_text(svg)
-    print(f"brand-{name}.svg  {w}x{box}  text={tw:.1f}px")
+    (OUT / f"tag-{name}.svg").write_text(svg)
+    print(f"tag-{name}.svg  {w}x{box}  text={tw:.1f}px")
 
 
 def pill(name, label, color, h=34, pad=14, gap=7, icon=15, size=13):
