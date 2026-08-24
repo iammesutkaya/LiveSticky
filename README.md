@@ -57,6 +57,8 @@ Every part is optional and configurable. Turn on only what your community wants.
 * Configurable grace period (default 6 minutes) rides out crashes and brief drops without duplicate threads.
 * Turns the live thread into a locked offline archive with the VOD link, then unpins it.
 * Compiles your top Twitch clips into a standalone highlights post.
+* Publishes a monthly Top 20 clips post on a schedule you choose.
+* Keeps the full clip history on subreddit wiki pages, one for stream clips and one for the monthly Top 20, and links to them from the posts.
 
 **Sidebar widget**
 
