@@ -106,7 +106,7 @@ Full feature list, setup, template variables, and every configuration option liv
 
 ## Privacy & security
 
-Zero user-data tracking. LiveSticky only uses the API credentials a moderator configures. Every outbound request goes to one of the domains below, all declared and locked in [`devvit.json`](./devvit.json):
+Zero user-data tracking. LiveSticky only uses the API credentials a moderator configures. Every outbound request goes to one of the domains below, all declared and locked in [`devvit.json`](https://github.com/iammesutkaya/LiveSticky/blob/main/devvit.json):
 
 | Domain | Purpose |
 | --- | --- |
@@ -123,4 +123,4 @@ Zero user-data tracking. LiveSticky only uses the API credentials a moderator co
 
 Full security disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
 
-Free to use · [source-available](LICENSE) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
+Free to use · [source-available](https://github.com/iammesutkaya/LiveSticky/blob/main/LICENSE) · Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
