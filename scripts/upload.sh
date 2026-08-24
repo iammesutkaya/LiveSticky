@@ -62,6 +62,14 @@ fi
 echo ""
 echo "📝 Detected version: $VERSION: updating website version tags..."
 
+# Update package.json version
+sed -i.bak -E "s|\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\"|\"version\": \"${VERSION}\"|g" package.json
+rm -f package.json.bak
+
+# Update README.md version badge
+sed -i.bak -E "s|badgen\.net/badge/version/v[0-9]+\.[0-9]+\.[0-9]+|badgen.net/badge/version/v${VERSION}|g" README.md
+rm -f README.md.bak
+
 # One app version drives everything the site exposes: the visible version
 # badge (index.html) and every stylesheet cache-buster (all pages), so
 # returning visitors always get fresh CSS after a release.
