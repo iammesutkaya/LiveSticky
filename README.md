@@ -6,8 +6,8 @@
 
 **Stop manually posting, pinning, and deleting stream threads.** LiveSticky watches your community's Twitch, YouTube, and Kick channels and does it all for you — creating a pinned live thread the moment someone goes live, keeping viewer counts and category fresh, then archiving it with the VOD when the stream ends.
 
-[![Install on Reddit](https://img.shields.io/badge/Install%20on%20Reddit-Add%20to%20your%20subreddit-FF4500?style=for-the-badge&logo=reddit)](https://developers.reddit.com/apps/live-sticky)
-[![Try the live demo](https://img.shields.io/badge/Try%20the%20live%20demo-livesticky.com-F5D474?style=for-the-badge&logo=googlechrome)](https://livesticky.com/demo)
+[![Add to your subreddit](https://img.shields.io/badge/Add%20to%20your%20subreddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
+[![Try the live demo](https://img.shields.io/badge/Try%20the%20live%20demo-F5D474?style=for-the-badge&logo=googlechrome&logoColor=black)](https://livesticky.com/demo)
 
 ---
 
