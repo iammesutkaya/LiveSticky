@@ -74,6 +74,14 @@ Every part is optional and configurable. Turn on only what your community wants.
 * Redis caching and circuit breakers keep status checks light and never hit API limits.
 * Pins to Reddit's Community Highlights carousel when both sticky slots are taken.
 
+**✏️ Every word is yours**
+
+LiveSticky never forces its own voice on your community. Post titles, bodies, footers, the pinned mod comment, sidebar text, and the highlights and monthly headers are all editable templates, with placeholders that fill themselves in:
+
+`{stream_title}` `{stream_game}` `{stream_viewers}` `{stream_uptime}` `{stream_display_name}` `{date}` `{month}` `{twitch_url}` `{youtube_url}` `{kick_url}`
+
+Full list and copy-paste examples in **[Variables & Templates](https://livesticky.com/customization.html)**.
+
 ## Want more than a thread?
 
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
