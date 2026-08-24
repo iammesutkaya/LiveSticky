@@ -2,7 +2,9 @@
   <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
 </a>
 
-# Never let your community miss a stream
+# LiveSticky — automated live threads for streamer subreddits
+
+### Never let your community miss a stream
 
 **Free, zero-maintenance stream promotion for your subreddit.** LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live — so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
