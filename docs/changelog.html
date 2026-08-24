@@ -374,28 +374,18 @@
         const jump = document.createElement('select');
         jump.className = 'changelog-jump';
         jump.setAttribute('aria-label', 'Jump to a version');
-        // Dates become optgroup headings instead of repeating on every row:
-        // five near-identical "v1.1.2xx · AUG nn, 2026" lines are hard to scan,
-        // and the browser renders group labels with their own weight.
-        let group = null;
-        let groupLabel = null;
+        // Version only. The list is newest-first with the top marked Latest,
+        // so position already conveys recency, and the entry you land on
+        // states its own date. Grouping by date meant four headings for five
+        // options, which is scaffolding rather than structure.
         links.forEach((a, i) => {
           const ver = a.querySelector('.changelog-ver').textContent.trim();
-          const dateEl = a.querySelector('.changelog-sidebar-date');
-          const date = dateEl ? dateEl.textContent.trim() : '';
-
-          if (date && date !== groupLabel) {
-            groupLabel = date;
-            group = document.createElement('optgroup');
-            group.label = date;
-            jump.appendChild(group);
-          }
-
           const opt = document.createElement('option');
           opt.value = a.getAttribute('href').slice(1);
           opt.textContent = i === 0 ? `${ver}  ·  Latest` : ver;
-          (group || jump).appendChild(opt);
+          jump.appendChild(opt);
         });
+
         jump.addEventListener('change', () => {
           window.location.hash = jump.value;
         });
