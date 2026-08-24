@@ -8,7 +8,7 @@ devvit.secret.yaml
 public/*.js
 public/*.js.map
 
-.claude/settings.local.json
+.claude/
 transform.js
 
 # Internal local documentation (gitignored)
