@@ -87,13 +87,11 @@ Every part is optional and configurable. Turn on only what your community wants.
 
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
 
-Completely optional. Create it from the mod menu whenever you want it, or never. The rest of the app works exactly the same either way.
+Completely optional. Supports both **Compact (320px)** and **Tall (512px)** post heights:
 
-<div align="center">
-  <a href="https://livesticky.com/demo">
-    <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png" width="620" alt="LiveSticky dashboard showing a streamer live on Twitch, YouTube, and Kick">
-  </a>
-</div>
+| Compact Dashboard (320px) | Tall Dashboard (512px) |
+| :---: | :---: |
+| <a href="https://livesticky.com/demo"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-nobg.png" width="450" alt="Compact LiveSticky Dashboard"></a> | <a href="https://livesticky.com/demo"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/dashboard-tall-nobg.png" width="450" alt="Tall LiveSticky Dashboard"></a> |
 
 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
 
