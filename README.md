@@ -2,7 +2,8 @@
 
 # LiveSticky
 
-[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.293/10b981)](https://livesticky.com/changelog.html)<br>
+[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.293/10b981)](https://livesticky.com/changelog.html)
+
 ![Twitch](https://badgen.net/badge/integration/Twitch%20Helix/9146ff) ![YouTube](https://badgen.net/badge/integration/YouTube/ff0000) ![Kick](https://badgen.net/badge/integration/Kick/53fc18) [![Docs](https://badgen.net/badge/docs/livesticky.com/f5d474)](https://livesticky.com)
 
 ### Automated live threads and dashboards for streamer subreddits
@@ -14,13 +15,7 @@ Never let your community miss a stream. LiveSticky watches your Twitch, YouTube,
 * **Free & 2-Minute Setup**: Installs on your subreddit with zero code required.
 * **Active in Top Streamer Subreddits**: Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
-<br>
-
-<a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
-&nbsp;
-<a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
-
-<br>
+[![Install on Reddit](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg)](https://developers.reddit.com/apps/live-sticky) [![Setup Guide](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg)](https://livesticky.com/setup.html)
 
 ## Why mods install it
 
