@@ -4,26 +4,29 @@
   <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
 </a>
 
-# LiveSticky: automated live threads and dashboards for streamer subreddits
+# LiveSticky
 
-### Never let your community miss a stream
+### Automated live threads and dashboards for streamer subreddits
 
-**Free, zero-maintenance stream promotion for your subreddit.** LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
+Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
-[![Add to your subreddit](https://img.shields.io/badge/Add%20to%20your%20subreddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
-[![Read the docs](https://img.shields.io/badge/Read%20the%20docs-F5D474?style=for-the-badge&logo=googlechrome&logoColor=black)](https://livesticky.com)
+<a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/btn-install.svg" height="46" alt="Add to your subreddit"></a>
+&nbsp;
+<a href="https://livesticky.com"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/btn-docs.svg" height="46" alt="Read the docs"></a>
 
-![Twitch](https://img.shields.io/badge/Twitch-9146FF?style=for-the-badge&logo=twitch&logoColor=white)
-![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)
-![Kick](https://img.shields.io/badge/Kick-53FC18?style=for-the-badge&logo=kick&logoColor=black)
+<br><br>
 
-**Free** · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-twitch.svg" height="34" alt="Twitch">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-youtube.svg" height="34" alt="YouTube">
+<img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/pill-kick.svg" height="34" alt="Kick">
+
+<br>
+
+Free · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
 </div>
 
 <!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
-
----
 
 ## Why mods install it
 
@@ -33,15 +36,11 @@
 * **Live stats, always current.** Viewer count, game or category, and uptime refresh every 2 minutes in the thread and in a sidebar status widget.
 * **Works across Twitch, YouTube, and Kick.** One app, side-by-side platform links, per-platform live detection.
 
----
-
 ## Quick start
 
 1. **[Add LiveSticky to your subreddit](https://developers.reddit.com/apps/live-sticky)** from the Reddit Developer Directory.
 2. Enter your Twitch, YouTube, or Kick channel names in Subreddit Settings. Full walkthrough in the **[2-minute Setup Guide](https://livesticky.com/setup.html)**.
 3. Go live. LiveSticky posts a pinned thread and keeps it updated every 2 minutes.
-
----
 
 ## How it works
 
@@ -75,8 +74,6 @@ Every part is optional and configurable. Turn on only what your community wants.
 
 </details>
 
----
-
 ## Want more than a thread?
 
 LiveSticky also includes an **interactive live dashboard**: a custom post you can pin to the top of your subreddit showing live status, stream preview, viewer stats, and clickable platform links, all updating in real time.
@@ -84,8 +81,6 @@ LiveSticky also includes an **interactive live dashboard**: a custom post you ca
 Completely optional. Create it from the mod menu whenever you want it, or never. The rest of the app works exactly the same either way.
 
 **[Try the interactive dashboard demo](https://livesticky.com/demo)**
-
----
 
 ## Documentation
 
@@ -96,8 +91,6 @@ Full feature list, setup, template variables, and every configuration option liv
 * **[Variables & Templates](https://livesticky.com/customization.html)**: dynamic placeholders and copy-paste post templates
 * **[Configuration Reference](https://livesticky.com/configuration.html)**: every setting, template, and mod control
 * **[FAQ](https://livesticky.com/faq.html)**: multistreaming, crash protection, and more
-
----
 
 ## Privacy & security
 
@@ -117,7 +110,5 @@ Zero user-data tracking. LiveSticky only uses the API credentials a moderator co
 | `i.redd.it` | Reddit image CDN (uploaded images) |
 
 Full security disclosure at **[livesticky.com/apis.html](https://livesticky.com/apis.html)**.
-
----
 
 Created by [u/iammesutkaya](https://reddit.com/u/iammesutkaya) · **[livesticky.com](https://livesticky.com)** · [twitch.tv/mesutkaya](https://twitch.tv/mesutkaya)
