@@ -8,32 +8,23 @@
 
 ### Automated live threads and dashboards for streamer subreddits
 
-![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=flat-square&logo=reddit&logoColor=white)
-![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=flat-square&logo=twitch&logoColor=white)
-![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)
-![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=flat-square&logo=kick&logoColor=black)
-![Redis](https://img.shields.io/badge/cache-Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
-[![License](https://img.shields.io/github/license/iammesutkaya/LiveSticky?style=flat-square)](LICENSE)
+</div>
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
+
+Free, installs in under 2 minutes, and already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
 <a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
 &nbsp;
 <a href="https://livesticky.com/setup.html"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg" height="46" alt="Setup Guide"></a>
 
-<a href="https://livesticky.com">Website</a>
-·
-<a href="https://livesticky.com/setup.html">Setup</a>
-·
-<a href="https://livesticky.com/demo">Demo</a>
-·
-<a href="https://livesticky.com/configuration.html">Configuration</a>
-·
-<a href="https://livesticky.com/faq.html">FAQ</a>
-
-Free · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
-
-</div>
+[![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
+![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=flat-square&logo=twitch&logoColor=white)
+![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)
+![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=flat-square&logo=kick&logoColor=black)
+![Redis](https://img.shields.io/badge/cache-Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
+[![Website](https://img.shields.io/badge/docs-livesticky.com-F5D474?style=flat-square&logo=googlechrome&logoColor=black)](https://livesticky.com)
+[![License](https://img.shields.io/github/license/iammesutkaya/LiveSticky?style=flat-square)](LICENSE)
 
 <!-- TODO: add stills or a GIF here: pinned live thread, offline VOD archive, sidebar widget. Biggest single conversion lever. -->
 
