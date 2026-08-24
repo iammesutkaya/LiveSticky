@@ -8,12 +8,7 @@
 
 ### Automated live threads and dashboards for streamer subreddits
 
-[![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
-[![Version](https://img.shields.io/badge/version-v1.1.286-10B981)](https://livesticky.com/changelog.html)
-![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?logo=twitch&logoColor=white)
-![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?logo=youtube&logoColor=white)
-![Kick](https://img.shields.io/badge/integration-Kick-53FC18?logo=kick&logoColor=black)
-[![Docs](https://img.shields.io/badge/docs-livesticky.com-F5D474?logo=googlechrome&logoColor=black)](https://livesticky.com)
+![LiveSticky Integrations & Specs](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/badges/chips-bar.svg)
 
 </div>
 
