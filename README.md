@@ -8,12 +8,12 @@
 
 ### Automated live threads and dashboards for streamer subreddits
 
-[![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
-[![Version](https://img.shields.io/badge/version-v1.1.286-10B981?style=flat-square)](https://livesticky.com/changelog.html)
-![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=flat-square&logo=twitch&logoColor=white)
-![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)
-![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=flat-square&logo=kick&logoColor=black)
-[![Docs](https://img.shields.io/badge/docs-livesticky.com-F5D474?style=flat-square&logo=googlechrome&logoColor=black)](https://livesticky.com)
+[![Platform](https://img.shields.io/badge/platform-Reddit%20Devvit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
+[![Version](https://img.shields.io/badge/version-v1.1.286-10B981?style=for-the-badge)](https://livesticky.com/changelog.html)
+![Twitch](https://img.shields.io/badge/integration-Twitch%20Helix-9146FF?style=for-the-badge&logo=twitch&logoColor=white)
+![YouTube](https://img.shields.io/badge/integration-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)
+![Kick](https://img.shields.io/badge/integration-Kick-53FC18?style=for-the-badge&logo=kick&logoColor=black)
+[![Docs](https://img.shields.io/badge/docs-livesticky.com-F5D474?style=for-the-badge&logo=googlechrome&logoColor=black)](https://livesticky.com)
 
 </div>
 
