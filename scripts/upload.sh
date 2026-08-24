@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # -------------------------------------------------------
-# upload.sh — Upload to Devvit, auto-update website version tags
+# upload.sh - Upload to Devvit, auto-update website version tags
 # Usage: ./scripts/upload.sh [--version X.Y.Z]
 # -------------------------------------------------------
 
@@ -55,12 +55,12 @@ else
 fi
 
 if [ -z "$VERSION" ]; then
-  echo "⚠️  Could not detect version — website tags not updated."
+  echo "⚠️  Could not detect version: website tags not updated."
   exit 0
 fi
 
 echo ""
-echo "📝 Detected version: $VERSION — updating website version tags..."
+echo "📝 Detected version: $VERSION: updating website version tags..."
 
 # One app version drives everything the site exposes: the visible version
 # badge (index.html) and every stylesheet cache-buster (all pages), so

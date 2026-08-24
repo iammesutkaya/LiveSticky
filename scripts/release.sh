@@ -7,7 +7,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
 # -------------------------------------------------------
-# release.sh — Publish to Devvit, auto-update website version tags
+# release.sh - Publish to Devvit, auto-update website version tags
 # Usage: ./scripts/release.sh [--version X.Y.Z] [--public]
 # -------------------------------------------------------
 

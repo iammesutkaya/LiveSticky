@@ -457,7 +457,7 @@ const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
       try {
         await reddit.getWikiPage(subredditName, page, { wikiVersion });
       } catch {
-        continue; // Doesn't exist — nothing to clean.
+        continue; // Doesn't exist: nothing to clean.
       }
       try {
         await reddit.updateWikiPage({ subredditName, page, content: '', reason: 'LiveSticky: retire legacy page', wikiVersion });

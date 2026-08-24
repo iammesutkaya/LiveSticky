@@ -15,4 +15,8 @@
 - Reddit Wiki API has no `DeleteWikiPage` method. Once a wiki page slug is created on Reddit, it is permanently recorded in the subreddit's database and cannot be deleted.
 - Changing slug casing or names creates orphan pages that cannot be removed from Reddit's database index, creating clutter for moderators.
 
+# Punctuation & Typography Constraints
+- NEVER use em-dashes (`—`) or en-dashes (`–`) anywhere in copy, documentation, website HTML, commit messages, or READMEs. Always use standard hyphens (`-`), colons (`:`), or commas.
+
+
 

@@ -19,8 +19,8 @@
 
 Never let your community miss a stream. LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live, so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
-* **Free & 2-Minute Setup** — Installs on your subreddit with zero code required.
-* **Active in Top Streamer Subreddits** — Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
+* **Free & 2-Minute Setup**: Installs on your subreddit with zero code required.
+* **Active in Top Streamer Subreddits**: Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
 <div align="center">
   <a href="https://developers.reddit.com/apps/live-sticky"><img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg" height="46" alt="Install on Reddit"></a>
