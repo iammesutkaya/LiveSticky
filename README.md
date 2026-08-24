@@ -13,7 +13,11 @@ Never let your community miss a stream. LiveSticky watches your Twitch, YouTube,
 * **Active in Top Streamer Subreddits**: Already running in communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
 
 <!-- github-only:start -->
+<br>
+
 [![Install on Reddit](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-install-reddit.svg)](https://developers.reddit.com/apps/live-sticky) [![Setup Guide](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/ui/btn-setup.svg)](https://livesticky.com/setup.html)
+
+<br>
 <!-- github-only:end -->
 
 ## Why mods install it
@@ -101,6 +105,7 @@ Full feature list, setup, template variables, and every configuration option liv
 * **[Variables & Templates](https://livesticky.com/customization.html)**: dynamic placeholders and copy-paste post templates
 * **[Configuration Reference](https://livesticky.com/configuration.html)**: every setting, template, and mod control
 * **[FAQ](https://livesticky.com/faq.html)**: multistreaming, crash protection, and more
+* **[Changelog](https://livesticky.com/changelog.html)**: release notes and version history
 
 ## Privacy & security
 
