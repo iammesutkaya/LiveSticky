@@ -2,12 +2,17 @@
   <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
 </a>
 
-# LiveSticky — Auto-pin live threads when your streamers go live
+# Never let your community miss a stream
 
-**Stop manually posting, pinning, and deleting stream threads.** LiveSticky watches your community's Twitch, YouTube, and Kick channels and does it all for you — creating a pinned live thread the moment someone goes live, keeping viewer counts and category fresh, then archiving it with the VOD when the stream ends.
+**Free, zero-maintenance stream promotion for your subreddit.** LiveSticky watches your Twitch, YouTube, and Kick channels and automatically posts, pins, updates, and archives a live thread every time you go live — so you never hand-pin an "I'm live" post again, or leave a dead one up for days after the stream ended.
 
 [![Add to your subreddit](https://img.shields.io/badge/Add%20to%20your%20subreddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://developers.reddit.com/apps/live-sticky)
 [![Try the live demo](https://img.shields.io/badge/Try%20the%20live%20demo-F5D474?style=for-the-badge&logo=googlechrome&logoColor=black)](https://livesticky.com/demo)
+
+**Free** · installs in under 2 minutes · already running in streamer communities like **r/Hasan_Piker** (211K) and **r/Vinesauce** (80K).
+
+<!-- TODO: add a GIF/screenshot here — go-live → pinned thread + dashboard appear → viewer count updates. Biggest single conversion lever. -->
+See it working in the **[interactive dashboard demo →](https://livesticky.com/demo)**
 
 ---
 
