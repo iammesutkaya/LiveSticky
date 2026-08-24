@@ -1,4 +1,4 @@
-[![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-140.png)](https://livesticky.com)
+[![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/icon-280.png)](https://livesticky.com)
 
 # LiveSticky
 
