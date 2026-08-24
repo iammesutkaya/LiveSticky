@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/header.png" width="100%" alt="LiveSticky - Automated Reddit Live Streaming Hub">
 </a>
 
-# LiveSticky: automated live threads for streamer subreddits
+# LiveSticky: automated live threads and dashboards for streamer subreddits
 
 ### Never let your community miss a stream
 
