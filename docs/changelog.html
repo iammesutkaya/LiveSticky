@@ -366,7 +366,37 @@
         if (!links.length) return;
         const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
         const heads = Array.from(document.querySelectorAll('.changelog-head h2'));
-        const setActive = (id) => links.forEach((a) => a.classList.toggle('is-active', a === byId.get(id)));
+
+        // Mobile jump-to-version control. Built from the sidebar links rather
+        // than duplicated in markup, so adding a release still means editing
+        // one list. Only revealed once it exists: if this script fails the
+        // chip list stays visible as the fallback.
+        const jump = document.createElement('select');
+        jump.className = 'changelog-jump';
+        jump.setAttribute('aria-label', 'Jump to a version');
+        links.forEach((a) => {
+          const ver = a.querySelector('.changelog-ver');
+          const date = a.querySelector('.changelog-sidebar-date');
+          const opt = document.createElement('option');
+          opt.value = a.getAttribute('href').slice(1);
+          opt.textContent = date
+            ? `${ver.textContent.trim()}  ·  ${date.textContent.trim()}`
+            : ver.textContent.trim();
+          jump.appendChild(opt);
+        });
+        jump.addEventListener('change', () => {
+          window.location.hash = jump.value;
+        });
+        const sidebarNav = document.querySelector('.changelog-sidebar nav');
+        if (sidebarNav) {
+          sidebarNav.appendChild(jump);
+          document.querySelector('.changelog-sidebar').classList.add('has-jump');
+        }
+
+        const setActive = (id) => {
+          links.forEach((a) => a.classList.toggle('is-active', a === byId.get(id)));
+          if (jump.value !== id) jump.value = id;
+        };
         const obs = new IntersectionObserver(
           (entries) => {
             entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); });
@@ -374,6 +404,13 @@
           { rootMargin: '-80px 0px -70% 0px' }
         );
         heads.forEach((h) => obs.observe(h));
+
+        // Above the first heading nothing intersects the observer band, so the
+        // previous selection would stick. Harmless for a link highlight, but
+        // the jump select shows it as text, so pin it to the newest release.
+        const syncTop = () => { if (window.scrollY < 40) setActive(heads[0].id); };
+        window.addEventListener('scroll', syncTop, { passive: true });
+        syncTop();
       })();
     </script>
 

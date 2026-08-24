@@ -423,6 +423,12 @@ h1 {
   border-left-color: var(--accent-gold, #f59e0b);
 }
 
+/* Desktop keeps the sidebar list; the jump select is mobile-only. Declared
+   before the media query so the mobile rule can override it. */
+.changelog-jump {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .changelog-layout {
     grid-template-columns: 1fr;
@@ -456,6 +462,30 @@ h1 {
 
   .changelog-sidebar a.is-active {
     border-color: var(--accent-gold, #f59e0b);
+  }
+
+  /* Once the jump select exists, it replaces the chip list entirely. */
+  .changelog-sidebar.has-jump ul {
+    display: none;
+  }
+
+  .changelog-jump {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-line);
+    border-radius: var(--radius-sm);
+  }
+
+  .changelog-jump:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
   }
 }
 
