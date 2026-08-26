@@ -156,15 +156,15 @@
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 26, 2026</span>
           </div>
-          <p><strong>Comprehensive Audit Remediation: Restored Features, Security Hardening &amp; Engine Optimizations</strong></p>
+          <p><strong>Comprehensive Reliability, Security &amp; Performance Update</strong></p>
           <ul>
-            <li><strong>Monthly Top 20 Clips Restored:</strong> Fixed a runtime reference error in <code>runMonthlyHighlights()</code> so monthly compilations post reliably.</li>
-            <li><strong>Create Dashboard Menu Item:</strong> Restored the <em>Create LiveSticky Dashboard</em> moderator menu action in Mod Tools for initializing interactive community posts.</li>
-            <li><strong>Self-Healing Search Protection:</strong> Self-healing post discovery now verifies bot ownership before recovering posts or moderating comments.</li>
-            <li><strong>Wiki Write Optimization:</strong> Implemented FNV-1a Redis content fingerprinting, reducing wiki API traffic from ~30 calls/tick down to 0 on steady-state streams.</li>
-            <li><strong>Offline Template Fallbacks:</strong> Offline posts cleanly replace <code>{stream_game}</code>, <code>{stream_viewers}</code>, and <code>{stream_uptime}</code> with fallback values instead of raw template tags.</li>
-            <li><strong>Clip Injection Protection:</strong> Sanitized Twitch clip titles across Markdown and HTML wiki paths to prevent link injection.</li>
-            <li><strong>Accessibility &amp; UX Improvements:</strong> Added visible focus rings (<code>:focus-visible</code>), keyboard focus for thread chips (<code>tabindex="0"</code>), and <code>@media (prefers-reduced-motion: reduce)</code> support.</li>
+            <li><strong>Monthly Top 20 Clips Restored:</strong> Monthly clip compilation posts now publish on schedule without interruption.</li>
+            <li><strong>Create Dashboard in Mod Tools:</strong> Restored the <em>Create LiveSticky Dashboard</em> action in Mod Tools so moderators can easily generate interactive community posts.</li>
+            <li><strong>Smarter Post Recovery:</strong> Enhanced self-healing thread discovery so LiveSticky only manages posts created by the app bot account.</li>
+            <li><strong>Faster Wiki Archiving:</strong> Streamlined clip history updates on subreddit wiki pages, eliminating unnecessary background updates when content hasn't changed.</li>
+            <li><strong>Cleaner Offline Threads:</strong> Templates using live stream stats now automatically clean up live-only tags when the stream ends.</li>
+            <li><strong>Safer Clip Formatting:</strong> Special characters in Twitch clip titles are now sanitized to keep post formatting clean and links secure.</li>
+            <li><strong>Accessibility &amp; Motion Support:</strong> Added full keyboard navigation, clear focus rings, and reduced-motion support for animations.</li>
           </ul>
 
           <details class="tech-details">
