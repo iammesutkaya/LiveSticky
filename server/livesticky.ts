@@ -1203,7 +1203,7 @@ const STATUS_LOCK_TTL_MS = 5 * 60 * 1000;
  * ownership by reading the token back, so an unexpected return value from the
  * driver can never wedge the scheduler permanently.
  */
-const withStatusLock = async (fn: () => Promise<void>): Promise<void> => {
+const withStatusLock = async (fn: () => Promise<void>): Promise<boolean> => {
   const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   try {
     await redis.set(STATUS_LOCK_KEY, token, {
@@ -1212,15 +1212,11 @@ const withStatusLock = async (fn: () => Promise<void>): Promise<void> => {
     });
   } catch {
     // Key already held: another tick is mid-flight.
-    console.log('[lock] Status check already running, skipping this tick.');
-    return;
+    return false;
   }
 
   const holder = await redis.get(STATUS_LOCK_KEY);
-  if (holder !== token) {
-    console.log('[lock] Status check already running, skipping this tick.');
-    return;
-  }
+  if (holder !== token) return false;
 
   try {
     await fn();
@@ -1228,9 +1224,30 @@ const withStatusLock = async (fn: () => Promise<void>): Promise<void> => {
     const stillOurs = await redis.get(STATUS_LOCK_KEY);
     if (stillOurs === token) await redis.del(STATUS_LOCK_KEY);
   }
+  return true;
 };
 
-export const runStatusCheck = async (): Promise<void> => withStatusLock(runStatusCheckInner);
+/** Scheduled path: a tick that collides with a running one is simply dropped. */
+export const runStatusCheck = async (): Promise<void> => {
+  const ran = await withStatusLock(runStatusCheckInner);
+  if (!ran) console.log('[lock] Status check already running, skipping this tick.');
+};
+
+/**
+ * Moderator-initiated path. "Refresh LiveSticky" wipes cached state before
+ * asking for a re-check, so silently dropping the check on a lock collision
+ * would leave the dashboard blank until the next cron tick. Wait for the
+ * in-flight run to finish instead.
+ */
+export const runStatusCheckNow = async (): Promise<boolean> => {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    if (await withStatusLock(runStatusCheckInner)) return true;
+    console.log('[lock] Manual refresh waiting for the running status check...');
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+  console.warn('[lock] Manual refresh gave up waiting; the next scheduled tick will catch up.');
+  return false;
+};
 
 const runStatusCheckInner = async (): Promise<void> => {
   const [
@@ -2140,7 +2157,7 @@ export const refreshLiveSticky = async (): Promise<string> => {
   ]);
 
   // Run status check and wiki sync asynchronously in background so response is immediate and doesn't time out in UI.
-  runStatusCheck().catch((e) => console.error('Immediate status check after refresh failed:', e));
+  runStatusCheckNow().catch((e) => console.error('Immediate status check after refresh failed:', e));
   ensureWikiArchiveReady().catch((wikiErr) => console.warn('Failed to sync wiki archive during refresh:', wikiErr));
 
   return `LiveSticky refreshed!`;
