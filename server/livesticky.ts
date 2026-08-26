@@ -2169,6 +2169,8 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('modmail_cooldown_youtube'),
     redis.del('highlights_post_id'),
     redis.del('last_highlights_post_id'),
+    redis.del('is_live_pinned'),
+    redis.del('live_post_id'),
   ]);
 
   // Run status check and wiki sync asynchronously in background so response is immediate and doesn't time out in UI.
