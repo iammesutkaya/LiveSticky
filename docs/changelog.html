@@ -96,8 +96,8 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
-                <a href="#v1-1-312">
-                  <span class="changelog-ver">v1.1.312</span>
+                <a href="#v1-1-313">
+                  <span class="changelog-ver">v1.1.313</span>
                   <span class="changelog-sidebar-date">AUG 26, 2026</span>
                 </a>
               </li>
@@ -146,13 +146,14 @@
         <article class="changelog-entry">
 
           <div class="changelog-head">
-            <h2 id="v1-1-312">v1.1.312</h2>
+            <h2 id="v1-1-313">v1.1.313</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 26, 2026</span>
           </div>
           <p><strong>Everything since v1.1.285: safer post handling, restored features, and accessibility</strong></p>
           <ul>
             <li><strong>Safer post recovery:</strong> When LiveSticky reconnects to a thread after a restart, it now only ever adopts posts it created itself. Previously it could match another post in your community and clear the comments on it.</li>
+            <li><strong>No duplicate live threads:</strong> If LiveSticky loses track of its own thread mid-stream, such as after an app update, it now reconnects to the existing one instead of pinning a second live thread beside it.</li>
             <li><strong>Monthly Top 20 clips fixed:</strong> The monthly clip compilation now publishes on schedule. It had been failing silently.</li>
             <li><strong>Create Dashboard is back in Mod Tools:</strong> The action to create the interactive dashboard post had gone missing from the mod menu.</li>
             <li><strong>Your timezone setting now applies:</strong> The Streamer Timezone option was quietly ignored and every date fell back to UTC. Dates in your post titles and bodies now use the timezone you picked.</li>
@@ -163,7 +164,7 @@
             <li><strong>Lighter background activity:</strong> Wiki archive pages are only rewritten when their content actually changes, instead of on every check.</li>
             <li><strong>Keyboard and motion support:</strong> The dashboard is now fully keyboard navigable with visible focus rings, and honours your system's reduced-motion setting.</li>
           </ul>
-          <p>This release rolls up versions 1.1.286 through 1.1.311, which were superseded during review and never became available to install.</p>
+          <p>This release rolls up versions 1.1.286 through 1.1.312, which were superseded during review and never became available to install.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -178,6 +179,7 @@
               <ul>
                 <li><strong>Select settings read as arrays</strong>: Devvit returns <code>select</code> settings as <code>['UTC']</code>, not <code>'UTC'</code>. All three <code>streamerTimezone</code> read sites called <code>.trim()</code> on the raw value. Two were masked by surrounding try/catch (silently falling back to UTC); a third, in the settings validator, threw on every scheduler tick. Added <code>settingText()</code> as the single accessor and widened the validator's input types to <code>unknown</code>.</li>
                 <li><strong>Self-healing search scoped to the app account (B3)</strong>: <code>findExistingSubredditPost</code> ran an unfiltered <code>searchPosts</code> and adopted <code>posts[0]</code>. <code>ensureStickyOfflinePost</code> then removed every comment on that post before the <code>edit()</code> that would have failed. Results are now filtered by <code>getAppUser()</code>.</li>
+                <li><strong>Self-healing read from the listing index</strong>: <code>findExistingSubredditPost</code> relied on <code>searchPosts</code>, whose index lags by minutes, so a live post created earlier in the same stream was invisible to recovery. Now tries <code>getPostsByUser</code> on the app account first, with search kept as a deeper-history fallback.</li>
                 <li><strong>Monthly highlights <code>ReferenceError</code> (B1)</strong>: <code>runMonthlyHighlights</code> referenced an undeclared <code>wikiArchive</code>, throwing into a catch block on every run.</li>
                 <li><strong>Dashboard menu route (B2)</strong>: <code>createDashboardPost</code> had no endpoint and no manifest entry; both restored.</li>
                 <li><strong>Clip title escaping (B6)</strong>: <code>escapeMarkdownBrackets()</code> and <code>escapeHtmlEntities()</code> applied to clip titles, creators and URLs on both the markdown and wiki render paths.</li>
