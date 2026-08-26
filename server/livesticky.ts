@@ -328,6 +328,23 @@ const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
 /**
  * Writes markdown to a specific wiki version ('v1' or 'v2').
  */
+/** FNV-1a. Not security, just a short stable fingerprint for "did we already write this?". */
+const fingerprint = (s: string): string => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+};
+
+// How long we trust our own record of what we last wrote to a page. On expiry
+// the next tick re-reads the page, so a wiki edit made by hand is repaired
+// within the hour. This is also the worst-case write rate if Reddit ever hands
+// content back in a form that never compares equal: one write per page per
+// hour, instead of one every two minutes.
+const WIKI_WRITE_MEMO_TTL_MS = 60 * 60 * 1000;
+
 const writeWikiPageVersion = async (
   subredditName: string,
   page: string,
@@ -335,6 +352,19 @@ const writeWikiPageVersion = async (
   wikiVersion: 'v1' | 'v2'
 ): Promise<boolean> => {
   try {
+    const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
+    const memoKey = `wiki_written_${wikiVersion}_${page}`;
+    const contentFingerprint = fingerprint(formattedContent);
+
+    // Fast path, before any API call: we already wrote exactly this, recently.
+    // Comparing against our own record rather than against what Reddit hands
+    // back means the skip cannot be defeated by the API normalizing markdown on
+    // the way out - and in the steady state it costs no API calls at all, which
+    // is nearly all of the per-tick wiki traffic. Reaching this memo at all
+    // means the write succeeded once, so the v2 gate below has already passed.
+    const lastWritten = await redis.get(memoKey);
+    if (lastWritten === contentFingerprint) return true;
+
     if (wikiVersion === 'v2') {
       try {
         const v2Enabled = await reddit.isWikiV2Enabled(subredditName);
@@ -348,7 +378,12 @@ const writeWikiPageVersion = async (
       }
     }
 
-    const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
+    const rememberWrite = async () => {
+      await redis.set(memoKey, contentFingerprint, {
+        expiration: new Date(Date.now() + WIKI_WRITE_MEMO_TTL_MS),
+      });
+    };
+
     let exists = false;
     let existingContent = '';
     try {
@@ -361,13 +396,16 @@ const writeWikiPageVersion = async (
 
     if (exists) {
       if (existingContent === formattedContent) {
-        // Skip write if content is unchanged to prevent unnecessary wiki revisions
+        // Already correct on Reddit's side (and now recorded, so the next tick
+        // skips the read too).
+        await rememberWrite();
         return true;
       }
       await reddit.updateWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive update', wikiVersion });
     } else {
       await reddit.createWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive init', wikiVersion });
     }
+    await rememberWrite();
 
     try {
       await reddit.updateWikiPageSettings({ subredditName, page, listed: true, permLevel: 0, wikiVersion });
@@ -416,6 +454,14 @@ const updateWikiIndex = async (subredditName: string): Promise<void> => {
  *    and automatically unlists them (`listed: false`, `permLevel: 2`), keeping the sidebar clean.
  */
 const autoCleanManagedWiki = async (subredditName: string): Promise<void> => {
+  // Page listing and permissions almost never change, and re-asserting them
+  // costs ~16 API calls. Once an hour is plenty to undo a manual change.
+  const sweepKey = 'wiki_cleaned_at';
+  if (await redis.get(sweepKey)) return;
+  await redis.set(sweepKey, '1', {
+    expiration: new Date(Date.now() + WIKI_WRITE_MEMO_TTL_MS),
+  });
+
   // The only pages LiveSticky wants visible in the sidebar index.
   const CANONICAL_PAGES = [
     'livesticky',
