@@ -1169,6 +1169,15 @@ const reportSettingProblems = async (
   const cooldownKey = 'modmail_cooldown_settings';
   if (await redis.get(cooldownKey)) return;
 
+  // Cooldown is written either way, but for very different reasons: a full day
+  // after a delivered alert so we don't nag, and a few minutes after a failed
+  // one so a transient outage isn't silently muted for a day - while a
+  // permanent failure (no modmail access, restricted subreddit) still can't
+  // turn every 2-minute tick into a failed API call. Same shape as the avatar
+  // refresh TTL in platforms.ts.
+  const DELIVERED_COOLDOWN = 86400;
+  const FAILED_COOLDOWN = 300;
+
   try {
     await reddit.modMail.createConversation({
       subredditName,
@@ -1177,10 +1186,16 @@ const reportSettingProblems = async (
       isAuthorHidden: true,
     });
     await redis.set(cooldownKey, 'true');
-    await redis.expire(cooldownKey, 86400);
+    await redis.expire(cooldownKey, DELIVERED_COOLDOWN);
     console.log(`Sent ModMail alert for ${problems.length} setting problem(s)`);
   } catch (err) {
     console.error('Failed to send settings ModMail alert:', err);
+    try {
+      await redis.set(cooldownKey, 'true');
+      await redis.expire(cooldownKey, FAILED_COOLDOWN);
+    } catch {
+      // Redis unavailable too: the next tick retries, which is the safe default.
+    }
   }
 };
 
