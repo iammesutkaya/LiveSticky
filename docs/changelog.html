@@ -32,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.303">
-  <link rel="stylesheet" href="landing.css?v=1.1.303">
+  <link rel="stylesheet" href="style.css?v=1.1.304">
+  <link rel="stylesheet" href="landing.css?v=1.1.304">
 
 </head>
 
@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-304">
+                  <span class="changelog-ver">v1.1.304</span>
+                  <span class="changelog-sidebar-date">AUG 26, 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-286">
                   <span class="changelog-ver">v1.1.286</span>
                   <span class="changelog-sidebar-date">AUG 20, 2026</span>
@@ -142,6 +148,37 @@
             <span class="view-toggle-knob"></span>
           </button>
         </div>
+
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-304">v1.1.304</h2>
+            <span class="changelog-badge live">Released</span>
+          </div>
+
+          <div class="changelog-meta">
+            <span class="changelog-date">August 26, 2026</span>
+          </div>
+
+          <div class="changelog-summary">
+            Comprehensive Audit Remediation: Restored Monthly Top 20 Clips & Dashboard Creation, Fixed Self-Healing Search Protection, Reduced Wiki API Calls via FNV-1a Fingerprinting, and Enforced Build Gates.
+          </div>
+
+          <div class="changelog-section">
+            <h3>Major Fixes &amp; Engine Enhancements</h3>
+            <ul>
+              <li><strong>Monthly Top 20 Clips Restored:</strong> Fixed a runtime reference error in `runMonthlyHighlights()` so monthly compilations post reliably.</li>
+              <li><strong>Create Dashboard Menu Item:</strong> Restored the <em>Create LiveSticky Dashboard</em> moderator menu action in Mod Tools for initializing interactive community posts.</li>
+              <li><strong>Self-Healing Search Protection:</strong> Self-healing post discovery now verifies bot ownership before recovering posts or moderating comments.</li>
+              <li><strong>Wiki Write Optimization:</strong> Implemented FNV-1a Redis content fingerprinting, reducing wiki API traffic from ~30 calls/tick down to 0 on steady-state streams.</li>
+              <li><strong>Offline Template Fallbacks:</strong> Offline posts cleanly replace `{stream_game}`, `{stream_viewers}`, and `{stream_uptime}` with fallback values instead of raw template tags.</li>
+              <li><strong>Clip Injection Protection:</strong> Sanitized Twitch clip titles across Markdown and HTML wiki paths to prevent link injection.</li>
+              <li><strong>Accessibility &amp; UX Improvements:</strong> Added visible focus rings (`:focus-visible`), keyboard focus for thread chips (`tabindex="0"`), and `@media (prefers-reduced-motion: reduce)` support.</li>
+              <li><strong>Strict Build Gates:</strong> Enforced `npx tsc --noEmit` type-checking and an expanded 89-test Vitest suite in release workflows.</li>
+            </ul>
+          </div>
+
+        </article>
 
         <article class="changelog-entry">
 
