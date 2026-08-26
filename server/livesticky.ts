@@ -62,30 +62,53 @@ const findExistingSubredditPost = async (
   queryKeyword: string,
   timeframe: 'day' | 'week' | 'month' | 'year' = 'month'
 ): Promise<string | null> => {
+  const appUser = await reddit.getAppUser().catch(() => null);
+  if (!appUser) {
+    console.warn('[Self-Healing] Could not resolve the app account; skipping recovery.');
+    return null;
+  }
+
+  const keyword = queryKeyword.toLowerCase();
+  const isOurs = (p: { authorId?: string; authorName?: string }) =>
+    p.authorId === appUser.id || p.authorName === appUser.username;
+  const looksRight = (p: { title?: string; subredditName?: string; removed?: boolean }) =>
+    !p.removed &&
+    (p.subredditName || '').toLowerCase() === subredditName.toLowerCase() &&
+    (p.title || '').toLowerCase().includes(keyword);
+
+  // 1. The app account's own recent posts. This reads the listing index, which
+  // is current - unlike search, which lags by minutes and so cannot see a post
+  // created earlier in the same stream. That gap produced a duplicate pinned
+  // live thread when Redis state was lost mid-stream.
   try {
-    const searchListing = reddit.searchPosts({
-      subredditName,
-      query: queryKeyword,
-      sort: 'new',
-      timeframe,
-      limit: 10,
-    });
-    const posts = await searchListing.all();
-    if (posts && posts.length > 0) {
-      const appUser = await reddit.getAppUser().catch(() => null);
-      const candidate = posts.find(
-        (p) =>
-          (appUser && p.authorId === appUser.id) ||
-          (appUser && p.authorName === appUser.username)
-      );
-      if (candidate) {
-        console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
-        return candidate.id;
-      }
+    const own = await reddit
+      .getPostsByUser({ username: appUser.username, sort: 'new', timeframe, limit: 100 })
+      .all();
+    const candidate = own.find(looksRight);
+    if (candidate) {
+      console.log(`[Self-Healing] Recovered "${queryKeyword}" post from app history: ${candidate.id}`);
+      return candidate.id;
+    }
+  } catch (err) {
+    console.warn(`[Self-Healing] Could not read app post history for "${queryKeyword}":`, err);
+  }
+
+  // 2. Search fallback. Slower to see new posts, but reaches further back than
+  // one page of history - which the year-long "Top Clips" lookup needs. Also
+  // covers a mod-customized title that the keyword match above would miss.
+  try {
+    const posts = await reddit
+      .searchPosts({ subredditName, query: queryKeyword, sort: 'new', timeframe, limit: 10 })
+      .all();
+    const candidate = posts?.find(isOurs);
+    if (candidate) {
+      console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
+      return candidate.id;
     }
   } catch (err) {
     console.error(`[Self-Healing] Error searching for "${queryKeyword}" post:`, err);
   }
+
   return null;
 };
 
