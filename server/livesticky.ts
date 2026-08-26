@@ -1073,22 +1073,32 @@ const updateDynamicPostFlair = async (
   streamInfo: UnifiedStreamInfo,
   liveFlairId?: string
 ) => {
-  try {
-    const gameName = streamInfo.game_name || '';
-    const viewers = streamInfo.viewer_count;
-    let flairText = '🔴 LIVE';
-    if (gameName && viewers > 0) {
-      const formattedViewers =
-        viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}K` : viewers.toString();
-      flairText = `🔴 LIVE: ${gameName} [${formattedViewers}]`;
-    } else if (gameName) {
-      flairText = `🔴 LIVE: ${gameName}`;
-    }
+  const gameName = streamInfo.game_name || '';
+  const viewers = streamInfo.viewer_count;
+  let flairText = '🔴 LIVE';
+  if (gameName && viewers > 0) {
+    const formattedViewers =
+      viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}K` : viewers.toString();
+    flairText = `🔴 LIVE: ${gameName} [${formattedViewers}]`;
+  } else if (gameName) {
+    flairText = `🔴 LIVE: ${gameName}`;
+  }
 
-    await reddit.setPostFlair({ postId: postId as `t3_${string}`, subredditName, text: flairText, flairTemplateId: liveFlairId });
+  const payload: any = { postId: postId as `t3_${string}`, subredditName, text: flairText };
+  if (liveFlairId && liveFlairId.trim()) {
+    payload.flairTemplateId = liveFlairId.trim();
+  }
+
+  try {
+    await reddit.setPostFlair(payload);
     console.log(`Updated post ${postId} flair dynamically to: ${flairText}`);
   } catch (flairError) {
-    console.error(`Failed to update dynamic post flair for ${postId}:`, flairError);
+    console.warn(`Failed to update post flair with template ID ${liveFlairId}, trying text-only:`, flairError);
+    try {
+      await reddit.setPostFlair({ postId: postId as `t3_${string}`, subredditName, text: flairText });
+    } catch (fallbackError) {
+      console.error(`Failed to update dynamic post flair for ${postId}:`, fallbackError);
+    }
   }
 };
 
@@ -1098,16 +1108,25 @@ const resetDynamicPostFlair = async (
   liveFlairId?: string,
   offlineFlairText?: string
 ) => {
+  const flairText = offlineFlairText || '⚫ OFFLINE';
+  const payload: any = {
+    postId: postId as `t3_${string}`,
+    subredditName,
+    text: flairText,
+  };
+  if (liveFlairId && liveFlairId.trim()) {
+    payload.flairTemplateId = liveFlairId.trim();
+  }
+
   try {
-    await reddit.setPostFlair({
-      postId: postId as `t3_${string}`,
-      subredditName,
-      text: offlineFlairText || '⚫ OFFLINE',
-      flairTemplateId: liveFlairId,
-    });
+    await reddit.setPostFlair(payload);
     console.log(`Reset post ${postId} flair to offline.`);
   } catch (flairError) {
-    console.error(`Failed to reset dynamic post flair for ${postId}:`, flairError);
+    try {
+      await reddit.setPostFlair({ postId: postId as `t3_${string}`, subredditName, text: flairText });
+    } catch (fallbackError) {
+      console.error(`Failed to reset dynamic post flair for ${postId}:`, fallbackError);
+    }
   }
 };
 
