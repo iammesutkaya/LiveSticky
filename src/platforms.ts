@@ -18,6 +18,7 @@ export interface RedisClient {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<unknown>;
   expire(key: string, seconds: number): Promise<unknown>;
+  del(key: string): Promise<unknown>;
 }
 
 export interface SettingsClient {
@@ -29,6 +30,18 @@ export interface PlatformContext {
   redis: RedisClient;
   onError?: (platform: string, msg: string) => Promise<void>;
 }
+
+/**
+ * Every upstream call goes through here so a hung platform API can never hold
+ * the 2-minute cron open. 10s is generous for all three providers.
+ */
+export const FETCH_TIMEOUT_MS = 10000;
+
+export const fetchWithTimeout = (
+  input: string,
+  init: RequestInit = {}
+): Promise<Response> =>
+  fetch(input, { ...init, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 
 export function sanitizeHandle(input: string, platformUrl: string): string {
   let clean = input.trim().toLowerCase();
@@ -163,7 +176,7 @@ async function resolveYouTubeChannelId(
   try {
     console.log(`YouTube channel ID cache miss. Resolving handle ${handle} via forHandle (1 unit)...`);
     const url = `https://youtube.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent(handle)}`;
-    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    const res = await fetchWithTimeout(url, { headers: { 'x-goog-api-key': apiKey } });
     if (res.status === 403) {
       await setYouTubeQuotaBlocked(redis);
       return null;
@@ -187,7 +200,7 @@ async function resolveYouTubeChannelId(
   try {
     console.log(`forHandle did not resolve ${handle}. Falling back to Search API (100 units)...`);
     const searchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel`;
-    const res = await fetch(searchUrl, {
+    const res = await fetchWithTimeout(searchUrl, {
       headers: { 'x-goog-api-key': apiKey },
     });
     if (res.status === 403) {
@@ -243,7 +256,7 @@ async function resolveYouTubeUploadsPlaylist(
 
   try {
     const url = `https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}`;
-    const res = await fetch(url, { headers: { 'x-goog-api-key': apiKey } });
+    const res = await fetchWithTimeout(url, { headers: { 'x-goog-api-key': apiKey } });
     if (res.status === 403) {
       await setYouTubeQuotaBlocked(redis);
       return null;
@@ -291,7 +304,7 @@ async function fetchYouTubeStatus(
   try {
     // 1 unit: the most recent uploads - a live stream sits at the top.
     const plUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=5&playlistId=${uploadsPlaylist}`;
-    const plRes = await fetch(plUrl, { headers: { 'x-goog-api-key': apiKey } });
+    const plRes = await fetchWithTimeout(plUrl, { headers: { 'x-goog-api-key': apiKey } });
     if (plRes.status === 403) {
       console.error('YouTube API quota exceeded or forbidden (403).');
       await setYouTubeQuotaBlocked(redis);
@@ -310,7 +323,7 @@ async function fetchYouTubeStatus(
 
     // 1 unit: resolve live status + viewer details for those candidate videos.
     const vUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(',')}`;
-    const vRes = await fetch(vUrl, { headers: { 'x-goog-api-key': apiKey } });
+    const vRes = await fetchWithTimeout(vUrl, { headers: { 'x-goog-api-key': apiKey } });
     if (!vRes.ok) {
       if (vRes.status === 403) {
         console.error('YouTube API quota exceeded or forbidden (403).');
@@ -389,7 +402,7 @@ async function fetchKickStatus(
   if (!accessToken) {
     try {
       console.log('Kick API token cache miss. Requesting Kick OAuth access token...');
-      const response = await fetch('https://id.kick.com/oauth/token', {
+      const response = await fetchWithTimeout('https://id.kick.com/oauth/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
@@ -422,7 +435,7 @@ async function fetchKickStatus(
   if (!accessToken) return null;
 
   try {
-    const res = await fetch(`https://api.kick.com/public/v1/channels/${channelSlug}`, {
+    const res = await fetchWithTimeout(`https://api.kick.com/public/v1/channels/${channelSlug}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         Accept: 'application/json',
@@ -431,7 +444,10 @@ async function fetchKickStatus(
 
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
-        console.error(`Kick API Unauthorized (HTTP ${res.status}).`);
+        // Drop the cached token so the next tick re-authenticates instead of
+        // replaying a dead one until its TTL expires.
+        await redis.del('kick_access_token');
+        console.error(`Kick API Unauthorized (HTTP ${res.status}). Invalidated cached token.`);
         if (onError) await onError('Kick', `Kick API Unauthorized (HTTP ${res.status}). Please check your Kick Client ID and Secret in LiveSticky settings.`);
       }
       return null;
@@ -491,7 +507,7 @@ export async function getOrRefreshTwitchToken(
 
   try {
     console.log('Twitch token cache miss. Fetching new Twitch Access Token...');
-    const tokenRes = await fetch(
+    const tokenRes = await fetchWithTimeout(
       'https://id.twitch.tv/oauth2/token',
       {
         method: 'POST',
@@ -559,7 +575,7 @@ async function fetchTwitchStatus(
     const token = await getOrRefreshTwitchToken(clientId, clientSecret, redis, onError);
     if (!token) return null;
 
-    const streamRes = await fetch(
+    const streamRes = await fetchWithTimeout(
       `https://api.twitch.tv/helix/streams?user_login=${channelName}`,
       {
         headers: {
@@ -570,6 +586,10 @@ async function fetchTwitchStatus(
     );
 
     if (!streamRes.ok) {
+      if (streamRes.status === 401 || streamRes.status === 403) {
+        console.warn(`[Twitch] Token returned ${streamRes.status}. Invalidating cached token.`);
+        await redis.del('twitch_access_token');
+      }
       console.error(`Failed to fetch Twitch stream status: ${streamRes.statusText}`);
       return null;
     }
@@ -740,7 +760,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
         try {
           const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, context.redis);
           if (token) {
-            const res = await fetch(
+            const res = await fetchWithTimeout(
               `https://api.twitch.tv/helix/users?login=${encodeURIComponent(twitchChannel.trim().toLowerCase())}`,
               { headers: { 'Client-ID': twitchClientId, Authorization: `Bearer ${token}` } }
             );
@@ -759,7 +779,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
           if (!(await isYouTubeQuotaBlocked(context.redis))) {
             const channelId = await resolveYouTubeChannelId(youtubeChannel, youtubeApiKey, context.redis);
             if (channelId) {
-              const res = await fetch(
+              const res = await fetchWithTimeout(
                 `https://youtube.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}`,
                 { headers: { 'x-goog-api-key': youtubeApiKey } }
               );
@@ -782,7 +802,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
         try {
           let accessToken = await context.redis.get('kick_access_token');
           if (!accessToken) {
-            const tokenRes = await fetch('https://id.kick.com/oauth/token', {
+            const tokenRes = await fetchWithTimeout('https://id.kick.com/oauth/token', {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
               body: new URLSearchParams({
@@ -802,7 +822,7 @@ export async function refreshChannelImages(context: PlatformContext): Promise<vo
             }
           }
           if (accessToken) {
-            const res = await fetch(
+            const res = await fetchWithTimeout(
               `https://api.kick.com/public/v1/channels/${encodeURIComponent(kickChannel.trim().toLowerCase())}`,
               { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
             );

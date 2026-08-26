@@ -107,6 +107,21 @@ export const buildKickUrl = (channel?: string | null): string | undefined => {
 // Post body formatters
 // ---------------------------------------------------------------------------
 
+export const escapeMarkdownBrackets = (text?: string): string => {
+  if (!text) return '';
+  return text.replace(/[[\]]/g, '\\$&');
+};
+
+export const escapeHtmlEntities = (text?: string): string => {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 export const replaceTemplateVariables = (text: string, vars: TemplateVariables, isLive: boolean): string => {
   let result = text;
   
@@ -131,14 +146,20 @@ export const replaceTemplateVariables = (text: string, vars: TemplateVariables, 
       .replace(/{viewers}/g, vars.streamViewers || '')
       .replace(/{uptime}/g, vars.streamUptime || '');
   } else {
-    // Offline fallback aliases
+    // Offline fallback: substitute all variables (using empty string if not live)
     result = result
       .replace(/{stream_handle}/g, vars.streamHandle || '')
       .replace(/{stream_display_name}/g, vars.streamDisplayName || '')
       .replace(/{stream_title}/g, vars.streamTitle || '')
+      .replace(/{stream_game}/g, vars.streamGame || '')
+      .replace(/{stream_viewers}/g, vars.streamViewers || '')
+      .replace(/{stream_uptime}/g, vars.streamUptime || '')
       // Backward-compatible fallback aliases for old template settings
       .replace(/{display_name}/g, vars.streamDisplayName || '')
-      .replace(/{title}/g, vars.streamTitle || '');
+      .replace(/{title}/g, vars.streamTitle || '')
+      .replace(/{game}/g, vars.streamGame || '')
+      .replace(/{viewers}/g, vars.streamViewers || '')
+      .replace(/{uptime}/g, vars.streamUptime || '');
   }
 
   if (vars.dateStr) {
@@ -226,14 +247,18 @@ export const renderClipListHtml = (clips: ClipInfo[]): string =>
       const imgUrl =
         c.redditThumbnailUrl ||
         (c.thumbnailUrl && (c.thumbnailUrl.includes('redd.it') || c.thumbnailUrl.includes('reddit.com')) ? c.thumbnailUrl : '');
-      const thumbHtml = imgUrl
-        ? `<a href="${c.url}"><img src="${imgUrl}" alt="${c.title || 'Clip Thumbnail'}" width="360" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
+      const safeTitle = escapeHtmlEntities(c.title) || 'Untitled Clip';
+      const safeUrl = escapeHtmlEntities(c.url);
+      const safeCreator = escapeHtmlEntities(c.creator) || 'Anonymous';
+      const safeImgUrl = escapeHtmlEntities(imgUrl);
+      const thumbHtml = safeImgUrl
+        ? `<a href="${safeUrl}"><img src="${safeImgUrl}" alt="${safeTitle}" width="360" style="border-radius: 8px; margin: 6px 0; display: block; max-width: 100%;"></a>\n`
         : '';
       return (
         `  <li style="margin-bottom: 16px;">\n` +
-        `    <strong><a href="${c.url}">${c.title || 'Untitled Clip'}</a></strong><br>\n` +
+        `    <strong><a href="${safeUrl}">${safeTitle}</a></strong><br>\n` +
         `    ${thumbHtml}` +
-        `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${c.creator || 'Anonymous'}\n` +
+        `    👁️ <strong>Views:</strong> ${(c.views || 0).toLocaleString()} &bull; 👤 <strong>Clipped by:</strong> ${safeCreator}\n` +
         `  </li>`
       );
     })
@@ -251,9 +276,9 @@ export const renderClipList = (clips: ClipInfo[]): string =>
   clips
     .map(
       (c, i) =>
-        `${i + 1}. **[${c.title || 'Untitled Clip'}](${c.url})**\n` +
+        `${i + 1}. **[${escapeMarkdownBrackets(c.title) || 'Untitled Clip'}](${c.url})**\n` +
         `   * **Views:** ${(c.views || 0).toLocaleString()}\n` +
-        `   * **Clipped by:** ${c.creator || 'Anonymous'}`
+        `   * **Clipped by:** ${escapeMarkdownBrackets(c.creator) || 'Anonymous'}`
     )
     .join('\n\n');
 

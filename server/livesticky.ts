@@ -14,7 +14,7 @@ import {
   type LinksAndComments,
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
-import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, type UnifiedStreamInfo } from '../src/platforms.js';
+import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, fetchWithTimeout, type UnifiedStreamInfo } from '../src/platforms.js';
 import {
   buildYouTubeUrl,
   buildKickUrl,
@@ -26,6 +26,7 @@ import {
   buildWikiArchive,
   buildWikiArchiveHtml,
   buildSingleClipsBody,
+  computeUptime,
   type TemplateVariables,
   type ClipInfo,
   type HighlightsEdition,
@@ -42,18 +43,13 @@ import {
   DEFAULT_MONTHLY_HIGHLIGHTS_POST_HEADER,
   DEFAULT_MONTHLY_HIGHLIGHTS_POST_FOOTER,
 } from '../src/templates.js';
+import {
+  validateSettings,
+  formatSettingProblems,
+  type SettingProblem,
+} from '../src/settings-validation.js';
 
 const get = <T = string>(name: string) => settings.get<T>(name);
-
-/** Formats elapsed time since `startedAt` as a compact "4h 19m" / "47m" string. */
-const computeUptime = (startedAt?: string): string => {
-  if (!startedAt) return '';
-  const elapsedMs = Date.now() - new Date(startedAt).getTime();
-  if (!Number.isFinite(elapsedMs) || elapsedMs < 0) return '';
-  const hours = Math.floor(elapsedMs / 3600000);
-  const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-};
 
 /**
  * Self-healing helper: Searches the subreddit for an existing post of a given type
@@ -71,16 +67,23 @@ const findExistingSubredditPost = async (
       query: queryKeyword,
       sort: 'new',
       timeframe,
-      limit: 5,
+      limit: 10,
     });
     const posts = await searchListing.all();
     if (posts && posts.length > 0) {
-      const candidate = posts[0];
-      console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
-      return candidate.id;
+      const appUser = await reddit.getAppUser().catch(() => null);
+      const candidate = posts.find(
+        (p) =>
+          (appUser && p.authorId === appUser.id) ||
+          (appUser && p.authorName === appUser.username)
+      );
+      if (candidate) {
+        console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
+        return candidate.id;
+      }
     }
   } catch (err) {
-    console.error(`[Self-Healing] Search failed for "${queryKeyword}":`, err);
+    console.error(`[Self-Healing] Error searching for "${queryKeyword}" post:`, err);
   }
   return null;
 };
@@ -222,7 +225,7 @@ const fetchTopClips = async (
   top: number
 ): Promise<any[] | null> => {
   const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${broadcasterId}&started_at=${startedAt}&ended_at=${endedAt}&first=${first}`;
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     headers: { 'Client-ID': clientId, Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
@@ -265,7 +268,7 @@ const fetchTwitchClipThumbnail = async (clipUrl: string): Promise<string | null>
     const token = await getOrRefreshTwitchToken(twitchClientId, twitchClientSecret, redis);
     if (!token) return null;
 
-    const res = await fetch(`https://api.twitch.tv/helix/clips?id=${clipId}`, {
+    const res = await fetchWithTimeout(`https://api.twitch.tv/helix/clips?id=${clipId}`, {
       headers: {
         'Client-ID': twitchClientId,
         Authorization: `Bearer ${token}`,
@@ -274,8 +277,9 @@ const fetchTwitchClipThumbnail = async (clipUrl: string): Promise<string | null>
 
     if (!res.ok) return null;
     const data = (await res.json()) as { data?: Array<{ thumbnail_url?: string }> };
-    if (data.data && data.data.length > 0 && data.data[0].thumbnail_url) {
-      return data.data[0].thumbnail_url;
+    const firstClip = data.data && data.data[0];
+    if (firstClip && firstClip.thumbnail_url) {
+      return firstClip.thumbnail_url;
     }
   } catch (err) {
     console.warn(`Could not fetch Twitch clip thumbnail for ${clipUrl}:`, err);
@@ -311,15 +315,6 @@ const toClipInfosAsync = async (raw: any[]): Promise<ClipInfo[]> => {
   }
   return clips;
 };
-const toClipInfos = (raw: any[]): ClipInfo[] =>
-  raw.map((c: any) => ({
-    title: c.title || 'Untitled Clip',
-    url: c.url,
-    views: c.view_count || 0,
-    creator: c.creator_name || 'Anonymous',
-    thumbnailUrl: c.thumbnail_url || '',
-  }));
-
 // Editions shown inline in the post body when the wiki archive is unavailable.
 // ponytail: fixed cap; 6 editions x 5 clips stays well under Reddit's body limit.
 const MAX_HIGHLIGHTS_EDITIONS = 6;
@@ -327,10 +322,8 @@ const MAX_HIGHLIGHTS_EDITIONS = 6;
 // itself holds the full browsable history; these keep Redis + the page comfortable.
 const ARCHIVE_MAX_EDITIONS = 50;
 const MONTHLY_ARCHIVE_MAX_EDITIONS = 24; // ~2 years of monthly compilations
-const INDEX_WIKI_PAGE = 'livesticky';
 const CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip-archive';
 const MONTHLY_ARCHIVE_WIKI_PAGE = 'livesticky/monthly-archive';
-const LEGACY_CLIP_ARCHIVE_WIKI_PAGE = 'livesticky/clip_archive';
 
 /**
  * Writes markdown to a specific wiki version ('v1' or 'v2').
@@ -357,14 +350,20 @@ const writeWikiPageVersion = async (
 
     const formattedContent = content.replace(/\r?\n/g, '\r\n').trim();
     let exists = false;
+    let existingContent = '';
     try {
-      await reddit.getWikiPage(subredditName, page, { wikiVersion });
+      const pageData = await reddit.getWikiPage(subredditName, page, { wikiVersion });
       exists = true;
+      existingContent = (pageData.content || '').replace(/\r?\n/g, '\r\n').trim();
     } catch {
       exists = false;
     }
 
     if (exists) {
+      if (existingContent === formattedContent) {
+        // Skip write if content is unchanged to prevent unnecessary wiki revisions
+        return true;
+      }
       await reddit.updateWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive update', wikiVersion });
     } else {
       await reddit.createWikiPage({ subredditName, page, content: formattedContent, reason: 'LiveSticky: archive init', wikiVersion });
@@ -750,7 +749,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
   let configuredHour = 12;
   if (timeRaw && typeof timeRaw === 'string' && timeRaw.trim().length > 0) {
     const timeMatch = timeRaw.trim().match(/^(\d{1,2})/);
-    if (timeMatch) {
+    if (timeMatch && timeMatch[1]) {
       const parsedHour = parseInt(timeMatch[1], 10);
       if (Number.isFinite(parsedHour) && parsedHour >= 0 && parsedHour <= 23) {
         configuredHour = parsedHour;
@@ -814,13 +813,14 @@ export const runMonthlyHighlights = async (): Promise<void> => {
       return;
     }
 
-    const [twitchChannel, customTitle, customHeader, customFooter, flairTemplateId] =
+    const [twitchChannel, customTitle, customHeader, customFooter, flairTemplateId, enableWikiArchive] =
       await Promise.all([
         get('twitchChannel'),
         get('monthlyHighlightsPostTitle'),
         get('monthlyHighlightsHeader'),
         get('monthlyHighlightsFooter'),
         get('highlightsFlairId'),
+        get<boolean>('enableWikiArchive'),
       ]);
 
     const displayName = (await redis.get('twitch_display_name')) || (twitchChannel as string) || '';
@@ -845,7 +845,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     monthlyEditions.unshift({ dateStr: monthLabel, clips: monthlyClipInfos });
     monthlyEditions = monthlyEditions.slice(0, MONTHLY_ARCHIVE_MAX_EDITIONS);
 
-    const archiveUrl = wikiArchive
+    const archiveUrl = enableWikiArchive
       ? await updateWikiArchive(
           subreddit.name,
           MONTHLY_ARCHIVE_WIKI_PAGE,
@@ -1091,7 +1091,102 @@ const syncDashboardConfig = async (
 // Main status check (formerly the check-twitch-status scheduler job)
 // ---------------------------------------------------------------------------
 
-export const runStatusCheck = async (): Promise<void> => {
+// ---------------------------------------------------------------------------
+// Settings validation
+// ---------------------------------------------------------------------------
+
+const collectSettingProblems = async (): Promise<SettingProblem[]> => {
+  const [offlineGracePeriod, monthlyHighlightsTime, customAvatarUrl, streamerTimezone] =
+    await Promise.all([
+      get<number>('offlineGracePeriod'),
+      get<string>('monthlyHighlightsTime'),
+      get<string>('customAvatarUrl'),
+      get<string>('streamerTimezone'),
+    ]);
+  return validateSettings({
+    offlineGracePeriod,
+    monthlyHighlightsTime,
+    customAvatarUrl,
+    streamerTimezone,
+  });
+};
+
+const reportSettingProblems = async (
+  subredditName: string,
+  problems: SettingProblem[]
+): Promise<void> => {
+  if (problems.length === 0) return;
+  for (const p of problems) {
+    console.warn(`[settings] ${p.setting}: ${p.problem} (${p.fallback})`);
+  }
+
+  const cooldownKey = 'modmail_cooldown_settings';
+  if (await redis.get(cooldownKey)) return;
+
+  try {
+    await redis.set(cooldownKey, 'true');
+    await redis.expire(cooldownKey, 86400);
+    await reddit.modMail.createConversation({
+      subredditName,
+      subject: '⚠️ LiveSticky: check your settings',
+      body: formatSettingProblems(problems),
+      isAuthorHidden: true,
+    });
+    console.log(`Sent ModMail alert for ${problems.length} setting problem(s)`);
+  } catch (err) {
+    console.error('Failed to send settings ModMail alert:', err);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Cron overlap guard
+// ---------------------------------------------------------------------------
+
+const STATUS_LOCK_KEY = 'status_check_lock';
+// ponytail: 5 min ceiling. A run that legitimately exceeds it (large clip
+// batches, slow media uploads) lets the next tick in; raise it if that shows up
+// in the logs rather than removing the guard.
+const STATUS_LOCK_TTL_MS = 5 * 60 * 1000;
+
+/**
+ * Runs `fn` only if no other status check currently holds the lock.
+ *
+ * `is_live_pinned` was doing double duty as a crude mutex, but it is read and
+ * written non-atomically, so two overlapping ticks could both see "not live"
+ * and both submit a live post. This takes a real `SET NX` lock and confirms
+ * ownership by reading the token back, so an unexpected return value from the
+ * driver can never wedge the scheduler permanently.
+ */
+const withStatusLock = async (fn: () => Promise<void>): Promise<void> => {
+  const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try {
+    await redis.set(STATUS_LOCK_KEY, token, {
+      nx: true,
+      expiration: new Date(Date.now() + STATUS_LOCK_TTL_MS),
+    });
+  } catch {
+    // Key already held: another tick is mid-flight.
+    console.log('[lock] Status check already running, skipping this tick.');
+    return;
+  }
+
+  const holder = await redis.get(STATUS_LOCK_KEY);
+  if (holder !== token) {
+    console.log('[lock] Status check already running, skipping this tick.');
+    return;
+  }
+
+  try {
+    await fn();
+  } finally {
+    const stillOurs = await redis.get(STATUS_LOCK_KEY);
+    if (stillOurs === token) await redis.del(STATUS_LOCK_KEY);
+  }
+};
+
+export const runStatusCheck = async (): Promise<void> => withStatusLock(runStatusCheckInner);
+
+const runStatusCheckInner = async (): Promise<void> => {
   const [
     twitchChannel,
     youtubeChannel,
@@ -1190,6 +1285,11 @@ export const runStatusCheck = async (): Promise<void> => {
 
   // Fetch subreddit early for ModMail alerts
   const subreddit = await reddit.getCurrentSubreddit();
+
+  // A misconfigured setting used to fail silently: the feature simply never
+  // happened and nothing told the moderator why. Report through the same
+  // ModMail channel the API alerts already use, rate-limited to once a day.
+  await reportSettingProblems(subreddit.name, await collectSettingProblems());
 
   // Poll every configured platform so the dashboard can show all simultaneous
   // streams. The first entry (highest priority that's live) is the "primary"
@@ -1362,7 +1462,7 @@ export const runStatusCheck = async (): Promise<void> => {
       }
 
       if (enableLivePost) {
-        let existingLivePostId = await redis.get('live_post_id');
+        let existingLivePostId: string | null = (await redis.get('live_post_id')) || null;
         if (!existingLivePostId) {
           const recoveredId = await findExistingSubredditPost(subreddit.name, 'is LIVE', 'day');
           if (recoveredId) {
@@ -1469,6 +1569,10 @@ export const runStatusCheck = async (): Promise<void> => {
             if (enableDynamicFlair) {
               await updateDynamicPostFlair(postId, subreddit.name, streamInfo, liveFlairId);
             }
+
+            // A sticky slot can be taken by a human mod mid-stream, which drops
+            // the live thread off the top of the feed silently. Re-pin it.
+            await verifyAndRepinIfNeeded(postId, 'live');
           } catch (e) {
             console.error('Failed to update live post stats:', e);
           }
@@ -1700,7 +1804,7 @@ export const runStatusCheck = async (): Promise<void> => {
       if (daysOffline > 7) {
         console.log(`Stream offline for ${daysOffline.toFixed(1)} days. Running Redis Garbage Collection...`);
         const keysToWipe = [
-          'last_live_at', 'live_post_id', 'offline_post_id', 'dashboard_post_id',
+          'last_live_at', 'live_post_id', 'offline_post_id',
           'twitch_broadcaster_id', 'twitch_started_at', 'twitch_stream_title',
           'twitch_display_name', 'last_pin_verified', 'is_live_pinned',
           'offline_since', 'dashboard_platform', 'dashboard_live_platforms',

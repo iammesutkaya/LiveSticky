@@ -42,6 +42,13 @@
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/refresh"
+      },
+      {
+        "label": "Create LiveSticky Dashboard",
+        "description": "Creates or updates the interactive multistream dashboard post in your community feed.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/create-dashboard"
       }
     ]
   },

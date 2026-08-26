@@ -58,6 +58,12 @@ if [ "$HAS_PUBLIC_FLAG" = false ]; then
   FLAGS+=("--public")
 fi
 
+# Quality gate runs before anything is rewritten: a failure here must not leave
+# the tree half-bumped. set -e aborts the release on a non-zero exit.
+echo "🔍 Type-checking and running tests..."
+npx tsc --noEmit
+npm test
+
 echo "📝 Updating webview and website version tags to v${VERSION}..."
 
 # Update webview client source HTML

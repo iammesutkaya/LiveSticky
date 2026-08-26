@@ -21,16 +21,19 @@
       document.documentElement.classList.add('theme-dark');
     }
 
-    // Also listen for postMessage events for real-time changes
+    // Also listen for postMessage events for real-time changes.
+    // Only the embedding frame may drive the theme, and only with one of the
+    // two values we understand. Devvit does not publish a stable parent origin,
+    // so the sender is checked by window reference rather than by an origin
+    // allowlist that a platform change could silently break.
     window.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'theme') {
-        document.documentElement.classList.remove('theme-light', 'theme-dark');
-        if (event.data.theme === 'light') {
-          document.documentElement.classList.add('theme-light');
-        } else if (event.data.theme === 'dark') {
-          document.documentElement.classList.add('theme-dark');
-        }
-      }
+      if (event.source !== window.parent) return;
+      if (!event.data || event.data.type !== 'theme') return;
+      if (event.data.theme !== 'light' && event.data.theme !== 'dark') return;
+      document.documentElement.classList.remove('theme-light', 'theme-dark');
+      document.documentElement.classList.add(
+        event.data.theme === 'light' ? 'theme-light' : 'theme-dark'
+      );
     });
   </script>
   <script type="module" crossorigin src="./default.js"></script>
@@ -164,7 +167,7 @@
 
   <!-- About Modal -->
   <div id="about-modal" class="modal-overlay hidden" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button id="close-modal-btn" class="modal-close" aria-label="Close modal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>

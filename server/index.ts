@@ -5,8 +5,10 @@ import {
   runStatusCheck,
   refreshLiveSticky,
   runMonthlyHighlights,
+  createDashboardPost,
 } from './livesticky.js';
-import { buildYouTubeUrl } from '../src/formatters.js';
+import { buildYouTubeUrl, computeUptime } from '../src/formatters.js';
+import { fetchWithTimeout } from '../src/platforms.js';
 
 const app = express();
 app.use(express.json());
@@ -66,16 +68,7 @@ app.get('/api/stream-status', async (_req, res) => {
     const startedAt = dashboardStartedAt || legacyStartedAt;
     const streamTitle = dashboardTitle || legacyTitle || '';
 
-    const uptimeFrom = (iso?: string): string => {
-      if (!iso) return '';
-      const elapsedMs = Date.now() - new Date(iso).getTime();
-      if (!Number.isFinite(elapsedMs) || elapsedMs < 0) return '';
-      const hours = Math.floor(elapsedMs / 3600000);
-      const minutes = Math.floor((elapsedMs % 3600000) / 60000);
-      return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-    };
-
-    const uptimeText = isLive ? uptimeFrom(startedAt) : '';
+    const uptimeText = isLive ? computeUptime(startedAt) : '';
 
     // Per-platform list for multistream. Each stored entry carries its own
     // startedAt so uptime is computed fresh here on every poll.
@@ -103,7 +96,7 @@ app.get('/api/stream-status', async (_req, res) => {
           title: p.title || '',
           game: p.game || '',
           viewers: p.viewers || '0',
-          uptime: uptimeFrom(p.startedAt),
+          uptime: computeUptime(p.startedAt),
           thumbnail: p.thumbnail || '',
         }));
       } catch (parseErr) {
@@ -187,7 +180,7 @@ app.get('/api/image/:encoded', async (req, res) => {
   if (!PROXY_ALLOWED_HOSTS.has(parsed.hostname)) { res.status(403).end(); return; }
 
   try {
-    const upstream = await fetch(url);
+    const upstream = await fetchWithTimeout(url);
     if (!upstream.ok) { res.status(upstream.status).end(); return; }
     const ct = upstream.headers.get('content-type');
     if (ct) res.setHeader('Content-Type', ct);
@@ -250,6 +243,17 @@ app.post('/internal/menu/refresh', async (_req, res) => {
     console.error('Failed to refresh LiveSticky:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     res.json({ showToast: `❌ Refresh failed: ${message.slice(0, 80)}` });
+  }
+});
+
+app.post('/internal/menu/create-dashboard', async (_req, res) => {
+  try {
+    const message = await createDashboardPost();
+    res.json({ showToast: message });
+  } catch (error) {
+    console.error('Failed to create LiveSticky Dashboard:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    res.json({ showToast: `❌ Create Dashboard failed: ${message.slice(0, 80)}` });
   }
 });
 

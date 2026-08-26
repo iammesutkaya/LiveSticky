@@ -23,6 +23,12 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Same gate as release.sh: dev uploads ship to a real subreddit, so they get the
+# same type-check and test run before anything leaves the machine.
+echo "🔍 Type-checking and running tests..."
+npx tsc --noEmit
+npm test
+
 # Temporarily disable local git exclusions (.git/info/exclude) so Devvit CLI uploads dist/
 EXCLUDE_FILE=".git/info/exclude"
 HAS_EXCLUDE=false
@@ -65,6 +71,10 @@ echo "📝 Detected version: $VERSION: updating website version tags..."
 # Update package.json version
 sed -i.bak -E "s|\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\"|\"version\": \"${VERSION}\"|g" package.json
 rm -f package.json.bak
+
+# Update webview client source HTML version
+sed -i.bak -E "s|v[0-9]+\.[0-9]+\.[0-9]+|v${VERSION}|g" src/client/index.html
+rm -f src/client/index.html.bak
 
 # Update README.md version badge
 sed -i.bak -E "s|badgen\.net/badge/version/v[0-9]+\.[0-9]+\.[0-9]+|badgen.net/badge/version/v${VERSION}|g" README.md

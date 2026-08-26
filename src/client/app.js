@@ -39,6 +39,13 @@ function safeNavigateTo(url) {
 
 const PLATFORM_NAME = { twitch: 'Twitch', youtube: 'YouTube', kick: 'Kick' };
 
+/** Display name for a platform key, safe to interpolate into markup. */
+function platformLabel(key) {
+  return Object.prototype.hasOwnProperty.call(PLATFORM_NAME, key)
+    ? PLATFORM_NAME[key]
+    : 'Stream';
+}
+
 const PLATFORM_LOGO = {
   twitch:
     '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>',
@@ -199,7 +206,23 @@ let avatarBlobUrl = null;
 // flicker). Devvit's webview CSP blocks direct <img src> from CDN hosts, and
 // plain <img src> requests don't carry Devvit's injected auth header - so every
 // image is fetched through the same-origin /api/image proxy and shown as a blob.
+//
+// Entries carry a timestamp: Twitch and YouTube keep the thumbnail URL stable
+// for the whole broadcast and swap the image behind it, so caching by url alone
+// froze the "live preview" on whatever frame loaded first.
 const thumbBlobCache = new Map();
+const THUMB_TTL_MS = 120000; // matches the server's 2-minute push cadence
+
+function readThumbCache(cdnUrl) {
+  const entry = thumbBlobCache.get(cdnUrl);
+  if (!entry) return null;
+  if (Date.now() - entry.at > THUMB_TTL_MS) {
+    if (entry.blobUrl && entry.blobUrl.startsWith('blob:')) URL.revokeObjectURL(entry.blobUrl);
+    thumbBlobCache.delete(cdnUrl);
+    return null;
+  }
+  return entry.blobUrl;
+}
 
 // Signature of the currently-rendered card set, so we only rebuild the card DOM
 // when the platform line-up changes (otherwise we update fields in place).
@@ -248,22 +271,23 @@ async function fetchProxiedImage(cdnUrl) {
 
 const MAX_THUMB_CACHE_SIZE = 20;
 
-/** Cached proxy fetch for thumbnails - one blob per distinct CDN url. */
+/** Cached proxy fetch for thumbnails - one fresh blob per distinct CDN url. */
 async function getThumbBlob(cdnUrl) {
-  if (thumbBlobCache.has(cdnUrl)) return thumbBlobCache.get(cdnUrl);
+  const cached = readThumbCache(cdnUrl);
+  if (cached) return cached;
   const blob = await fetchProxiedImage(cdnUrl);
   if (blob) {
     if (thumbBlobCache.size >= MAX_THUMB_CACHE_SIZE) {
       const oldestKey = thumbBlobCache.keys().next().value;
       if (oldestKey) {
-        const oldBlobUrl = thumbBlobCache.get(oldestKey);
-        if (oldBlobUrl && oldBlobUrl.startsWith('blob:')) {
-          URL.revokeObjectURL(oldBlobUrl);
+        const oldest = thumbBlobCache.get(oldestKey);
+        if (oldest && oldest.blobUrl && oldest.blobUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(oldest.blobUrl);
         }
         thumbBlobCache.delete(oldestKey);
       }
     }
-    thumbBlobCache.set(cdnUrl, blob);
+    thumbBlobCache.set(cdnUrl, { blobUrl: blob, at: Date.now() });
   }
   return blob;
 }
@@ -302,7 +326,21 @@ async function fetchStatus() {
   }
 }
 
+/**
+ * A failed poll is usually a blip that the next tick recovers from. Only take
+ * over the whole view when there is nothing good on screen yet; once the
+ * dashboard has rendered real data, keep showing it and mark the footer stale
+ * instead of blanking the stream the viewer is watching.
+ */
 function showError(message) {
+  const hasRenderedData = lastFetchTime !== null && !contentEl.classList.contains('hidden');
+
+  if (hasRenderedData) {
+    setUpdateMode('stale');
+    if (updateModeEl && message) updateModeEl.title = message;
+    return;
+  }
+
   loadingEl.classList.add('hidden');
   contentEl.classList.add('hidden');
   if (errorEl) {
@@ -324,10 +362,15 @@ function updateTimestampDisplay() {
   else lastUpdatedEl.textContent = `${diffMin}m ago`;
 }
 
+const UPDATE_MODE_TITLE = {
+  healthy: 'Dashboard is up to date',
+  stale: 'Showing the last update - reconnecting…',
+};
+
 function setUpdateMode(mode) {
   if (!updateModeEl) return;
   updateModeEl.className = `update-mode ${mode}`;
-  updateModeEl.title = mode === 'healthy' ? 'Dashboard is up to date' : 'Waiting for update…';
+  updateModeEl.title = UPDATE_MODE_TITLE[mode] || 'Waiting for update…';
 }
 
 // ---------------------------------------------------------------------------
@@ -373,11 +416,11 @@ function buildCard(p, cinematic) {
   card.rel = 'noopener noreferrer';
   card.className = `stream-card${cinematic ? ' cinematic' : ''}`;
   card.dataset.platform = p.platform;
-  const name = PLATFORM_NAME[p.platform] || p.platform;
+  const name = platformLabel(p.platform);
   const logo = PLATFORM_LOGO[p.platform] || '';
 
   const chipHtml = `
-    <span class="reddit-thread-chip hidden" role="button" aria-label="Join live discussion thread on Reddit" title="Join live discussion thread on Reddit">
+    <span class="reddit-thread-chip hidden" role="button" tabindex="0" aria-label="Join live discussion thread on Reddit" title="Join live discussion thread on Reddit">
       <span class="rtc-badge" aria-hidden="true">
         <svg class="rtc-icon" width="10" height="9" viewBox="0 0 19.21 16.8" fill="currentColor">
           <path d="M13.99,0c1.1,0,2,.89,2,2s-.9,2-2,2c-.95,0-1.74-.66-1.95-1.54h0c-1.15.16-2.03,1.15-2.03,2.34h0c1.78.07,3.4.57,4.69,1.37.47-.36,1.06-.58,1.71-.58,1.55,0,2.8,1.26,2.8,2.8,0,1.12-.66,2.08-1.6,2.53-.09,3.26-3.64,5.88-8,5.88S1.71,14.18,1.61,10.93c-.95-.45-1.61-1.41-1.61-2.54,0-1.55,1.26-2.8,2.8-2.8.64,0,1.24.22,1.71.59,1.27-.79,2.88-1.29,4.64-1.36h0c0-1.67,1.26-3.04,2.88-3.22C12.22.68,13.03,0,13.99,0ZM5.91,8.38c-.78,0-1.46.78-1.51,1.8-.05,1.02.64,1.43,1.43,1.43s1.37-.37,1.42-1.39c.05-1.02-.55-1.84-1.34-1.84ZM13.31,8.38c-.79,0-1.39.82-1.34,1.84.05,1.02.63,1.39,1.42,1.39s1.47-.41,1.43-1.43c-.05-1.02-.72-1.8-1.51-1.8ZM9.61,12.39c-.97,0-1.91.05-2.77.14-.15.02-.24.17-.18.31.48,1.15,1.62,1.96,2.95,1.96s2.47-.81,2.95-1.96c.06-.14-.04-.29-.18-.31-.86-.09-1.8-.14-2.77-.14Z"/>
@@ -427,10 +470,14 @@ function buildCard(p, cinematic) {
 
   const threadChip = card.querySelector('.reddit-thread-chip');
   if (threadChip) {
-    threadChip.addEventListener('click', (e) => {
+    const openThread = (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (redditThreadUrl) safeNavigateTo(redditThreadUrl);
+    };
+    threadChip.addEventListener('click', openThread);
+    threadChip.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') openThread(e);
     });
   }
 
@@ -462,21 +509,19 @@ function updateCard(p) {
     if (thumbContainer) thumbContainer.classList.remove('skeleton');
     return;
   }
-  if (img.dataset.src === cdnSrc && img.style.display === 'block') {
+  const cachedBlobUrl = readThumbCache(cdnSrc);
+  if (img.dataset.src === cdnSrc && img.style.display === 'block' && cachedBlobUrl) {
     if (thumbContainer) thumbContainer.classList.remove('skeleton');
-    return; // already rendered
+    return; // already rendered and still fresh
   }
   img.dataset.src = cdnSrc;
 
   // Synchronous cache hit check to eliminate thumbnail flickering when switching demo sizes/views
-  if (thumbBlobCache.has(cdnSrc)) {
-    const cachedBlobUrl = thumbBlobCache.get(cdnSrc);
-    if (cachedBlobUrl) {
-      img.src = cachedBlobUrl;
-      img.style.display = 'block';
-      if (thumbContainer) thumbContainer.classList.remove('skeleton');
-      return;
-    }
+  if (cachedBlobUrl) {
+    img.src = cachedBlobUrl;
+    img.style.display = 'block';
+    if (thumbContainer) thumbContainer.classList.remove('skeleton');
+    return;
   }
 
   if (thumbContainer) thumbContainer.classList.add('skeleton');
@@ -498,8 +543,13 @@ let activePlatformIndex = 0;
 let forcedHeightMode = new URLSearchParams(window.location.search).get('heightMode');
 let currentPlatforms = [];
 
+// Only the embedding frame may drive the layout, and only with a height mode
+// we recognise. Checked by window reference: Devvit does not publish a stable
+// parent origin to allowlist against.
 window.addEventListener('message', (e) => {
+  if (e.source !== window.parent) return;
   if (e.data && e.data.type === 'heightMode') {
+    if (e.data.heightMode !== 'compact' && e.data.heightMode !== 'tall') return;
     if (forcedHeightMode === e.data.heightMode) return;
     forcedHeightMode = e.data.heightMode;
     lastListSignature = '';
@@ -540,37 +590,75 @@ function renderPlatformList(platforms) {
       // Multistream + Compact Mode (320px): Chips on TOP, Hero card (standard card without watch bar) BELOW
       const chipsEl = document.createElement('div');
       chipsEl.className = 'platform-selector-chips';
-      chipsEl.role = 'tablist';
-      chipsEl.ariaLabel = 'Select live stream platform';
+      chipsEl.setAttribute('role', 'tablist');
+      chipsEl.setAttribute('aria-label', 'Select live stream platform');
+
+      const selectChip = (idx) => {
+        activePlatformIndex = idx;
+        lastListSignature = '';
+        renderPlatformList(platforms);
+        const chips = platformListEl.querySelectorAll('.platform-chip');
+        if (chips[idx]) chips[idx].focus();
+      };
 
       platforms.forEach((p, idx) => {
+        const isActive = idx === activePlatformIndex;
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = `platform-chip platform-${p.platform}${idx === activePlatformIndex ? ' active' : ''}`;
-        chip.role = 'tab';
-        chip.ariaSelected = idx === activePlatformIndex ? 'true' : 'false';
+        chip.className = `platform-chip platform-${p.platform}${isActive ? ' active' : ''}`;
+        chip.setAttribute('role', 'tab');
+        chip.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        chip.setAttribute('aria-controls', 'compact-hero-card');
+        // Roving tabindex: the tablist is one tab stop, arrows move within it.
+        chip.tabIndex = isActive ? 0 : -1;
 
-        const name = PLATFORM_NAME[p.platform] || p.platform;
+        const name = platformLabel(p.platform);
         const logo = PLATFORM_LOGO[p.platform] || '';
         const viewersFormatted = formatNumber(p.viewers);
+
+        // The selected chip is also the way out to the platform, so say so
+        // rather than leaving a second, invisible click behaviour.
+        chip.title = isActive ? `Watch ${name}` : `Show ${name}`;
+        chip.setAttribute(
+          'aria-label',
+          isActive
+            ? `Watch ${name}, ${viewersFormatted} viewers`
+            : `Show ${name}, ${viewersFormatted} viewers`
+        );
 
         chip.innerHTML = `
           <span class="chip-logo">${logo}</span>
           <span class="chip-name">${name}</span>
           <span class="chip-viewers">${viewersFormatted}</span>
+          <span class="chip-go" aria-hidden="true">${ARROW_SVG}</span>
         `;
 
         chip.addEventListener('click', (e) => {
           e.preventDefault();
           if (activePlatformIndex === idx) {
-            // Clicking active chip navigates to watch
+            // The selected chip doubles as the watch link.
             const url = platformUrl(p.platform);
             if (url) safeNavigateTo(url);
             return;
           }
-          activePlatformIndex = idx;
-          lastListSignature = '';
-          renderPlatformList(platforms);
+          selectChip(idx);
+        });
+
+        chip.addEventListener('keydown', (e) => {
+          const last = platforms.length - 1;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectChip(idx === last ? 0 : idx + 1);
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectChip(idx === 0 ? last : idx - 1);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            selectChip(0);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            selectChip(last);
+          }
         });
 
         chipsEl.appendChild(chip);
@@ -582,6 +670,8 @@ function renderPlatformList(platforms) {
       const activePlatform = platforms[activePlatformIndex] || platforms[0];
       const heroCard = buildCard(activePlatform, false);
       heroCard.classList.add('compact-hero-card');
+      heroCard.id = 'compact-hero-card';
+      heroCard.setAttribute('role', 'tabpanel');
       const watchBtn = heroCard.querySelector('.watch-btn');
       if (watchBtn) watchBtn.style.display = 'none';
       platformListEl.appendChild(heroCard);
@@ -620,12 +710,16 @@ function renderPlatformList(platforms) {
   updateRedditThread(currentState);
 }
 
-// Re-evaluate platform list layout on window resize
+// Re-evaluate platform list layout on window resize (debounced)
+let resizeTimeout = null;
 window.addEventListener('resize', () => {
-  if (currentPlatforms.length > 0) {
-    lastListSignature = '';
-    renderPlatformList(currentPlatforms);
-  }
+  if (resizeTimeout) clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (currentPlatforms.length > 0) {
+      lastListSignature = '';
+      renderPlatformList(currentPlatforms);
+    }
+  }, 150);
 });
 
 // ---------------------------------------------------------------------------
@@ -766,7 +860,7 @@ function updateDashboard(data) {
     if (isNowLive && platforms.length > 1) {
       headerSubEl.textContent = `Live on ${platforms.length} platforms${uptimeSuffix}`;
     } else if (isNowLive && platforms.length === 1) {
-      headerSubEl.textContent = `Live on ${PLATFORM_NAME[platforms[0].platform] || 'stream'}${uptimeSuffix}`;
+      headerSubEl.textContent = `Live on ${platformLabel(platforms[0].platform)}${uptimeSuffix}`;
     } else if (isNowLive) {
       headerSubEl.textContent = `Live now${uptimeSuffix}`;
     } else {
@@ -906,7 +1000,7 @@ async function init() {
   setInterval(updateTimestampDisplay, 30000);
 
   setInterval(() => {
-    if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 60000) setUpdateMode('');
+    if (!lastFetchTime || Date.now() - lastFetchTime.getTime() > 150000) setUpdateMode('');
   }, 15000);
 
   // Config must load BEFORE the first status render: updateDashboard() reads
@@ -953,16 +1047,36 @@ async function init() {
     // Remember what had focus so we can restore it when the modal closes.
     let lastFocused = null;
 
+    // Tab must not walk out of an open dialog into the page behind it.
+    const trapFocus = (e) => {
+      if (e.key !== 'Tab') return;
+      const focusable = aboutModal.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
     const openModal = () => {
       lastFocused = document.activeElement;
       aboutModal.classList.remove('hidden');
       aboutModal.setAttribute('aria-hidden', 'false');
+      aboutModal.addEventListener('keydown', trapFocus);
       closeModalBtn.focus();
     };
 
     const closeModal = () => {
       aboutModal.classList.add('hidden');
       aboutModal.setAttribute('aria-hidden', 'true');
+      aboutModal.removeEventListener('keydown', trapFocus);
       if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
     };
 
