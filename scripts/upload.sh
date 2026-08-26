@@ -52,6 +52,9 @@ if [ $UPLOAD_EXIT_CODE -ne 0 ]; then
   exit $UPLOAD_EXIT_CODE
 fi
 
+echo "🚀 Upgrading installation on r/live_sticky_dev..."
+npx devvit install live_sticky_dev || true
+
 
 # Determine the version: use explicit if provided, otherwise extract from output
 if [ -n "$EXPLICIT_VERSION" ]; then
