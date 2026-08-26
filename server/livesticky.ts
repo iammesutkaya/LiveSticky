@@ -46,6 +46,7 @@ import {
 import {
   validateSettings,
   formatSettingProblems,
+  settingText,
   type SettingProblem,
 } from '../src/settings-validation.js';
 
@@ -750,7 +751,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     get<number>('monthlyHighlightsHour'),
     get('streamerTimezone'),
   ]);
-  const tz = (tzRaw as string | undefined)?.trim() || 'UTC';
+  const tz = settingText(tzRaw) || 'UTC';
 
   let localYear = now.getUTCFullYear();
   let localMonth = now.getUTCMonth() + 1; // 1-indexed (1-12)
@@ -1387,7 +1388,14 @@ const runStatusCheckInner = async (): Promise<void> => {
   // A misconfigured setting used to fail silently: the feature simply never
   // happened and nothing told the moderator why. Report through the same
   // ModMail channel the API alerts already use, rate-limited to once a day.
-  await reportSettingProblems(subreddit.name, await collectSettingProblems());
+  //
+  // Wrapped because this is advisory: a defect in the advice must never stop
+  // the stream check that follows it. It did exactly that once already.
+  try {
+    await reportSettingProblems(subreddit.name, await collectSettingProblems());
+  } catch (validationErr) {
+    console.error('Settings validation failed (continuing with status check):', validationErr);
+  }
 
   // Poll every configured platform so the dashboard can show all simultaneous
   // streams. The first entry (highest priority that's live) is the "primary"
@@ -1458,7 +1466,7 @@ const runStatusCheckInner = async (): Promise<void> => {
 
     let dateStr = '';
     try {
-      const tz = (streamerTimezone as string | undefined)?.trim();
+      const tz = settingText(streamerTimezone);
       dateStr = dateObj.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',

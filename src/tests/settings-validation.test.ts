@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateSettings, formatSettingProblems } from '../settings-validation.js';
+import { validateSettings, formatSettingProblems, settingText } from '../settings-validation.js';
 
 const settingsWithProblems = (values: Parameters<typeof validateSettings>[0]) =>
   validateSettings(values).map((p) => p.setting);
@@ -71,6 +71,53 @@ describe('validateSettings', () => {
       streamerTimezone: 'Nowhere/Land',
     });
     expect(problems).toHaveLength(4);
+  });
+});
+
+describe('select settings arrive as arrays', () => {
+  // Regression: Devvit returns `select` settings as ['Europe/Berlin'], not a
+  // string. Calling .trim() on that threw TypeError inside validateSettings,
+  // which ran early in every status check and took the whole tick down with
+  // it - the app reported every stream offline until this was fixed.
+  it('does not throw when a select setting arrives as an array', () => {
+    expect(() =>
+      validateSettings({
+        streamerTimezone: ['Europe/Berlin'],
+        monthlyHighlightsTime: ['13:30'],
+        offlineGracePeriod: ['6'],
+        customAvatarUrl: ['https://i.redd.it/a.png'],
+      })
+    ).not.toThrow();
+  });
+
+  it('reads the value out of the array rather than rejecting it', () => {
+    expect(validateSettings({ streamerTimezone: ['Europe/Berlin'] })).toEqual([]);
+    expect(validateSettings({ monthlyHighlightsTime: ['13:30'] })).toEqual([]);
+  });
+
+  it('still catches a bad value inside an array', () => {
+    const problems = validateSettings({ streamerTimezone: ['Middle/Earth'] });
+    expect(problems.map((p) => p.setting)).toContain('Streamer Timezone');
+  });
+
+  it.each([
+    [undefined, ''],
+    [null, ''],
+    [[], ''],
+    [['  Europe/Berlin  '], 'Europe/Berlin'],
+    ['  UTC ', 'UTC'],
+    [42, '42'],
+  ])('settingText(%p) is %p', (input, expected) => {
+    expect(settingText(input)).toBe(expected);
+  });
+
+  it('never throws on any shape the settings API could return', () => {
+    for (const value of [undefined, null, [], [null], {}, 0, false, ['x'], 'x']) {
+      expect(() => validateSettings({ streamerTimezone: value })).not.toThrow();
+      expect(() => validateSettings({ customAvatarUrl: value })).not.toThrow();
+      expect(() => validateSettings({ offlineGracePeriod: value })).not.toThrow();
+      expect(() => validateSettings({ monthlyHighlightsTime: value })).not.toThrow();
+    }
   });
 });
 

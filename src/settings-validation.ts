@@ -8,11 +8,28 @@
  * No Devvit imports here so the rules stay unit-testable.
  */
 
+/**
+ * Devvit returns `select` settings as an array (`['Europe/Berlin']`), and text
+ * settings as a plain string. Read every setting through this so a select can
+ * never reach string methods as an array - the bug that took the status check
+ * down on every tick.
+ */
+export const settingText = (value: unknown): string => {
+  if (value === undefined || value === null) return '';
+  if (Array.isArray(value)) return settingText(value[0]);
+  return String(value).trim();
+};
+
+/**
+ * Values arrive straight from the settings API, so every field is typed
+ * `unknown` deliberately: the declared type is a promise the runtime does not
+ * keep, and this module must never be the thing that throws.
+ */
 export interface SettingValues {
-  offlineGracePeriod?: number;
-  monthlyHighlightsTime?: string;
-  customAvatarUrl?: string;
-  streamerTimezone?: string;
+  offlineGracePeriod?: unknown;
+  monthlyHighlightsTime?: unknown;
+  customAvatarUrl?: unknown;
+  streamerTimezone?: unknown;
 }
 
 export interface SettingProblem {
@@ -28,12 +45,13 @@ export const CUSTOM_AVATAR_HOST = 'i.redd.it';
 export const validateSettings = (values: SettingValues): SettingProblem[] => {
   const problems: SettingProblem[] = [];
 
-  const grace = values.offlineGracePeriod;
-  if (grace !== undefined && grace !== null) {
+  const graceRaw = values.offlineGracePeriod;
+  if (graceRaw !== undefined && graceRaw !== null && settingText(graceRaw) !== '') {
+    const grace = Number(settingText(graceRaw));
     if (!Number.isFinite(grace) || grace < 0) {
       problems.push({
         setting: 'Offline Grace Period',
-        problem: `"${grace}" is not a number of minutes at or above 0.`,
+        problem: `"${settingText(graceRaw)}" is not a number of minutes at or above 0.`,
         fallback: 'using the 6-minute default',
       });
     } else if (grace > 180) {
@@ -45,7 +63,7 @@ export const validateSettings = (values: SettingValues): SettingProblem[] => {
     }
   }
 
-  const time = values.monthlyHighlightsTime?.trim();
+  const time = settingText(values.monthlyHighlightsTime);
   if (time && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(time)) {
     problems.push({
       setting: 'Monthly Highlights Time',
@@ -54,7 +72,7 @@ export const validateSettings = (values: SettingValues): SettingProblem[] => {
     });
   }
 
-  const avatar = values.customAvatarUrl?.trim();
+  const avatar = settingText(values.customAvatarUrl);
   if (avatar) {
     let host = '';
     try {
@@ -77,7 +95,7 @@ export const validateSettings = (values: SettingValues): SettingProblem[] => {
     }
   }
 
-  const tz = values.streamerTimezone?.trim();
+  const tz = settingText(values.streamerTimezone);
   if (tz) {
     try {
       new Intl.DateTimeFormat('en-US', { timeZone: tz });
