@@ -633,6 +633,7 @@ const postStreamHighlights = async (
         console.log(`Updated reused highlights post: ${existingPostId}`);
       } catch (editErr) {
         console.warn(`Could not edit existing highlights post ${existingPostId}, creating a new one:`, editErr);
+        await redis.del('highlights_post_id');
       }
     }
 
@@ -915,12 +916,17 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
   const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
   const t3Id = postId as `t3_${string}`;
 
-  // 1. Try legacy sticky first.
+  // 1. Try legacy sticky first (default slot). If both slots full (400 Bad Request), attempt forcing slot 2.
   try {
     const post = await reddit.getPostById(t3Id);
     await post.sticky();
   } catch (stickyErr) {
-    console.warn(`[pin] Legacy sticky failed for ${postId}:`, stickyErr);
+    try {
+      const post = await reddit.getPostById(t3Id);
+      await post.sticky(2);
+    } catch (slot2Err) {
+      console.warn(`[pin] Legacy sticky failed for ${postId}:`, stickyErr);
+    }
   }
 
   // 2. Re-fetch to see if the legacy slot was actually granted.
@@ -937,21 +943,26 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
     return;
   }
 
-  // 3. Legacy slot was not granted - explicitly add to Community Highlights.
+  // 3. Legacy slot was not granted - attempt Community Highlights if available.
   console.log(
     `[pin] Post ${postId} did not get a legacy sticky slot. ` +
-      `Adding to Community Highlights as ANNOUNCEMENT (visible in official app).`
+      `Attempting Community Highlights as ANNOUNCEMENT.`
   );
   try {
     await linksAndComments.AddPostToHighlights({
       postId,
       label: HighlightedPostLabel.ANNOUNCEMENT,
     });
-  } catch (hlErr) {
-    console.error(`[pin] AddPostToHighlights failed for ${postId}:`, hlErr);
+  } catch (hlErr: any) {
+    const isUnimplemented = hlErr?.code === 12 || String(hlErr?.message || '').includes('UNIMPLEMENTED');
+    if (isUnimplemented) {
+      console.log(`[pin] Note: AddPostToHighlights is not implemented by current Devvit server runtime.`);
+    } else {
+      console.error(`[pin] AddPostToHighlights failed for ${postId}:`, hlErr);
+    }
     console.warn(
       `[pin] WARNING: Post ${postId} could not be pinned via legacy sticky OR Community Highlights. ` +
-        `It may not be visible at the top of the subreddit. Check mod permissions.`
+        `Check existing stickied posts or mod permissions.`
     );
     return;
   }
@@ -1974,21 +1985,13 @@ export const refreshLiveSticky = async (): Promise<string> => {
     redis.del('dashboard_post_score'),
     redis.del('yt_quota_blocked'),
     redis.del('modmail_cooldown_youtube'),
+    redis.del('highlights_post_id'),
+    redis.del('last_highlights_post_id'),
   ]);
 
-  // Run one immediate check so state is rebuilt without waiting for the cron.
-  try {
-    await runStatusCheck();
-  } catch (e) {
-    console.error('Immediate status check after refresh failed:', e);
-  }
-
-  // Ensure wiki pages (hub, clip archive, sidebar visibility) are initialized and managed
-  try {
-    await ensureWikiArchiveReady();
-  } catch (wikiErr) {
-    console.warn('Failed to sync wiki archive during refresh:', wikiErr);
-  }
+  // Run status check and wiki sync asynchronously in background so response is immediate and doesn't time out in UI.
+  runStatusCheck().catch((e) => console.error('Immediate status check after refresh failed:', e));
+  ensureWikiArchiveReady().catch((wikiErr) => console.warn('Failed to sync wiki archive during refresh:', wikiErr));
 
   return `LiveSticky refreshed!`;
 };
