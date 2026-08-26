@@ -1221,12 +1221,13 @@ const STATUS_LOCK_TTL_MS = 5 * 60 * 1000;
 const withStatusLock = async (fn: () => Promise<void>): Promise<boolean> => {
   const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   try {
-    await redis.set(STATUS_LOCK_KEY, token, {
-      nx: true,
-      expiration: new Date(Date.now() + STATUS_LOCK_TTL_MS),
-    });
-  } catch {
-    // Key already held: another tick is mid-flight.
+    const existing = await redis.get(STATUS_LOCK_KEY);
+    if (existing) return false;
+
+    await redis.set(STATUS_LOCK_KEY, token);
+    await redis.expire(STATUS_LOCK_KEY, Math.floor(STATUS_LOCK_TTL_MS / 1000));
+  } catch (err) {
+    console.warn('[lock] Error setting lock in Redis:', err);
     return false;
   }
 
