@@ -166,7 +166,8 @@
           <ul>
             <li><strong>Zero-Overhead Wiki Archiving:</strong> Streamlined background wiki page updates using Redis content fingerprinting, reducing background API calls per tick to zero when content hasn't changed.</li>
             <li><strong>Automated Pre-Release Safety Gates:</strong> Release workflows now automatically run type checking and full unit test suites prior to publishing.</li>
-            <li><strong>Devvit Credentials Guidance:</strong> Added security documentation regarding per-subreddit moderator API key visibility.</li>
+            <li><strong>Refresh no longer blanks the dashboard:</strong> Using <em>Refresh LiveSticky</em> while a scheduled check was already running could leave the dashboard empty for up to two minutes. It now waits for the running check and repopulates straight away.</li>
+            <li><strong>Who can see your API credentials:</strong> The Setup Guide now explains that any moderator with access to your subreddit's app settings can read the platform keys you enter, what those keys can and cannot do, and how to rotate them.</li>
           </ul>
 
           <details class="tech-details">
@@ -182,6 +183,11 @@
               <ul>
                 <li><strong>FNV-1a Redis Content Fingerprinting (B4)</strong>: Replaced round-trip wiki page reads with deterministic FNV-1a content fingerprinting in Redis (`wiki_written_${wikiVersion}_${page}`) with 1h TTL. Reaching memo bypasses `isWikiV2Enabled` (7 calls/tick) and `updateWikiPageSettings` (~16 calls/tick), reducing steady-state wiki traffic from ~30 calls/tick to 0.</li>
                 <li><strong>Automated Pre-Release Verification Gates (M2)</strong>: Integrated `npx tsc --noEmit` and Vitest unit testing into `release.sh` and `upload.sh`.</li>
+                <li><strong>Credential visibility documentation</strong>: New <em>Who can see your API credentials</em> section in <code>setup.html</code> covering Devvit's per-subreddit settings model, the read-only scope of the Twitch/YouTube/Kick credentials, and rotation steps. Cross-linked from <code>apis.html</code>.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Manual refresh starved by the status lock (M1 follow-up)</strong>: `withStatusLock` now reports whether it acquired the lock. The scheduled path still drops a colliding tick; `runStatusCheckNow()` retries for up to 30s so the mod-menu refresh, which clears cached Redis keys before re-checking, always repopulates them.</li>
               </ul>
             </div>
           </details>

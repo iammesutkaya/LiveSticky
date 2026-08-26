@@ -253,6 +253,19 @@
 
         <hr>
 
+        <h2 id="credentials">Who can see your API credentials</h2>
+        <p>The keys you pasted in Step 2 are stored as subreddit settings on Reddit's Developer Platform. <strong>Any moderator with access to your subreddit's app settings can open that page and read them.</strong> That is how per-subreddit settings work on Devvit and applies to every app, not just LiveSticky: an app cannot hide a setting from the moderators who are allowed to edit it.</p>
+        <p>What those keys can do if someone copies them is limited. All three are read-only credentials for public data: Twitch and Kick client credentials grant App Access Tokens that can read public stream status, metadata, and clips, and a YouTube API key can read public channel and video data. None of them can post, moderate, change your channel, or reach anything private. The realistic risk is someone burning your YouTube daily quota or making requests in your app's name.</p>
+        <p>Practical advice:</p>
+        <ul>
+          <li>Create the credentials on an account the whole mod team is comfortable being tied to, rather than a personal main account.</li>
+          <li>Treat them as shared with your current mod team, the same way you would a shared bot password.</li>
+          <li>Rotate them if someone leaves the team: regenerate the secret in the <a href="https://dev.twitch.tv/console" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a>, the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>, or the <a href="https://dev.kick.com/" target="_blank" rel="noopener noreferrer">Kick developer portal</a>, then paste the new value into Subreddit Settings.</li>
+        </ul>
+        <p>Full outbound request disclosure lives on the <a href="apis.html">External APIs</a> page.</p>
+
+        <hr>
+
         <h2>Configuration Reference</h2>
         <p>Looking for a complete breakdown of all settings, customizable post template flairs, dynamic placeholders (like <code>{viewers}</code> or <code>{uptime}</code>), and moderator control options? Check out the full <a href="configuration.html">Configuration Reference</a>.</p>
       </div>
