@@ -96,21 +96,9 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
-                <a href="#v1-1-305">
-                  <span class="changelog-ver">v1.1.305</span>
+                <a href="#v1-1-312">
+                  <span class="changelog-ver">v1.1.312</span>
                   <span class="changelog-sidebar-date">AUG 26, 2026</span>
-                </a>
-              </li>
-              <li>
-                <a href="#v1-1-304">
-                  <span class="changelog-ver">v1.1.304</span>
-                  <span class="changelog-sidebar-date">AUG 26, 2026</span>
-                </a>
-              </li>
-              <li>
-                <a href="#v1-1-286">
-                  <span class="changelog-ver">v1.1.286</span>
-                  <span class="changelog-sidebar-date">AUG 20, 2026</span>
                 </a>
               </li>
               <li>
@@ -158,17 +146,24 @@
         <article class="changelog-entry">
 
           <div class="changelog-head">
-            <h2 id="v1-1-305">v1.1.305</h2>
+            <h2 id="v1-1-312">v1.1.312</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 26, 2026</span>
           </div>
-          <p><strong>Zero-Overhead Wiki Archiving &amp; Platform Security Hardening</strong></p>
+          <p><strong>Everything since v1.1.285: safer post handling, restored features, and accessibility</strong></p>
           <ul>
-            <li><strong>Zero-Overhead Wiki Archiving:</strong> Streamlined background wiki page updates using Redis content fingerprinting, reducing background API calls per tick to zero when content hasn't changed.</li>
-            <li><strong>Automated Pre-Release Safety Gates:</strong> Release workflows now automatically run type checking and full unit test suites prior to publishing.</li>
-            <li><strong>Refresh no longer blanks the dashboard:</strong> Using <em>Refresh LiveSticky</em> while a scheduled check was already running could leave the dashboard empty for up to two minutes. It now waits for the running check and repopulates straight away.</li>
-            <li><strong>Who can see your API credentials:</strong> The Setup Guide now explains that any moderator with access to your subreddit's app settings can read the platform keys you enter, what those keys can and cannot do, and how to rotate them.</li>
+            <li><strong>Safer post recovery:</strong> When LiveSticky reconnects to a thread after a restart, it now only ever adopts posts it created itself. Previously it could match another post in your community and clear the comments on it.</li>
+            <li><strong>Monthly Top 20 clips fixed:</strong> The monthly clip compilation now publishes on schedule. It had been failing silently.</li>
+            <li><strong>Create Dashboard is back in Mod Tools:</strong> The action to create the interactive dashboard post had gone missing from the mod menu.</li>
+            <li><strong>Your timezone setting now applies:</strong> The Streamer Timezone option was quietly ignored and every date fell back to UTC. Dates in your post titles and bodies now use the timezone you picked.</li>
+            <li><strong>Safer clip formatting:</strong> Unusual characters in Twitch clip titles can no longer break post layout or slip an unexpected link into a pinned thread.</li>
+            <li><strong>Cleaner offline threads:</strong> Templates that use live stream stats no longer leave raw placeholders like <code>&#123;stream_game&#125;</code> behind once the stream ends.</li>
+            <li><strong>YouTube quota protection:</strong> If YouTube's daily API limit is reached, LiveSticky pauses those requests and resumes automatically at midnight Pacific.</li>
+            <li><strong>More reliable Refresh:</strong> Refresh LiveSticky now clears rate-limit blocks for immediate retesting, and no longer leaves the dashboard blank when it runs alongside a scheduled check.</li>
+            <li><strong>Lighter background activity:</strong> Wiki archive pages are only rewritten when their content actually changes, instead of on every check.</li>
+            <li><strong>Keyboard and motion support:</strong> The dashboard is now fully keyboard navigable with visible focus rings, and honours your system's reduced-motion setting.</li>
           </ul>
+          <p>This release rolls up versions 1.1.286 through 1.1.311, which were superseded during review and never became available to install.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -179,102 +174,29 @@
               <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </summary>
             <div class="tech-content">
-              <h3>Added</h3>
-              <ul>
-                <li><strong>FNV-1a Redis Content Fingerprinting (B4)</strong>: Replaced round-trip wiki page reads with deterministic FNV-1a content fingerprinting in Redis (`wiki_written_${wikiVersion}_${page}`) with 1h TTL. Reaching memo bypasses `isWikiV2Enabled` (7 calls/tick) and `updateWikiPageSettings` (~16 calls/tick), reducing steady-state wiki traffic from ~30 calls/tick to 0.</li>
-                <li><strong>Automated Pre-Release Verification Gates (M2)</strong>: Integrated `npx tsc --noEmit` and Vitest unit testing into `release.sh` and `upload.sh`.</li>
-                <li><strong>Credential visibility documentation</strong>: New <em>Who can see your API credentials</em> section in <code>setup.html</code> covering Devvit's per-subreddit settings model, the read-only scope of the Twitch/YouTube/Kick credentials, and rotation steps. Cross-linked from <code>apis.html</code>.</li>
-              </ul>
               <h3>Fixed</h3>
               <ul>
-                <li><strong>Manual refresh starved by the status lock (M1 follow-up)</strong>: `withStatusLock` now reports whether it acquired the lock. The scheduled path still drops a colliding tick; `runStatusCheckNow()` retries for up to 30s so the mod-menu refresh, which clears cached Redis keys before re-checking, always repopulates them.</li>
+                <li><strong>Select settings read as arrays</strong>: Devvit returns <code>select</code> settings as <code>['UTC']</code>, not <code>'UTC'</code>. All three <code>streamerTimezone</code> read sites called <code>.trim()</code> on the raw value. Two were masked by surrounding try/catch (silently falling back to UTC); a third, in the settings validator, threw on every scheduler tick. Added <code>settingText()</code> as the single accessor and widened the validator's input types to <code>unknown</code>.</li>
+                <li><strong>Self-healing search scoped to the app account (B3)</strong>: <code>findExistingSubredditPost</code> ran an unfiltered <code>searchPosts</code> and adopted <code>posts[0]</code>. <code>ensureStickyOfflinePost</code> then removed every comment on that post before the <code>edit()</code> that would have failed. Results are now filtered by <code>getAppUser()</code>.</li>
+                <li><strong>Monthly highlights <code>ReferenceError</code> (B1)</strong>: <code>runMonthlyHighlights</code> referenced an undeclared <code>wikiArchive</code>, throwing into a catch block on every run.</li>
+                <li><strong>Dashboard menu route (B2)</strong>: <code>createDashboardPost</code> had no endpoint and no manifest entry; both restored.</li>
+                <li><strong>Clip title escaping (B6)</strong>: <code>escapeMarkdownBrackets()</code> and <code>escapeHtmlEntities()</code> applied to clip titles, creators and URLs on both the markdown and wiki render paths.</li>
+                <li><strong>Offline template variables (B5)</strong>: the <code>isLive === false</code> branch of <code>replaceTemplateVariables</code> skipped game, viewers and uptime.</li>
+                <li><strong>Dashboard pointer garbage collected (B7)</strong>: <code>dashboard_post_id</code> removed from the 7-day wipe list.</li>
+                <li><strong>Token invalidation (B8)</strong>: Twitch and Kick cached tokens are dropped on HTTP 401/403 instead of being replayed until TTL.</li>
+                <li><strong>Scheduler overlap (M1)</strong>: <code>SET NX</code> lock with ownership read-back and a 5-minute TTL; the manual refresh path waits for an in-flight run rather than being dropped.</li>
+              </ul>
+              <h3>Added</h3>
+              <ul>
+                <li><strong>Wiki write fingerprinting (B4)</strong>: FNV-1a content hash in Redis with a 1h TTL, checked before any API call. Steady-state wiki traffic per tick went from ~30 calls to zero.</li>
+                <li><strong>Settings validation (M10)</strong>: grace period, publish time, avatar host and timezone are validated each tick and reported through ModMail, rate-limited to once a day with a short retry window after a failed send.</li>
+                <li><strong>HTTP timeouts (M9)</strong>: every upstream call routed through <code>fetchWithTimeout</code> (10s).</li>
+                <li><strong>Pre-ship gates (M2)</strong>: <code>tsc --noEmit</code> and the Vitest suite run in both <code>release.sh</code> and <code>upload.sh</code> before anything is uploaded. Test count 59 → 99.</li>
+                <li><strong>Accessibility (U1-U6)</strong>: token-based <code>:focus-visible</code> rings, keyboard-operable thread chip, roving-tabindex tablist with arrow keys, modal focus trap and <code>aria-modal</code>, and a <code>prefers-reduced-motion</code> block.</li>
               </ul>
             </div>
           </details>
         </article>
-
-        <article class="changelog-entry">
-
-          <div class="changelog-head">
-            <h2 id="v1-1-304">v1.1.304</h2>
-            <span class="changelog-badge live">Released</span>
-            <span class="changelog-date">AUG 26, 2026</span>
-          </div>
-          <p><strong>Comprehensive Reliability, Security &amp; Performance Update</strong></p>
-          <ul>
-            <li><strong>Monthly Top 20 Clips Restored:</strong> Monthly clip compilation posts now publish on schedule without interruption.</li>
-            <li><strong>Create Dashboard in Mod Tools:</strong> Restored the <em>Create LiveSticky Dashboard</em> action in Mod Tools so moderators can easily generate interactive community posts.</li>
-            <li><strong>Smarter Post Recovery:</strong> Enhanced self-healing thread discovery so LiveSticky only manages posts created by the app bot account.</li>
-            <li><strong>Faster Wiki Archiving:</strong> Streamlined clip history updates on subreddit wiki pages, eliminating unnecessary background updates when content hasn't changed.</li>
-            <li><strong>Cleaner Offline Threads:</strong> Templates using live stream stats now automatically clean up live-only tags when the stream ends.</li>
-            <li><strong>Safer Clip Formatting:</strong> Special characters in Twitch clip titles are now sanitized to keep post formatting clean and links secure.</li>
-            <li><strong>Accessibility &amp; Motion Support:</strong> Added full keyboard navigation, clear focus rings, and reduced-motion support for animations.</li>
-          </ul>
-
-          <details class="tech-details">
-            <summary class="tech-summary">
-              <span class="tech-summary-left">
-                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                Technical details &amp; developer notes
-              </span>
-              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </summary>
-            <div class="tech-content">
-              <h3>Added</h3>
-              <ul>
-                <li><strong>Strict Build &amp; Release Gates:</strong> Enforced <code>npx tsc --noEmit</code> strict type checking and 89 unit tests (via Vitest) into automated release scripts.</li>
-                <li><strong>FNV-1a Wiki Content Fingerprinting:</strong> Fingerprints generated wiki content into Redis (<code>wiki_written_${wikiVersion}_${page}</code>) with 1h TTL, skipping pre-flight API calls and reducing steady-state traffic from ~30 calls/tick to 0.</li>
-                <li><strong>Input Settings Validation:</strong> Added validation guards for <code>offlineGracePeriod</code> (&gt;= 0), <code>monthlyHighlightsTime</code> (24h HH:MM regex), and <code>customAvatarUrl</code> (<code>i.redd.it</code> host requirement).</li>
-              </ul>
-              <h3>Fixed</h3>
-              <ul>
-                <li><strong>Undeclared Scope Variable (B1):</strong> Added <code>enableWikiArchive</code> to setting reader inside <code>runMonthlyHighlights()</code>.</li>
-                <li><strong>Mod Menu Endpoint Routing (B2):</strong> Registered <code>/internal/menu/create-dashboard</code> endpoint and handler in <code>devvit.json</code> and <code>server/index.ts</code>.</li>
-                <li><strong>Unowned Post Search &amp; Comment Removal (B3):</strong> Filtered self-healing search results to require matching bot user ID or username.</li>
-                <li><strong>Garbage Collection Sweep (B7):</strong> Removed <code>dashboard_post_id</code> from 7-day offline key deletion sweep.</li>
-                <li><strong>401 Token Invalidation (B8):</strong> Automatically deletes cached Twitch and Kick tokens on HTTP 401/403 errors to force re-authentication.</li>
-                <li><strong>Fetch Timeouts (M9):</strong> Added <code>AbortSignal.timeout(10000)</code> to all platform status fetch calls.</li>
-              </ul>
-            </div>
-          </details>
-        </article>
-
-        <article class="changelog-entry">
-
-          <div class="changelog-head">
-            <h2 id="v1-1-286">v1.1.286</h2>
-            <span class="changelog-badge live">Released</span>
-            <span class="changelog-date">AUG 20, 2026</span>
-          </div>
-          <p><strong>YouTube Rate Limit Shield &amp; Mod Menu Reset</strong></p>
-          <ul>
-            <li><strong>Automatic Quota Protection</strong>: If YouTube's daily API limits are reached, LiveSticky now pauses YouTube status requests automatically and resumes at midnight when Google resets daily quotas, preventing error spam without breaking other platforms.</li>
-            <li><strong>Instant Mod Menu Recovery</strong>: Performing a <em>Refresh LiveSticky</em> command in the Mod Menu now immediately clears temporary rate-limit blocks for instant manual testing.</li>
-          </ul>
-
-          <details class="tech-details">
-            <summary class="tech-summary">
-              <span class="tech-summary-left">
-                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                Technical details &amp; developer notes
-              </span>
-              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </summary>
-            <div class="tech-content">
-              <h3>Added</h3>
-              <ul>
-                <li><strong>YouTube API Quota Circuit Breaker</strong>: Automatically detects HTTP 403 quota errors on YouTube Data API requests. When quota is exceeded, LiveSticky trips a circuit breaker in Redis (<code>yt_quota_blocked</code>) that auto-expires at Pacific Time midnight (when YouTube daily API quotas reset), preventing redundant API requests and log spam.</li>
-                <li><strong>6-Hour Negative Caching</strong>: Failed channel handle resolutions and upload playlist lookups now cache <code>NOT_FOUND</code> in Redis for 6 hours, eliminating repeated search API calls every 2 minutes for invalid channel settings.</li>
-                <li><strong>Manual Quota Reset via Refresh</strong>: Performing a <em>Refresh LiveSticky</em> command from the Mod Menu automatically resets <code>yt_quota_blocked</code> and <code>modmail_cooldown_youtube</code> Redis keys for instant manual recovery.</li>
-              </ul>
-              <h3>Fixed</h3>
-              <ul>
-                <li><strong>Quota Error Handling &amp; Avatar Fetching</strong>: Short-circuits YouTube status polling and channel avatar refresh routines immediately when the quota block is active, protecting API key status across scheduled cron runs.</li>
-              </ul>
-            </div>
-          </details>
-        </article>
-
         <article class="changelog-entry">
           <div class="changelog-head">
             <h2 id="v1-1-285">v1.1.285</h2>
