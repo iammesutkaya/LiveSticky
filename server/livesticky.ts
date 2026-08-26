@@ -1170,14 +1170,14 @@ const reportSettingProblems = async (
   if (await redis.get(cooldownKey)) return;
 
   try {
-    await redis.set(cooldownKey, 'true');
-    await redis.expire(cooldownKey, 86400);
     await reddit.modMail.createConversation({
       subredditName,
       subject: '⚠️ LiveSticky: check your settings',
       body: formatSettingProblems(problems),
       isAuthorHidden: true,
     });
+    await redis.set(cooldownKey, 'true');
+    await redis.expire(cooldownKey, 86400);
     console.log(`Sent ModMail alert for ${problems.length} setting problem(s)`);
   } catch (err) {
     console.error('Failed to send settings ModMail alert:', err);
