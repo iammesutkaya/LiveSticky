@@ -43,8 +43,10 @@ export const fetchWithTimeout = (
 ): Promise<Response> =>
   fetch(input, { ...init, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 
-export function sanitizeHandle(input: string, platformUrl: string): string {
-  let clean = input.trim().toLowerCase();
+export function sanitizeHandle(input: string | string[] | unknown, platformUrl: string): string {
+  if (!input) return '';
+  const rawStr = Array.isArray(input) ? String(input[0] ?? '') : String(input);
+  let clean = rawStr.trim().toLowerCase();
   // Strip trailing slashes
   while (clean.endsWith('/')) {
     clean = clean.slice(0, -1);
@@ -638,30 +640,43 @@ export async function checkAllStreamStatuses(
   context: PlatformContext
 ): Promise<UnifiedStreamInfo[]> {
   const [
-    twitchChannel,
-    twitchClientId,
-    twitchClientSecret,
-    youtubeChannel,
-    youtubeApiKey,
-    kickChannel,
-    kickClientId,
-    kickClientSecret,
+    rawTwitchChannel,
+    rawTwitchClientId,
+    rawTwitchClientSecret,
+    rawYoutubeChannel,
+    rawYoutubeApiKey,
+    rawKickChannel,
+    rawKickClientId,
+    rawKickClientSecret,
     primaryPlatformRaw,
   ] = await Promise.all([
-    context.settings.get('twitchChannel') as Promise<string | undefined>,
-    context.settings.get('twitchClientId') as Promise<string | undefined>,
-    context.settings.get('twitchClientSecret') as Promise<string | undefined>,
-    context.settings.get('youtubeChannel') as Promise<string | undefined>,
-    context.settings.get('youtubeApiKey') as Promise<string | undefined>,
-    context.settings.get('kickChannel') as Promise<string | undefined>,
-    context.settings.get('kickClientId') as Promise<string | undefined>,
-    context.settings.get('kickClientSecret') as Promise<string | undefined>,
-    context.settings.get('primaryPlatform') as Promise<unknown>,
+    context.settings.get('twitchChannel'),
+    context.settings.get('twitchClientId'),
+    context.settings.get('twitchClientSecret'),
+    context.settings.get('youtubeChannel'),
+    context.settings.get('youtubeApiKey'),
+    context.settings.get('kickChannel'),
+    context.settings.get('kickClientId'),
+    context.settings.get('kickClientSecret'),
+    context.settings.get('primaryPlatform'),
   ]);
 
-  const primaryPlatform = Array.isArray(primaryPlatformRaw)
-    ? (primaryPlatformRaw[0] as string | undefined)
-    : (primaryPlatformRaw as string | undefined);
+  const normalizeStr = (val: unknown): string => {
+    if (!val) return '';
+    if (Array.isArray(val)) return String(val[0] ?? '').trim();
+    return String(val).trim();
+  };
+
+  const twitchChannel = normalizeStr(rawTwitchChannel);
+  const twitchClientId = normalizeStr(rawTwitchClientId);
+  const twitchClientSecret = normalizeStr(rawTwitchClientSecret);
+  const youtubeChannel = normalizeStr(rawYoutubeChannel);
+  const youtubeApiKey = normalizeStr(rawYoutubeApiKey);
+  const kickChannel = normalizeStr(rawKickChannel);
+  const kickClientId = normalizeStr(rawKickClientId);
+  const kickClientSecret = normalizeStr(rawKickClientSecret);
+
+  const primaryPlatform = normalizeStr(primaryPlatformRaw);
 
   // Build the checks in priority order so the resulting array stays
   // Twitch > YouTube > Kick after the nulls are filtered out.
