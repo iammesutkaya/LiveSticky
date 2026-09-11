@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-314">
+                  <span class="changelog-ver">v1.1.314</span>
+                  <span class="changelog-sidebar-date">SEP 11, 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-313">
                   <span class="changelog-ver">v1.1.313</span>
                   <span class="changelog-sidebar-date">AUG 26, 2026</span>
@@ -143,6 +149,44 @@
           </button>
         </div>
 
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-314">v1.1.314</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">SEP 11, 2026</span>
+          </div>
+          <p><strong>Fixes a clips post being pinned in place of the live thread</strong></p>
+          <ul>
+            <li><strong>The right post gets pinned when you go live:</strong> On communities using a custom live post title, LiveSticky could pin the previous stream's Top Clips post instead of creating a new live thread, overwriting that post's body with live stream stats while its title still read "Top Clips". It now creates the live thread as expected.</li>
+            <li><strong>Custom live post titles are fully supported:</strong> Reconnecting to an existing live thread no longer depends on your title containing the words "is LIVE", so renaming the thread in your settings is safe.</li>
+            <li><strong>Posts LiveSticky manages stay separate:</strong> The live thread, offline post, Top Clips post and dashboard post can no longer be mistaken for one another during recovery, so none of them will be edited or pinned in another's place.</li>
+            <li><strong>Yesterday's thread stays closed:</strong> Recovery only considers posts created during the current stream, so a concluded thread from an earlier stream is never re-pinned.</li>
+          </ul>
+          <p>Communities on the default live post title were unaffected. If yours uses a custom title and Top Clips posts are enabled, this release fixes it.</p>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Search fallback adopted the wrong post</strong>: the offline path deletes <code>live_post_id</code>, so every go-live runs <code>findExistingSubredditPost</code>. It was called with the hardcoded keyword <code>'is LIVE'</code> while <code>livePostTitle</code> is a mod setting, so the listing pass (which requires the title to contain the keyword) missed on customized titles. The <code>searchPosts</code> fallback then filtered results with an author check alone and no title check. Reddit search is fuzzy and the default highlights footer contains the word "live", so the first app-authored hit was the previous stream's Top Clips post. It was adopted as the live thread, passed through <code>post.edit({ text })</code> - which rewrites the body but never the title - and pinned. The fallback now applies the same predicate as the listing pass.</li>
+                <li><strong>Live recovery no longer matches on title</strong>: <code>queryKeyword</code> accepts <code>null</code>, and the helper takes <code>notBefore</code> and <code>excludeIds</code>. The live lookup passes <code>null</code>, bounds candidates to the current stream's <code>started_at</code>, and excludes <code>dashboard_post_id</code>, <code>offline_post_id</code>, <code>highlights_post_id</code> and <code>last_highlights_post_id</code>. If <code>started_at</code> is unavailable the lookup is skipped and a fresh post is created.</li>
+                <li><strong>Cross-adoption between managed posts</strong>: the <code>'is offline'</code> and <code>'Top Clips'</code> lookups keep their keywords and gained the same exclusion set, so no recovery path can reach a post another path owns.</li>
+              </ul>
+              <h3>Added</h3>
+              <ul>
+                <li><strong><code>src/post-recovery.ts</code></strong>: the candidate predicate extracted as a pure <code>isRecoveryCandidate()</code>, testable without the Devvit runtime. Test count 99 &rarr; 105.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
         <article class="changelog-entry">
 
           <div class="changelog-head">
