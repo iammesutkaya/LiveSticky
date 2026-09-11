@@ -15,6 +15,7 @@ import {
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, fetchWithTimeout, type UnifiedStreamInfo } from '../src/platforms.js';
+import { isRecoveryCandidate, type RecoveryCandidate } from '../src/post-recovery.js';
 import {
   buildYouTubeUrl,
   buildKickUrl,
@@ -56,11 +57,16 @@ const get = <T = string>(name: string) => settings.get<T>(name);
  * Self-healing helper: Searches the subreddit for an existing post of a given type
  * when Redis state is missing or lost (e.g. after server crash, cache clear, or cold restart).
  * Prevents duplicate post creation on Reddit by discovering and reconnecting to active posts.
+ *
+ * `queryKeyword` is matched against the post title. Pass `null` when the title is
+ * mod-configurable and therefore not a reliable marker - identity then rests on
+ * `notBefore` and `excludeIds`, which is stricter than a keyword ever was.
  */
 const findExistingSubredditPost = async (
   subredditName: string,
-  queryKeyword: string,
-  timeframe: 'day' | 'week' | 'month' | 'year' = 'month'
+  queryKeyword: string | null,
+  timeframe: 'day' | 'week' | 'month' | 'year' = 'month',
+  opts: { excludeIds?: (string | null | undefined)[]; notBefore?: Date } = {}
 ): Promise<string | null> => {
   const appUser = await reddit.getAppUser().catch(() => null);
   if (!appUser) {
@@ -68,13 +74,14 @@ const findExistingSubredditPost = async (
     return null;
   }
 
-  const keyword = queryKeyword.toLowerCase();
+  const keyword = queryKeyword?.toLowerCase() ?? null;
+  const label = queryKeyword ?? 'live';
+  const excluded = new Set((opts.excludeIds ?? []).filter((id): id is string => !!id));
+
   const isOurs = (p: { authorId?: string; authorName?: string }) =>
     p.authorId === appUser.id || p.authorName === appUser.username;
-  const looksRight = (p: { title?: string; subredditName?: string; removed?: boolean }) =>
-    !p.removed &&
-    (p.subredditName || '').toLowerCase() === subredditName.toLowerCase() &&
-    (p.title || '').toLowerCase().includes(keyword);
+  const looksRight = (p: RecoveryCandidate) =>
+    isRecoveryCandidate(p, { keyword, subredditName, excludeIds: excluded, notBefore: opts.notBefore });
 
   // 1. The app account's own recent posts. This reads the listing index, which
   // is current - unlike search, which lags by minutes and so cannot see a post
@@ -86,27 +93,30 @@ const findExistingSubredditPost = async (
       .all();
     const candidate = own.find(looksRight);
     if (candidate) {
-      console.log(`[Self-Healing] Recovered "${queryKeyword}" post from app history: ${candidate.id}`);
+      console.log(`[Self-Healing] Recovered "${label}" post from app history: ${candidate.id}`);
       return candidate.id;
     }
   } catch (err) {
-    console.warn(`[Self-Healing] Could not read app post history for "${queryKeyword}":`, err);
+    console.warn(`[Self-Healing] Could not read app post history for "${label}":`, err);
   }
 
   // 2. Search fallback. Slower to see new posts, but reaches further back than
-  // one page of history - which the year-long "Top Clips" lookup needs. Also
-  // covers a mod-customized title that the keyword match above would miss.
+  // one page of history - which the year-long "Top Clips" lookup needs. Only
+  // usable with a keyword, and the keyword must still match: search is fuzzy and
+  // an author-only filter here adopted whichever app post ranked first.
+  if (keyword === null) return null;
+
   try {
     const posts = await reddit
-      .searchPosts({ subredditName, query: queryKeyword, sort: 'new', timeframe, limit: 10 })
+      .searchPosts({ subredditName, query: queryKeyword as string, sort: 'new', timeframe, limit: 10 })
       .all();
-    const candidate = posts?.find(isOurs);
+    const candidate = posts?.find((p) => isOurs(p) && looksRight(p));
     if (candidate) {
-      console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
+      console.log(`[Self-Healing] Discovered existing post for "${label}": ${candidate.id}`);
       return candidate.id;
     }
   } catch (err) {
-    console.error(`[Self-Healing] Error searching for "${queryKeyword}" post:`, err);
+    console.error(`[Self-Healing] Error searching for "${label}" post:`, err);
   }
 
   return null;
@@ -175,7 +185,14 @@ const ensureStickyOfflinePost = async (
   let offlinePostId = await redis.get('offline_post_id');
   if (!offlinePostId) {
     const subreddit = await reddit.getCurrentSubreddit();
-    const recoveredId = await findExistingSubredditPost(subreddit.name, 'is offline', 'month');
+    const recoveredId = await findExistingSubredditPost(subreddit.name, 'is offline', 'month', {
+      excludeIds: await Promise.all([
+        redis.get('live_post_id'),
+        redis.get('dashboard_post_id'),
+        redis.get('highlights_post_id'),
+        redis.get('last_highlights_post_id'),
+      ]),
+    });
     if (recoveredId) {
       offlinePostId = recoveredId;
       await redis.set('offline_post_id', recoveredId);
@@ -683,7 +700,13 @@ const postStreamHighlights = async (
 
     let existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
     if (reusePost && !existingPostId) {
-      const recoveredId = await findExistingSubredditPost(subreddit.name, 'Top Clips', 'year');
+      const recoveredId = await findExistingSubredditPost(subreddit.name, 'Top Clips', 'year', {
+        excludeIds: await Promise.all([
+          redis.get('live_post_id'),
+          redis.get('dashboard_post_id'),
+          redis.get('offline_post_id'),
+        ]),
+      });
       if (recoveredId) {
         existingPostId = recoveredId;
         await redis.set('highlights_post_id', recoveredId);
@@ -1593,7 +1616,21 @@ const runStatusCheckInner = async (): Promise<void> => {
       if (enableLivePost) {
         let existingLivePostId: string | null = (await redis.get('live_post_id')) || null;
         if (!existingLivePostId) {
-          const recoveredId = await findExistingSubredditPost(subreddit.name, 'is LIVE', 'day');
+          // The live title is mod-configurable, so a title keyword cannot identify this
+          // post. Bound it to the current stream instead, and never adopt a post the app
+          // already manages elsewhere.
+          const startedAt = streamInfo.started_at ? new Date(streamInfo.started_at) : null;
+          const recoveredId = startedAt && !isNaN(startedAt.getTime())
+            ? await findExistingSubredditPost(subreddit.name, null, 'day', {
+                notBefore: startedAt,
+                excludeIds: await Promise.all([
+                  redis.get('dashboard_post_id'),
+                  redis.get('offline_post_id'),
+                  redis.get('highlights_post_id'),
+                  redis.get('last_highlights_post_id'),
+                ]),
+              })
+            : null;
           if (recoveredId) {
             existingLivePostId = recoveredId;
             await redis.set('live_post_id', recoveredId);
