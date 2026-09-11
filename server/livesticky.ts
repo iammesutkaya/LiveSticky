@@ -31,6 +31,7 @@ import {
   type ClipInfo,
   type HighlightsEdition,
 } from '../src/formatters.js';
+import { isRecoveryCandidate, type RecoveryFilter } from '../src/recovery.js';
 import {
   DEFAULT_LIVE_SIDEBAR,
   DEFAULT_OFFLINE_SIDEBAR,
@@ -60,7 +61,8 @@ const get = <T = string>(name: string) => settings.get<T>(name);
 const findExistingSubredditPost = async (
   subredditName: string,
   queryKeyword: string,
-  timeframe: 'day' | 'week' | 'month' | 'year' = 'month'
+  timeframe: 'day' | 'week' | 'month' | 'year' = 'month',
+  notBefore?: Date
 ): Promise<string | null> => {
   const appUser = await reddit.getAppUser().catch(() => null);
   if (!appUser) {
@@ -68,13 +70,20 @@ const findExistingSubredditPost = async (
     return null;
   }
 
-  const keyword = queryKeyword.toLowerCase();
-  const isOurs = (p: { authorId?: string; authorName?: string }) =>
-    p.authorId === appUser.id || p.authorName === appUser.username;
-  const looksRight = (p: { title?: string; subredditName?: string; removed?: boolean }) =>
-    !p.removed &&
-    (p.subredditName || '').toLowerCase() === subredditName.toLowerCase() &&
-    (p.title || '').toLowerCase().includes(keyword);
+  const filter: RecoveryFilter = {
+    appUserId: appUser.id,
+    appUserName: appUser.username,
+    subredditName,
+    keyword: queryKeyword,
+    // `notBefore` is what keeps a *session* post (the live thread) from being
+    // recovered out of a previous session. Reddit ignores the timeframe
+    // argument when sorting by `new`, and search's own day window still covers
+    // yesterday's thread for anyone who streams daily, so neither listing can
+    // be trusted to bound this on its own.
+    notBefore,
+  };
+  const looksRight = (p: Parameters<typeof isRecoveryCandidate>[0]) =>
+    isRecoveryCandidate(p, filter);
 
   // 1. The app account's own recent posts. This reads the listing index, which
   // is current - unlike search, which lags by minutes and so cannot see a post
@@ -94,13 +103,19 @@ const findExistingSubredditPost = async (
   }
 
   // 2. Search fallback. Slower to see new posts, but reaches further back than
-  // one page of history - which the year-long "Top Clips" lookup needs. Also
-  // covers a mod-customized title that the keyword match above would miss.
+  // one page of history - which the year-long "Top Clips" lookup needs.
+  //
+  // Reddit's search is fuzzy: a query of "is LIVE" also returns the app's other
+  // posts, and this branch used to accept the first app-authored hit whatever
+  // its title. On a subreddit where the app posts a highlights thread too, that
+  // meant adopting the "Top Clips" post as the live thread - overwriting its
+  // body with live stream stats and pinning it, while no live thread was ever
+  // created. Candidates must clear the same bar as the listing branch.
   try {
     const posts = await reddit
       .searchPosts({ subredditName, query: queryKeyword, sort: 'new', timeframe, limit: 10 })
       .all();
-    const candidate = posts?.find(isOurs);
+    const candidate = posts?.find(looksRight);
     if (candidate) {
       console.log(`[Self-Healing] Discovered existing post for "${queryKeyword}": ${candidate.id}`);
       return candidate.id;
@@ -1671,7 +1686,18 @@ const runStatusCheckInner = async (): Promise<void> => {
       if (enableLivePost) {
         let existingLivePostId: string | null = (await redis.get('live_post_id')) || null;
         if (!existingLivePostId) {
-          const recoveredId = await findExistingSubredditPost(subreddit.name, 'is LIVE', 'day');
+          // live_post_id is deleted when a stream concludes, so this recovery
+          // runs on every single go-live - it must only ever match a thread
+          // belonging to the session that is on air right now. Without the
+          // bound it reliably adopted the previous stream's concluded thread,
+          // re-pinned that, and never posted a new one. The 12h ceiling is only
+          // for the case where Twitch gave us no start time.
+          const sessionStart = streamInfo.started_at ? new Date(streamInfo.started_at) : null;
+          const notBefore =
+            sessionStart && !isNaN(sessionStart.getTime())
+              ? sessionStart
+              : new Date(Date.now() - 12 * 60 * 60 * 1000);
+          const recoveredId = await findExistingSubredditPost(subreddit.name, 'is LIVE', 'day', notBefore);
           if (recoveredId) {
             existingLivePostId = recoveredId;
             await redis.set('live_post_id', recoveredId);
