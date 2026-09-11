@@ -146,6 +146,43 @@
         <article class="changelog-entry">
 
           <div class="changelog-head">
+            <h2 id="v1-1-314">v1.1.314</h2>
+            <span class="changelog-badge in-review">In Review</span>
+            <span class="changelog-date">SEP 11, 2026</span>
+          </div>
+          <p><strong>The live thread gets the pin back</strong></p>
+          <ul>
+            <li><strong>The live thread is pinned first again:</strong> Reddit allows only two pinned posts. The Top Clips post was pinned at the end of every stream and never unpinned, so it kept one of the two slots for good &mdash; leaving the live thread pinned beneath it, or not pinned at all if anything else held the second slot. The Top Clips post is now unpinned when the stream starts and pinned again when it ends.</li>
+            <li><strong>Quiet streams keep their Top Clips pin:</strong> A stream that produced no clips used to leave the Top Clips post unpinned until the next one that did.</li>
+            <li><strong>You hear about it when a pin fails:</strong> If LiveSticky cannot get a pinned slot, it now sends a ModMail explaining that both slots are taken, instead of failing silently. Rate-limited to once a day.</li>
+          </ul>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Highlights post held a sticky slot permanently</strong>: <code>postStreamHighlights</code> called <code>pinPostWithFallback</code> on every stream end, but nothing ever called <code>unsticky()</code> on the highlights post &mdash; the offline post was the only secondary pin released on go-live. Reddit fills the bottom-most free slot, so once the highlights post occupied slot 1 the live thread could only ever reach slot 2, and with a third pin present (dashboard post, or a mod's own announcement) <code>sticky()</code> returned 400 and the <code>sticky(2)</code> fallback could not place it either. The <code>StreamState.LIVE</code> go-live branch now releases the highlights pin alongside the offline pin, gated on <code>stickyHighlightsPost</code>.</li>
+                <li><strong>Highlights pin not restored after a clipless stream</strong>: <code>postStreamHighlights</code> returns early when <code>fetchTopClips</code> yields zero clips or Twitch credentials are missing, skipping its own re-pin. The grace-period cleanup now calls <code>verifyAndRepinIfNeeded(highlightsPostId, 'highlights')</code> after the highlights step, which no-ops when the post is already stickied or highlighted.</li>
+              </ul>
+              <h3>Added</h3>
+              <ul>
+                <li><strong>ModMail alert on pin failure</strong>: <code>alertModsPinFailed()</code> fires when <code>pinPostWithFallback</code> exhausts both legacy sticky and <code>AddPostToHighlights</code>. Same cooldown shape as <code>reportSettingProblems</code>: <code>modmail_cooldown_pin</code>, 24h after a delivered alert, 5m after a failed send.</li>
+                <li><strong><code>getHighlightsPostId()</code> and <code>unpinPost()</code> helpers</strong>: the first resolves <code>highlights_post_id</code> (reuse mode) or <code>last_highlights_post_id</code> (per-stream mode); the second releases a slot and treats a missing or already-unstickied post as success.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
+
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
             <h2 id="v1-1-313">v1.1.313</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 26, 2026</span>

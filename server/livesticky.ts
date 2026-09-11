@@ -972,6 +972,71 @@ export const runMonthlyHighlights = async (): Promise<void> => {
 // ---------------------------------------------------------------------------
 
 /**
+ * Resolves the highlights ("Top Clips") post id regardless of which mode the
+ * mod runs: the reused post keeps `highlights_post_id`, the per-stream mode
+ * records the most recent one under `last_highlights_post_id`.
+ */
+const getHighlightsPostId = async (): Promise<string | null> =>
+  (await redis.get('highlights_post_id')) || (await redis.get('last_highlights_post_id')) || null;
+
+/**
+ * Releases a sticky slot. Missing or already-unstickied posts are not errors -
+ * the point is only that the slot is free afterwards.
+ */
+const unpinPost = async (postId: string, label: string): Promise<void> => {
+  try {
+    const post = await reddit.getPostById(postId as `t3_${string}`);
+    await post.unsticky();
+    console.log(`[pin] Released the sticky slot held by the ${label} post: ${postId}`);
+  } catch (err) {
+    console.warn(`[pin] Could not unsticky the ${label} post ${postId}:`, err);
+  }
+};
+
+/**
+ * Reddit only has two sticky slots, and a pin that cannot get one fails
+ * silently: the post is simply not at the top of the feed and nothing says why.
+ * That is how a stream can run for days with the wrong post pinned, so tell the
+ * mods. Rate-limited like the other alerts, on the same cooldown shape as
+ * `reportSettingProblems`.
+ */
+const alertModsPinFailed = async (postId: string): Promise<void> => {
+  const cooldownKey = 'modmail_cooldown_pin';
+  if (await redis.get(cooldownKey)) return;
+
+  const DELIVERED_COOLDOWN = 86400;
+  const FAILED_COOLDOWN = 300;
+
+  try {
+    const subreddit = await reddit.getCurrentSubreddit();
+    await reddit.modMail.createConversation({
+      subredditName: subreddit.name,
+      subject: '⚠️ LiveSticky: could not pin a post',
+      body:
+        `Hello,\n\nLiveSticky tried to pin [this post](https://www.reddit.com/comments/${postId.replace(/^t3_/, '')}) ` +
+        `but could not get a sticky slot.\n\n` +
+        `Reddit allows only **two stickied posts** per subreddit. Both slots are currently taken by other posts, ` +
+        `so this one stays in the normal feed.\n\n` +
+        `To fix it, unsticky a post you no longer need pinned. LiveSticky will pin its own post on the next check ` +
+        `(within a few minutes).\n\n` +
+        `*(This alert is rate-limited to once per 24 hours.)*`,
+      isAuthorHidden: true,
+    });
+    await redis.set(cooldownKey, 'true');
+    await redis.expire(cooldownKey, DELIVERED_COOLDOWN);
+    console.log('Sent ModMail alert for a failed pin');
+  } catch (err) {
+    console.error('Failed to send pin-failure ModMail alert:', err);
+    try {
+      await redis.set(cooldownKey, 'true');
+      await redis.expire(cooldownKey, FAILED_COOLDOWN);
+    } catch {
+      // Redis unavailable too: the next tick retries, which is the safe default.
+    }
+  }
+};
+
+/**
  * Pins a post using Reddit's legacy sticky system and, if that slot is already
  * taken (both slots full → post gets no `stickied=true` flag), explicitly adds
  * the post to Community Highlights so it is visible in the official Reddit app
@@ -1034,6 +1099,7 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
       `[pin] WARNING: Post ${postId} could not be pinned via legacy sticky OR Community Highlights. ` +
         `Check existing stickied posts or mod permissions.`
     );
+    await alertModsPinFailed(postId);
     return;
   }
 
@@ -1590,6 +1656,18 @@ const runStatusCheckInner = async (): Promise<void> => {
         }
       }
 
+      // The highlights post is pinned at the end of every stream and, unlike the
+      // offline post, used to stay pinned through the next one. It therefore
+      // kept a sticky slot permanently - and because Reddit fills the bottom
+      // slot first, the live thread ended up beneath it, or got no slot at all
+      // once a third post (a dashboard post, a mod's own announcement) held the
+      // other one. Release it here so the live thread is the pin that matters
+      // while the stream is on; the offline path below re-pins it afterwards.
+      if (stickyHighlightsPost) {
+        const highlightsPostId = await getHighlightsPostId();
+        if (highlightsPostId) await unpinPost(highlightsPostId, 'highlights');
+      }
+
       if (enableLivePost) {
         let existingLivePostId: string | null = (await redis.get('live_post_id')) || null;
         if (!existingLivePostId) {
@@ -1893,6 +1971,17 @@ const runStatusCheckInner = async (): Promise<void> => {
         } catch (highlightsError) {
           console.error('Failed to trigger postStreamHighlights:', highlightsError);
         }
+      }
+
+      // postStreamHighlights re-pins the post itself, but it bails out early
+      // when the session produced no clips (or Twitch credentials are missing),
+      // and the go-live path above has since unstickied it. Restore the pin here
+      // so an uneventful stream doesn't quietly retire the highlights post.
+      if (stickyHighlightsPost) {
+        const highlightsPostId = await getHighlightsPostId();
+        // verifyAndRepinIfNeeded, not a bare pin: postStreamHighlights has
+        // usually pinned it already and re-pinning would burn a second API call.
+        if (highlightsPostId) await verifyAndRepinIfNeeded(highlightsPostId, 'highlights');
       }
 
       if (stickyOfflinePost) {
