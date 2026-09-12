@@ -16,7 +16,6 @@ import {
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, fetchWithTimeout, type UnifiedStreamInfo } from '../src/platforms.js';
 import { isRecoveryCandidate, withMarker, type RecoveryCandidate, type ManagedPostKind } from '../src/post-recovery.js';
-import { runHighlightsProbe } from './_probe.js'; // TEMP playtest experiment
 import {
   buildYouTubeUrl,
   buildKickUrl,
@@ -1483,27 +1482,7 @@ const runStatusCheckInner = async (): Promise<void> => {
     }
   });
   
-  // TEMP playtest experiment: fill both legacy sticky slots, probe highlights.
-  await runHighlightsProbe(subreddit.name).catch((e) => console.error('[probe] failed:', e));
-
-  // TEMP playtest experiment: pretend the stream is live so the whole go-live
-  // path runs against the filled slots. Fixed start so uptime advances.
-  const SIMULATED: UnifiedStreamInfo[] = subreddit.name.toLowerCase() === 'live_sticky_dev'
-    ? [{
-        isLive: true,
-        platform: 'twitch',
-        user_name: 'livestickydev',
-        title: 'Simulated stream for sticky slot testing',
-        game_name: 'Just Chatting',
-        viewer_count: 1234,
-        started_at: '2026-09-12T00:00:00Z',
-        thumbnail_url: '',
-        user_id: '123456',
-      }]
-    : [];
-  const effectiveStreams = SIMULATED.length ? SIMULATED : liveStreams;
-
-  const streamInfo = effectiveStreams[0] ?? null;
+  const streamInfo = liveStreams[0] ?? null;
   const isLive = streamInfo !== null;
 
   const isCurrentlyPinned = await redis.get('is_live_pinned');
