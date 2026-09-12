@@ -15,7 +15,8 @@ import {
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, fetchWithTimeout, type UnifiedStreamInfo } from '../src/platforms.js';
-import { isRecoveryCandidate, type RecoveryCandidate } from '../src/post-recovery.js';
+import { isRecoveryCandidate, withMarker, type RecoveryCandidate, type ManagedPostKind } from '../src/post-recovery.js';
+import { runHighlightsProbe } from './_probe.js'; // TEMP playtest experiment
 import {
   buildYouTubeUrl,
   buildKickUrl,
@@ -66,7 +67,7 @@ const findExistingSubredditPost = async (
   subredditName: string,
   queryKeyword: string | null,
   timeframe: 'day' | 'week' | 'month' | 'year' = 'month',
-  opts: { excludeIds?: (string | null | undefined)[]; notBefore?: Date } = {}
+  opts: { marker?: ManagedPostKind; excludeIds?: (string | null | undefined)[]; notBefore?: Date } = {}
 ): Promise<string | null> => {
   const appUser = await reddit.getAppUser().catch(() => null);
   if (!appUser) {
@@ -81,7 +82,13 @@ const findExistingSubredditPost = async (
   const isOurs = (p: { authorId?: string; authorName?: string }) =>
     p.authorId === appUser.id || p.authorName === appUser.username;
   const looksRight = (p: RecoveryCandidate) =>
-    isRecoveryCandidate(p, { keyword, subredditName, excludeIds: excluded, notBefore: opts.notBefore });
+    isRecoveryCandidate(p, {
+      marker: opts.marker,
+      keyword,
+      subredditName,
+      excludeIds: excluded,
+      notBefore: opts.notBefore,
+    });
 
   // 1. The app account's own recent posts. This reads the listing index, which
   // is current - unlike search, which lags by minutes and so cannot see a post
@@ -180,12 +187,15 @@ const ensureStickyOfflinePost = async (
     preloadedOfflineBody,
     preloadedOfflineFooter
   );
+  // The offline post is recycled and long-lived, so it carries its own marker.
+  const offlineBody = withMarker(concludingBody, 'offline');
   const templateTitle = preloadedOfflineTitle?.trim() || DEFAULT_OFFLINE_POST_TITLE;
   const offlinePostTitle = replaceTemplateVariables(templateTitle, vars, false);
   let offlinePostId = await redis.get('offline_post_id');
   if (!offlinePostId) {
     const subreddit = await reddit.getCurrentSubreddit();
     const recoveredId = await findExistingSubredditPost(subreddit.name, 'is offline', 'month', {
+      marker: 'offline',
       excludeIds: await Promise.all([
         redis.get('live_post_id'),
         redis.get('dashboard_post_id'),
@@ -218,7 +228,7 @@ const ensureStickyOfflinePost = async (
         console.error('Failed to fetch/remove comments:', commentFetchError);
       }
 
-      await offlinePost.edit({ text: concludingBody });
+      await offlinePost.edit({ text: offlineBody });
       await pinPostWithFallback(offlinePostId);
       console.log(`Successfully updated and stickied existing offline post: ${offlinePostId}`);
       offlinePostExists = true;
@@ -234,7 +244,7 @@ const ensureStickyOfflinePost = async (
       const offlinePost = await reddit.submitPost({
         title: safeTitle,
         subredditName: subreddit.name,
-        text: concludingBody,
+        text: offlineBody,
       });
       await pinPostWithFallback(offlinePost.id);
       await redis.set('offline_post_id', offlinePost.id);
@@ -697,10 +707,12 @@ const postStreamHighlights = async (
     const body = archiveUrl
       ? buildLatestClipsBody(latestEdition, activeVars, header, footer, archiveUrl)
       : buildHighlightsBody(editions, activeVars, header, footer, MAX_HIGHLIGHTS_EDITIONS);
+    const clipsBody = withMarker(body, 'clips');
 
     let existingPostId = reusePost ? await redis.get('highlights_post_id') : null;
     if (reusePost && !existingPostId) {
       const recoveredId = await findExistingSubredditPost(subreddit.name, 'Top Clips', 'year', {
+        marker: 'clips',
         excludeIds: await Promise.all([
           redis.get('live_post_id'),
           redis.get('dashboard_post_id'),
@@ -720,7 +732,7 @@ const postStreamHighlights = async (
     if (existingPostId) {
       try {
         const post = await reddit.getPostById(existingPostId as `t3_${string}`);
-        await post.edit({ text: body });
+        await post.edit({ text: clipsBody });
         postId = existingPostId as `t3_${string}`;
         console.log(`Updated reused highlights post: ${existingPostId}`);
       } catch (editErr) {
@@ -745,7 +757,7 @@ const postStreamHighlights = async (
       const created = await reddit.submitPost({
         title: safeTitle,
         subredditName: subreddit.name,
-        text: body,
+        text: clipsBody,
       });
       postId = created.id;
       console.log(`Created ${reusePost ? 'reused highlights post (initial)' : 'per-stream highlights post'}: ${postId}`);
@@ -966,7 +978,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     const monthlyPost = await reddit.submitPost({
       title: safeTitle,
       subredditName: subreddit.name,
-      text: body,
+      text: withMarker(body, 'monthly'),
     });
     console.log(`Created monthly highlights post for ${monthLabel}: ${monthlyPost.id}`);
     await redis.set('monthly_editions', JSON.stringify(monthlyEditions));
@@ -1471,7 +1483,27 @@ const runStatusCheckInner = async (): Promise<void> => {
     }
   });
   
-  const streamInfo = liveStreams[0] ?? null;
+  // TEMP playtest experiment: fill both legacy sticky slots, probe highlights.
+  await runHighlightsProbe(subreddit.name).catch((e) => console.error('[probe] failed:', e));
+
+  // TEMP playtest experiment: pretend the stream is live so the whole go-live
+  // path runs against the filled slots. Fixed start so uptime advances.
+  const SIMULATED: UnifiedStreamInfo[] = subreddit.name.toLowerCase() === 'live_sticky_dev'
+    ? [{
+        isLive: true,
+        platform: 'twitch',
+        user_name: 'livestickydev',
+        title: 'Simulated stream for sticky slot testing',
+        game_name: 'Just Chatting',
+        viewer_count: 1234,
+        started_at: '2026-09-12T00:00:00Z',
+        thumbnail_url: '',
+        user_id: '123456',
+      }]
+    : [];
+  const effectiveStreams = SIMULATED.length ? SIMULATED : liveStreams;
+
+  const streamInfo = effectiveStreams[0] ?? null;
   const isLive = streamInfo !== null;
 
   const isCurrentlyPinned = await redis.get('is_live_pinned');
@@ -1555,6 +1587,9 @@ const runStatusCheckInner = async (): Promise<void> => {
         livePostBody,
         livePostFooter
       );
+      // Stamped so recovery can identify this thread without relying on the
+      // mod-configurable title. The concluding edit rewrites the body without it.
+      const markedLiveBody = withMarker(postBody, 'live');
       const templateTitle = livePostTitle?.trim() || DEFAULT_LIVE_POST_TITLE;
       const postTitle = replaceTemplateVariables(templateTitle, currentVars, true);
 
@@ -1622,6 +1657,7 @@ const runStatusCheckInner = async (): Promise<void> => {
           const startedAt = streamInfo.started_at ? new Date(streamInfo.started_at) : null;
           const recoveredId = startedAt && !isNaN(startedAt.getTime())
             ? await findExistingSubredditPost(subreddit.name, null, 'day', {
+                marker: 'live',
                 notBefore: startedAt,
                 excludeIds: await Promise.all([
                   redis.get('dashboard_post_id'),
@@ -1642,7 +1678,7 @@ const runStatusCheckInner = async (): Promise<void> => {
           console.log(`[Self-Healing] Found active live post (${existingLivePostId}). Updating and re-pinning instead of recreating.`);
           try {
             const post = await reddit.getPostById(existingLivePostId as `t3_${string}`);
-            await post.edit({ text: postBody });
+            await post.edit({ text: markedLiveBody });
             await pinPostWithFallback(existingLivePostId);
             if (enableDynamicFlair) {
               await updateDynamicPostFlair(existingLivePostId, subreddit.name, streamInfo, liveFlairId);
@@ -1660,7 +1696,7 @@ const runStatusCheckInner = async (): Promise<void> => {
             const post = await reddit.submitPost({
               title: safeTitle,
               subredditName: subreddit.name,
-              text: postBody,
+              text: markedLiveBody,
             });
             await pinPostWithFallback(post.id);
 
@@ -1725,7 +1761,7 @@ const runStatusCheckInner = async (): Promise<void> => {
             
             if (cachedBody !== postBody) {
               const post = await reddit.getPostById(postId as `t3_${string}`);
-              await post.edit({ text: postBody });
+              await post.edit({ text: markedLiveBody });
               await redis.set(cachedBodyKey, postBody);
               console.log(`Successfully updated live post stats for: ${postId}`);
             } else {
