@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-317">
+                  <span class="changelog-ver">v1.1.317</span>
+                  <span class="changelog-sidebar-date">SEP 12, 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-316">
                   <span class="changelog-ver">v1.1.316</span>
                   <span class="changelog-sidebar-date">SEP 12, 2026</span>
@@ -155,6 +161,41 @@
           </button>
         </div>
 
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-317">v1.1.317</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">SEP 12, 2026</span>
+          </div>
+          <p><strong>You now get told when a post could not be pinned</strong></p>
+          <ul>
+            <li><strong>A modmail when both slots are full:</strong> If LiveSticky creates a post but both of your community's pinned slots are already taken, it now sends your mod team a message explaining what happened and what to do. Previously this failed silently and the only clue was a live thread sitting in new instead of at the top.</li>
+            <li><strong>It fixes itself once you free a slot:</strong> Unpin any post and LiveSticky claims the free slot within 2 minutes, with nothing else to do.</li>
+            <li><strong>Honest logs:</strong> LiveSticky used to report "posted and pinned" even when the post got no slot. It now says which of the two actually happened.</li>
+          </ul>
+          <p>To be clear about what was never at risk: the post is always created. Pinning has always been a separate, best-effort step, so a full slot has never meant a missing live thread.</p>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong>ModMail alert on pin failure</strong>: <code>alertPinFailure()</code> fires from the one place that knows the outcome, the post-sticky verification inside <code>pinPostWithFallback</code>, so it covers the live, offline, clips and dashboard posts alike. One shared cooldown key (<code>modmail_cooldown_pin</code>) means a subreddit with both slots taken gets one message rather than four. Uses the delivered/failed cooldown shape already used for settings problems: 24h after a successful send, 5 minutes after a failed one, so a transient ModMail outage is not silently muted for a day.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong><code>pinPostWithFallback</code> now reports its result</strong>: it returned <code>void</code> and swallowed its own failures, so the create path logged <code>Successfully posted and pinned</code> unconditionally - including when the post held no slot. It returns <code>Promise&lt;boolean&gt;</code> and the caller logs what actually happened. That false log line is part of why an unpinned live thread was hard to diagnose from the outside.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
         <article class="changelog-entry">
 
           <div class="changelog-head">

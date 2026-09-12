@@ -1011,7 +1011,43 @@ export const runMonthlyHighlights = async (): Promise<void> => {
  * So when both slots are taken, the pin fails and says so. The caller's job is
  * to not let that happen: the go-live path frees the highlights slot first.
  */
-const pinPostWithFallback = async (postId: string): Promise<void> => {
+const alertPinFailure = async (postId: string): Promise<void> => {
+  // Same delivered/failed cooldown shape as the settings-problem alert: a
+  // transient modmail outage retries in 5 minutes, a working send goes quiet
+  // for a day. One key for every managed post, so a subreddit with both slots
+  // taken gets one message, not four.
+  const cooldownKey = 'modmail_cooldown_pin';
+  if (await redis.get(cooldownKey)) return;
+
+  try {
+    const subreddit = await reddit.getCurrentSubreddit();
+    await reddit.modMail.createConversation({
+      subredditName: subreddit.name,
+      subject: '⚠️ LiveSticky could not pin a post',
+      body:
+        `Hello,\n\nLiveSticky created its post but could not pin it, because both of ` +
+        `r/${subreddit.name}'s pinned slots are already taken by other posts.\n\n` +
+        `The post itself is fine and is visible in new - it just is not stuck to the ` +
+        `top of the feed: https://reddit.com/${postId.replace('t3_', 'comments/')}\n\n` +
+        `**What to do:** unpin one post in your community, and LiveSticky will claim ` +
+        `the free slot within 2 minutes on its own. No further action needed.\n\n` +
+        `A subreddit has exactly two pinned slots and apps cannot use more, so ` +
+        `LiveSticky needs one of them free while the stream is live.\n\n` +
+        `*(This alert is rate-limited to once per 24 hours.)*`,
+      isAuthorHidden: true,
+    });
+    await redis.set(cooldownKey, 'true');
+    await redis.expire(cooldownKey, 86400);
+    console.log('[pin] Sent ModMail alert about the unavailable sticky slot.');
+  } catch (err) {
+    await redis.set(cooldownKey, 'true');
+    await redis.expire(cooldownKey, 300);
+    console.error('[pin] Failed to send ModMail alert about pinning:', err);
+  }
+};
+
+/** Resolves true when the post actually holds a sticky slot afterwards. */
+const pinPostWithFallback = async (postId: string): Promise<boolean> => {
   const t3Id = postId as `t3_${string}`;
 
   // Try the default slot, then force slot 2 if the first is taken (400 Bad Request).
@@ -1031,14 +1067,19 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
     const refreshed = await reddit.getPostById(t3Id);
     if (refreshed.stickied) {
       console.log(`[pin] Post ${postId} is stickied.`);
-    } else {
-      console.warn(
-        `[pin] WARNING: Post ${postId} got no sticky slot. Both are taken by other ` +
-          `posts - check the subreddit's pinned posts or the app's mod permissions.`
-      );
+      return true;
     }
+    console.warn(
+      `[pin] WARNING: Post ${postId} got no sticky slot. Both are taken by other ` +
+        `posts - the post exists and is visible in new, just not pinned.`
+    );
+    // Mods cannot read these logs, and on a subreddit the developer does not
+    // moderate neither can he. Tell them where it will actually be seen.
+    await alertPinFailure(postId);
+    return false;
   } catch (fetchErr) {
     console.warn(`[pin] Could not re-fetch post ${postId} to check stickied flag:`, fetchErr);
+    return false;
   }
 };
 
@@ -1636,7 +1677,7 @@ const runStatusCheckInner = async (): Promise<void> => {
               subredditName: subreddit.name,
               text: markedLiveBody,
             });
-            await pinPostWithFallback(post.id);
+            const pinned = await pinPostWithFallback(post.id);
 
             if (suggestedSort && suggestedSort !== 'BLANK') {
               try {
@@ -1676,7 +1717,11 @@ const runStatusCheckInner = async (): Promise<void> => {
             }
 
             await redis.set('live_post_id', post.id);
-            console.log(`Successfully posted and pinned: ${post.id}`);
+            console.log(
+              pinned
+                ? `Successfully posted and pinned: ${post.id}`
+                : `Posted ${post.id}, but no sticky slot was free - it is live in new, unpinned.`
+            );
           } catch (e: any) {
             console.error('Failed to post stream status to Reddit:', e);
             if (e && e.message && e.message.includes('400')) {
