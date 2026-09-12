@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-315">
+                  <span class="changelog-ver">v1.1.315</span>
+                  <span class="changelog-sidebar-date">SEP 12, 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-314">
                   <span class="changelog-ver">v1.1.314</span>
                   <span class="changelog-sidebar-date">SEP 11, 2026</span>
@@ -149,6 +155,42 @@
           </button>
         </div>
 
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-315">v1.1.315</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">SEP 12, 2026</span>
+          </div>
+          <p><strong>The live thread now gets a pinned slot, and LiveSticky reliably knows its own posts</strong></p>
+          <ul>
+            <li><strong>Your live thread gets pinned, even in a busy community:</strong> A subreddit has only two pinned slots. The Top Clips post used to claim one when a stream ended and never give it back, so with one of your own threads in the other slot, the live thread had nowhere to go and was quietly left unpinned. The clips post now releases its slot when the stream starts and takes it back when the stream ends.</li>
+            <li><strong>Rename your posts freely:</strong> LiveSticky now recognises its own posts by an invisible tag in the post body instead of by words in the title. Custom titles for your live thread, offline post and clips post are fully supported, and renaming one can no longer confuse the bot.</li>
+            <li><strong>No more mixing up posts:</strong> The live thread, offline post, Top Clips post and monthly Top 20 post can never be mistaken for one another, so none of them can be edited or pinned in another's place. This closes the last route to the problem fixed in v1.1.314.</li>
+            <li><strong>Clearer pinning:</strong> When both slots really are occupied by other posts, LiveSticky now says so plainly in its logs instead of failing quietly.</li>
+          </ul>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong>Sticky slot released at go-live</strong>: with <code>stickyHighlightsPost</code> enabled, <code>postStreamHighlights</code> claimed a legacy slot at stream end and nothing ever released it, so it held one of two slots across every following stream. The LIVE branch now unstickies <code>highlights_post_id</code> alongside the existing <code>offline_post_id</code> unsticky, before the live post calls <code>pinPostWithFallback</code>.</li>
+                <li><strong>Recovery identifies posts by marker, not by id list</strong>: <code>findExistingSubredditPost</code> matched a hardcoded title keyword and excluded a list of known post ids. Neither is sound - <code>livePostTitle</code> is a mod setting, and the monthly top-20 post's id is never written to Redis so no exclude list can reach it. Every managed body now carries an empty-label link marker (<code>[](#ls-live)</code>, <code>[](#ls-offline)</code>, <code>[](#ls-clips)</code>, <code>[](#ls-monthly)</code>), stamped at the four body-build sites. The live lookup matches the marker alone; the recycled offline and clips lookups accept marker OR legacy title keyword so posts from older versions keep working until an edit stamps them. Verified on r/live_sticky_dev that Reddit preserves the marker across both submit and edit round-trips.</li>
+              </ul>
+              <h3>Removed</h3>
+              <ul>
+                <li><strong>Community Highlights fallback</strong>: <code>pinPostWithFallback</code> called <code>AddPostToHighlights</code> when no legacy slot was available. Measured directly on the Devvit runtime, both that method and <code>GetIsPostHighlighted</code> return <code>12 UNIMPLEMENTED</code>, and the branch had never executed in production logs. Removed along with the <code>LinksAndCommentsDefinition</code> plugin handle and the <code>HighlightedPostLabel</code> import. <code>verifyAndRepinIfNeeded</code> simplifies to a stickied check. Apps get the two legacy slots; highlights slots 3-6 are not addressable, and <code>Post.sticky()</code> positions 3 and 4 are profile pins.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
         <article class="changelog-entry">
 
           <div class="changelog-head">

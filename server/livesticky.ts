@@ -8,12 +8,6 @@
  * to render.
  */
 import { reddit, redis, settings, realtime, media } from '@devvit/web/server';
-import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
-import {
-  LinksAndCommentsDefinition,
-  type LinksAndComments,
-} from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
-import { HighlightedPostLabel } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { checkAllStreamStatuses, getOrRefreshTwitchToken, refreshChannelImages, fetchWithTimeout, type UnifiedStreamInfo } from '../src/platforms.js';
 import { isRecoveryCandidate, withMarker, type RecoveryCandidate, type ManagedPostKind } from '../src/post-recovery.js';
 import {
@@ -1006,21 +1000,21 @@ export const runMonthlyHighlights = async (): Promise<void> => {
 // ---------------------------------------------------------------------------
 
 /**
- * Pins a post using Reddit's legacy sticky system and, if that slot is already
- * taken (both slots full → post gets no `stickied=true` flag), explicitly adds
- * the post to Community Highlights so it is visible in the official Reddit app
- * even when third-party clients miss it.
+ * Pins a post using Reddit's legacy sticky system.
  *
- * Reddit's sticky system caps at 2 legacy slots; Community Highlights supports
- * up to 6 slots. Legacy stickies auto-sync into Highlights slots 1-2, but
- * Highlights-only slots 3-6 do NOT set `stickied=true` - that's why third-
- * party clients that only read the `stickied` boolean may see nothing.
+ * There are exactly two slots, and an app cannot reach past them. Community
+ * Highlights slots 3-6 are not addressable: AddPostToHighlights and
+ * GetIsPostHighlighted both answer `12 UNIMPLEMENTED` on the Devvit runtime,
+ * measured directly on r/live_sticky_dev. The fallback that used to sit here
+ * had never executed once in production. See the release notes for v1.1.315.
+ *
+ * So when both slots are taken, the pin fails and says so. The caller's job is
+ * to not let that happen: the go-live path frees the highlights slot first.
  */
 const pinPostWithFallback = async (postId: string): Promise<void> => {
-  const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
   const t3Id = postId as `t3_${string}`;
 
-  // 1. Try legacy sticky first (default slot). If both slots full (400 Bad Request), attempt forcing slot 2.
+  // Try the default slot, then force slot 2 if the first is taken (400 Bad Request).
   try {
     const post = await reddit.getPostById(t3Id);
     await post.sticky();
@@ -1033,71 +1027,26 @@ const pinPostWithFallback = async (postId: string): Promise<void> => {
     }
   }
 
-  // 2. Re-fetch to see if the legacy slot was actually granted.
-  let isLegacyStickied = false;
   try {
     const refreshed = await reddit.getPostById(t3Id);
-    isLegacyStickied = refreshed.stickied;
-  } catch (fetchErr) {
-    console.warn(`[pin] Could not re-fetch post ${postId} to check stickied flag:`, fetchErr);
-  }
-
-  if (isLegacyStickied) {
-    console.log(`[pin] Post ${postId} is legacy-stickied (third-party clients will see it).`);
-    return;
-  }
-
-  // 3. Legacy slot was not granted - attempt Community Highlights if available.
-  console.log(
-    `[pin] Post ${postId} did not get a legacy sticky slot. ` +
-      `Attempting Community Highlights as ANNOUNCEMENT.`
-  );
-  try {
-    await linksAndComments.AddPostToHighlights({
-      postId,
-      label: HighlightedPostLabel.ANNOUNCEMENT,
-    });
-  } catch (hlErr: any) {
-    const isUnimplemented = hlErr?.code === 12 || String(hlErr?.message || '').includes('UNIMPLEMENTED');
-    if (isUnimplemented) {
-      console.log(`[pin] Note: AddPostToHighlights is not implemented by current Devvit server runtime.`);
-    } else {
-      console.error(`[pin] AddPostToHighlights failed for ${postId}:`, hlErr);
-    }
-    console.warn(
-      `[pin] WARNING: Post ${postId} could not be pinned via legacy sticky OR Community Highlights. ` +
-        `Check existing stickied posts or mod permissions.`
-    );
-    return;
-  }
-
-  // 4. Verify the highlights add actually landed.
-  try {
-    const { isHighlighted } = await linksAndComments.GetIsPostHighlighted({ postId });
-    if (isHighlighted) {
-      console.log(`[pin] Confirmed: post ${postId} is in Community Highlights.`);
+    if (refreshed.stickied) {
+      console.log(`[pin] Post ${postId} is stickied.`);
     } else {
       console.warn(
-        `[pin] WARNING: AddPostToHighlights returned success but GetIsPostHighlighted ` +
-          `reports post ${postId} is NOT highlighted. Investigate mod permissions.`
+        `[pin] WARNING: Post ${postId} got no sticky slot. Both are taken by other ` +
+          `posts - check the subreddit's pinned posts or the app's mod permissions.`
       );
     }
-  } catch (verifyErr) {
-    console.warn(`[pin] Could not verify highlight status for ${postId}:`, verifyErr);
+  } catch (fetchErr) {
+    console.warn(`[pin] Could not re-fetch post ${postId} to check stickied flag:`, fetchErr);
   }
 };
 
 /**
- * Verifies that a previously pinned post is still visible (legacy stickied or
- * in Community Highlights). If neither is true, re-pins via pinPostWithFallback.
- * Called from the 2-minute cron to catch slots that slipped.
+ * Re-pins a post that has lost its sticky slot. Called from the 2-minute cron.
  */
 export const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<void> => {
-  const linksAndComments = getDevvitConfig().use<LinksAndComments>(LinksAndCommentsDefinition);
-
   let isStickied = false;
-  let isHighlighted = false;
-
   try {
     const post = await reddit.getPostById(postId as `t3_${string}`);
     isStickied = post.stickied;
@@ -1107,18 +1056,7 @@ export const verifyAndRepinIfNeeded = async (postId: string, label: string): Pro
   }
 
   if (!isStickied) {
-    try {
-      const result = await linksAndComments.GetIsPostHighlighted({ postId });
-      isHighlighted = result.isHighlighted;
-    } catch (err) {
-      console.warn(`[verify] GetIsPostHighlighted failed for ${label} post ${postId}:`, err);
-    }
-  }
-
-  if (!isStickied && !isHighlighted) {
-    console.warn(
-      `[verify] ${label} post ${postId} is neither legacy-stickied nor in Community Highlights - re-pinning.`
-    );
+    console.warn(`[verify] ${label} post ${postId} lost its sticky slot - re-pinning.`);
     await pinPostWithFallback(postId);
   }
 };
@@ -1623,6 +1561,27 @@ const runStatusCheckInner = async (): Promise<void> => {
             console.log(`Successfully unstickied offline post: ${offlinePostId}`);
           } catch (unstickyError) {
             console.error('Failed to unsticky offline post:', unstickyError);
+          }
+        }
+      }
+
+      // A subreddit has two sticky slots and an app cannot reach past them. The
+      // Top Clips post claims one when a stream ends and never gave it back, so
+      // across streams it held half the capacity permanently - and with a mod
+      // thread in the other slot, the live thread had nowhere to go and was
+      // silently left unpinned. Release it here; postStreamHighlights re-pins it
+      // when the stream ends and the slot is free again.
+      if (stickyHighlightsPost) {
+        const highlightsPostId = await redis.get('highlights_post_id');
+        if (highlightsPostId) {
+          try {
+            const highlightsPost = await reddit.getPostById(highlightsPostId as `t3_${string}`);
+            if (highlightsPost.stickied) {
+              await highlightsPost.unsticky();
+              console.log(`Freed sticky slot held by highlights post: ${highlightsPostId}`);
+            }
+          } catch (unstickyError) {
+            console.error('Failed to unsticky highlights post:', unstickyError);
           }
         }
       }
