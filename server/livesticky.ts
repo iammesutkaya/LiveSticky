@@ -1006,7 +1006,7 @@ export const runMonthlyHighlights = async (): Promise<void> => {
  * Highlights slots 3-6 are not addressable: AddPostToHighlights and
  * GetIsPostHighlighted both answer `12 UNIMPLEMENTED` on the Devvit runtime,
  * measured directly on r/live_sticky_dev. The fallback that used to sit here
- * had never executed once in production. See the release notes for v1.1.315.
+ * had never executed once in production. See the release notes for v1.1.316.
  *
  * So when both slots are taken, the pin fails and says so. The caller's job is
  * to not let that happen: the go-live path frees the highlights slot first.
