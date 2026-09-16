@@ -164,6 +164,50 @@
         <article class="changelog-entry">
 
           <div class="changelog-head">
+            <h2 id="v1-1-318">v1.1.318</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">SEP 16, 2026</span>
+          </div>
+          <p><strong>The monthly top-20 post now actually arrives, and clip lists past number 10 look right</strong></p>
+          <ul>
+            <li><strong>The monthly clips post no longer depends on luck:</strong> It only ever went out if the streamer happened to be live at the exact scheduled hour. Two communities with identical settings could get different results, which is exactly what happened last month. It now runs whether the stream is on or off.</li>
+            <li><strong>A missed hour no longer costs the whole month:</strong> The post used to need one exact hour to line up. If that hour was missed for any reason, the month was simply skipped with no retry. It now still goes out for up to two days after the scheduled time.</li>
+            <li><strong>"End of month" scheduling works:</strong> A post scheduled for the last day of the month could previously fall through the gap at midnight. It now catches up into the next day and still counts as that month's post.</li>
+            <li><strong>Clip lists are readable past clip 10:</strong> In the top-20 post and in any highlights post with ten or more clips, everything after the tenth restarted its numbering at 1 and its view counts broke out of the list. Reported by a moderator of r/vargskelethor.</li>
+            <li><strong>First-run help in the dashboard:</strong> A freshly installed dashboard used to show a generic "is offline" card. It now shows what to set up and links to the setup guide.</li>
+            <li><strong>Settings are easier to read:</strong> The settings page is split into 16 labelled sections instead of 6, and the repeated icons on every field are gone.</li>
+          </ul>
+          <p>Nothing needs to be reconfigured. A community that has not streamed since updating will get its monthly post from the stream after next, once the channel is seen live one more time.</p>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><strong><code>src/schedule.ts</code></strong>: pure slot resolution for the monthly job - <code>parseMonthlyDayRule</code>, <code>resolveMonthlySlot</code>, <code>shouldFireMonthly</code> and <code>monthCoveredBySlot</code>, with no Devvit imports so the cases that matter (a missed tick, an END slot crossing midnight, a fresh mid-month install) are unit-testable.</li>
+                <li><strong>Unconfigured dashboard state</strong>: <code>isUnconfigured()</code> reads the empty <code>/api/config</code> URLs, guarded by a <code>configLoaded</code> flag so a failed fetch is not mistaken for a fresh install. Preview it with <code>?mock=setup</code>.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li><strong><code>twitch_broadcaster_id</code> is no longer session state</strong>: it was written on go-live and deleted again on go-offline, and <code>runMonthlyHighlights</code> returned early without it, so the monthly post required the stream to be live at the scheduled hour. It is now cached durably, stamped with the channel it belongs to, refreshed on every live tick, and removed from both the offline cleanup and the 7-day GC list. Reads and writes go through <code>getBroadcasterId</code> / <code>rememberBroadcasterId</code>, which also fixes the same dependency in the stream-end highlights path.</li>
+                <li><strong>Exact-hour slot matching replaced with a 48h window</strong>: <code>localDay !== configuredDay || localHour !== configuredHour</code> against an hourly cron meant one missed tick lost the month. The upper bound stops a mid-month install from immediately posting the previous month.</li>
+                <li><strong>Schedule anchored to the slot, not to <code>now</code></strong>: the dedupe key and the compiled month both derive from the resolved slot, so an END slot firing on the 1st claims its own month's key rather than the next one's, and compiles the same month it would have on time.</li>
+                <li><strong><code>renderClipList</code> indent tracks the marker width</strong>: sub-bullets used a fixed three-space indent, which clears <code>1. </code> but not <code>10. </code>. The bullets fell outside the list item, terminating the list, so every later clip opened a fresh one that Reddit renumbered from 1.</li>
+                <li><strong>Table section rows on the docs site</strong>: <code>docs/main.js</code> labelled every cell from the column headers, printing a stray "Setting Name" above each section title in the mobile card layout.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
+
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
             <h2 id="v1-1-317">v1.1.317</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">SEP 12, 2026</span>
