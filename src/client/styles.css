@@ -1011,6 +1011,119 @@ body {
 }
 
 /* ==========================================================================
+   Setup state (no channel configured)
+   ========================================================================== */
+
+/* Nothing real to put in the header yet - the name would read "Streamer" and
+   the pill "OFFLINE", both noise. Give the card the whole surface instead. */
+.dashboard.is-unconfigured .app-header,
+.dashboard.is-unconfigured .platform-links {
+  display: none;
+}
+
+.setup-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.setup-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg-card);
+  /* Concentric with the 16px padding: inner controls use --radius-sm. */
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.setup-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-text);
+}
+
+.setup-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: setup-step;
+  text-align: left;
+  max-width: 280px;
+}
+
+.setup-steps li {
+  counter-increment: setup-step;
+  position: relative;
+  padding-left: 24px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.setup-steps li::before {
+  content: counter(setup-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-dim);
+  color: var(--gold-text);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Optical: seats the numeral against the 1.45 line-height of the text. */
+  margin-top: 1px;
+}
+
+.setup-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-gold);
+  color: #111111;                 /* dark content on the gold fill, as elsewhere */
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.setup-guide:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.setup-guide:focus-visible {
+  outline: 2px solid var(--gold-border);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
    Platform links (offline only) - neutral cards with brand logos
    ========================================================================== */
 

@@ -110,6 +110,32 @@
           </div>
         </div>
 
+        <!-- Setup state: shown when no channel is configured yet, so the first
+             thing a mod sees after install is what to do next, not a dead
+             "Streamer is offline" card. -->
+        <div id="setup-content" class="setup-content hidden">
+          <div class="setup-card">
+            <div class="setup-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 21v-7"/><path d="M4 10V3"/>
+                <path d="M12 21v-9"/><path d="M12 8V3"/>
+                <path d="M20 21v-5"/><path d="M20 12V3"/>
+                <path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>
+              </svg>
+            </div>
+            <h2 class="setup-title">Not set up yet</h2>
+            <ol class="setup-steps">
+              <li>Open Mod Tools, then Apps, then LiveSticky.</li>
+              <li>Add a channel name and its API credentials.</li>
+              <li>Go live. The thread pins itself.</li>
+            </ol>
+            <a id="setup-guide-link" class="setup-guide" href="https://livesticky.com/setup.html" target="_blank" rel="noopener noreferrer">
+              <span>Setup guide</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+            </a>
+          </div>
+        </div>
+
         <!-- Platform links - external streaming destinations, shown only when offline -->
         <nav id="platform-links" class="platform-links" aria-label="Stream platform links">
           <a id="twitch-link" href="#" target="_blank" rel="noopener noreferrer" class="platform-btn twitch hidden" aria-label="Watch on Twitch">

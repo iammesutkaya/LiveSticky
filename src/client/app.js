@@ -73,6 +73,7 @@ const displayNameEl = $('display-name');
 const headerSubEl = $('header-sub');
 const liveContent = $('live-content');
 const offlineContent = $('offline-content');
+const setupContent = $('setup-content');
 const platformListEl = $('platform-list');
 const refreshBtn = $('refresh-btn');
 const offlineNameEl = $('offline-name');
@@ -106,6 +107,11 @@ let config = {
   youtubeUrl: null,
   kickUrl: null,
 };
+
+// Only true once /api/config has actually answered. An empty `config` means
+// "no channel configured" only when the fetch succeeded - a failed fetch
+// leaves it empty too, and must not be mistaken for a fresh install.
+let configLoaded = false;
 
 // Reddit discussion post URL for the live-thread row.
 let redditThreadUrl = null;
@@ -301,6 +307,7 @@ async function fetchConfig() {
     const res = await fetch('/api/config');
     if (res.ok) {
       config = await res.json();
+      configLoaded = true;
       updatePlatformLinks();
     }
   } catch (err) {
@@ -796,6 +803,32 @@ function updateRedditThread(data) {
 // Main dashboard update
 // ---------------------------------------------------------------------------
 
+/**
+ * True when the app is installed but no channel name has been entered in
+ * settings yet. syncDashboardConfig mirrors the raw setting values, so empty
+ * URLs mean "nothing filled in", not "credentials rejected".
+ */
+function isUnconfigured() {
+  if (!setupContent) return false;
+  if (isMockMode) return mockMode === 'setup';   // ?mock=setup previews this view
+  if (!configLoaded) return false;
+  return !config.twitchUrl && !config.youtubeUrl && !config.kickUrl;
+}
+
+/** First-run view: what the mod has to do, instead of a dead offline card. */
+function renderSetupState() {
+  dashboard.classList.remove('is-live');
+  dashboard.classList.add('is-unconfigured');
+  liveContent.classList.add('hidden');
+  offlineContent.classList.add('hidden');
+  if (redditThreadEl) redditThreadEl.classList.add('hidden');
+  setupContent.classList.remove('hidden');
+
+  loadingEl.classList.add('hidden');
+  errorEl.classList.add('hidden');
+  contentEl.classList.remove('hidden');
+}
+
 function updateDashboard(data) {
   const isNowLive = data.isLive;
   currentState = { ...currentState, ...data };
@@ -803,6 +836,14 @@ function updateDashboard(data) {
   lastFetchTime = new Date();
   updateTimestampDisplay();
   setUpdateMode('healthy');
+
+  if (isUnconfigured()) {
+    renderSetupState();
+    return;
+  }
+
+  dashboard.classList.remove('is-unconfigured');
+  setupContent?.classList.add('hidden');
 
   // Header: name + avatar
   const displayName = data.displayName || 'Streamer';
@@ -1114,6 +1155,14 @@ async function init() {
     linkAuthor.addEventListener('click', (e) => {
       e.preventDefault();
       safeNavigateTo('https://www.reddit.com/user/iammesutkaya');
+    });
+  }
+
+  const setupGuideLink = $('setup-guide-link');
+  if (setupGuideLink) {
+    setupGuideLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      safeNavigateTo('https://livesticky.com/setup.html');
     });
   }
 }
