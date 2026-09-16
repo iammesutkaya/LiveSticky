@@ -271,15 +271,25 @@ export interface HighlightsEdition {
   clips: ClipInfo[];
 }
 
-/** Render a numbered markdown list from clips (no header/footer). */
+/**
+ * Render a numbered markdown list from clips (no header/footer).
+ *
+ * The sub-bullets must be indented past the list marker, and the marker grows
+ * with the number: "1. " is three columns but "10. " is four. A fixed three-space
+ * indent therefore broke every clip from the tenth on - the bullets escaped the
+ * item, which ended the list, so each later clip started a fresh one and Reddit
+ * renumbered it back to 1.
+ */
 export const renderClipList = (clips: ClipInfo[]): string =>
   clips
-    .map(
-      (c, i) =>
+    .map((c, i) => {
+      const indent = ' '.repeat(String(i + 1).length + 2);
+      return (
         `${i + 1}. **[${escapeMarkdownBrackets(c.title) || 'Untitled Clip'}](${c.url})**\n` +
-        `   * **Views:** ${(c.views || 0).toLocaleString()}\n` +
-        `   * **Clipped by:** ${escapeMarkdownBrackets(c.creator) || 'Anonymous'}`
-    )
+        `${indent}* **Views:** ${(c.views || 0).toLocaleString()}\n` +
+        `${indent}* **Clipped by:** ${escapeMarkdownBrackets(c.creator) || 'Anonymous'}`
+      );
+    })
     .join('\n\n');
 
 /**

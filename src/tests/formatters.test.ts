@@ -13,8 +13,10 @@ import {
   buildLatestClipsBody,
   buildWikiArchive,
   buildSingleClipsBody,
+  renderClipList,
   type TemplateVariables,
   type HighlightsEdition,
+  type ClipInfo,
 } from '../formatters.js';
 
 const mockVars: TemplateVariables = {
@@ -202,6 +204,34 @@ describe('replaceTemplateVariables - monthly var', () => {
   it('replaces {month} for monthly posts', () => {
     const result = replaceTemplateVariables('Top clips of {month}', { monthLabel: 'August 2026' }, false);
     expect(result).toBe('Top clips of August 2026');
+  });
+});
+
+describe('renderClipList - sub-bullet indent tracks the marker width', () => {
+  const mkClips = (n: number): ClipInfo[] =>
+    Array.from({ length: n }, (_, i) => ({
+      title: `Clip ${i + 1}`,
+      url: `https://clips.twitch.tv/${i + 1}`,
+      views: i + 1,
+      creator: `user${i + 1}`,
+    }));
+
+  it('indents every clip past its own marker, single and double digit alike', () => {
+    const lines = renderClipList(mkClips(20)).split('\n');
+    for (const line of lines) {
+      const marker = line.match(/^(\d+)\. /);
+      if (!marker) continue;
+      const n = marker[1] as string;
+      const views = lines[lines.indexOf(line) + 1] as string;
+      expect(views.startsWith(`${' '.repeat(n.length + 2)}* **Views:**`)).toBe(true);
+    }
+  });
+
+  it('gives the tenth clip a four-space indent, not three', () => {
+    const body = renderClipList(mkClips(10));
+    expect(body).toContain('10. **[Clip 10]');
+    expect(body).toContain('\n    * **Views:** 10');
+    expect(body).not.toContain('\n   * **Views:** 10');
   });
 });
 
