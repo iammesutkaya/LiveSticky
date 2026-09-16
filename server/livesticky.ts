@@ -44,7 +44,12 @@ import {
   settingText,
   type SettingProblem,
 } from '../src/settings-validation.js';
-import { shouldFireMonthly } from '../src/schedule.js';
+import {
+  resolveMonthlySlot,
+  shouldFireMonthly,
+  monthCoveredBySlot,
+  parseMonthlyDayRule,
+} from '../src/schedule.js';
 
 const get = <T = string>(name: string) => settings.get<T>(name);
 
@@ -866,7 +871,6 @@ export const runMonthlyHighlights = async (): Promise<void> => {
   let localMonth = now.getUTCMonth() + 1; // 1-indexed (1-12)
   let localDay = now.getUTCDate();
   let localHour = now.getUTCHours();
-  let firedKey = `${localYear}-${localMonth}`;
   try {
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone: tz,
@@ -881,24 +885,8 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     localMonth = Number(part('month'));
     localDay = Number(part('day'));
     localHour = Number(part('hour'));
-    firedKey = `${localYear}-${localMonth}`;
   } catch {
     console.warn(`Invalid streamer timezone "${tz}", using UTC for monthly schedule.`);
-  }
-
-  // Determine configured target day of the month
-  let configuredDay = 1;
-  const dayStr = String(dayRaw ?? 'START').toUpperCase().trim();
-  if (dayStr === 'END' || dayStr === 'LAST') {
-    // Dynamic last day of current month in local timezone (28, 29, 30, or 31)
-    configuredDay = new Date(localYear, localMonth, 0).getDate();
-  } else if (dayStr === 'MIDDLE') {
-    configuredDay = 15;
-  } else if (dayStr === 'START') {
-    configuredDay = 1;
-  } else {
-    const numDay = parseInt(dayStr, 10);
-    configuredDay = Number.isFinite(numDay) ? Math.min(Math.max(numDay, 1), 31) : 1;
   }
 
   // Determine configured target hour (from 24h time string like "13:30" or legacy hour number)
@@ -918,14 +906,22 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     }
   }
 
-  // Fire at the slot, or within a short window after it, so one missed hourly
-  // tick no longer costs the whole month. The per-month dedupe key below still
-  // guarantees a single post. ponytail: the window is same-month only, so an
-  // END (last day of month) slot missed past midnight rolls into a new month
-  // and is skipped; widen this if END turns out to be commonly configured.
-  if (!shouldFireMonthly(localDay, localHour, configuredDay, configuredHour, MONTHLY_CATCHUP_HOURS)) {
+  // Fire at the most recent slot, or within a short window after it, so one
+  // missed hourly tick no longer costs the whole month. Both the dedupe key and
+  // the month compiled come from the slot, so a last-day-of-month slot that
+  // catches up after midnight still belongs to the month it was scheduled in.
+  const slot = resolveMonthlySlot(
+    parseMonthlyDayRule(dayRaw),
+    configuredHour,
+    localYear,
+    localMonth,
+    localDay,
+    localHour
+  );
+  if (!shouldFireMonthly(slot, MONTHLY_CATCHUP_HOURS)) {
     return; // Before the slot, or too long after it to still be a catch-up.
   }
+  const firedKey = `${slot.year}-${slot.month}`;
 
   const lastPosted = await redis.get('monthly_last_posted');
   if (lastPosted === firedKey) {
@@ -949,9 +945,10 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     return;
   }
 
-  // Previous calendar month: [first day of last month, first day of this month).
-  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
-  const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  // The complete calendar month before the slot: [first day, first day of next).
+  const covered = monthCoveredBySlot(slot);
+  const monthStart = new Date(Date.UTC(covered.year, covered.month - 1, 1));
+  const monthEnd = new Date(Date.UTC(covered.year, covered.month, 1));
   const monthLabel = monthStart.toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
