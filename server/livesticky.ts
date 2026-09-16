@@ -44,6 +44,7 @@ import {
   settingText,
   type SettingProblem,
 } from '../src/settings-validation.js';
+import { shouldFireMonthly } from '../src/schedule.js';
 
 const get = <T = string>(name: string) => settings.get<T>(name);
 
@@ -781,6 +782,63 @@ const postStreamHighlights = async (
 };
 
 /**
+ * How long after the configured slot the monthly job may still fire. The cron
+ * ticks hourly and the slot used to be matched by exact equality, so a single
+ * missed or delayed tick cost the whole month. The window is short enough that
+ * installing mid-month does not immediately dump last month's compilation.
+ */
+const MONTHLY_CATCHUP_HOURS = 48;
+
+/**
+ * A Twitch broadcaster id never changes for a channel, so it is cached durably
+ * and stamped with the channel it was resolved for. It used to be written on
+ * go-live and deleted again on go-offline, which left the monthly top-20 job
+ * able to run only while the streamer happened to be live at the scheduled
+ * hour - the reason one community got its post and an identically configured
+ * one did not.
+ */
+const rememberBroadcasterId = async (channel: unknown, userId: string): Promise<void> => {
+  const stamp = settingText(channel).toLowerCase();
+  if (!stamp || !userId) return;
+  const [storedId, storedChannel] = await Promise.all([
+    redis.get('twitch_broadcaster_id'),
+    redis.get('twitch_broadcaster_channel'),
+  ]);
+  if (storedId === userId && storedChannel === stamp) return;
+  await Promise.all([
+    redis.set('twitch_broadcaster_id', userId),
+    redis.set('twitch_broadcaster_channel', stamp),
+  ]);
+};
+
+/**
+ * The cached broadcaster id, but only when it still belongs to the channel the
+ * mod has configured. A mod who repoints the app at another channel must not
+ * get the previous streamer's clips.
+ */
+const getBroadcasterId = async (): Promise<string | null> => {
+  const [id, storedChannel, configured] = await Promise.all([
+    redis.get('twitch_broadcaster_id'),
+    redis.get('twitch_broadcaster_channel'),
+    get('twitchChannel'),
+  ]);
+  if (!id) return null;
+  const want = settingText(configured).toLowerCase();
+  if (!want) return null;
+  // No stamp means the id predates this cache and was written by the old
+  // live-only path; it is still this channel's, and the next live tick stamps it.
+  if (storedChannel && storedChannel !== want) {
+    await Promise.all([
+      redis.del('twitch_broadcaster_id'),
+      redis.del('twitch_broadcaster_channel'),
+    ]);
+    console.log(`Twitch channel changed to "${want}". Dropped the cached broadcaster id.`);
+    return null;
+  }
+  return id;
+};
+
+/**
  * Posts a "Top 20 clips of the month" compilation. Fired by the monthly
  * scheduler cron on the 1st, covering the previous calendar month. Independent
  * of the per-stream highlights post; not stickied (it's an archive).
@@ -860,8 +918,13 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     }
   }
 
-  if (localDay !== configuredDay || localHour !== configuredHour) {
-    return; // Not the scheduled slot this hour.
+  // Fire at the slot, or within a short window after it, so one missed hourly
+  // tick no longer costs the whole month. The per-month dedupe key below still
+  // guarantees a single post. ponytail: the window is same-month only, so an
+  // END (last day of month) slot missed past midnight rolls into a new month
+  // and is skipped; widen this if END turns out to be commonly configured.
+  if (!shouldFireMonthly(localDay, localHour, configuredDay, configuredHour, MONTHLY_CATCHUP_HOURS)) {
+    return; // Before the slot, or too long after it to still be a catch-up.
   }
 
   const lastPosted = await redis.get('monthly_last_posted');
@@ -870,9 +933,9 @@ export const runMonthlyHighlights = async (): Promise<void> => {
     return;
   }
 
-  const broadcasterId = await redis.get('twitch_broadcaster_id');
+  const broadcasterId = await getBroadcasterId();
   if (!broadcasterId) {
-    console.log('No Twitch broadcaster ID stored yet. Skipping monthly highlights.');
+    console.log('No Twitch broadcaster ID cached yet. Skipping monthly highlights until the next stream.');
     return;
   }
 
@@ -1540,6 +1603,14 @@ const runStatusCheckInner = async (): Promise<void> => {
   switch (currentState) {
     case StreamState.LIVE: {
       if (!streamInfo) break;
+
+      // Cache the broadcaster id on every live tick, not just the go-live
+      // transition, so an install that is already live when this ships picks it
+      // up on the next check rather than waiting for the stream after next.
+      if (streamInfo.platform === 'twitch' && streamInfo.user_id) {
+        await rememberBroadcasterId(twitchChannel, streamInfo.user_id);
+      }
+
       const postBody = formatLivePostBody(
         currentVars,
         livePostBody,
@@ -1562,7 +1633,6 @@ const runStatusCheckInner = async (): Promise<void> => {
       await redis.set('twitch_display_name', currentVars.streamDisplayName || '');
 
       if (streamInfo.platform === 'twitch') {
-        if (streamInfo.user_id) await redis.set('twitch_broadcaster_id', streamInfo.user_id);
         if (streamInfo.started_at) await redis.set('twitch_started_at', streamInfo.started_at);
         if (streamInfo.title) await redis.set('twitch_stream_title', streamInfo.title);
       }
@@ -1844,7 +1914,7 @@ const runStatusCheckInner = async (): Promise<void> => {
       console.log('Grace period expired! Concluding post and unpinning...');
 
       const postId = await redis.get('live_post_id');
-      const broadcasterId = await redis.get('twitch_broadcaster_id');
+      const broadcasterId = await getBroadcasterId();
       const startedAt = await redis.get('twitch_started_at');
 
       let cleanupSafe = true;
@@ -1965,7 +2035,8 @@ const runStatusCheckInner = async (): Promise<void> => {
         await redis.del('is_live_pinned');
         await redis.del('offline_since');
         await redis.del('live_post_id');
-        await redis.del('twitch_broadcaster_id');
+        // twitch_broadcaster_id is deliberately kept: it is immutable for the
+        // channel, and the monthly top-20 job needs it while the stream is off.
         await redis.del('twitch_started_at');
         await redis.del('twitch_stream_title');
       }
@@ -1990,7 +2061,7 @@ const runStatusCheckInner = async (): Promise<void> => {
         console.log(`Stream offline for ${daysOffline.toFixed(1)} days. Running Redis Garbage Collection...`);
         const keysToWipe = [
           'last_live_at', 'live_post_id', 'offline_post_id',
-          'twitch_broadcaster_id', 'twitch_started_at', 'twitch_stream_title',
+          'twitch_started_at', 'twitch_stream_title',
           'twitch_display_name', 'last_pin_verified', 'is_live_pinned',
           'offline_since', 'dashboard_platform', 'dashboard_live_platforms',
           'dashboard_display_name', 'dashboard_started_at', 'dashboard_title',
