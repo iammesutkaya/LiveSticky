@@ -133,7 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Responsive table labels for mobile stacked layout
   document.querySelectorAll('.token-table').forEach((table) => {
     const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
-    table.querySelectorAll('tbody tr').forEach((row) => {
+    // Section-break rows span all columns, so a per-column label would print a
+    // stray "Setting Name" eyebrow above the section title on mobile.
+    table.querySelectorAll('tbody tr:not(.table-subheader)').forEach((row) => {
       row.querySelectorAll('td').forEach((td, index) => {
         if (headers[index]) {
           td.setAttribute('data-label', headers[index]);

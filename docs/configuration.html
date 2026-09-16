@@ -116,62 +116,78 @@
             <tr><th>Setting Name</th><th>Type</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>⚙️ Custom Post Dashboard</td><td>Boolean</td><td>Powers a persistent interactive dashboard post.</td></tr>
-            <tr><td>⚙️ Dashboard Post Height</td><td>Select</td><td>Select the height of your interactive dashboard post. Options: Compact (320px) or Tall (512px). Default: Compact (320px).</td></tr>
-            <tr><td>⚙️ Sidebar Widget</td><td>Boolean</td><td>Creates and automatically updates a "Stream Status" text widget in your community sidebar.</td></tr>
-            <tr><td>⚙️ Suggested Comment Sort</td><td>Select</td><td>Sets default comment sort for live threads (New, Live, Q&A).</td></tr>
-            <tr><td>⚙️ Offline Post</td><td>Boolean</td><td>Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Note: Each time the offline post is re-pinned, previous comments are cleared to keep the thread fresh.</td></tr>
-            <tr><td>⚙️ Live Post</td><td>Boolean</td><td>Automatically creates and pins a standard text post when the stream goes live.</td></tr>
-            <tr><td>⚙️ Hide Live Post from Feed when Offline</td><td>Boolean</td><td>Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed.</td></tr>
-            <tr><td>⚙️ Delete Live Post when Offline</td><td>Boolean</td><td>Deletes the live post and all its comments when the stream ends.</td></tr>
-            <tr><td>⚙️ Lock Live Thread when Offline</td><td>Boolean</td><td>Locks the live thread post comments when the stream ends so no new comments can be added. (Default: Off)</td></tr>
-            <tr><td>⚙️ Disconnect Grace Period (Minutes)</td><td>Number</td><td>Minutes to wait before concluding the live post (prevents duplicates during crashes).</td></tr>
-            <tr><td>⚙️ Streamer Timezone</td><td>Select</td><td>Select your local timezone for {date} template variables in post titles & body (covers 27 major global regions). Defaults to UTC.</td></tr>
-            <tr><td>⚙️ Stream Highlights Post</td><td>Boolean</td><td>Automatically posts a compilation of top Twitch clips generated during the stream when it ends.</td></tr>
-            <tr><td>⚙️ Sticky Highlights Post</td><td>Boolean</td><td>Pins the clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post.</td></tr>
-            <tr><td>⚙️ Reuse Single Highlights Post</td><td>Boolean</td><td>Recycles a single permanent clips post after each stream instead of creating a new post every time. When off (default), a new highlights post is created for each stream session.</td></tr>
-            <tr><td>⚙️ Monthly Top 20 Clips Post</td><td>Boolean</td><td>Posts a compilation of the top 20 most-watched Twitch clips from the previous calendar month. Use the day/hour settings to choose when it drops.</td></tr>
-            <tr><td>⚙️ Monthly Post - Schedule Day</td><td>Select</td><td>Select when to publish the monthly top-20 compilation post: Start of new month (1st), Middle of month (15th), or End of month (Last day). Default: Start of new month.</td></tr>
-            <tr><td>⚙️ Monthly Post - Publish Time (24h format)</td><td>String</td><td>Time of day in 24h format (e.g. 13:30 or 09:00) in your configured Streamer Timezone. Default: 12:00.</td></tr>
-            <tr><td>⚙️ Wiki Clip Archive</td><td>Boolean</td><td>Keeps the full clip history on subreddit wiki pages (one for stream clips, one for monthly top-20) and links to them from the posts. When off, the stream highlights post shows a shorter in-body archive of the last few streams instead. Requires wiki to be enabled on your subreddit. Default: Off.</td></tr>
-            <tr><td>💊 Dynamic Post Flair Updates</td><td>Boolean</td><td>Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K]).</td></tr>
-            <tr><td>💊 Offline User Flair Text</td><td>String</td><td>Assigned to the streamer's user flair when offline.</td></tr>
-            <tr><td>💊 Live User Flair Text</td><td>String</td><td>Assigned to the streamer's user flair when live.</td></tr>
-            <tr><td>💊 Live Post Flair Template ID</td><td>String</td><td>The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair).</td></tr>
-            <tr><td>💊 Highlights Post Flair Template ID</td><td>String</td><td>The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair).</td></tr>
-            <tr><td>👑 Primary Platform</td><td>Select</td><td>This platform will always appear at the top of the multistream dashboard.</td></tr>
-            <tr><td>👑 Avatar Image URL</td><td>String</td><td>Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Upload an image to Reddit, then copy its direct link. Leave blank to auto-fetch from your primary platform.</td></tr>
-            <tr><td>📖 Platform API Setup Guide</td><td>String</td><td>Follow the step-by-step guide to generate API credentials for the platforms below: <a href="https://livesticky.com/setup">https://livesticky.com/setup</a></td></tr>
-            <tr><td>🟪 Twitch Channel Name</td><td>String</td><td>Twitch channel to monitor.</td></tr>
-            <tr><td>🟪 Twitch Client ID</td><td>String</td><td>Required for Twitch.</td></tr>
-            <tr><td>🟪 Twitch Client Secret</td><td>String</td><td>Required for Twitch.</td></tr>
-            <tr><td>🟥 YouTube Channel Name / Handle</td><td>String</td><td>YouTube channel to monitor.</td></tr>
-            <tr><td>🟥 YouTube API Key</td><td>String</td><td>Required for YouTube.</td></tr>
-            <tr><td>🟩 Kick Channel Name</td><td>String</td><td>Kick channel to monitor.</td></tr>
-            <tr><td>🟩 Kick Client ID</td><td>String</td><td>Required for Kick.</td></tr>
-            <tr><td>🟩 Kick Client Secret</td><td>String</td><td>Required for Kick.</td></tr>
-            <tr><td>📖 Templates & Placeholders Reference</td><td>String</td><td>Copy and paste templates for the text fields below from the LiveSticky website: <a href="https://livesticky.com/customization">https://livesticky.com/customization</a></td></tr>
-            <tr><td>📺 Dashboard Post Title</td><td>String</td><td>Title for the dashboard post.</td></tr>
-            <tr><td>😴 Offline Post Title</td><td>String</td><td>Title for the offline post.</td></tr>
-            <tr><td>😴 Offline Post Body</td><td>Paragraph</td><td>Body for the offline post.</td></tr>
-            <tr><td>😴 Offline Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the offline post.</td></tr>
-            <tr><td>😴 Offline Sidebar Widget Text</td><td>Paragraph</td><td>Body for the offline sidebar widget.</td></tr>
-            <tr><td>😴 Offline Sidebar Widget Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the offline sidebar widget.</td></tr>
-            <tr><td>🔴 Live Post Title</td><td>String</td><td>Title for the live post.</td></tr>
-            <tr><td>🔴 Live Post Body</td><td>Paragraph</td><td>Body for the live post.</td></tr>
-            <tr><td>🔴 Live Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the live post.</td></tr>
-            <tr><td>🔴 Auto-Pinned Comment Text</td><td>Paragraph</td><td>Automatically posts and pins a mod comment inside the live post.</td></tr>
-            <tr><td>🔴 Live Sidebar Widget Text</td><td>Paragraph</td><td>Body for the live sidebar widget.</td></tr>
-            <tr><td>🔴 Live Sidebar Widget Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the live sidebar widget.</td></tr>
-            <tr><td>🎬 Concluding Post Body</td><td>Paragraph</td><td>Body for the concluding post.</td></tr>
-            <tr><td>🎬 Concluding Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the concluding post.</td></tr>
-            <tr><td>🎬 Highlights Post Title</td><td>String</td><td>Title for the stream highlights post. Supports {stream_display_name}, {stream_title}, and {date}. Note: {date} is automatically ignored when "Reuse Single Highlights Post" is enabled so the master thread title stays timeless.</td></tr>
-            <tr><td>🎬 Highlights Post Header Text</td><td>Paragraph</td><td>Intro shown at the top of the clip compilation post, above the newest stream's clips.</td></tr>
-            <tr><td>🎬 Highlights Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the clip compilation post.</td></tr>
-            <tr><td>🏆 Monthly Top 20 Post Title</td><td>String</td><td>Title for the monthly top-20 clips post. Supports {month} and {stream_display_name}.</td></tr>
-            <tr><td>🏆 Monthly Top 20 Header Text</td><td>Paragraph</td><td>Header for the monthly top-20 clips post. Supports {month}.</td></tr>
-            <tr><td>🏆 Monthly Top 20 Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the monthly top-20 clips post.</td></tr>
-            <tr><td>📝 Internal Moderator Notes</td><td>Paragraph</td><td>Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes. LiveSticky ignores this field.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>Dashboard & General</strong></td></tr>
+            <tr><td>Custom Post Dashboard</td><td>Boolean</td><td>Powers a persistent interactive dashboard post.</td></tr>
+            <tr><td>Dashboard Post Height</td><td>Select</td><td>Select the height of your interactive dashboard post. Options: Compact (320px) or Tall (512px). Default: Compact (320px).</td></tr>
+            <tr><td>Sidebar Widget</td><td>Boolean</td><td>Creates and automatically updates a "Stream Status" text widget in your community sidebar.</td></tr>
+            <tr><td>Primary Platform</td><td>Select</td><td>This platform will always appear at the top of the multistream dashboard.</td></tr>
+            <tr><td>Avatar Image URL</td><td>String</td><td>Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Upload an image to Reddit, then copy its direct link. Leave blank to auto-fetch from your primary platform.</td></tr>
+            <tr><td>Streamer Timezone</td><td>Select</td><td>Select your local timezone for {date} template variables in post titles & body (covers 27 major global regions). Defaults to UTC.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>Platform API Credentials</strong></td></tr>
+            <tr><td>Platform API Setup Guide</td><td>String</td><td>Follow the step-by-step guide to generate API credentials for the platforms below: <a href="https://livesticky.com/setup">https://livesticky.com/setup</a></td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🟪 Twitch</strong></td></tr>
+            <tr><td>Twitch Channel Name</td><td>String</td><td>Twitch channel to monitor.</td></tr>
+            <tr><td>Twitch Client ID</td><td>String</td><td>Required for Twitch.</td></tr>
+            <tr><td>Twitch Client Secret</td><td>String</td><td>Required for Twitch.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🟥 YouTube</strong></td></tr>
+            <tr><td>YouTube Channel Name / Handle</td><td>String</td><td>YouTube channel to monitor.</td></tr>
+            <tr><td>YouTube API Key</td><td>String</td><td>Required for YouTube.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🟩 Kick</strong></td></tr>
+            <tr><td>Kick Channel Name</td><td>String</td><td>Kick channel to monitor.</td></tr>
+            <tr><td>Kick Client ID</td><td>String</td><td>Required for Kick.</td></tr>
+            <tr><td>Kick Client Secret</td><td>String</td><td>Required for Kick.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🔴 Live Post</strong></td></tr>
+            <tr><td>Live Post</td><td>Boolean</td><td>Automatically creates and pins a standard text post when the stream goes live.</td></tr>
+            <tr><td>Suggested Comment Sort</td><td>Select</td><td>Sets default comment sort for live threads (New, Live, Q&A).</td></tr>
+            <tr><td>Disconnect Grace Period (Minutes)</td><td>Number</td><td>Minutes to wait before concluding the live post (prevents duplicates during crashes).</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>😴 When the Stream Ends</strong></td></tr>
+            <tr><td>Lock Live Thread when Offline</td><td>Boolean</td><td>Locks the live thread post comments when the stream ends so no new comments can be added. (Default: Off)</td></tr>
+            <tr><td>Hide Live Post from Feed when Offline</td><td>Boolean</td><td>Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed.</td></tr>
+            <tr><td>Delete Live Post when Offline</td><td>Boolean</td><td>Deletes the live post and all its comments when the stream ends.</td></tr>
+            <tr><td>Offline Post</td><td>Boolean</td><td>Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Note: Each time the offline post is re-pinned, previous comments are cleared to keep the thread fresh.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🎬 Stream Highlights</strong></td></tr>
+            <tr><td>Stream Highlights Post</td><td>Boolean</td><td>Automatically posts a compilation of top Twitch clips generated during the stream when it ends.</td></tr>
+            <tr><td>Sticky Highlights Post</td><td>Boolean</td><td>Pins the clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post.</td></tr>
+            <tr><td>Reuse Single Highlights Post</td><td>Boolean</td><td>Recycles a single permanent clips post after each stream instead of creating a new post every time. When off (default), a new highlights post is created for each stream session.</td></tr>
+            <tr><td>Wiki Clip Archive</td><td>Boolean</td><td>Keeps the full clip history on subreddit wiki pages (one for stream clips, one for monthly top-20) and links to them from the posts. When off, the stream highlights post shows a shorter in-body archive of the last few streams instead. Requires wiki to be enabled on your subreddit. Default: Off.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🏆 Monthly Top 20</strong></td></tr>
+            <tr><td>Monthly Top 20 Clips Post</td><td>Boolean</td><td>Posts a compilation of the top 20 most-watched Twitch clips from the previous calendar month. Use the day/hour settings to choose when it drops.</td></tr>
+            <tr><td>Schedule Day</td><td>Select</td><td>Select when to publish the monthly top-20 compilation post: Start of new month (1st), Middle of month (15th), or End of month (Last day). Default: Start of new month.</td></tr>
+            <tr><td>Publish Time (24h format)</td><td>String</td><td>Time of day in 24h format (e.g. 13:30 or 09:00) in your configured Streamer Timezone. Default: 12:00.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>Post & User Flairs</strong></td></tr>
+            <tr><td>Dynamic Post Flair Updates</td><td>Boolean</td><td>Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K]).</td></tr>
+            <tr><td>Live Post Flair Template ID</td><td>String</td><td>The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair).</td></tr>
+            <tr><td>Highlights Post Flair Template ID</td><td>String</td><td>The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair).</td></tr>
+            <tr><td>Live User Flair Text</td><td>String</td><td>Assigned to the streamer's user flair when live.</td></tr>
+            <tr><td>Offline User Flair Text</td><td>String</td><td>Assigned to the streamer's user flair when offline.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>📖 Content & Message Templates</strong></td></tr>
+            <tr><td>Templates & Placeholders Reference</td><td>String</td><td>Copy and paste templates for the text fields below from the LiveSticky website: <a href="https://livesticky.com/customization">https://livesticky.com/customization</a></td></tr>
+            <tr><td>Dashboard Post Title</td><td>String</td><td>Title for the dashboard post.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🔴 Live Post Templates</strong></td></tr>
+            <tr><td>Live Post Title</td><td>String</td><td>Title for the live post.</td></tr>
+            <tr><td>Live Post Body</td><td>Paragraph</td><td>Body for the live post.</td></tr>
+            <tr><td>Live Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the live post.</td></tr>
+            <tr><td>Auto-Pinned Comment Text</td><td>Paragraph</td><td>Automatically posts and pins a mod comment inside the live post.</td></tr>
+            <tr><td>Live Sidebar Widget Text</td><td>Paragraph</td><td>Body for the live sidebar widget.</td></tr>
+            <tr><td>Live Sidebar Widget Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the live sidebar widget.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>😴 Offline Templates</strong></td></tr>
+            <tr><td>Offline Post Title</td><td>String</td><td>Title for the offline post.</td></tr>
+            <tr><td>Offline Post Body</td><td>Paragraph</td><td>Body for the offline post.</td></tr>
+            <tr><td>Offline Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the offline post.</td></tr>
+            <tr><td>Offline Sidebar Widget Text</td><td>Paragraph</td><td>Body for the offline sidebar widget.</td></tr>
+            <tr><td>Offline Sidebar Widget Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the offline sidebar widget.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🎬 Concluding & Highlights Templates</strong></td></tr>
+            <tr><td>Concluding Post Body</td><td>Paragraph</td><td>Body for the concluding post.</td></tr>
+            <tr><td>Concluding Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the concluding post.</td></tr>
+            <tr><td>Highlights Post Title</td><td>String</td><td>Title for the stream highlights post. Supports {stream_display_name}, {stream_title}, and {date}. Note: {date} is automatically ignored when "Reuse Single Highlights Post" is enabled so the master thread title stays timeless.</td></tr>
+            <tr><td>Highlights Post Header Text</td><td>Paragraph</td><td>Intro shown at the top of the clip compilation post, above the newest stream's clips.</td></tr>
+            <tr><td>Highlights Post Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the clip compilation post.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>🏆 Monthly Top 20 Templates</strong></td></tr>
+            <tr><td>Monthly Top 20 Post Title</td><td>String</td><td>Title for the monthly top-20 clips post. Supports {month} and {stream_display_name}.</td></tr>
+            <tr><td>Monthly Top 20 Header Text</td><td>Paragraph</td><td>Header for the monthly top-20 clips post. Supports {month}.</td></tr>
+            <tr><td>Monthly Top 20 Footer Text</td><td>Paragraph</td><td>Appended to the bottom of the monthly top-20 clips post.</td></tr>
+            <tr class="table-subheader"><td colspan="3"><strong>Internal Notes</strong></td></tr>
+            <tr><td>Internal Moderator Notes</td><td>Paragraph</td><td>Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes. LiveSticky ignores this field.</td></tr>
           </tbody>
         </table>
         <p>Once the Custom Post Dashboard is enabled, create the post from <strong>Mod Tools</strong> ➔ the <strong>Create LiveSticky Dashboard</strong> menu item. Running it again replaces the existing dashboard rather than creating a duplicate.</p>

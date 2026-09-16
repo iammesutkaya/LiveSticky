@@ -265,6 +265,13 @@ h1 {
   color: var(--text-primary);
 }
 
+/* Section break inside a long settings/variable table - mirrors the grouping
+   of the app's own settings page so the two read in the same order. */
+.token-table .table-subheader td {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
 .token-table code {
   background: var(--bg-surface);
   padding: 2px 6px;
@@ -1057,6 +1064,12 @@ html.theme-light .theme-toggle .moon-icon {
   }
   body .token-table td:last-child {
     border-bottom: none !important;
+  }
+  body .token-table .table-subheader {
+    background: var(--bg-surface) !important;
+    border: none !important;
+    padding: 12px 16px !important;
+    margin-bottom: 8px !important;
   }
   body .token-table td::before {
     content: attr(data-label);
