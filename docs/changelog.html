@@ -96,6 +96,12 @@
             <span class="changelog-toc-label">Versions</span>
             <ul>
               <li>
+                <a href="#v1-1-318">
+                  <span class="changelog-ver">v1.1.318</span>
+                  <span class="changelog-sidebar-date">SEP 16, 2026</span>
+                </a>
+              </li>
+              <li>
                 <a href="#v1-1-317">
                   <span class="changelog-ver">v1.1.317</span>
                   <span class="changelog-sidebar-date">SEP 12, 2026</span>
@@ -188,14 +194,14 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><code>src/schedule.ts</code>: pure, tested slot logic for the monthly job.</li>
+                <li><code>src/schedule.ts</code>: tested slot logic for the monthly job.</li>
                 <li>Unconfigured dashboard state, previewable with <code>?mock=setup</code>.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
                 <li><code>twitch_broadcaster_id</code> is cached per channel instead of being deleted when the stream ends.</li>
-                <li>Monthly slot matching uses a 48h catch-up window anchored to the slot, so END slots survive the month boundary.</li>
-                <li><code>renderClipList</code> indents sub-bullets past two-digit markers.</li>
+                <li>Monthly scheduling uses a 48h catch-up window anchored to the slot, so end-of-month slots survive the month boundary.</li>
+                <li><code>renderClipList</code> indents sub-bullets past two-digit list markers.</li>
               </ul>
             </div>
           </details>
@@ -208,13 +214,13 @@
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">SEP 12, 2026</span>
           </div>
-          <p><strong>You now get told when a post could not be pinned</strong></p>
+          <p><strong>Alerts when a post can't be pinned</strong></p>
           <ul>
-            <li><strong>A modmail when both slots are full:</strong> If LiveSticky creates a post but both of your community's pinned slots are already taken, it now sends your mod team a message explaining what happened and what to do. Previously this failed silently and the only clue was a live thread sitting in new instead of at the top.</li>
-            <li><strong>It fixes itself once you free a slot:</strong> Unpin any post and LiveSticky claims the free slot within 2 minutes, with nothing else to do.</li>
-            <li><strong>Honest logs:</strong> LiveSticky used to report "posted and pinned" even when the post got no slot. It now says which of the two actually happened.</li>
+            <li><strong>Pin alerts:</strong> If both pinned slots are taken, your mod team gets a modmail explaining what to do.</li>
+            <li><strong>Automatic retry:</strong> Unpin any post and LiveSticky takes the free slot within 2 minutes.</li>
+            <li><strong>Accurate logs:</strong> Logs now say whether a post was pinned or only created.</li>
           </ul>
-          <p>To be clear about what was never at risk: the post is always created. Pinning has always been a separate, best-effort step, so a full slot has never meant a missing live thread.</p>
+          <p>Posts are always created, even when no pinned slot is free.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -227,15 +233,16 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><strong>ModMail alert on pin failure</strong>: <code>alertPinFailure()</code> fires from the one place that knows the outcome, the post-sticky verification inside <code>pinPostWithFallback</code>, so it covers the live, offline, clips and dashboard posts alike. One shared cooldown key (<code>modmail_cooldown_pin</code>) means a subreddit with both slots taken gets one message rather than four. Uses the delivered/failed cooldown shape already used for settings problems: 24h after a successful send, 5 minutes after a failed one, so a transient ModMail outage is not silently muted for a day.</li>
+                <li><code>alertPinFailure()</code> sends one modmail per cooldown for the live, offline, clips and dashboard posts.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
-                <li><strong><code>pinPostWithFallback</code> now reports its result</strong>: it returned <code>void</code> and swallowed its own failures, so the create path logged <code>Successfully posted and pinned</code> unconditionally - including when the post held no slot. It returns <code>Promise&lt;boolean&gt;</code> and the caller logs what actually happened. That false log line is part of why an unpinned live thread was hard to diagnose from the outside.</li>
+                <li><code>pinPostWithFallback</code> returns whether the pin succeeded instead of always logging success.</li>
               </ul>
             </div>
           </details>
         </article>
+
         <article class="changelog-entry">
 
           <div class="changelog-head">
@@ -243,14 +250,14 @@
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">SEP 12, 2026</span>
           </div>
-          <p><strong>The live thread now gets a pinned slot, and LiveSticky reliably knows its own posts</strong></p>
+          <p><strong>Room for the live thread, and safe custom titles</strong></p>
           <ul>
-            <li><strong>Your live thread gets pinned, even in a busy community:</strong> A subreddit has only two pinned slots. The Top Clips post used to claim one when a stream ended and never give it back, so with one of your own threads in the other slot, the live thread had nowhere to go and was quietly left unpinned. The clips post now releases its slot when the stream starts and takes it back when the stream ends.</li>
-            <li><strong>Rename your posts freely:</strong> LiveSticky now recognises its own posts by an invisible tag in the post body instead of by words in the title. Custom titles for your live thread, offline post and clips post are fully supported, and renaming one can no longer confuse the bot.</li>
-            <li><strong>No more mixing up posts:</strong> The live thread, offline post, Top Clips post and monthly Top 20 post can never be mistaken for one another, so none of them can be edited or pinned in another's place. This closes the last route to the problem fixed in v1.1.314.</li>
-            <li><strong>Clearer pinning:</strong> When both slots really are occupied by other posts, LiveSticky now says so plainly in its logs instead of failing quietly.</li>
+            <li><strong>Pinned live thread:</strong> The Top Clips post gives up its pinned slot when a stream starts, so the live thread always has room.</li>
+            <li><strong>Custom titles:</strong> LiveSticky recognizes its own posts by a hidden tag, so renaming them is safe.</li>
+            <li><strong>Separate posts:</strong> The live, offline, Top Clips and monthly posts can no longer be mistaken for each other.</li>
+            <li><strong>Clearer logs:</strong> Logs say when both pinned slots are held by other posts.</li>
           </ul>
-          <p>Version 1.1.315 was superseded during upload and never reached review, so this release carries its changes.</p>
+          <p>Includes changes from version 1.1.315.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -263,16 +270,17 @@
             <div class="tech-content">
               <h3>Fixed</h3>
               <ul>
-                <li><strong>Sticky slot released at go-live</strong>: with <code>stickyHighlightsPost</code> enabled, <code>postStreamHighlights</code> claimed a legacy slot at stream end and nothing ever released it, so it held one of two slots across every following stream. The LIVE branch now unstickies <code>highlights_post_id</code> alongside the existing <code>offline_post_id</code> unsticky, before the live post calls <code>pinPostWithFallback</code>.</li>
-                <li><strong>Recovery identifies posts by marker, not by id list</strong>: <code>findExistingSubredditPost</code> matched a hardcoded title keyword and excluded a list of known post ids. Neither is sound - <code>livePostTitle</code> is a mod setting, and the monthly top-20 post's id is never written to Redis so no exclude list can reach it. Every managed body now carries an empty-label link marker (<code>[](#ls-live)</code>, <code>[](#ls-offline)</code>, <code>[](#ls-clips)</code>, <code>[](#ls-monthly)</code>), stamped at the four body-build sites. The live lookup matches the marker alone; the recycled offline and clips lookups accept marker OR legacy title keyword so posts from older versions keep working until an edit stamps them. Verified on r/live_sticky_dev that Reddit preserves the marker across both submit and edit round-trips.</li>
+                <li>The highlights post is unpinned at go-live, before the live post pins.</li>
+                <li>Post recovery matches a hidden body marker such as <code>[](#ls-live)</code> instead of title keywords and ID lists.</li>
               </ul>
               <h3>Removed</h3>
               <ul>
-                <li><strong>Community Highlights fallback</strong>: <code>pinPostWithFallback</code> called <code>AddPostToHighlights</code> when no legacy slot was available. Measured directly on the Devvit runtime, both that method and <code>GetIsPostHighlighted</code> return <code>12 UNIMPLEMENTED</code>, and the branch had never executed in production logs. Removed along with the <code>LinksAndCommentsDefinition</code> plugin handle and the <code>HighlightedPostLabel</code> import. <code>verifyAndRepinIfNeeded</code> simplifies to a stickied check. Apps get the two legacy slots; highlights slots 3-6 are not addressable, and <code>Post.sticky()</code> positions 3 and 4 are profile pins.</li>
+                <li>The Community Highlights fallback, which the Devvit runtime does not support.</li>
               </ul>
             </div>
           </details>
         </article>
+
         <article class="changelog-entry">
 
           <div class="changelog-head">
@@ -280,14 +288,14 @@
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">SEP 11, 2026</span>
           </div>
-          <p><strong>Fixes a clips post being pinned in place of the live thread</strong></p>
+          <p><strong>The live thread is pinned, not the clips post</strong></p>
           <ul>
-            <li><strong>The right post gets pinned when you go live:</strong> On communities using a custom live post title, LiveSticky could pin the previous stream's Top Clips post instead of creating a new live thread, overwriting that post's body with live stream stats while its title still read "Top Clips". It now creates the live thread as expected.</li>
-            <li><strong>Custom live post titles are fully supported:</strong> Reconnecting to an existing live thread no longer depends on your title containing the words "is LIVE", so renaming the thread in your settings is safe.</li>
-            <li><strong>Posts LiveSticky manages stay separate:</strong> The live thread, offline post, Top Clips post and dashboard post can no longer be mistaken for one another during recovery, so none of them will be edited or pinned in another's place.</li>
-            <li><strong>Yesterday's thread stays closed:</strong> Recovery only considers posts created during the current stream, so a concluded thread from an earlier stream is never re-pinned.</li>
+            <li><strong>Correct post pinned:</strong> Going live with a custom live post title creates a new live thread instead of reusing the Top Clips post.</li>
+            <li><strong>Custom titles:</strong> Reconnecting to a live thread no longer needs "is LIVE" in the title.</li>
+            <li><strong>Separate posts:</strong> Managed posts can no longer be adopted in place of each other.</li>
+            <li><strong>Old threads stay closed:</strong> Only posts from the current stream are reconnected.</li>
           </ul>
-          <p>Communities on the default live post title were unaffected. If yours uses a custom title and Top Clips posts are enabled, this release fixes it.</p>
+          <p>Only communities with a custom live post title were affected.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -298,19 +306,19 @@
               <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </summary>
             <div class="tech-content">
-              <h3>Fixed</h3>
-              <ul>
-                <li><strong>Search fallback adopted the wrong post</strong>: the offline path deletes <code>live_post_id</code>, so every go-live runs <code>findExistingSubredditPost</code>. It was called with the hardcoded keyword <code>'is LIVE'</code> while <code>livePostTitle</code> is a mod setting, so the listing pass (which requires the title to contain the keyword) missed on customized titles. The <code>searchPosts</code> fallback then filtered results with an author check alone and no title check. Reddit search is fuzzy and the default highlights footer contains the word "live", so the first app-authored hit was the previous stream's Top Clips post. It was adopted as the live thread, passed through <code>post.edit({ text })</code> - which rewrites the body but never the title - and pinned. The fallback now applies the same predicate as the listing pass.</li>
-                <li><strong>Live recovery no longer matches on title</strong>: <code>queryKeyword</code> accepts <code>null</code>, and the helper takes <code>notBefore</code> and <code>excludeIds</code>. The live lookup passes <code>null</code>, bounds candidates to the current stream's <code>started_at</code>, and excludes <code>dashboard_post_id</code>, <code>offline_post_id</code>, <code>highlights_post_id</code> and <code>last_highlights_post_id</code>. If <code>started_at</code> is unavailable the lookup is skipped and a fresh post is created.</li>
-                <li><strong>Cross-adoption between managed posts</strong>: the <code>'is offline'</code> and <code>'Top Clips'</code> lookups keep their keywords and gained the same exclusion set, so no recovery path can reach a post another path owns.</li>
-              </ul>
               <h3>Added</h3>
               <ul>
-                <li><strong><code>src/post-recovery.ts</code></strong>: the candidate predicate extracted as a pure <code>isRecoveryCandidate()</code>, testable without the Devvit runtime. Test count 99 &rarr; 105.</li>
+                <li><code>src/post-recovery.ts</code> with a testable <code>isRecoveryCandidate()</code>.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li>The search fallback applies the same checks as the listing lookup.</li>
+                <li>Live recovery is bounded to the current stream's start and excludes other managed posts.</li>
               </ul>
             </div>
           </details>
         </article>
+
         <article class="changelog-entry">
 
           <div class="changelog-head">
@@ -318,21 +326,17 @@
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 26, 2026</span>
           </div>
-          <p><strong>Everything since v1.1.285: safer post handling, restored features, and accessibility</strong></p>
+          <p><strong>Safer post handling, restored features and accessibility</strong></p>
           <ul>
-            <li><strong>Safer post recovery:</strong> When LiveSticky reconnects to a thread after a restart, it now only ever adopts posts it created itself. Previously it could match another post in your community and clear the comments on it.</li>
-            <li><strong>No duplicate live threads:</strong> If LiveSticky loses track of its own thread mid-stream, such as after an app update, it now reconnects to the existing one instead of pinning a second live thread beside it.</li>
-            <li><strong>Monthly Top 20 clips fixed:</strong> The monthly clip compilation now publishes on schedule. It had been failing silently.</li>
-            <li><strong>Create Dashboard is back in Mod Tools:</strong> The action to create the interactive dashboard post had gone missing from the mod menu.</li>
-            <li><strong>Your timezone setting now applies:</strong> The Streamer Timezone option was quietly ignored and every date fell back to UTC. Dates in your post titles and bodies now use the timezone you picked.</li>
-            <li><strong>Safer clip formatting:</strong> Unusual characters in Twitch clip titles can no longer break post layout or slip an unexpected link into a pinned thread.</li>
-            <li><strong>Cleaner offline threads:</strong> Templates that use live stream stats no longer leave raw placeholders like <code>&#123;stream_game&#125;</code> behind once the stream ends.</li>
-            <li><strong>YouTube quota protection:</strong> If YouTube's daily API limit is reached, LiveSticky pauses those requests and resumes automatically at midnight Pacific.</li>
-            <li><strong>More reliable Refresh:</strong> Refresh LiveSticky now clears rate-limit blocks for immediate retesting, and no longer leaves the dashboard blank when it runs alongside a scheduled check.</li>
-            <li><strong>Lighter background activity:</strong> Wiki archive pages are only rewritten when their content actually changes, instead of on every check.</li>
-            <li><strong>Keyboard and motion support:</strong> The dashboard is now fully keyboard navigable with visible focus rings, and honours your system's reduced-motion setting.</li>
+            <li><strong>Safer recovery:</strong> LiveSticky only reconnects to posts it created, and no longer pins a duplicate live thread.</li>
+            <li><strong>Restored features:</strong> The monthly Top 20 post publishes again, and Create Dashboard is back in Mod Tools.</li>
+            <li><strong>Timezone:</strong> Dates in posts now use your Streamer Timezone setting.</li>
+            <li><strong>Cleaner posts:</strong> Clip titles can't break post layout, and offline threads no longer show raw placeholders.</li>
+            <li><strong>YouTube quota:</strong> Requests pause at the daily limit and resume at midnight Pacific.</li>
+            <li><strong>Refresh:</strong> Refresh LiveSticky clears rate-limit blocks and no longer blanks the dashboard.</li>
+            <li><strong>Accessibility:</strong> The dashboard is keyboard navigable and respects reduced motion.</li>
           </ul>
-          <p>This release rolls up versions 1.1.286 through 1.1.312, which were superseded during review and never became available to install.</p>
+          <p>Includes changes from versions 1.1.286 to 1.1.312.</p>
 
           <details class="tech-details">
             <summary class="tech-summary">
@@ -343,40 +347,38 @@
               <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </summary>
             <div class="tech-content">
-              <h3>Fixed</h3>
-              <ul>
-                <li><strong>Select settings read as arrays</strong>: Devvit returns <code>select</code> settings as <code>['UTC']</code>, not <code>'UTC'</code>. All three <code>streamerTimezone</code> read sites called <code>.trim()</code> on the raw value. Two were masked by surrounding try/catch (silently falling back to UTC); a third, in the settings validator, threw on every scheduler tick. Added <code>settingText()</code> as the single accessor and widened the validator's input types to <code>unknown</code>.</li>
-                <li><strong>Self-healing search scoped to the app account (B3)</strong>: <code>findExistingSubredditPost</code> ran an unfiltered <code>searchPosts</code> and adopted <code>posts[0]</code>. <code>ensureStickyOfflinePost</code> then removed every comment on that post before the <code>edit()</code> that would have failed. Results are now filtered by <code>getAppUser()</code>.</li>
-                <li><strong>Self-healing read from the listing index</strong>: <code>findExistingSubredditPost</code> relied on <code>searchPosts</code>, whose index lags by minutes, so a live post created earlier in the same stream was invisible to recovery. Now tries <code>getPostsByUser</code> on the app account first, with search kept as a deeper-history fallback.</li>
-                <li><strong>Monthly highlights <code>ReferenceError</code> (B1)</strong>: <code>runMonthlyHighlights</code> referenced an undeclared <code>wikiArchive</code>, throwing into a catch block on every run.</li>
-                <li><strong>Dashboard menu route (B2)</strong>: <code>createDashboardPost</code> had no endpoint and no manifest entry; both restored.</li>
-                <li><strong>Clip title escaping (B6)</strong>: <code>escapeMarkdownBrackets()</code> and <code>escapeHtmlEntities()</code> applied to clip titles, creators and URLs on both the markdown and wiki render paths.</li>
-                <li><strong>Offline template variables (B5)</strong>: the <code>isLive === false</code> branch of <code>replaceTemplateVariables</code> skipped game, viewers and uptime.</li>
-                <li><strong>Dashboard pointer garbage collected (B7)</strong>: <code>dashboard_post_id</code> removed from the 7-day wipe list.</li>
-                <li><strong>Token invalidation (B8)</strong>: Twitch and Kick cached tokens are dropped on HTTP 401/403 instead of being replayed until TTL.</li>
-                <li><strong>Scheduler overlap (M1)</strong>: <code>SET NX</code> lock with ownership read-back and a 5-minute TTL; the manual refresh path waits for an in-flight run rather than being dropped.</li>
-              </ul>
               <h3>Added</h3>
               <ul>
-                <li><strong>Wiki write fingerprinting (B4)</strong>: FNV-1a content hash in Redis with a 1h TTL, checked before any API call. Steady-state wiki traffic per tick went from ~30 calls to zero.</li>
-                <li><strong>Settings validation (M10)</strong>: grace period, publish time, avatar host and timezone are validated each tick and reported through ModMail, rate-limited to once a day with a short retry window after a failed send.</li>
-                <li><strong>HTTP timeouts (M9)</strong>: every upstream call routed through <code>fetchWithTimeout</code> (10s).</li>
-                <li><strong>Pre-ship gates (M2)</strong>: <code>tsc --noEmit</code> and the Vitest suite run in both <code>release.sh</code> and <code>upload.sh</code> before anything is uploaded. Test count 59 → 99.</li>
-                <li><strong>Accessibility (U1-U6)</strong>: token-based <code>:focus-visible</code> rings, keyboard-operable thread chip, roving-tabindex tablist with arrow keys, modal focus trap and <code>aria-modal</code>, and a <code>prefers-reduced-motion</code> block.</li>
+                <li>Settings validation, reported through modmail at most once a day.</li>
+                <li>10s timeouts on every external request.</li>
+                <li>Type-checking and tests run before every upload.</li>
+                <li>Wiki pages are only rewritten when their content changes.</li>
+              </ul>
+              <h3>Fixed</h3>
+              <ul>
+                <li>Select settings are read through <code>settingText()</code>, since Devvit returns them as arrays.</li>
+                <li>Post recovery is limited to the app account and checks the post listing before search.</li>
+                <li>A <code>ReferenceError</code> in <code>runMonthlyHighlights</code>.</li>
+                <li>The missing Create Dashboard menu endpoint.</li>
+                <li>Clip titles, creators and URLs are escaped in posts and wiki pages.</li>
+                <li>Cached Twitch and Kick tokens are dropped on 401 or 403.</li>
+                <li>A scheduler lock prevents overlapping status checks.</li>
               </ul>
             </div>
           </details>
         </article>
+
         <article class="changelog-entry">
+
           <div class="changelog-head">
             <h2 id="v1-1-285">v1.1.285</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 20, 2026</span>
           </div>
-          <p><strong>Rich Visual Clip Cards on Reddit Wiki V2 &amp; Wiki Navigation Hub</strong></p>
+          <p><strong>Clip thumbnails on wiki archive pages</strong></p>
           <ul>
-            <li><strong>Rich Clip Thumbnails</strong>: Clip compilation pages on modern Reddit (web and official iOS/Android apps) now feature visual 16:9 thumbnail cards, view counters, and clip creator credits.</li>
-            <li><strong>Subreddit Navigation Link</strong>: Added prominent <code>📚 Return to LiveSticky Archive Hub</code> links across stream and monthly clip pages for easy navigation.</li>
+            <li><strong>Clip thumbnails:</strong> Wiki clip archives show thumbnails, view counts and creators on new Reddit and the mobile apps.</li>
+            <li><strong>Archive navigation:</strong> Clip pages link back to the LiveSticky archive hub.</li>
           </ul>
 
           <details class="tech-details">
@@ -390,29 +392,28 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><strong>Rich HTML Clip Lists for Wiki V2</strong>: Introduced native HTML rendering for clip archives (<code>renderClipListHtml</code> and <code>buildWikiArchiveHtml</code>) complete with embedded 16:9 clip thumbnails, responsive image scaling, view counters, and creator attribution.</li>
-                <li><strong>Subreddit Wiki Hub Navigation</strong>: Added prominent archive hub backlinks linking back to <code>/r/{subreddit}/wiki/livesticky</code> across monthly and stream clip archive pages.</li>
-                <li><strong>Canonical Wiki Slug Enforcement</strong>: Standardized page routing under <code>livesticky/clip-archive</code> and <code>livesticky/monthly-archive</code> with automatic unlisting of legacy duplicate wiki entries.</li>
+                <li><code>renderClipListHtml</code> and <code>buildWikiArchiveHtml</code> render archives as HTML.</li>
+                <li>Archive pages live at <code>livesticky/clip-archive</code> and <code>livesticky/monthly-archive</code>, with duplicates unlisted.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
-                <li><strong>Mobile Wiki Thumbnail Rendering</strong>: Fixed clip thumbnail images on Reddit Wiki V2, providing clean visual clip cards on official iOS and Android apps.</li>
-                <li><strong>Wiki Navigation Hierarchy</strong>: Refined heading structure (<code>h2</code> page titles, <code>h1</code> entry headers) to optimize table-of-contents generation on Devvit Wiki pages.</li>
+                <li>Heading levels on wiki pages, for a correct table of contents.</li>
               </ul>
             </div>
           </details>
         </article>
 
         <article class="changelog-entry">
+
           <div class="changelog-head">
             <h2 id="v1-1-250">v1.1.250</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 19, 2026</span>
           </div>
-          <p><strong>Devvit Wiki V2 Integration &amp; Automated Wiki Directory Management</strong></p>
+          <p><strong>Wiki archives on new Reddit</strong></p>
           <ul>
-            <li><strong>Modern Reddit Wiki Support</strong>: Clip archive pages are now published to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; official mobile apps), eliminating blank pages.</li>
-            <li><strong>Zero Maintenance Wiki Cleanup</strong>: Automatically creates parent wiki directory pages and cleans up legacy orphan pages without requiring manual moderator edits.</li>
+            <li><strong>Wiki pages everywhere:</strong> Clip archives now show on new Reddit and the mobile apps, not just old Reddit.</li>
+            <li><strong>Automatic cleanup:</strong> The wiki index page is created for you, and duplicate pages are hidden.</li>
           </ul>
 
           <details class="tech-details">
@@ -426,29 +427,29 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><strong>Devvit Wiki V2 &amp; Dual-Write Support</strong>: LiveSticky now publishes clip compilation pages to both Wiki V1 (Old Reddit) and Wiki V2 (New Reddit &amp; mobile apps).</li>
-                <li><strong>Auto-Managed Wiki Index Page</strong>: Automatically creates and updates the parent <code>/wiki/livesticky</code> directory landing page, eliminating <em>"livesticky does not exist"</em> errors.</li>
-                <li><strong>100% Automated Wiki Namespace Cleanup</strong>: Dynamically inspects subreddit wiki pages and automatically unlists/hides legacy or duplicate orphan pages.</li>
+                <li>Archive pages are written to both wiki versions.</li>
+                <li>The <code>/wiki/livesticky</code> index page is managed automatically.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
-                <li><strong>Clip Archive Link Availability</strong>: Resolved issue where clicking <code>/wiki/livesticky/clip-archive/</code> on modern Reddit resulted in an unpopulated blank page.</li>
-                <li><strong>Duplicate Sidebar Entries</strong>: Resolved duplicate sidebar list items on subreddit wikis by setting legacy non-canonical page paths to unlisted mod-only mode.</li>
+                <li>A blank <code>/wiki/livesticky/clip-archive</code> page on new Reddit.</li>
+                <li>Duplicate entries in the wiki sidebar.</li>
               </ul>
             </div>
           </details>
         </article>
 
         <article class="changelog-entry">
+
           <div class="changelog-head">
             <h2 id="v1-1-249">v1.1.249</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 18, 2026</span>
           </div>
-          <p><strong>Self-Healing Post Recovery &amp; Card Layout Refinements</strong></p>
+          <p><strong>Post recovery and dashboard layout polish</strong></p>
           <ul>
-            <li><strong>Self-Healing Post Recovery</strong>: If app state is cleared or reset, LiveSticky automatically detects and re-links active live posts on your subreddit instead of creating duplicate posts.</li>
-            <li><strong>Layout Polish</strong>: Unified live thread pill placement and thumbnail positioning across single-stream and multi-stream card layouts.</li>
+            <li><strong>Post recovery:</strong> If app data is reset, LiveSticky reconnects to active posts instead of creating duplicates.</li>
+            <li><strong>Dashboard layout:</strong> Single and multistream cards now share one layout.</li>
           </ul>
 
           <details class="tech-details">
@@ -462,29 +463,33 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><strong>Self-Healing Post Recovery</strong>: Powered by Devvit 0.14.1's <code>searchPosts()</code> API. Automatically searches the subreddit for active live posts, offline posts, or clip compilations before creating new ones.</li>
-                <li>Upgraded core Devvit SDK packages to <strong>v0.14.1</strong>.</li>
+                <li>Recovery looks up existing posts with <code>searchPosts()</code> before creating new ones.</li>
+              </ul>
+              <h3>Changed</h3>
+              <ul>
+                <li>Devvit SDK upgraded to 0.14.1.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
-                <li><strong>Single-Stream vs Multi-Stream Layout Match</strong>: Unified single-stream (cinematic) and multi-stream card layouts in compact mode.</li>
-                <li>Improved responsive 16:9 thumbnail cropping with top-centered object positioning on desktop and embedded demo containers.</li>
+                <li>Consistent 16:9 thumbnail cropping.</li>
               </ul>
             </div>
           </details>
         </article>
 
         <article class="changelog-entry">
+
           <div class="changelog-head">
             <h2 id="v1-1-244">v1.1.244</h2>
             <span class="changelog-badge live">Released</span>
             <span class="changelog-date">AUG 13, 2026</span>
           </div>
-          <p><strong>Stream Highlights Upgrade, Wiki Archive &amp; Monthly Top 20 Post</strong></p>
+          <p><strong>Monthly Top 20 post and wiki archives</strong></p>
           <ul>
-            <li><strong>Monthly Top 20 Clips Post</strong>: Automatically publish a monthly recap of your subreddit's top 20 Twitch clips with customizable scheduling (Start, Middle, or End of month).</li>
-            <li><strong>Flexible Stream Clip Posts</strong>: Choose between publishing a new clip post per stream session or recycling a single master sticky clips post.</li>
-            <li><strong>Permanent Wiki Archives</strong>: Store full clip histories on your subreddit wiki pages with automatic links from clip posts.</li>
+            <li><strong>Monthly Top 20 post:</strong> A monthly roundup of your top 20 Twitch clips, scheduled for the start, middle or end of the month.</li>
+            <li><strong>Clip posts:</strong> Choose a new clip post per stream or one reused post.</li>
+            <li><strong>Wiki archives:</strong> Keep your full clip history on subreddit wiki pages.</li>
+            <li><strong>YouTube:</strong> Live streams are detected correctly on the dashboard.</li>
           </ul>
 
           <details class="tech-details">
@@ -498,20 +503,16 @@
             <div class="tech-content">
               <h3>Added</h3>
               <ul>
-                <li><strong>Previous Stream Clip Link</strong>: Automatically links to the previous stream's clip post at the bottom of the body (available as <code>{previous_highlights_url}</code> template placeholder).</li>
-                <li><strong>Reuse Single Highlights Post</strong> setting (opt-in): Recycles a single permanent master clips post after each stream.</li>
-                <li><strong>Wiki Clip Archive</strong> (opt-in): Keeps full clip history on subreddit wiki pages for stream clips and monthly top-20.</li>
-                <li><strong>Monthly Top 20 Clips Post</strong>: Publishes the 20 most-watched Twitch clips from the previous calendar month.</li>
-                <li><strong>Sticky Highlights Post</strong> setting: Keeps the clip compilation pinned, re-pinning it after each stream if it slips.</li>
+                <li><code>{previous_highlights_url}</code> placeholder.</li>
+                <li>Reuse Single Highlights Post, Wiki Clip Archive and Sticky Highlights Post settings.</li>
               </ul>
               <h3>Changed</h3>
               <ul>
-                <li>Stream highlights post defaults to creating a <strong>new post per stream session</strong>, allowing per-stream variables like <code>{date}</code> and <code>{stream_title}</code> in post titles.</li>
+                <li>Highlights default to a new post per stream, so <code>{date}</code> and <code>{stream_title}</code> work in titles.</li>
               </ul>
               <h3>Fixed</h3>
               <ul>
-                <li>Fixed YouTube livestream detection on dashboard.</li>
-                <li>The <code>{date}</code> variable now respects the configured Streamer Timezone instead of always using UTC.</li>
+                <li><code>{date}</code> uses the Streamer Timezone instead of UTC.</li>
               </ul>
             </div>
           </details>
