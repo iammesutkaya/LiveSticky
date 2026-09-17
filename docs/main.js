@@ -150,6 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const domain = link.getAttribute('data-domain');
     if (user && domain) {
       link.setAttribute('href', `mailto:${user}@${domain}`);
+      // Links that display the address (rather than "Contact Support") get it
+      // written in here, so it never sits in the HTML for scrapers.
+      if (link.hasAttribute('data-show-address')) link.textContent = `${user}@${domain}`;
     }
   });
 
