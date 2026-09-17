@@ -76,5 +76,7 @@ We may update this Privacy Policy from time to time to reflect changes in our pr
 
 If you have any questions, concerns, or requests regarding this Privacy Policy or the "LiveSticky" Reddit Bot, please contact the developer:
 
+* **Legal & privacy:** [legal@livesticky.com](mailto:legal@livesticky.com)
+* **Support:** [support@livesticky.com](mailto:support@livesticky.com)
 * **Website:** [livesticky.com](https://livesticky.com)
 * **Reddit:** [u/iammesutkaya](https://www.reddit.com/user/iammesutkaya)
