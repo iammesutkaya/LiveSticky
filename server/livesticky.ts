@@ -1085,14 +1085,13 @@ const alertPinFailure = async (postId: string): Promise<void> => {
       subredditName: subreddit.name,
       subject: '⚠️ LiveSticky could not pin a post',
       body:
-        `Hello,\n\nLiveSticky created its post but could not pin it, because both of ` +
-        `r/${subreddit.name}'s pinned slots are already taken by other posts.\n\n` +
+        `Hello,\n\nLiveSticky created its post but could not pin or highlight it, because ` +
+        `r/${subreddit.name}'s pinned and highlight slots are already full.\n\n` +
         `The post itself is fine and is visible in new - it just is not stuck to the ` +
         `top of the feed: https://reddit.com/${postId.replace('t3_', 'comments/')}\n\n` +
-        `**What to do:** unpin one post in your community, and LiveSticky will claim ` +
+        `**What to do:** unpin or unhighlight one post in your community, and LiveSticky will claim ` +
         `the free slot within 2 minutes on its own. No further action needed.\n\n` +
-        `A subreddit has exactly two pinned slots and apps cannot use more, so ` +
-        `LiveSticky needs one of them free while the stream is live.\n\n` +
+        `LiveSticky needs one pin or highlight slot free while the stream is live.\n\n` +
         `*(This alert is rate-limited to once per 24 hours.)*`,
       isAuthorHidden: true,
     });
@@ -1106,11 +1105,45 @@ const alertPinFailure = async (postId: string): Promise<void> => {
   }
 };
 
-/** Resolves true when the post actually holds a sticky slot afterwards. */
+/**
+ * Unpins and unhighlights a post, ensuring it is removed from both legacy sticky
+ * slots and modern Community Highlights (Devvit 0.14.7).
+ */
+const unpinPost = async (post: { unsticky: () => Promise<void>; unhighlight?: () => Promise<void> }): Promise<void> => {
+  await Promise.allSettled([
+    post.unsticky().catch(() => {}),
+    typeof post.unhighlight === 'function' ? post.unhighlight().catch(() => {}) : Promise.resolve(),
+  ]);
+};
+
+/**
+ * Promotes a post to the #1 position in Community Highlights if highlights exist (Devvit 0.14.7).
+ */
+const promoteToFirstHighlight = async (postId: string): Promise<void> => {
+  try {
+    const subreddit = await reddit.getCurrentSubreddit();
+    if (typeof (subreddit as any).getHighlightedPosts !== 'function') return;
+    const highlights = await (subreddit as any).getHighlightedPosts();
+    if (highlights && highlights.length > 0) {
+      const t3Id = postId as `t3_${string}`;
+      const otherIds = highlights.map((h: any) => h.postId).filter((id: string) => id !== t3Id);
+      await (subreddit as any).reorderHighlightedPosts([t3Id, ...otherIds]);
+      console.log(`[pin] Promoted ${postId} to position #1 in Community Highlights.`);
+    }
+  } catch (err) {
+    // Non-fatal fallback for subreddits where Community Highlights are disabled or not supported.
+    console.warn(`[pin] Could not reorder Community Highlights for ${postId}:`, err);
+  }
+};
+
+/**
+ * Resolves true when the post actually holds a sticky or community highlight slot afterwards.
+ * Tries legacy sticky (slot 1, then slot 2) and modern Community Highlights (Devvit 0.14.7).
+ */
 const pinPostWithFallback = async (postId: string): Promise<boolean> => {
   const t3Id = postId as `t3_${string}`;
 
-  // Try the default slot, then force slot 2 if the first is taken (400 Bad Request).
+  // 1. Try legacy sticky (default slot, then force slot 2 if taken).
   try {
     const post = await reddit.getPostById(t3Id);
     await post.sticky();
@@ -1123,14 +1156,29 @@ const pinPostWithFallback = async (postId: string): Promise<boolean> => {
     }
   }
 
+  // 2. Also ensure it is added to Community Highlights (Devvit 0.14.7).
+  // Community Highlights supports up to 6 slots, overcoming the legacy 2-sticky limit.
+  try {
+    const post = await reddit.getPostById(t3Id);
+    if (typeof (post as any).highlight === 'function') {
+      await (post as any).highlight();
+    }
+  } catch (hlErr) {
+    console.warn(`[pin] Community highlight failed for ${postId}:`, hlErr);
+  }
+
   try {
     const refreshed = await reddit.getPostById(t3Id);
-    if (refreshed.stickied) {
-      console.log(`[pin] Post ${postId} is stickied.`);
+    const isHl = typeof (refreshed as any).isHighlighted === 'function'
+      ? await (refreshed as any).isHighlighted().catch(() => false)
+      : false;
+
+    if (refreshed.stickied || isHl) {
+      console.log(`[pin] Post ${postId} is secured (stickied=${refreshed.stickied}, highlighted=${isHl}).`);
       return true;
     }
     console.warn(
-      `[pin] WARNING: Post ${postId} got no sticky slot. Both are taken by other ` +
+      `[pin] WARNING: Post ${postId} got no sticky or highlight slot. All slots are taken by other ` +
         `posts - the post exists and is visible in new, just not pinned.`
     );
     // Mods cannot read these logs, and on a subreddit the developer does not
@@ -1138,26 +1186,29 @@ const pinPostWithFallback = async (postId: string): Promise<boolean> => {
     await alertPinFailure(postId);
     return false;
   } catch (fetchErr) {
-    console.warn(`[pin] Could not re-fetch post ${postId} to check stickied flag:`, fetchErr);
+    console.warn(`[pin] Could not re-fetch post ${postId} to check pin/highlight status:`, fetchErr);
     return false;
   }
 };
 
 /**
- * Re-pins a post that has lost its sticky slot. Called from the 2-minute cron.
+ * Re-pins a post that has lost its sticky/highlight slot. Called from the 2-minute cron.
  */
 export const verifyAndRepinIfNeeded = async (postId: string, label: string): Promise<void> => {
   let isStickied = false;
   try {
     const post = await reddit.getPostById(postId as `t3_${string}`);
-    isStickied = post.stickied;
+    const isHl = typeof (post as any).isHighlighted === 'function'
+      ? await (post as any).isHighlighted().catch(() => false)
+      : false;
+    isStickied = post.stickied || isHl;
   } catch {
     // Post may have been deleted - caller handles missing-post logic separately.
     return;
   }
 
   if (!isStickied) {
-    console.warn(`[verify] ${label} post ${postId} lost its sticky slot - re-pinning.`);
+    console.warn(`[verify] ${label} post ${postId} lost its sticky/highlight slot - re-securing.`);
     await pinPostWithFallback(postId);
   }
 };
@@ -1665,31 +1716,31 @@ const runStatusCheckInner = async (): Promise<void> => {
         if (offlinePostId) {
           try {
             const offlinePost = await reddit.getPostById(offlinePostId as `t3_${string}`);
-            await offlinePost.unsticky();
-            console.log(`Successfully unstickied offline post: ${offlinePostId}`);
+            await unpinPost(offlinePost);
+            console.log(`Successfully unpinned offline post: ${offlinePostId}`);
           } catch (unstickyError) {
-            console.error('Failed to unsticky offline post:', unstickyError);
+            console.error('Failed to unpin offline post:', unstickyError);
           }
         }
       }
 
-      // A subreddit has two sticky slots and an app cannot reach past them. The
-      // Top Clips post claims one when a stream ends and never gave it back, so
-      // across streams it held half the capacity permanently - and with a mod
-      // thread in the other slot, the live thread had nowhere to go and was
-      // silently left unpinned. Release it here; postStreamHighlights re-pins it
-      // when the stream ends and the slot is free again.
+      // A subreddit has two legacy sticky slots and up to six Community Highlights.
+      // Freeing the highlights slot here ensures maximum availability; postStreamHighlights
+      // re-secures it when the stream ends.
       if (stickyHighlightsPost) {
         const highlightsPostId = await redis.get('highlights_post_id');
         if (highlightsPostId) {
           try {
             const highlightsPost = await reddit.getPostById(highlightsPostId as `t3_${string}`);
-            if (highlightsPost.stickied) {
-              await highlightsPost.unsticky();
-              console.log(`Freed sticky slot held by highlights post: ${highlightsPostId}`);
+            const isHl = typeof (highlightsPost as any).isHighlighted === 'function'
+              ? await (highlightsPost as any).isHighlighted().catch(() => false)
+              : false;
+            if (highlightsPost.stickied || isHl) {
+              await unpinPost(highlightsPost);
+              console.log(`Freed sticky/highlight slot held by highlights post: ${highlightsPostId}`);
             }
           } catch (unstickyError) {
-            console.error('Failed to unsticky highlights post:', unstickyError);
+            console.error('Failed to unpin highlights post:', unstickyError);
           }
         }
       }
@@ -1726,6 +1777,7 @@ const runStatusCheckInner = async (): Promise<void> => {
             const post = await reddit.getPostById(existingLivePostId as `t3_${string}`);
             await post.edit({ text: markedLiveBody });
             await pinPostWithFallback(existingLivePostId);
+            await promoteToFirstHighlight(existingLivePostId);
             if (enableDynamicFlair) {
               await updateDynamicPostFlair(existingLivePostId, subreddit.name, streamInfo, liveFlairId);
             }
@@ -1745,6 +1797,7 @@ const runStatusCheckInner = async (): Promise<void> => {
               text: markedLiveBody,
             });
             const pinned = await pinPostWithFallback(post.id);
+            await promoteToFirstHighlight(post.id);
 
             if (suggestedSort && suggestedSort !== 'BLANK') {
               try {
@@ -1961,7 +2014,7 @@ const runStatusCheckInner = async (): Promise<void> => {
               } catch (editError) {
                 console.error('Failed to update concluding body:', editError);
               }
-              await post.unsticky();
+              await unpinPost(post);
               console.log(`Successfully unpinned concluding post: ${postId}`);
             }
 
@@ -2289,7 +2342,7 @@ export const createDashboardPost = async (): Promise<string> => {
   if (oldDashPostId) {
     try {
       const oldPost = await reddit.getPostById(oldDashPostId as `t3_${string}`);
-      await oldPost.unsticky().catch(() => {});
+      await unpinPost(oldPost).catch(() => {});
       await oldPost.delete();
       console.log(`Deleted old dashboard post: ${oldDashPostId}`);
     } catch {
@@ -2320,6 +2373,7 @@ export const createDashboardPost = async (): Promise<string> => {
 
   await redis.set('dashboard_post_id', post.id);
   await pinPostWithFallback(post.id);
+  await promoteToFirstHighlight(post.id);
   console.log(`Created new LiveSticky Dashboard post: ${post.id}`);
   return `Dashboard created (${isCompact ? 'Compact 320px' : 'Tall 512px'}): ${dashboardTitle}`;
 };

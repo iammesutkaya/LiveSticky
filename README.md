@@ -1,6 +1,6 @@
 [![LiveSticky](https://raw.githubusercontent.com/iammesutkaya/LiveSticky/main/assets/banner.png)](https://livesticky.com)
 
-[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.318/10b981)](https://livesticky.com/changelog.html)  
+[![Platform](https://badgen.net/badge/platform/Reddit%20Devvit/ff4500)](https://developers.reddit.com/apps/live-sticky) [![Version](https://badgen.net/badge/version/v1.1.319/10b981)](https://livesticky.com/changelog.html)  
 ![Twitch](https://badgen.net/badge/integration/Twitch%20Helix/9146ff) ![YouTube](https://badgen.net/badge/integration/YouTube/ff0000) ![Kick](https://badgen.net/badge/integration/Kick/53fc18) [![Docs](https://badgen.net/badge/docs/livesticky.com/f5d474)](https://livesticky.com)
 
 ### Automated live threads and dashboards for streamer subreddits
@@ -76,7 +76,7 @@ Every part is optional and configurable. Turn on only what your community wants.
 * Auto-posts a customizable pinned comment to promote your Discord, socials, or rules.
 * Refresh state, flush cached images, and force a status check from the mod menu.
 * Redis caching and circuit breakers keep status checks light and never hit API limits.
-* Pins to Reddit's Community Highlights carousel when both sticky slots are taken.
+* Full Community Highlights support: seamlessly pins to legacy sticky slots and Reddit's Community Highlights carousel (up to 6 slots), auto-promoting the active live thread to position #1 without displacing community announcements.
 
 **✏️ Every word is yours**
 

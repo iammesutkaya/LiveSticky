@@ -32,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.318">
-  <link rel="stylesheet" href="landing.css?v=1.1.318">
+  <link rel="stylesheet" href="style.css?v=1.1.319">
+  <link rel="stylesheet" href="landing.css?v=1.1.319">
 
 </head>
 
@@ -95,6 +95,12 @@
           <nav aria-label="Jump to a version">
             <span class="changelog-toc-label">Versions</span>
             <ul>
+              <li>
+                <a href="#v1-1-319">
+                  <span class="changelog-ver">v1.1.319</span>
+                  <span class="changelog-sidebar-date">OCT 5, 2026</span>
+                </a>
+              </li>
               <li>
                 <a href="#v1-1-318">
                   <span class="changelog-ver">v1.1.318</span>
@@ -166,6 +172,46 @@
             <span class="view-toggle-knob"></span>
           </button>
         </div>
+
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-319">v1.1.319</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">OCT 5, 2026</span>
+          </div>
+          <p><strong>Devvit 0.14.7 &amp; Community Highlights Support</strong></p>
+          <ul>
+            <li><strong>Community Highlights:</strong> LiveSticky now directly integrates with Reddit's Community Highlights carousel (up to 6 slots). Live threads and dashboards are automatically pinned and promoted to position #1 in the carousel without displacing other community announcements.</li>
+            <li><strong>Dual Pinning &amp; Clean Teardown:</strong> Seamlessly coordinates both legacy sticky slots (<code>post.sticky()</code>) and Community Highlights (<code>post.highlight()</code>) when live, and cleanly clears both when streams conclude.</li>
+            <li><strong>Wiki Archive Stability:</strong> Upgraded to Devvit 0.14.7, resolving an upstream platform issue where reading subreddit wiki archive pages failed if the page was last edited by a Reddit Premium user.</li>
+            <li><strong>Settings UX:</strong> Added clean multi-line formatting and line breaks across all subreddit configuration fields in Mod Tools.</li>
+          </ul>
+          <p>No settings adjustments required. Your live and offline posts automatically benefit from Community Highlights.</p>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Added</h3>
+              <ul>
+                <li><code>promoteToFirstHighlight()</code>: Uses <code>subreddit.getHighlightedPosts()</code> and <code>subreddit.reorderHighlightedPosts()</code> to order the live post first in the carousel.</li>
+                <li><code>unpinPost()</code>: Pairs <code>post.unsticky()</code> with <code>post.unhighlight()</code> for comprehensive teardown across classic and modern feeds.</li>
+              </ul>
+              <h3>Changed</h3>
+              <ul>
+                <li>Upgraded Devvit SDK to <code>0.14.7</code> across <code>@devvit/public-api</code>, <code>@devvit/web</code>, and <code>@devvit/start</code>.</li>
+                <li><code>pinPostWithFallback()</code>: Concurrently secures both legacy sticky and Community Highlights slots, preventing false alerts when legacy slots are taken but highlights carousel slots remain open.</li>
+                <li><code>verifyAndRepinIfNeeded()</code>: Checks <code>post.stickied || post.isHighlighted()</code> so highlighted posts aren't redundantly re-pinned.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
 
         <article class="changelog-entry">
 
@@ -658,6 +704,6 @@
     </svg>
   </button>
 
-  <script src="main.js?v=1.1.318"></script>
+  <script src="main.js?v=1.1.319"></script>
 </body>
 </html>

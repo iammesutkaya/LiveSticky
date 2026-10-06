@@ -106,7 +106,7 @@
               }
             ],
             "defaultValue": "regular",
-            "helpText": "Select the height of your interactive dashboard post. Compact (320px) keeps the post extra tight on community feeds. Tall (512px) provides extra visual room."
+            "helpText": "Select the height of your interactive dashboard post:\n\n• Compact (320px) – keeps the post tight on community feeds.\n• Tall (512px) – provides extra visual room."
           },
           "updateSidebarWidget": {
             "type": "boolean",
@@ -137,7 +137,7 @@
           "customAvatarUrl": {
             "type": "string",
             "label": "Avatar Image URL",
-            "helpText": "Override your profile picture with a DIRECT Reddit image link (i.redd.it/…). Upload an image to Reddit, then copy its direct link. Leave blank to auto-fetch from your primary platform.",
+            "helpText": "Override your profile picture with a DIRECT Reddit image link (i.redd.it/…).\n\nUpload an image to Reddit, then copy its direct link.\nLeave blank to auto-fetch from your primary platform.",
             "placeholder": "https://..."
           },
           "streamerTimezone": {
@@ -254,7 +254,7 @@
               }
             ],
             "defaultValue": "UTC",
-            "helpText": "Select your local timezone for {date} template variables in post titles & body."
+            "helpText": "Select your local timezone.\n\nUsed for {date} template variables in post titles, body text, and scheduled posts."
           }
         }
       },
@@ -266,7 +266,7 @@
           "setupReference": {
             "type": "string",
             "label": "Platform API Setup Guide",
-            "helpText": "Follow the step-by-step guide to generate API credentials for the platforms below: https://livesticky.com/setup",
+            "helpText": "Follow the step-by-step guide to generate API credentials for the platforms below:\n\nhttps://livesticky.com/setup",
             "defaultValue": "https://livesticky.com/setup"
           }
         }
@@ -279,19 +279,19 @@
           "twitchChannel": {
             "type": "string",
             "label": "Twitch Channel Name",
-            "helpText": "Twitch channel to monitor.",
+            "helpText": "Twitch channel name to monitor.\n\nExample: ChannelName (without the URL)",
             "placeholder": "ChannelName"
           },
           "twitchClientId": {
             "type": "string",
             "label": "Twitch Client ID",
-            "helpText": "Required for Twitch.",
+            "helpText": "Client ID from the Twitch Developer Console.\n\nRequired for Twitch live monitoring and clips.",
             "placeholder": "your Twitch Client ID"
           },
           "twitchClientSecret": {
             "type": "string",
             "label": "Twitch Client Secret",
-            "helpText": "Required for Twitch.",
+            "helpText": "Client Secret from the Twitch Developer Console.\n\nRequired for Twitch live monitoring and clips.",
             "placeholder": "your Twitch Client Secret"
           }
         }
@@ -304,13 +304,13 @@
           "youtubeChannel": {
             "type": "string",
             "label": "YouTube Channel Name / Handle",
-            "helpText": "YouTube channel to monitor.",
+            "helpText": "YouTube channel name or handle to monitor.\n\nExample: @ChannelName or ChannelName",
             "placeholder": "ChannelName"
           },
           "youtubeApiKey": {
             "type": "string",
             "label": "YouTube API Key",
-            "helpText": "Required for YouTube.",
+            "helpText": "API key from the Google Cloud Console.\n\nRequired for YouTube live monitoring.",
             "placeholder": "your YouTube API key"
           }
         }
@@ -323,19 +323,19 @@
           "kickChannel": {
             "type": "string",
             "label": "Kick Channel Name",
-            "helpText": "Kick channel to monitor.",
+            "helpText": "Kick channel name to monitor.\n\nExample: ChannelName (without the URL)",
             "placeholder": "ChannelName"
           },
           "kickClientId": {
             "type": "string",
             "label": "Kick Client ID",
-            "helpText": "Required for Kick.",
+            "helpText": "Client ID from the Kick Developer Portal.\n\nRequired for Kick live monitoring.",
             "placeholder": "your Kick Client ID"
           },
           "kickClientSecret": {
             "type": "string",
             "label": "Kick Client Secret",
-            "helpText": "Required for Kick.",
+            "helpText": "Client Secret from the Kick Developer Portal.\n\nRequired for Kick live monitoring.",
             "placeholder": "your Kick Client Secret"
           }
         }
@@ -349,7 +349,7 @@
             "type": "boolean",
             "label": "Live Post",
             "defaultValue": true,
-            "helpText": "Automatically creates and pins a standard text post when the stream goes live."
+            "helpText": "Automatically creates and pins a standard text post when the stream goes live.\n\nSupports Community Highlights (up to 6 slots) and legacy sticky slots."
           },
           "suggestedSort": {
             "type": "select",
@@ -372,13 +372,14 @@
                 "value": "BLANK"
               }
             ],
-            "defaultValue": "NEW"
+            "defaultValue": "NEW",
+            "helpText": "Select how comments in the live post should be sorted for viewers.\n\n'New' or 'Live' is recommended for real-time discussion."
           },
           "offlineGracePeriod": {
             "type": "number",
             "label": "Disconnect Grace Period (Minutes)",
             "defaultValue": 6,
-            "helpText": "Minutes to wait before concluding the live post (prevents duplicates during crashes)."
+            "helpText": "Minutes to wait before concluding the live post.\n\nPrevents duplicate posts during brief stream restarts or connection drops (default: 6 minutes)."
           }
         }
       },
@@ -397,19 +398,19 @@
             "type": "boolean",
             "label": "Hide Live Post from Feed when Offline",
             "defaultValue": false,
-            "helpText": "Mod action: Hides the live post from the community feed when offline. It remains accessible via direct links or comment histories without cluttering the feed."
+            "helpText": "Mod action: Hides the live post from the community feed when offline.\n\nIt remains accessible via direct links or comment histories without cluttering the feed."
           },
           "deleteOfflinePost": {
             "type": "boolean",
             "label": "Delete Live Post when Offline",
             "defaultValue": false,
-            "helpText": "Deletes the live post and all its comments when the stream ends."
+            "helpText": "Permanently deletes the live post and all its comments when the stream ends."
           },
           "stickyOfflinePost": {
             "type": "boolean",
             "label": "Offline Post",
             "defaultValue": true,
-            "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links. The post is unpinned when live and pinned again when offline. Because it is recycled, users are never notified of a new post after creation."
+            "helpText": "Recycles a single permanent pinned post when offline to announce news and useful links.\n\nThe post is unpinned when live and pinned again when offline.\nBecause it is recycled, users are never notified of a new post after creation."
           }
         }
       },
@@ -428,19 +429,19 @@
             "type": "boolean",
             "label": "Sticky Highlights Post",
             "defaultValue": false,
-            "helpText": "Pins the reused clip compilation post so it stays at the top of the subreddit. It is re-pinned after each stream in case it slipped. Requires Stream Highlights Post."
+            "helpText": "Pins the clip compilation post so it stays at the top of the subreddit.\n\nIt is re-pinned after each stream in case it slipped.\nRequires Stream Highlights Post."
           },
           "reuseHighlightsPost": {
             "type": "boolean",
             "label": "Reuse Single Highlights Post",
             "defaultValue": false,
-            "helpText": "Recycles a single permanent clips post after each stream instead of creating a new post every time. When off (default), a new highlights post is created for each stream session."
+            "helpText": "Recycles a single permanent clips post after each stream instead of creating a new post every time.\n\nWhen off (default), a new highlights post is created for each stream session."
           },
           "enableWikiArchive": {
             "type": "boolean",
             "label": "Wiki Clip Archive",
             "defaultValue": false,
-            "helpText": "Keeps the full clip history on subreddit wiki pages (one for stream clips, one for monthly top-20) and links to them from the posts. When off, the stream highlights post shows a shorter in-body archive of the last few streams instead and the monthly post has no archive link. Requires wiki to be enabled on your subreddit."
+            "helpText": "Keeps the full clip history on subreddit wiki pages (one for stream clips, one for monthly top-20) and links to them from the posts.\n\nWhen off, the stream highlights post shows a shorter in-body archive of the last few streams instead and the monthly post has no archive link.\n\nRequires wiki to be enabled on your subreddit."
           }
         }
       },
@@ -473,14 +474,14 @@
               }
             ],
             "defaultValue": "START",
-            "helpText": "Select when to publish the monthly top-20 compilation post. It always covers the previous complete calendar month."
+            "helpText": "Select when to publish the monthly top-20 compilation post.\n\nIt always covers the previous complete calendar month."
           },
           "monthlyHighlightsTime": {
             "type": "string",
             "label": "Publish Time (24h format)",
             "defaultValue": "12:00",
             "placeholder": "13:30",
-            "helpText": "Time of day in 24h format (e.g., 13:30 or 09:00) in your configured Streamer Timezone (defaults to 12:00)."
+            "helpText": "Time of day in 24h format (e.g. 13:30 or 09:00) in your configured Streamer Timezone.\n\nDefaults to 12:00."
           }
         }
       },
@@ -493,17 +494,17 @@
             "type": "boolean",
             "label": "Dynamic Post Flair Updates",
             "defaultValue": false,
-            "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers (e.g. 🔴 LIVE: Just Chatting [15.4K])."
+            "helpText": "Periodically updates the live post (or dashboard post) flair with active game and live viewers.\n\nExample: 🔴 LIVE: Just Chatting [15.4K]"
           },
           "liveFlairId": {
             "type": "string",
             "label": "Live Post Flair Template ID",
-            "helpText": "The UUID of the flair template to apply to the live post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
+            "helpText": "The UUID of the flair template to apply to the live post.\n\nFind this in Mod Tools ➔ Look and Feel ➔ Post Flair."
           },
           "highlightsFlairId": {
             "type": "string",
             "label": "Highlights Post Flair Template ID",
-            "helpText": "The UUID of the flair template to apply to the stream highlights post (from Mod Tools ➔ Look and Feel ➔ Post Flair)."
+            "helpText": "The UUID of the flair template to apply to the stream highlights post.\n\nFind this in Mod Tools ➔ Look and Feel ➔ Post Flair."
           },
           "liveUserFlairText": {
             "type": "string",
@@ -525,7 +526,7 @@
           "templatesReference": {
             "type": "string",
             "label": "Templates & Placeholders Reference",
-            "helpText": "Copy and paste templates for the text fields below from the LiveSticky website: https://livesticky.com/customization",
+            "helpText": "Copy and paste templates for the text fields below from the LiveSticky website:\n\nhttps://livesticky.com/customization",
             "defaultValue": "https://livesticky.com/customization"
           },
           "dashboardPostTitle": {
@@ -544,35 +545,35 @@
           "livePostTitle": {
             "type": "string",
             "label": "Live Post Title",
-            "helpText": "Title for the live post. If empty, the default template is used.",
+            "helpText": "Title for the live post.\n\nIf empty, the default template is used.",
             "defaultValue": "🚨 {stream_display_name} is LIVE! 🚨 - {stream_title}"
           },
           "livePostBody": {
             "type": "paragraph",
             "label": "Live Post Body",
-            "helpText": "Body for the live post. If empty, the default template is used.",
+            "helpText": "Body for the live post.\n\nSupports template variables like {stream_game}, {stream_viewers}, {stream_uptime}, {twitch_url}, etc.\n\nIf empty, the default template is used.",
             "defaultValue": "* **Category/Game:** {stream_game}\n* **Current Viewers:** {stream_viewers}\n* **Uptime:** live for {stream_uptime}\n\n---\n**Watch the stream on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**\n\n---\n*Stats are auto-updated in real-time by LiveSticky.*"
           },
           "livePostFooter": {
             "type": "paragraph",
             "label": "Live Post Footer Text",
-            "helpText": "Optional. Appended to the bottom of the live post."
+            "helpText": "Optional.\n\nAppended to the bottom of the live post."
           },
           "liveCommentText": {
             "type": "paragraph",
             "label": "Auto-Pinned Comment Text",
-            "helpText": "Optional. Automatically posts and pins a mod comment inside the live post."
+            "helpText": "Optional.\n\nAutomatically posts and pins a mod comment inside the live post."
           },
           "liveSidebarText": {
             "type": "paragraph",
             "label": "Live Sidebar Widget Text",
-            "helpText": "Body for the live sidebar widget. If empty, the default template is used.",
+            "helpText": "Body for the live sidebar widget.\n\nIf empty, the default template is used.",
             "defaultValue": "# 🚨 {stream_display_name} is LIVE! 🚨\n\n**Title:**\n{stream_title}\n\n* **Category/Game:** {stream_game}\n* **Current Viewers:** {stream_viewers}\n* **Uptime:** live for {stream_uptime}\n\n---\n**Watch the stream on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
           },
           "liveSidebarFooter": {
             "type": "paragraph",
             "label": "Live Sidebar Widget Footer Text",
-            "helpText": "Optional. Appended to the bottom of the live sidebar widget."
+            "helpText": "Optional.\n\nAppended to the bottom of the live sidebar widget."
           }
         }
       },
@@ -584,30 +585,30 @@
           "offlinePostTitle": {
             "type": "string",
             "label": "Offline Post Title",
-            "helpText": "Title for the offline post. If empty, the default template is used.",
+            "helpText": "Title for the offline post.\n\nIf empty, the default template is used.",
             "defaultValue": "😴 {stream_display_name} is offline 😴"
           },
           "offlinePostBody": {
             "type": "paragraph",
             "label": "Offline Post Body",
-            "helpText": "Body for the offline post. If empty, the default template is used.",
+            "helpText": "Body for the offline post.\n\nIf empty, the default template is used.",
             "defaultValue": "The stream is currently offline. Check back soon or follow the channels below to get notified when {stream_display_name} goes live!\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
           },
           "offlinePostFooter": {
             "type": "paragraph",
             "label": "Offline Post Footer Text",
-            "helpText": "Optional. Appended to the bottom of the offline post."
+            "helpText": "Optional.\n\nAppended to the bottom of the offline post."
           },
           "offlineSidebarText": {
             "type": "paragraph",
             "label": "Offline Sidebar Widget Text",
-            "helpText": "Body for the offline sidebar widget. If empty, the default template is used.",
+            "helpText": "Body for the offline sidebar widget.\n\nIf empty, the default template is used.",
             "defaultValue": "# 😴 {stream_display_name} is offline 😴\n\nFollow the channels below to get notified when {stream_display_name} goes live!\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**"
           },
           "offlineSidebarFooter": {
             "type": "paragraph",
             "label": "Offline Sidebar Widget Footer Text",
-            "helpText": "Optional. Appended to the bottom of the offline sidebar widget."
+            "helpText": "Optional.\n\nAppended to the bottom of the offline sidebar widget."
           }
         }
       },
@@ -619,30 +620,30 @@
           "concludingPostBody": {
             "type": "paragraph",
             "label": "Concluding Post Body",
-            "helpText": "Body for the concluding post. If empty, the default template is used.",
+            "helpText": "Body for the concluding post when the stream ends.\n\nIf empty, the default template is used.",
             "defaultValue": "### 👋 Stream Ended - Thanks for watching! 👋\n\n**Title:**\n{stream_title}\n\nThe stream has concluded. VODs and highlights may be available via the links below.\n\n---\n**Watch the VODs on:**\n\n🟪 **[Twitch]({twitch_url})**  •  🟥 **[YouTube]({youtube_url})**  •  🟩 **[Kick]({kick_url})**\n\n---\n*This post is now locked as the stream has ended.*"
           },
           "concludingPostFooter": {
             "type": "paragraph",
             "label": "Concluding Post Footer Text",
-            "helpText": "Optional. Appended to the bottom of the concluding post."
+            "helpText": "Optional.\n\nAppended to the bottom of the concluding post."
           },
           "highlightsPostTitle": {
             "type": "string",
             "label": "Highlights Post Title",
-            "helpText": "Title for the stream highlights post. Supports {stream_display_name}, {stream_title}, and {date}. Note: {date} is automatically ignored when \"Reuse Single Highlights Post\" is enabled so the master thread title stays timeless.",
+            "helpText": "Title for the stream highlights post.\n\nSupports {stream_display_name}, {stream_title}, and {date}.\n\nNote: {date} is automatically ignored when \"Reuse Single Highlights Post\" is enabled so the master thread title stays timeless.",
             "defaultValue": "🎬 Top Clips - {stream_display_name}"
           },
           "highlightsHeader": {
             "type": "paragraph",
             "label": "Highlights Post Header Text",
-            "helpText": "Intro shown at the top of the clip compilation post, above the newest stream's clips. If empty, the default template is used.",
+            "helpText": "Intro shown at the top of the clip compilation post, above the newest stream's clips.\n\nIf empty, the default template is used.",
             "defaultValue": "The most-watched Twitch clips from {stream_display_name}'s recent streams, compiled automatically by LiveSticky. Newest stream first."
           },
           "highlightsFooter": {
             "type": "paragraph",
             "label": "Highlights Post Footer Text",
-            "helpText": "Appended to the bottom of the clip compilation post, below the archived editions. If empty, the default template is used.",
+            "helpText": "Appended to the bottom of the clip compilation post, below the archived editions.\n\nIf empty, the default template is used.",
             "defaultValue": "---\n*Watch VODs and catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*"
           }
         }
@@ -655,19 +656,19 @@
           "monthlyHighlightsPostTitle": {
             "type": "string",
             "label": "Monthly Top 20 Post Title",
-            "helpText": "Title for the monthly top-20 clips post. Supports {month} and {stream_display_name}. If empty, the default template is used.",
+            "helpText": "Title for the monthly top-20 clips post.\n\nSupports {month} and {stream_display_name}.\n\nIf empty, the default template is used.",
             "defaultValue": "🏆 Top 20 Clips of {month} - {stream_display_name}"
           },
           "monthlyHighlightsHeader": {
             "type": "paragraph",
             "label": "Monthly Top 20 Header Text",
-            "helpText": "Header for the monthly top-20 clips post. Supports {month}. If empty, the default template is used.",
+            "helpText": "Header for the monthly top-20 clips post.\n\nSupports {month}.\n\nIf empty, the default template is used.",
             "defaultValue": "The 20 most-watched Twitch clips from {month}, compiled automatically by LiveSticky."
           },
           "monthlyHighlightsFooter": {
             "type": "paragraph",
             "label": "Monthly Top 20 Footer Text",
-            "helpText": "Appended to the bottom of the monthly top-20 clips post. If empty, the default template is used.",
+            "helpText": "Appended to the bottom of the monthly top-20 clips post.\n\nIf empty, the default template is used.",
             "defaultValue": "---\n*Catch the next stream live on [twitch.tv/{twitch_channel}](https://twitch.tv/{twitch_channel})!*"
           }
         }
@@ -680,7 +681,7 @@
           "modNotes": {
             "type": "paragraph",
             "label": "Internal Moderator Notes",
-            "helpText": "Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes. LiveSticky ignores this field.",
+            "helpText": "Use this space as a scratchpad for your mod team to document API key owners, custom flair IDs, or temporary configuration changes.\n\nLiveSticky completely ignores this field.",
             "placeholder": "e.g. \"Twitch API keys belong to u/ModName\""
           }
         }
