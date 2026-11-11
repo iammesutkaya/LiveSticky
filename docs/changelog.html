@@ -32,8 +32,8 @@
   <meta name="twitter:card" content="summary">
 
   <link rel="icon" type="image/png" href="favicon-squircle.png">
-  <link rel="stylesheet" href="style.css?v=1.1.319">
-  <link rel="stylesheet" href="landing.css?v=1.1.319">
+  <link rel="stylesheet" href="style.css?v=1.1.320">
+  <link rel="stylesheet" href="landing.css?v=1.1.320">
 
 </head>
 
@@ -95,6 +95,12 @@
           <nav aria-label="Jump to a version">
             <span class="changelog-toc-label">Versions</span>
             <ul>
+              <li>
+                <a href="#v1-1-320">
+                  <span class="changelog-ver">v1.1.320</span>
+                  <span class="changelog-sidebar-date">NOV 11, 2026</span>
+                </a>
+              </li>
               <li>
                 <a href="#v1-1-319">
                   <span class="changelog-ver">v1.1.319</span>
@@ -172,6 +178,40 @@
             <span class="view-toggle-knob"></span>
           </button>
         </div>
+
+        <article class="changelog-entry">
+
+          <div class="changelog-head">
+            <h2 id="v1-1-320">v1.1.320</h2>
+            <span class="changelog-badge live">Released</span>
+            <span class="changelog-date">NOV 11, 2026</span>
+          </div>
+          <p><strong>Devvit 0.15.3 Platform Upgrade &amp; Dashboard Custom Post Flair</strong></p>
+          <ul>
+            <li><strong>Instant Dashboard Flair:</strong> Interactive dashboard posts now apply community live and offline flairs immediately upon creation, eliminating the delay where newly created dashboard posts briefly appeared unflaired in community feeds.</li>
+            <li><strong>Platform Modernization:</strong> Upgraded the underlying runtime to Devvit 0.15.3 and completed the migration to pure modern web packages, removing deprecated platform components for faster, more reliable app execution.</li>
+            <li><strong>Media Upload Attribution:</strong> Stream highlight thumbnails uploaded to Reddit now include direct author and moderation attribution for transparent community auditing.</li>
+          </ul>
+
+          <details class="tech-details">
+            <summary class="tech-summary">
+              <span class="tech-summary-left">
+                <svg class="tech-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Technical details &amp; developer notes
+              </span>
+              <svg class="tech-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <div class="tech-content">
+              <h3>Changed</h3>
+              <ul>
+                <li>Upgraded Devvit dependencies to <code>0.15.3</code> across <code>@devvit/web</code> and <code>@devvit/start</code>.</li>
+                <li>Removed deprecated <code>@devvit/public-api</code> dependency from <code>package.json</code>.</li>
+                <li>Updated <code>createDashboardPost()</code> in <code>server/livesticky.ts</code> to pass <code>flairId</code> and <code>flairText</code> directly in <code>reddit.submitCustomPost()</code>, leveraging the 0.15.3 platform fix.</li>
+                <li>Cleaned up Community Highlights typing in <code>server/livesticky.ts</code> (<code>subreddit.getHighlightedPosts()</code>, <code>subreddit.reorderHighlightedPosts()</code>, <code>post.highlight()</code>) using first-class definitions from <code>@devvit/reddit</code>.</li>
+              </ul>
+            </div>
+          </details>
+        </article>
 
         <article class="changelog-entry">
 
@@ -704,6 +744,6 @@
     </svg>
   </button>
 
-  <script src="main.js?v=1.1.319"></script>
+  <script src="main.js?v=1.1.320"></script>
 </body>
 </html>

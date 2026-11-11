@@ -1122,12 +1122,12 @@ const unpinPost = async (post: { unsticky: () => Promise<void>; unhighlight?: ()
 const promoteToFirstHighlight = async (postId: string): Promise<void> => {
   try {
     const subreddit = await reddit.getCurrentSubreddit();
-    if (typeof (subreddit as any).getHighlightedPosts !== 'function') return;
-    const highlights = await (subreddit as any).getHighlightedPosts();
+    if (typeof subreddit.getHighlightedPosts !== 'function') return;
+    const highlights = await subreddit.getHighlightedPosts();
     if (highlights && highlights.length > 0) {
       const t3Id = postId as `t3_${string}`;
-      const otherIds = highlights.map((h: any) => h.postId).filter((id: string) => id !== t3Id);
-      await (subreddit as any).reorderHighlightedPosts([t3Id, ...otherIds]);
+      const otherIds = highlights.map((h) => h.postId).filter((id: string) => id !== t3Id);
+      await subreddit.reorderHighlightedPosts([t3Id, ...otherIds]);
       console.log(`[pin] Promoted ${postId} to position #1 in Community Highlights.`);
     }
   } catch (err) {
@@ -1138,7 +1138,7 @@ const promoteToFirstHighlight = async (postId: string): Promise<void> => {
 
 /**
  * Resolves true when the post actually holds a sticky or community highlight slot afterwards.
- * Tries legacy sticky (slot 1, then slot 2) and modern Community Highlights (Devvit 0.14.7).
+ * Tries legacy sticky (slot 1, then slot 2) and modern Community Highlights (Devvit 0.14.7+).
  */
 const pinPostWithFallback = async (postId: string): Promise<boolean> => {
   const t3Id = postId as `t3_${string}`;
@@ -1156,12 +1156,12 @@ const pinPostWithFallback = async (postId: string): Promise<boolean> => {
     }
   }
 
-  // 2. Also ensure it is added to Community Highlights (Devvit 0.14.7).
+  // 2. Also ensure it is added to Community Highlights.
   // Community Highlights supports up to 6 slots, overcoming the legacy 2-sticky limit.
   try {
     const post = await reddit.getPostById(t3Id);
-    if (typeof (post as any).highlight === 'function') {
-      await (post as any).highlight();
+    if (typeof post.highlight === 'function') {
+      await post.highlight();
     }
   } catch (hlErr) {
     console.warn(`[pin] Community highlight failed for ${postId}:`, hlErr);
@@ -1169,8 +1169,8 @@ const pinPostWithFallback = async (postId: string): Promise<boolean> => {
 
   try {
     const refreshed = await reddit.getPostById(t3Id);
-    const isHl = typeof (refreshed as any).isHighlighted === 'function'
-      ? await (refreshed as any).isHighlighted().catch(() => false)
+    const isHl = typeof refreshed.isHighlighted === 'function'
+      ? await refreshed.isHighlighted().catch(() => false)
       : false;
 
     if (refreshed.stickied || isHl) {
@@ -2350,17 +2350,59 @@ export const createDashboardPost = async (): Promise<string> => {
     }
   }
 
-  const dashboardTitle = await get<string>('dashboardPostTitle') || 'LiveSticky Dashboard';
-  const dashboardHeightRaw = await get<unknown>('dashboardHeight');
+  const [
+    dashboardTitleSetting,
+    dashboardHeightRaw,
+    liveFlairId,
+    offlineFlairText,
+    enableDynamicFlair,
+    isLiveNow,
+    isLivePinned,
+    dashboardGame,
+    dashboardViewers,
+  ] = await Promise.all([
+    get<string>('dashboardPostTitle'),
+    get<unknown>('dashboardHeight'),
+    get<string>('liveFlairId'),
+    get<string>('offlineFlairText'),
+    get<boolean>('enableDynamicFlair'),
+    redis.get('is_live_now'),
+    redis.get('is_live_pinned'),
+    redis.get('dashboard_game'),
+    redis.get('dashboard_viewers'),
+  ]);
+
+  const dashboardTitle = dashboardTitleSetting || 'LiveSticky Dashboard';
   const dashboardHeight = Array.isArray(dashboardHeightRaw)
     ? (dashboardHeightRaw[0] as string | undefined)
     : (dashboardHeightRaw as string | undefined);
   const val = String(dashboardHeight || 'regular').toLowerCase();
   const isCompact = val !== 'tall';
 
-  console.log(`Creating dashboard post. heightSetting="${dashboardHeight}", isCompact=${isCompact}`);
+  let initialFlairId: string | undefined = liveFlairId && liveFlairId.trim() ? liveFlairId.trim() : undefined;
+  let initialFlairText: string | undefined = undefined;
 
-  const post = await reddit.submitCustomPost({
+  if (enableDynamicFlair) {
+    const isLive = isLiveNow !== undefined ? isLiveNow === 'true' : isLivePinned === 'true';
+    if (isLive) {
+      const gameName = dashboardGame ? dashboardGame.trim() : '';
+      const viewers = dashboardViewers ? parseInt(dashboardViewers, 10) : 0;
+      if (gameName && !isNaN(viewers) && viewers > 0) {
+        const formattedViewers = viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}K` : viewers.toString();
+        initialFlairText = `🔴 LIVE: ${gameName} [${formattedViewers}]`;
+      } else if (gameName) {
+        initialFlairText = `🔴 LIVE: ${gameName}`;
+      } else {
+        initialFlairText = '🔴 LIVE';
+      }
+    } else {
+      initialFlairText = offlineFlairText || '⚫ OFFLINE';
+    }
+  }
+
+  console.log(`Creating dashboard post. heightSetting="${dashboardHeight}", isCompact=${isCompact}, initialFlair="${initialFlairText || 'none'}"`);
+
+  const customPostOptions: any = {
     subredditName: subreddit.name,
     title: dashboardTitle,
     entry: isCompact ? 'default' : 'tall',
@@ -2369,7 +2411,11 @@ export const createDashboardPost = async (): Promise<string> => {
       height: (isCompact ? 'REGULAR' : 'TALL') as any,
       heightPixels: isCompact ? 320 : 512,
     } as any,
-  });
+  };
+  if (initialFlairId) customPostOptions.flairId = initialFlairId;
+  if (initialFlairText) customPostOptions.flairText = initialFlairText;
+
+  const post = await reddit.submitCustomPost(customPostOptions);
 
   await redis.set('dashboard_post_id', post.id);
   await pinPostWithFallback(post.id);
